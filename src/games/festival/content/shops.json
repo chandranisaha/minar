@@ -1,7 +1,0 @@
-[
-  { "id": "daamfix", "sticker": 1.0, "quality": "good", "haggle": "none" },
-  { "id": "chacha", "sticker": 1.1, "quality": "good", "haggle": "friendly", "haggleTo": 0.97 },
-  { "id": "aunty", "sticker": 1.3, "quality": "good", "haggle": "tough", "haggleTo": 1.05, "haggleChance": 0.6 },
-  { "id": "megasale", "sticker": 1.15, "quality": "good", "haggle": "tenoff", "was": 2 },
-  { "id": "sasta", "sticker": 0.65, "quality": "low", "haggle": "friendly", "haggleTo": 0.58 }
-]

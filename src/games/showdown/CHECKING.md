@@ -25,7 +25,7 @@ npm run build     # must end with "✓ built"
 npm run dev
 ```
 
-Open the game (Festival Showdown is now the default at `/play/plan`; the old Countdown is at `/play/plan?old` until it is deleted):
+Open the game:
 
 http://localhost:5173/play/plan
 

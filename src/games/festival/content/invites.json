@@ -1,7 +1,0 @@
-[
-  { "id": "wheel", "from": "arjun", "yes": 60, "swap": 0 },
-  { "id": "kulfi", "from": "ayesha", "yes": 40, "swap": 15 },
-  { "id": "biryani", "from": "arjun", "yes": 160, "swap": 80 },
-  { "id": "loan", "from": "sunny", "yes": 100, "swap": 50, "loan": true, "noFriendship": -3 },
-  { "id": "covers", "from": "arjun", "yes": 120, "swap": 0 }
-]

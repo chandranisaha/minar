@@ -7,33 +7,16 @@ import { TitleCard } from '../components/TitleCard'
 import { useGame } from '../store/game'
 import { saveResult } from '../lib/gameResult'
 
-const FestivalCountdown = lazy(() => import('../games/festival/FestivalCountdown'))
 const ShowdownGame = lazy(() => import('../games/showdown/ShowdownGame'))
 
-/** Pillar 1. `?demo` starts Demo mode (seed DEMO); `?cohort=CODE` tags the result for the NGO view. */
+/** Pillar 1: Festival Showdown. `?cohort=CODE` tags the result for the NGO view. */
 function PlanGame() {
   const nav = useNavigate()
   const [params] = useSearchParams()
   const complete = useGame((s) => s.completePillar)
-  // the new Festival Showdown is the Plan & Budget game; ?old opens the previous Countdown until it is deleted
-  if (!params.has('old')) {
-    return (
-      <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
-        <ShowdownGame
-          cohortCode={params.get('cohort') ?? 'local'}
-          onComplete={(r) => {
-            saveResult(r)
-            if (r.minaretLit) complete('plan')
-          }}
-          onExit={() => nav('/')}
-        />
-      </Suspense>
-    )
-  }
   return (
     <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
-      <FestivalCountdown
-        seed={params.has('demo') ? 'DEMO' : undefined}
+      <ShowdownGame
         cohortCode={params.get('cohort') ?? 'local'}
         onComplete={(r) => {
           saveResult(r)
