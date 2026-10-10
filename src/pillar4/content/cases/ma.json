@@ -1,0 +1,47 @@
+{
+  "id": "MA", "kind": "mystery", "variant": "A", "support": "none",
+  "victim": { "name": "Kavya", "age": 17 },
+  "apps": ["messages", "phone", "chatup", "paynow"],
+  "items": [
+    { "id": "MA-M01", "app": "messages", "kind": "sms", "thread": "90XXXXXX55", "time": "Sun 7:02 PM" },
+    { "id": "MA-M02", "app": "messages", "kind": "sms", "thread": "90XXXXXX55", "time": "Sun 7:05 PM" },
+    { "id": "MA-M03", "app": "messages", "kind": "sms", "thread": "90XXXXXX55", "time": "Sun 7:10 PM" },
+    { "id": "MA-M04", "app": "messages", "kind": "sms", "thread": "90XXXXXX55", "time": "Sun 7:12 PM" },
+    { "id": "MA-M05", "app": "messages", "kind": "sms", "thread": "90XXXXXX55", "time": "Sun 7:14 PM" },
+    { "id": "MA-M06", "app": "messages", "kind": "sms", "thread": "90XXXXXX55", "time": "Sun 7:46 PM" },
+    { "id": "MA-M07", "app": "messages", "kind": "sms", "thread": "Amma" },
+    { "id": "MA-M08", "app": "messages", "kind": "sms", "thread": "Sunrise Junior College", "role": "herring" },
+    { "id": "MA-P01", "app": "phone", "kind": "call", "dir": "out", "role": "context", "explainKey": "MA-C01.explain" },
+    { "id": "MA-P02", "app": "phone", "kind": "call" },
+    { "id": "MA-C01", "app": "chatup", "kind": "chat", "thread": "Kiran (saved)", "time": "Sun 7:41 PM", "role": "context" },
+    { "id": "MA-C02", "app": "chatup", "kind": "chat", "thread": "Family group" },
+    { "id": "MA-C03", "app": "chatup", "kind": "chat", "thread": "Class group" },
+    { "id": "MA-N01", "app": "paynow", "kind": "payees" },
+    { "id": "MA-N02", "app": "paynow", "kind": "history", "time": "Sat" },
+    { "id": "MA-N03", "app": "paynow", "kind": "history", "time": "Fri", "role": "herring" }
+  ],
+  "clues": [
+    { "id": "MA-01", "kind": "required", "reason": "pretend", "distractors": ["too_good", "threat"], "step": 1, "targets": ["MA-M01"] },
+    { "id": "MA-02", "kind": "required", "reason": "secret", "alsoAccepted": ["pretend"], "distractors": ["too_good", "grab"], "step": 2, "targets": ["MA-M02"] },
+    { "id": "MA-03", "kind": "required", "reason": "rushing", "distractors": ["too_good", "secret"], "step": 3, "targets": ["MA-M03"] },
+    { "id": "MA-04", "kind": "required", "reason": "grab", "distractors": ["too_good", "secret"], "step": 4, "targets": ["MA-N01", "MA-M04"] },
+    { "id": "MA-05", "kind": "required", "reason": "secret", "distractors": ["too_good", "grab"], "step": 5, "targets": ["MA-M06"] },
+    { "id": "MA-G1", "kind": "gold", "reason": "secret", "alsoAccepted": ["rushing"], "distractors": ["grab", "threat"], "step": 3, "targets": ["MA-M05"] }
+  ],
+  "leads": [],
+  "fix": {
+    "qKey": "MA.fix.q",
+    "options": [
+      { "key": "MA.fix.a", "correct": false, "whyKey": "MA.fix.a.why" },
+      { "key": "MA.fix.b", "correct": true, "whyKey": "MA.fix.b.why" },
+      { "key": "MA.fix.c", "correct": false, "whyKey": "MA.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 1, "captionKey": "MA-01.explain" },
+    { "step": 2, "captionKey": "MA-02.explain" },
+    { "step": 3, "captionKey": "MA-03.explain" },
+    { "step": 4, "captionKey": "MA-04.explain" },
+    { "step": 5, "captionKey": "MA-05.explain" }
+  ]
+}

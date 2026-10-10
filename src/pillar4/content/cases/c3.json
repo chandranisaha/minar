@@ -1,0 +1,93 @@
+{
+  "id": "C3", "kind": "case", "support": "independent",
+  "victim": { "name": "Ramesh", "age": 45 },
+  "apps": ["messages", "phone", "chatup", "instaglam", "paynow", "settings"],
+  "items": [
+    { "id": "C3-M01", "app": "messages", "kind": "sms", "thread": "FASTTRK", "time": "Sat", "role": "herring" },
+    { "id": "C3-M02", "app": "messages", "kind": "sms", "thread": "PAYNOW-INFO", "time": "Wed", "role": "context" },
+    { "id": "C3-M03", "app": "messages", "kind": "sms", "thread": "Mr. Prasad (Office)" },
+    { "id": "C3-M04", "app": "messages", "kind": "sms", "thread": "Lakshmi (wife)", "time": "Mon 11:40 AM and 12:20 PM", "role": "context", "explainKey": "C3-M04.explain" },
+    { "id": "C3-M05", "app": "messages", "kind": "sms", "thread": "VM-PNOW", "time": "Mon 12:32 PM", "role": "context" },
+    { "id": "C3-M06", "app": "messages", "kind": "sms", "thread": "Electricity Board", "role": "herring" },
+
+    { "id": "C3-P01", "app": "phone", "kind": "call", "linkKey": "num30" },
+    { "id": "C3-P02", "app": "phone", "kind": "call", "linkKey": "num30" },
+    { "id": "C3-P03", "app": "phone", "kind": "call", "role": "context", "explainKey": "C3-M04.explain" },
+    { "id": "C3-P04", "app": "phone", "kind": "call", "role": "context", "explainKey": "C3-M04.explain" },
+    { "id": "C3-P05", "app": "phone", "kind": "call", "role": "context", "explainKey": "C3-M04.explain" },
+    { "id": "C3-P06", "app": "phone", "kind": "call", "role": "herring", "explainKey": "C3-P06.explain" },
+    { "id": "C3-P07", "app": "phone", "kind": "call", "dir": "out", "linkKey": "num30" },
+    { "id": "C3-P01-R1", "app": "phone", "kind": "caption", "thread": "C3-P01" },
+    { "id": "C3-P01-R2", "app": "phone", "kind": "caption", "thread": "C3-P01" },
+    { "id": "C3-P02-R1", "app": "phone", "kind": "caption", "thread": "C3-P02" },
+
+    { "id": "C3-CH01", "app": "chatup", "kind": "videocall", "thread": "Inspector Rao (Central Crime Cell)", "time": "Mon 11:20 AM" },
+    { "id": "C3-V1", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-V2", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-V3", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-V4", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-V5", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-V6", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-V7", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-F1", "app": "chatup", "kind": "highlight", "thread": "C3-CH01", "zones": [ { "id": "C3-F1", "zoomKey": "C3-F1.zoom" } ] },
+    { "id": "C3-F2", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-F3", "app": "chatup", "kind": "highlight", "thread": "C3-CH01" },
+    { "id": "C3-CH02a", "app": "chatup", "kind": "chat", "thread": "Inspector Rao", "time": "Mon 11:15 AM" },
+    { "id": "C3-CH02b", "app": "chatup", "kind": "chat", "thread": "Inspector Rao", "time": "Mon 12:10 PM" },
+    { "id": "C3-CH03", "app": "chatup", "kind": "chat", "thread": "Lakshmi", "role": "context", "explainKey": "C3-M04.explain" },
+    { "id": "C3-CH04", "app": "chatup", "kind": "chat", "thread": "Kiran (son)" },
+    { "id": "C3-CH05", "app": "chatup", "kind": "chat", "thread": "Office group" },
+    { "id": "C3-CH06", "app": "chatup", "kind": "chat", "thread": "Sai Tuition Centre", "role": "herring", "explainKey": "C3-P06.explain" },
+
+    { "id": "C3-S01", "app": "settings", "kind": "perm", "thread": "PayNow" },
+    { "id": "C3-S02", "app": "settings", "kind": "perm", "thread": "ChatUp" },
+    { "id": "C3-S03", "app": "settings", "kind": "perm", "thread": "InstaGlam" },
+    { "id": "C3-S04", "app": "settings", "kind": "perm", "thread": "Camera", "role": "herring" },
+    { "id": "C3-S05", "app": "settings", "kind": "perm", "thread": "Calculator" },
+    { "id": "C3-S06", "app": "settings", "kind": "perm", "thread": "SupportView" },
+
+    { "id": "C3-PN01", "app": "paynow", "kind": "history", "time": "Mon 12:32 PM" },
+    { "id": "C3-PN02", "app": "paynow", "kind": "history", "time": "Sat", "role": "herring", "explainKey": "C3-P06.explain" },
+    { "id": "C3-PN03", "app": "paynow", "kind": "history", "time": "Fri", "role": "herring", "explainKey": "C3-P06.explain" },
+    { "id": "C3-PN04", "app": "paynow", "kind": "history", "time": "Wed" },
+    { "id": "C3-PN05", "app": "paynow", "kind": "payees" },
+
+    { "id": "C3-IG01", "app": "instaglam", "kind": "feed" },
+    { "id": "C3-IG02", "app": "instaglam", "kind": "page", "thread": "Following" }
+  ],
+  "clues": [
+    { "id": "C3-01", "kind": "required", "reason": "threat", "alsoAccepted": ["pretend"], "distractors": ["too_good", "secret"], "step": 1, "targets": ["C3-P01-R1", "C3-P01-R2"] },
+    { "id": "C3-02", "kind": "required", "reason": "pretend", "alsoAccepted": ["threat"], "distractors": ["too_good", "rushing"], "step": 2, "targets": ["C3-V1", "C3-P02-R1"] },
+    { "id": "C3-03", "kind": "required", "reason": "secret", "alsoAccepted": ["threat"], "distractors": ["too_good", "grab"], "step": 3, "targets": ["C3-V4", "C3-CH02a", "C3-V7"] },
+    { "id": "C3-04", "kind": "required", "reason": "grab", "distractors": ["too_good", "rushing"], "step": 4, "targets": ["C3-S06", "C3-V5", "C3-CH02b"] },
+    { "id": "C3-05", "kind": "required", "reason": "grab", "distractors": ["too_good", "rushing"], "step": 4, "targets": ["C3-PN01", "C3-V6", "C3-F3", "C3-PN05"] },
+    { "id": "C3-06", "kind": "required", "reason": "secret", "distractors": ["too_good", "rushing"], "step": 5, "targets": ["C3-P07"] },
+    { "id": "C3-G1", "kind": "gold", "reason": "threat", "alsoAccepted": ["rushing"], "distractors": ["too_good", "grab"], "step": 3, "targets": ["C3-V3", "C3-V2"] },
+    { "id": "C3-G2", "kind": "gold", "reason": "pretend", "distractors": ["too_good", "rushing"], "step": 2, "targets": ["C3-F1", "C3-F2"] },
+    { "id": "C3-X1", "kind": "connect", "step": 5, "linkKey": "num30", "targets": [] }
+  ],
+  "leads": [
+    { "id": "C3-L1", "clueId": "C3-01", "glowApp": "phone", "pulseTarget": "C3-P01-R1" },
+    { "id": "C3-L2", "clueId": "C3-02", "glowApp": "chatup", "pulseTarget": "C3-V1" },
+    { "id": "C3-L3", "clueId": "C3-03", "glowApp": "chatup", "pulseTarget": "C3-V4" },
+    { "id": "C3-L4", "clueId": "C3-04", "glowApp": "settings", "pulseTarget": "C3-S06" },
+    { "id": "C3-L5", "clueId": "C3-05", "glowApp": "paynow", "pulseTarget": "C3-PN01" },
+    { "id": "C3-L6", "clueId": "C3-06", "glowApp": "phone", "pulseTarget": "C3-P07" }
+  ],
+  "fix": {
+    "qKey": "C3.fix.q",
+    "shield": "pause",
+    "options": [
+      { "key": "C3.fix.a", "correct": false, "whyKey": "C3.fix.a.why" },
+      { "key": "C3.fix.b", "correct": false, "whyKey": "C3.fix.b.why" },
+      { "key": "C3.fix.c", "correct": true, "whyKey": "C3.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 1, "captionKey": "C3.replay.1" },
+    { "step": 2, "captionKey": "C3.replay.2" },
+    { "step": 3, "captionKey": "C3.replay.3" },
+    { "step": 4, "captionKey": "C3.replay.4" },
+    { "step": 5, "captionKey": "C3.replay.5" }
+  ]
+}

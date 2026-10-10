@@ -1,9 +1,13 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PILLARS, SKILLS, type PillarId } from '../content/data'
 import { TopHud } from '../components/Hud'
 import { TitleCard } from '../components/TitleCard'
 import { useGame } from '../store/game'
+
+// Pillar 4 (Stay Financially Safe) lives in src/pillar4 and is loaded only when its doorway is entered.
+const Pillar4 = lazy(() => import('../pillar4/Pillar4'))
 
 /** Simple line icons, no text: bangle, chai cup, pearl, phone. */
 function PillarIcon({ id }: { id: PillarId }) {
@@ -39,8 +43,13 @@ export default function Play() {
   const nav = useNavigate()
   const completed = useGame((s) => s.completedPillars)
   const complete = useGame((s) => s.completePillar)
+  const lang = useGame((s) => s.language)
+  const persona = useGame((s) => s.persona)
+  const gender = useGame((s) => s.gender)
+  const setLanguage = useGame((s) => s.setLanguage)
   const p = PILLARS.find((x) => x.id === pillar)
   if (!p) return <Navigate to="/" replace />
+  if (p.id === 'safe') return <Suspense fallback={null}><Pillar4 language={lang} setLanguage={setLanguage} avatarSrc={persona ? `/art/avatar/${gender}-${persona}-face.webp` : undefined} onExit={() => nav('/')} onComplete={() => complete('safe')} /></Suspense>
   const id: PillarId = p.id
   const done = completed.includes(id)
   return (
