@@ -8,12 +8,20 @@ import { useGame } from '../store/game'
 import { saveResult } from '../lib/gameResult'
 
 const FestivalCountdown = lazy(() => import('../games/festival/FestivalCountdown'))
+const ShowdownGame = lazy(() => import('../games/showdown/ShowdownGame'))
 
 /** Pillar 1. `?demo` starts Demo mode (seed DEMO); `?cohort=CODE` tags the result for the NGO view. */
 function PlanGame() {
   const nav = useNavigate()
   const [params] = useSearchParams()
   const complete = useGame((s) => s.completePillar)
+  if (params.has('showdown')) {
+    return (
+      <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
+        <ShowdownGame onExit={() => nav('/')} />
+      </Suspense>
+    )
+  }
   return (
     <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
       <FestivalCountdown
