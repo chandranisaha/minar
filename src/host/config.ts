@@ -19,6 +19,7 @@ export const GAME_FOLDERS: Record<PillarId, string> = {
 export const GAME_ENTRIES: Partial<Record<PillarId, { file: string }>> = {
   plan: { file: 'FestivalCountdown' },
   save: { file: 'PayRun' },
+  safe: { file: 'Pillar4' },
 }
 
 /** the order pillars are offered after a game ends ("Continue" goes to the next unfinished one) */

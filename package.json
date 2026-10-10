@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run p4:validate && tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "art": "python tools/import_art.py",
     "check:tokens": "node tools/check-tokens.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "p4:validate": "node --experimental-strip-types --no-warnings tools/p4-validate.mjs",
+    "p4:test": "node --experimental-strip-types --no-warnings --test tools/p4-tests/engine.test.ts tools/p4-tests/audit.test.ts"
   },
   "dependencies": {
     "@fontsource/bowlby-one": "^5.3.0",

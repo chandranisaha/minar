@@ -1,0 +1,85 @@
+{
+  "id": "C2", "kind": "case", "support": "half",
+  "victim": { "name": "Imran", "age": 18 },
+  "apps": ["messages", "phone", "chatup", "instaglam", "paynow"],
+  "items": [
+    { "id": "C2-M01", "app": "messages", "kind": "sms", "thread": "Bhai (brother)" },
+    { "id": "C2-M02", "app": "messages", "kind": "sms", "thread": "JOBPORT", "role": "herring" },
+    { "id": "C2-M03", "app": "messages", "kind": "sms", "thread": "VM-PNOW", "time": "Fri 10:26 AM", "role": "context", "explainKey": "C2-M03.explain" },
+    { "id": "C2-M04", "app": "messages", "kind": "sms", "thread": "VM-PNOW", "time": "Fri 4:10 PM", "role": "context", "explainKey": "C2-M03.explain" },
+    { "id": "C2-M05", "app": "messages", "kind": "sms", "thread": "Coaching Centre", "role": "herring" },
+    { "id": "C2-M06", "app": "messages", "kind": "sms", "thread": "Amma" },
+    { "id": "C2-M07", "app": "messages", "kind": "sms", "thread": "TEL-OFFER", "role": "herring" },
+
+    { "id": "C2-P01", "app": "phone", "kind": "call" },
+    { "id": "C2-P02", "app": "phone", "kind": "call", "dir": "out" },
+    { "id": "C2-P03", "app": "phone", "kind": "call" },
+    { "id": "C2-P04", "app": "phone", "kind": "call", "role": "herring", "explainKey": "C2-M05.explain" },
+    { "id": "C2-P05", "app": "phone", "kind": "call" },
+
+    { "id": "C2-CH01a", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)", "time": "Thu 8:22 PM" },
+    { "id": "C2-CH01b", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)" },
+    { "id": "C2-CH01c", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)", "time": "Fri 10:02 AM", "role": "context" },
+    { "id": "C2-CH01d", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)", "time": "Fri 10:25 AM" },
+    { "id": "C2-CH01e", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)", "time": "Fri 4:30 PM" },
+    { "id": "C2-CH01f", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)", "time": "Fri 6:45 PM" },
+    { "id": "C2-CH01g", "app": "chatup", "kind": "chat", "thread": "Priya HR (WorkNest Global)", "time": "Sat 9:00 AM" },
+    { "id": "C2-CH01p", "app": "chatup", "kind": "profile", "thread": "Priya HR (WorkNest Global)" },
+    { "id": "C2-CH02a", "app": "chatup", "kind": "chat", "thread": "WorkNest Earners 12 (247 members)" },
+    { "id": "C2-CH02b", "app": "chatup", "kind": "chat", "thread": "WorkNest Earners 12 (247 members)" },
+    { "id": "C2-CH02c", "app": "chatup", "kind": "chat", "thread": "WorkNest Earners 12 (247 members)", "time": "Fri 3:00 PM" },
+    { "id": "C2-CH02d", "app": "chatup", "kind": "chat", "thread": "WorkNest Earners 12 (247 members)", "time": "Pinned" },
+    { "id": "C2-CH02e", "app": "chatup", "kind": "chat", "thread": "WorkNest Earners 12 (247 members)", "time": "Sat 9:00 AM" },
+    { "id": "C2-CH03", "app": "chatup", "kind": "chat", "thread": "Bhai", "role": "herring" },
+    { "id": "C2-CH04", "app": "chatup", "kind": "chat", "thread": "Coaching batch group" },
+    { "id": "C2-CH05", "app": "chatup", "kind": "chat", "thread": "Amma" },
+
+    { "id": "C2-IG01", "app": "instaglam", "kind": "saved", "thread": "worknest.global.jobs" },
+    { "id": "C2-IG02", "app": "instaglam", "kind": "page", "thread": "worknest.global.jobs" },
+    { "id": "C2-IG03", "app": "instaglam", "kind": "dm", "thread": "worknest.global.jobs", "time": "Thu 8:18 PM" },
+    { "id": "C2-IG04", "app": "instaglam", "kind": "feed" },
+    { "id": "C2-IG05", "app": "instaglam", "kind": "dm", "thread": "Bhai" },
+
+    { "id": "C2-PN01", "app": "paynow", "kind": "history", "time": "Fri 4:10 PM", "linkKey": "neha" },
+    { "id": "C2-PN02", "app": "paynow", "kind": "history", "time": "Fri 10:26 AM", "linkKey": "neha" },
+    { "id": "C2-PN03", "app": "paynow", "kind": "history", "time": "Thu", "role": "herring", "explainKey": "C2-PN03.explain" },
+    { "id": "C2-PN04", "app": "paynow", "kind": "history", "time": "Wed", "role": "herring", "explainKey": "C2-PN03.explain" },
+    { "id": "C2-PN05", "app": "paynow", "kind": "history", "time": "Mon" },
+    { "id": "C2-PN06", "app": "paynow", "kind": "payees" }
+  ],
+  "clues": [
+    { "id": "C2-01", "kind": "required", "reason": "too_good", "alsoAccepted": ["rushing"], "distractors": ["pretend", "threat"], "step": 1, "targets": ["C2-IG01", "C2-CH01a"] },
+    { "id": "C2-02", "kind": "required", "reason": "pretend", "distractors": ["rushing", "threat"], "step": 2, "targets": ["C2-CH01b", "C2-CH01p", "C2-IG02"] },
+    { "id": "C2-03", "kind": "required", "reason": "too_good", "distractors": ["rushing", "threat"], "step": 2, "targets": ["C2-PN02", "C2-CH01d"] },
+    { "id": "C2-04", "kind": "required", "reason": "rushing", "alsoAccepted": ["too_good"], "distractors": ["pretend", "secret"], "step": 3, "targets": ["C2-CH02c", "C2-CH01f"] },
+    { "id": "C2-05", "kind": "required", "reason": "grab", "distractors": ["rushing", "pretend"], "step": 4, "targets": ["C2-PN01"] },
+    { "id": "C2-06", "kind": "required", "reason": "secret", "distractors": ["too_good", "grab"], "step": 5, "targets": ["C2-CH02e", "C2-CH01g"] },
+    { "id": "C2-G1", "kind": "gold", "reason": "pretend", "alsoAccepted": ["too_good"], "distractors": ["rushing", "threat"], "step": 2, "targets": ["C2-CH02b"] },
+    { "id": "C2-G2", "kind": "gold", "reason": "secret", "distractors": ["rushing", "grab"], "step": 3, "targets": ["C2-CH01e", "C2-CH02d"] },
+    { "id": "C2-X1", "kind": "connect", "step": 4, "linkKey": "neha", "targets": [] }
+  ],
+  "leads": [
+    { "id": "C2-L1", "clueId": "C2-01", "glowApp": "instaglam", "pulseTarget": "C2-IG01" },
+    { "id": "C2-L2", "clueId": "C2-02", "glowApp": "chatup", "pulseTarget": "C2-CH01b" },
+    { "id": "C2-L3", "clueId": "C2-03", "glowApp": "paynow", "pulseTarget": "C2-PN02" },
+    { "id": "C2-L4", "clueId": "C2-04", "glowApp": "chatup", "pulseTarget": "C2-CH02c" },
+    { "id": "C2-L5", "clueId": "C2-05", "glowApp": "paynow", "pulseTarget": "C2-PN01" },
+    { "id": "C2-L6", "clueId": "C2-06", "glowApp": "chatup", "pulseTarget": "C2-CH02e" }
+  ],
+  "fix": {
+    "qKey": "C2.fix.q",
+    "shield": "verify",
+    "options": [
+      { "key": "C2.fix.a", "correct": false, "whyKey": "C2.fix.a.why" },
+      { "key": "C2.fix.b", "correct": true, "whyKey": "C2.fix.b.why" },
+      { "key": "C2.fix.c", "correct": false, "whyKey": "C2.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 1, "captionKey": "C2.replay.1" },
+    { "step": 2, "captionKey": "C2.replay.2" },
+    { "step": 3, "captionKey": "C2.replay.3" },
+    { "step": 4, "captionKey": "C2.replay.4" },
+    { "step": 5, "captionKey": "C2.replay.5" }
+  ]
+}

@@ -13,6 +13,7 @@ const ENTRY_FILES = import.meta.glob('/src/games/*/*.tsx')
 const WRAPPERS: Partial<Record<PillarId, () => Promise<GameModule>>> = {
   plan: () => import('./wrappers/FestivalGame'),
   save: () => import('./wrappers/PayRunGame'),
+  safe: () => import('./wrappers/CaseFilesGame'),
 }
 
 const REAL_KEY = 'mm-real'
@@ -24,7 +25,7 @@ function realLoader(pillar: PillarId): (() => Promise<GameModule>) | undefined {
   if (hit) return REAL_GAMES[hit]
   const entry = GAME_ENTRIES[pillar]
   const wrapper = WRAPPERS[pillar]
-  return entry && wrapper && `/src/games/${folder}/${entry.file}.tsx` in ENTRY_FILES ? wrapper : undefined
+  return entry && wrapper && (`/src/games/${folder}/${entry.file}.tsx` in ENTRY_FILES || entry.file === 'Pillar4') ? wrapper : undefined
 }
 
 export const hasRealGame = (pillar: PillarId): boolean => realLoader(pillar) !== undefined

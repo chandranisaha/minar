@@ -223,13 +223,12 @@ describe('registry', () => {
       expect(e.placeholder).toBe(PLACEHOLDERS[id])
     }
   })
-  it('uses the real game where one exists (Festival Countdown, Pay Run) and the placeholder where not yet', async () => {
+  it('uses the real game where one exists (Festival Countdown, Pay Run, Case Files) and the placeholder where not yet', async () => {
     expect(hasRealGame('plan')).toBe(true)
     expect(hasRealGame('save')).toBe(true)
-    for (const id of ['invest', 'safe'] as const) {
-      expect(hasRealGame(id)).toBe(false)
-      expect((await PILLAR_GAMES[id].load()).default).toBe(PILLAR_GAMES[id].placeholder)
-    }
+    expect(hasRealGame('safe')).toBe(true)
+    expect(hasRealGame('invest')).toBe(false)
+    expect((await PILLAR_GAMES.invest.load()).default).toBe(PILLAR_GAMES.invest.placeholder)
   })
   it('each pillar maps to its own folder name', () => {
     expect(new Set(Object.values(GAME_FOLDERS)).size).toBe(4)

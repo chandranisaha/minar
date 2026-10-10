@@ -1,0 +1,47 @@
+{
+  "id": "MB", "kind": "mystery", "variant": "B", "support": "none",
+  "victim": { "name": "Sana", "age": 17 },
+  "apps": ["messages", "chatup", "paynow"],
+  "items": [
+    { "id": "MB-C08", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Earlier", "role": "context" },
+    { "id": "MB-C01", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Fri 9:41 PM" },
+    { "id": "MB-C02", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Fri 9:41 PM" },
+    { "id": "MB-C03", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Fri 9:42 PM" },
+    { "id": "MB-C04", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Fri 9:43 PM" },
+    { "id": "MB-C05", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Fri 9:50 PM" },
+    { "id": "MB-C06", "app": "chatup", "kind": "chat", "thread": "Zoya", "time": "Fri 9:44 PM" },
+    { "id": "MB-C07", "app": "chatup", "kind": "chat", "thread": "Class 12-B group", "time": "Fri 10:30 PM", "role": "context" },
+    { "id": "MB-C10", "app": "chatup", "kind": "chat", "thread": "Class 12-B group" },
+    { "id": "MB-C09", "app": "chatup", "kind": "chat", "thread": "Amma" },
+    { "id": "MB-M01", "app": "messages", "kind": "sms", "thread": "CHATUP-OTP", "time": "Fri 9:43 PM", "role": "context" },
+    { "id": "MB-M02", "app": "messages", "kind": "sms", "thread": "Amma" },
+    { "id": "MB-M03", "app": "messages", "kind": "sms", "thread": "Sunrise Junior College", "role": "herring" },
+    { "id": "MB-N01", "app": "paynow", "kind": "history", "role": "herring" },
+    { "id": "MB-N02", "app": "paynow", "kind": "summary" },
+    { "id": "MB-N03", "app": "paynow", "kind": "history", "time": "Thu", "role": "herring" }
+  ],
+  "clues": [
+    { "id": "MB-01", "kind": "required", "reason": "pretend", "distractors": ["too_good", "threat"], "step": 1, "targets": ["MB-C01"] },
+    { "id": "MB-02", "kind": "required", "reason": "secret", "alsoAccepted": ["pretend"], "distractors": ["too_good", "grab"], "step": 2, "targets": ["MB-C02"] },
+    { "id": "MB-03", "kind": "required", "reason": "rushing", "distractors": ["pretend", "threat"], "step": 3, "targets": ["MB-C03"] },
+    { "id": "MB-04", "kind": "required", "reason": "grab", "distractors": ["too_good", "secret"], "step": 4, "targets": ["MB-C04"] },
+    { "id": "MB-05", "kind": "required", "reason": "secret", "distractors": ["too_good", "grab"], "step": 5, "targets": ["MB-C05"] },
+    { "id": "MB-G1", "kind": "gold", "reason": "pretend", "alsoAccepted": ["rushing"], "distractors": ["too_good", "grab"], "step": 2, "targets": ["MB-C06"] }
+  ],
+  "leads": [],
+  "fix": {
+    "qKey": "MB.fix.q",
+    "options": [
+      { "key": "MB.fix.a", "correct": false, "whyKey": "MB.fix.a.why" },
+      { "key": "MB.fix.b", "correct": true, "whyKey": "MB.fix.b.why" },
+      { "key": "MB.fix.c", "correct": false, "whyKey": "MB.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 1, "captionKey": "MB-01.explain" },
+    { "step": 2, "captionKey": "MB-02.explain" },
+    { "step": 3, "captionKey": "MB-03.explain" },
+    { "step": 4, "captionKey": "MB-04.explain" },
+    { "step": 5, "captionKey": "MB-05.explain" }
+  ]
+}
