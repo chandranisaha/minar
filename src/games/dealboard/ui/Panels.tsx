@@ -34,7 +34,7 @@ export function MarketLine({ banner }: { banner: Banner }) {
   const text = banner.key === 'sectorRally' ? t('news.sectorRally', { sector: t(`sectors.${banner.sector}`) }) : t(`news.${banner.key}`)
   const down = banner.marketShock < 0
   return (
-    <div className="flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2" style={{ background: down ? '#F5D9CF' : '#E4EDCF' }}>
+    <div className={`flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2 ${down ? 'db-flash red' : 'db-flash green'}`} style={{ background: down ? '#F5D9CF' : '#E4EDCF' }} role="status">
       <span className="font-sign text-[16px] leading-none" style={{ color: down ? '#C8442F' : '#2f6f4a' }} aria-hidden>{down ? '▼' : '▲'}</span>
       <span className="text-[14px] font-semibold leading-snug"><span className="font-extrabold">{t('desk.market')}: </span>{text}</span>
     </div>
@@ -46,6 +46,17 @@ export function Stat({ label, value, strong }: { label: string; value: string; s
     <div className="flex min-w-0 flex-col leading-none">
       <span className="text-[10px] font-extrabold uppercase tracking-[.14em] opacity-60">{label}</span>
       <span className={`mt-1 truncate ${strong ? 'font-sign text-[14px] sm:text-[16px]' : 'text-[13px] font-extrabold sm:text-[14px]'}`}>{value}</span>
+    </div>
+  )
+}
+
+/** A short flashing strip for a wildcard: a rival entering, or anything the player did not see coming. */
+export function AlertStrip({ children, tag }: { children: React.ReactNode; tag?: string }) {
+  const { t } = useTranslation('dealboard')
+  return (
+    <div className="db-flash red flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2" style={{ background: '#F5D9CF' }} role="status">
+      <span className="font-sign mt-0.5 rounded border-2 border-ink bg-[#C8442F] px-1.5 text-[10px] leading-5 text-jasmine">{tag ?? t('alert.tag')}</span>
+      <span className="text-[14px] font-semibold leading-snug">{children}</span>
     </div>
   )
 }

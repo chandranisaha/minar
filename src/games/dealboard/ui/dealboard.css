@@ -176,3 +176,17 @@ button.db-lot.glow { box-shadow: 0 0 0 3px #E5457A, 3px 3px 0 3px var(--color-in
 .db-info-btn:hover > span, .db-info-btn[aria-expanded="true"] > span { background: var(--brass); }
 .db-info-btn:focus-visible { outline: 4px solid var(--color-pink); outline-offset: -4px; border-radius: 12px; }
 .db-info-panel { margin-top: 4px; padding: 8px 12px; background: #F6E6BE; border: 2px solid var(--color-ink); border-radius: 8px; font-size: 13px; line-height: 1.4; font-weight: 600; }
+
+/* company tiles: keep mark, name and gain from piling into the colour band on small screens */
+.db-lot { justify-content: center; padding: 20% 2px 3px; gap: 2px; }
+.db-lot .label { font-size: clamp(8px, 2.3vw, 12px); line-height: 1.1; word-break: break-word; }
+.db-lot .badge { font-size: clamp(8px, 2.2vw, 11px); line-height: 1; white-space: nowrap; }
+@media (max-width: 520px) { .db-lot .lotmark { display: none; } }
+
+/* wildcards and market moves flash three times, then settle: minimal, steps not fades */
+@keyframes db-flash-red { 0%,100% { box-shadow: 0 0 0 0 rgba(200,68,47,0) } 50% { box-shadow: 0 0 0 4px rgba(200,68,47,.55) } }
+@keyframes db-flash-green { 0%,100% { box-shadow: 0 0 0 0 rgba(47,111,74,0) } 50% { box-shadow: 0 0 0 4px rgba(47,111,74,.45) } }
+.db-flash.red { animation: db-flash-red .7s steps(2, jump-none) 3; }
+.db-flash.green { animation: db-flash-green .7s steps(2, jump-none) 3; }
+html[data-lite="true"] .db-flash { animation: none; }
+@media (prefers-reduced-motion: reduce) { .db-flash { animation: none; } }

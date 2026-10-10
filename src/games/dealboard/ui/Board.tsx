@@ -71,7 +71,7 @@ export function Board({ run, m, tokenAt, pitching, onOpen, children }: { run: Ru
             onClick={() => { setHover(null); onOpen(id) }}
           >
             <span className="band" style={{ background: SECTOR_COLOUR[COMPANY[id].sector] }} />
-            {met || own ? <Mark id={id} size={22} /> : <span className="font-sign grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border-[2.5px] border-dashed border-ink/50 text-[12px] opacity-70" aria-hidden>?</span>}
+            <span className="lotmark">{met || own ? <Mark id={id} size={22} /> : <span className="font-sign grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border-[2.5px] border-dashed border-ink/50 text-[12px] opacity-70" aria-hidden>?</span>}</span>
             <span className="label lang-fit">{t(`companies.${id}.name`)}</span>
             {own && g !== null ? <span className="badge" style={{ color: g >= 0 ? '#2f6f4a' : '#C8442F' }}>{g >= 0 ? '▲' : '▼'}{Math.abs(g * 100).toFixed(0)}%</span> : glow ? <span className="badge" style={{ color: '#B8473A' }}>{t('lotState.pitching')}</span> : null}
           </button>

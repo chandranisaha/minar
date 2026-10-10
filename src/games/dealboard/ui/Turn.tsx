@@ -11,7 +11,8 @@ import { Mark } from './Companies'
 import { InfoHeader } from './InfoTip'
 import { LessonCard } from './LessonCard'
 import { LightChip, MiniChart, lightFacts } from './Lights'
-import { MarketLine, Sheet, useInr } from './Panels'
+import { AlertStrip, MarketLine, Sheet, useInr } from './Panels'
+import { rivalAlerts } from '../engine/rivals'
 import { ReviewCard } from './Review'
 import { ASK_STATS, StatRow } from './Stats'
 import type { TradeMode } from './TradeDialog'
@@ -154,6 +155,7 @@ function LastQuarter({ run, m, onOpen }: { run: RunState; m: MarketRun; onOpen: 
     <section className="space-y-2">
       <div className="db-eyebrow text-[#8a5a2b]">{t('desk.last')}</div>
       <MarketLine banner={m.banners[q - 1]} />
+      {rivalAlerts(m, q).map((rid) => <AlertStrip key={rid}>{t('alert.rival', { name: t(`companies.${rid}.name`) })}</AlertStrip>)}
       {entries.map((e) => <ReviewCard key={e.id} entry={e} defaultOpen={e.verdict !== 'good' || run.log.length <= 1} />)}
       {ids.map((id) => {
         const { move, reasons } = explainQuarter(m, id, q)
@@ -218,7 +220,7 @@ function Emergency({ run, m, dispatch, onTrade }: { run: RunState; m: MarketRun;
   const ids = Object.keys(run.holdings) as CompanyId[]
   return (
     <Sheet eyebrow={t('emergency.eyebrow')} title={t('emergency.title')} tone="#C8442F" actions={<button type="button" className="ink-btn pink" disabled={short > 0 && ids.length > 0} style={{ opacity: short > 0 && ids.length > 0 ? 0.5 : 1 }} onClick={() => dispatch({ type: 'payEmergency' })}>{short > 0 ? t('emergency.payShort') : t('emergency.pay')}</button>}>
-      <p className="m-0">{t('emergency.body')}</p>
+      <div className="mb-2"><AlertStrip tag={t('alert.wild')}>{t('emergency.body')}</AlertStrip></div>
       <p className="m-0 mt-1 font-bold">{t('emergency.have', { cash: money(run.cash) })} · {short > 0 ? t('emergency.short', { x: money(short) }) : t('emergency.ready')}</p>
       {short > 0 && ids.length === 0 && <p className="m-0 text-[13px] opacity-75">{t('emergency.payShortNote')}</p>}
       <ul className="m-0 mt-2 list-none space-y-1.5 p-0">

@@ -185,5 +185,10 @@
       "needCash": "I need the cash",
       "forced": "I have to pay the family emergency"
     }
+  },
+  "alert": {
+    "tag": "Market alert",
+    "wild": "Wildcard",
+    "rival": "A new rival has started winning {{name}}’s customers. More are leaving than joining."
   }
 }
