@@ -19,11 +19,11 @@ export function floorFor(i: ItemId, s: StallId, day: Day): number | null {
   return round10(item(i).base * dayMul(day) * stall(s).floor)
 }
 
-/** Mega Sale's fake "was" price: double the sticker. */
+/** Mega Sale's fake "was" price: double the unrounded sticker (base x1.15 x2), as in the spec's day-1 table. */
 export function wasPriceFor(i: ItemId, s: StallId, day: Day): number | null {
-  const p = priceFor(i, s, day)
   const w = stall(s).wasMultiplier
-  return p != null && w ? round10(p * w) : null
+  if (!sells(s, i) || !w) return null
+  return round10(item(i).base * dayMul(day) * stall(s).sticker * w)
 }
 
 /** The Daam Fix day-1 price is the yardstick for "smart shopping". */

@@ -19,7 +19,7 @@ describe('prices', () => {
   test('Mega Sale "was" prices are double', () => {
     expect(wasPriceFor('decor', 'megasale', 1)).toBe(280)
     expect(wasPriceFor('outfit', 'megasale', 1)).toBe(920)
-    expect(wasPriceFor('gift', 'megasale', 1)).toBe(700) // spec shows ₹690; 350 x 2 rounds to 700
+    expect(wasPriceFor('gift', 'megasale', 1)).toBe(690)
   })
   test('day multipliers and floors', () => {
     expect(priceFor('outfit', 'daamfix', 3)).toBe(500)
