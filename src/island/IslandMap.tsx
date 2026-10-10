@@ -294,11 +294,12 @@ export function IslandMap() {
 
         {/* buildings: painted cutouts when present (shop-*.webp), a quiet placeholder otherwise. Layered by their base line. */}
         {raw.buildings.map((b) => {
-          const a = art[b.art]
+          const artName = b.id === 'gate' && allDone && art['gate-open'] ? 'gate-open' : b.art
+          const a = art[artName]
           const [bx, by] = px([b.x, b.y])
           if (a) {
             const h = (b.w * a.h) / a.w
-            return <img key={b.id} src={`/art/${b.art}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: bx - b.w / 2, top: by - h, width: b.w, height: h, zIndex: Math.round(by), pointerEvents: 'none' }} />
+            return <img key={b.id} src={`/art/${artName}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: bx - b.w / 2, top: by - h, width: b.w, height: h, zIndex: Math.round(by), pointerEvents: 'none' }} />
           }
           return (
             <svg key={b.id} width={WORLD.w} height={WORLD.h} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: Math.round(by), pointerEvents: 'none' }} aria-hidden>
@@ -314,7 +315,7 @@ export function IslandMap() {
         {monument && (() => {
           const w = raw.monument.w, h = (w * monument.h) / monument.w
           const [mx, my] = px([raw.monument.x, raw.monument.y])
-          return <img src="/art/monument.webp" alt="" draggable={false} style={{ position: 'absolute', left: mx - w / 2, top: my - h * 0.78, width: w, height: h, zIndex: Math.round(my + 120), pointerEvents: 'none' }} />
+          return <img src="/art/monument.webp" alt="" draggable={false} style={{ position: 'absolute', left: mx - w / 2, top: my - h * 0.78, width: w, height: h, zIndex: Math.round(my - 10), pointerEvents: 'none' }} />
         })()}
 
         {/* places: marker flag + hit area. Positions come from island.json; swapping art never breaks them. */}

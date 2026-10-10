@@ -38,5 +38,20 @@
   "w": 900,
   "h": 597,
   "src": "C:\\Users\\maith\\Downloads\\meg26_van\\codebase\\megathon26-sushi-aur-ek\\new_graphics\\Mediterranean Tea Terrace Caf\u00e9.png"
+ },
+ "shop-safe": {
+  "w": 900,
+  "h": 900,
+  "src": "C:\\Users\\maith\\Downloads\\meg26_van\\codebase\\megathon26-sushi-aur-ek\\new_graphics\\Isometric Teal Phone Kiosk.png"
+ },
+ "gate-closed": {
+  "w": 800,
+  "h": 805,
+  "src": "Twin Fantasy Gates_ Closed and Open.png"
+ },
+ "gate-open": {
+  "w": 800,
+  "h": 806,
+  "src": "Twin Fantasy Gates_ Closed and Open.png"
  }
 }

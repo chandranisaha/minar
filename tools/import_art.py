@@ -13,6 +13,7 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 RULES = [  # (keywords any-of, slot, max width)
+    (['teal phone kiosk'], 'shop-safe', 900),
     (['jewel bazaar'], 'shop-invest', 900),
     (['tea terrace'], 'shop-save', 900),
     (['colourful bangles'], 'shop-plan', 900),
@@ -108,6 +109,15 @@ for fn in sorted(files, key=lambda q: os.path.basename(q)):
     if 'caf' in low and 'character' in low:
         for nm in cut_props(os.path.join(src, fn), CAFE_BOXES, 'char-cafe-'):
             done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
+    if 'twin fantasy gates' in low:
+        g = Image.open(fn).convert('RGBA'); half = g.width // 2
+        for nm, box in (('gate-closed', (0, 0, half, g.height)), ('gate-open', (half, 0, g.width, g.height))):
+            part = g.crop(box); part = part.crop(part.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
+            if part.width > 800: part = part.resize((800, round(part.height * 800 / part.width)), Image.LANCZOS)
+            part.save(os.path.join(out, nm + '.webp'), 'WEBP', quality=88, method=6)
+            manifest[nm] = {'w': part.width, 'h': part.height, 'src': os.path.basename(fn)}
+            done.append((fn, nm, part.size))
         continue
     if 'hacker' in low:
         for nm in cut_props(os.path.join(src, fn), HACKER_BOXES, 'char-hacker-'):
