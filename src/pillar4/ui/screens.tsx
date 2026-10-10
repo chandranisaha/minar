@@ -46,27 +46,48 @@ export function LangToggle() {
   )
 }
 
+const STORY_BEATS = ['b1', 'b2', 'b3', 'b4'] as const
+
+/** the opening: Raju Bhai from the phone kiosk tells the story in a few quick beats (first run only) */
+function Backstory({ onDone, onBack }: { onDone: () => void; onBack: () => void }) {
+  const t = useT()
+  const reduce = useReduceMotion()
+  const [i, setI] = useState(0)
+  const last = i === STORY_BEATS.length - 1
+  return (
+    <Page onBack={onBack} title={t('ui.subtitle')} right={<LangToggle />}>
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 text-center">
+        <img src="/art/npc-kiosk-phone.webp" alt="" draggable={false} className={`h-[34vh] max-h-[280px] object-contain ${reduce ? '' : 'idle'}`} style={{ filter: 'drop-shadow(0 6px 8px rgba(58,42,36,.3))' }} />
+        <div className="p4-chip is-accent">{t('ui.story.name')} · {t('ui.story.role')}</div>
+        <div key={i} className="p4-panel rise w-full max-w-md !p-4 text-left text-[18px] font-semibold leading-snug" role="status">
+          {t(`ui.story.${STORY_BEATS[i]}`)}
+        </div>
+        <div className="flex gap-1.5" aria-hidden>
+          {STORY_BEATS.map((k, n) => <span key={k} style={{ width: n === i ? 22 : 8, height: 8, borderRadius: 4, background: n <= i ? 'var(--p4-accent)' : 'var(--p4-line)', transition: 'width .25s' }} />)}
+        </div>
+        <div className="flex w-full max-w-md gap-2">
+          <button type="button" className="p4-btn" onClick={onDone}>{t('ui.story.skip')}</button>
+          <button type="button" className="p4-btn primary flex-1" autoFocus onClick={() => (last ? onDone() : setI(i + 1))}>{last ? t('ui.story.go') : t('ui.story.next')}</button>
+        </div>
+      </div>
+    </Page>
+  )
+}
+
 // ---- Intro ----------------------------------------------------------------------------------------------
 export function Intro({ onStart, onBack }: { onStart: () => void; onBack: () => void }) {
   const t = useT()
   const profile = usePillar4((s) => s.profile)
   const setProfile = usePillar4((s) => s.setProfile)
+  const [told, setTold] = useState(false)
+  if (!told) return <Backstory onDone={() => setTold(true)} onBack={onBack} />
   return (
     <Page onBack={onBack} title={t('ui.subtitle')} right={<LangToggle />}>
       <div className="flex flex-col gap-5">
         <div>
           <div className="p4-eyebrow">{t('ui.intro.eyebrow')}</div>
           <h1 className="p4-h1 mt-1" style={{ fontSize: 28 }}>{t('ui.title')}</h1>
-          <p className="mt-3 text-[16px] leading-relaxed">{t('ui.intro.body')}</p>
         </div>
-        <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-          {(['inspect', 'tag', 'rebuild', 'decide'] as const).map((k, i) => (
-            <li key={k} className="p4-panel flex gap-3 !p-3">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[14px] font-extrabold" style={{ background: 'var(--p4-accent)', color: 'var(--p4-accent-ink)' }}>{i + 1}</span>
-              <span className="text-[15px] leading-snug"><b>{t(`ui.intro.m.${k}`)}.</b> <span className="p4-muted">{t(`ui.intro.m.${k}.body`)}</span></span>
-            </li>
-          ))}
-        </ul>
         <fieldset className="m-0 border-0 p-0">
           <legend className="p4-eyebrow mb-2">{t('ui.intro.level')}</legend>
           <div className="flex flex-col gap-2">
