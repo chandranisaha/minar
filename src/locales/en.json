@@ -132,11 +132,12 @@
   "celebrate": {
     "title": "Goal reached",
     "body": "The college gate is open. Well done.",
-    "again": "Continue"
+    "again": "Continue",
+    "enter": "Step through the gate"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "body": "Your skills will show up here soon."
+    "title": "Goal reached",
+    "body": "You made it. The college gate is open."
   },
   "lang_notice": "Language",
   "island": {

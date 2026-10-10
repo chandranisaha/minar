@@ -54,3 +54,6 @@ export function ArtSlot({ name, fallback, className, alt = '' }: { name: string;
   if (src) return <img src={src} className={className} alt={alt} draggable={false} />
   return <>{fallback}</>
 }
+
+/** true once the named import exists in the art manifest */
+export const useArtReady = (name: string) => !!useManifest()[name]

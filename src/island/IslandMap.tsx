@@ -40,7 +40,6 @@ export function IslandMap() {
   const { t } = useTranslation()
   const nav = useNavigate()
   const completed = useGame((s) => s.completedPillars)
-  const celebrated = useGame((s) => s.celebrated)
   const setCelebrated = useGame((s) => s.setCelebrated)
   const allDone = completed.length >= 4
   const touch = useTouchUi()
@@ -294,13 +293,24 @@ export function IslandMap() {
 
         {/* buildings: painted cutouts when present (shop-*.webp), a quiet placeholder otherwise. Layered by their base line. */}
         {raw.buildings.map((b) => {
-          const artName = b.id === 'gate' && allDone && art['gate-open'] ? 'gate-open' : b.art
-          const a = art[artName]
           const [bx, by] = px([b.x, b.y])
-          if (a) {
+          const img = (name: string, extra?: React.CSSProperties) => {
+            const a = art[name]
+            if (!a) return null
             const h = (b.w * a.h) / a.w
-            return <img key={b.id} src={`/art/${artName}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: bx - b.w / 2, top: by - h, width: b.w, height: h, zIndex: Math.round(by), pointerEvents: 'none' }} />
+            return <img key={name} src={`/art/${name}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: bx - b.w / 2, top: by - h, width: b.w, height: h, zIndex: Math.round(by), pointerEvents: 'none', ...extra }} />
           }
+          if (b.id === 'gate' && art['gate-closed'] && art['gate-open']) {
+            // the gate swings open (stepped cross-fade + warm glow) once all four lessons are complete
+            return (
+              <div key={b.id}>
+                {allDone && <div className="gate-glow" style={{ position: 'absolute', left: bx - 200, top: by - 330, width: 400, height: 330, zIndex: Math.round(by) - 1, pointerEvents: 'none' }} />}
+                {img('gate-closed')}
+                {img('gate-open', { opacity: allDone ? 1 : 0, transition: 'opacity 1.1s steps(8)', zIndex: Math.round(by) + 1 })}
+              </div>
+            )
+          }
+          if (art[b.art]) return img(b.art)
           return (
             <svg key={b.id} width={WORLD.w} height={WORLD.h} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: Math.round(by), pointerEvents: 'none' }} aria-hidden>
               <g transform={`translate(${bx} ${by}) scale(1.6)`}>
@@ -402,7 +412,7 @@ export function IslandMap() {
             )}
             <div className="mt-3 flex gap-2">
               {card !== 'gate' && <button type="button" className="ink-btn" autoFocus onClick={() => nav(`/play/${card}`)}>{t('hud.enter')} ▸</button>}
-              {card === 'gate' && allDone && !celebrated && <button type="button" className="ink-btn" autoFocus onClick={() => { setCelebrated(true); setCard(null) }}>{t('celebrate.again')}</button>}
+              {card === 'gate' && allDone && <button type="button" className="ink-btn" autoFocus onClick={() => { setCelebrated(true); nav('/dashboard') }}>{t('celebrate.enter')}</button>}
               <button type="button" className="ink-btn cream" onClick={() => { S.current.dismissed = S.current.near; setCard(null) }}>{t('buttons.back')}</button>
             </div>
           </div>
