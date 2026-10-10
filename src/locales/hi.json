@@ -56,7 +56,12 @@
     "keysHint": "चलने के लिए तीर कुंजियाँ / WASD · अंदर जाने के लिए Enter",
     "completed": "पूरा",
     "illustrative": "ये रकमें सिर्फ़ उदाहरण हैं। असली ऑफ़र या सलाह नहीं।",
-    "settings": "सेटिंग्स"
+    "settings": "सेटिंग्स",
+    "classCode": "क्लास कोड",
+    "resetProgress": "प्रगति रीसेट करें",
+    "resetConfirm": "इस डिवाइस की सारी प्रगति मिटाएँ?",
+    "resetYes": "हाँ, रीसेट करें",
+    "resetNo": "रहने दें"
   },
   "personas": {
     "school": {
@@ -420,5 +425,17 @@
     "bonalu": "Bonalu",
     "sankranti": "Sankranti",
     "christmas": "Christmas"
+  },
+  "summary": {
+    "title": "आपका सार",
+    "closing": {
+      "allBright": "चारों जगहें रोशन हैं। ब्रेक लेते रहें।",
+      "someDim": "कुछ जगहें धुँधली हैं। उन्हें दोबारा खेलकर चमकाएँ।",
+      "keepGoing": "फाटक खोलने के लिए चारों जगहें पूरी करें।"
+    },
+    "lessons": "देखे गए पाठ: {{n}}",
+    "brighten": "दोबारा खेलने लायक: {{names}}",
+    "share": "शेयर कार्ड डाउनलोड करें",
+    "shareTitle": "मेरा मनी मोहल्ला लक्ष्य"
   }
 }

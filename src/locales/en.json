@@ -56,7 +56,12 @@
     "keysHint": "Arrow keys / WASD to walk · Enter to go in",
     "completed": "Done",
     "illustrative": "Illustrative amounts. Not real offers or advice.",
-    "settings": "Settings"
+    "settings": "Settings",
+    "classCode": "Class code",
+    "resetProgress": "Reset progress",
+    "resetConfirm": "Erase all progress on this device?",
+    "resetYes": "Yes, reset",
+    "resetNo": "Keep it"
   },
   "personas": {
     "school": {
@@ -420,5 +425,17 @@
     "bonalu": "Bonalu",
     "sankranti": "Sankranti",
     "christmas": "Christmas"
+  },
+  "summary": {
+    "title": "Your summary",
+    "closing": {
+      "allBright": "All four places are bright. Keep taking breaks.",
+      "someDim": "Some places are dim. Replay them to brighten them.",
+      "keepGoing": "Finish all four places to open the gate."
+    },
+    "lessons": "Lessons seen: {{n}}",
+    "brighten": "Worth replaying: {{names}}",
+    "share": "Download share card",
+    "shareTitle": "My Money Mohalla goal"
   }
 }

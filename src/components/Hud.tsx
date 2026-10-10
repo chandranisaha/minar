@@ -80,6 +80,10 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
   const lite = useLite()
   const setLite = useGame((s) => s.setLite)
   const [open, setOpen] = useState(false)
+  const classCode = useGame((s) => s.classCode)
+  const setClassCode = useGame((s) => s.setClassCode)
+  const resetProgress = useGame((s) => s.resetProgress)
+  const [confirm, setConfirm] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!open) return
@@ -105,6 +109,21 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
             <span>{t('hud.lite')}</span>
             <span>{lite ? '●' : '○'}</span>
           </button>
+          <label className="mt-3 block text-[11px] font-bold uppercase tracking-[.18em] opacity-60">
+            {t('hud.classCode')}
+            <input type="text" value={classCode ?? ''} maxLength={12} onChange={(e) => setClassCode(e.target.value)} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[15px] normal-case tracking-normal" />
+          </label>
+          {confirm ? (
+            <div className="mt-2" role="alertdialog" aria-label={t('hud.resetConfirm')}>
+              <p className="m-0 mb-1.5 text-[13px] font-bold">{t('hud.resetConfirm')}</p>
+              <div className="flex gap-2">
+                <button type="button" className="ink-btn" onClick={() => { resetProgress(); setConfirm(false); setOpen(false) }}>{t('hud.resetYes')}</button>
+                <button type="button" className="ink-btn cream" autoFocus onClick={() => setConfirm(false)}>{t('hud.resetNo')}</button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={() => setConfirm(true)}>{t('hud.resetProgress')}</button>
+          )}
           {replay && (
             <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={() => nav('/story?replay=1')}>
               ↺ {t('hud.replay')}
