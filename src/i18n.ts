@@ -4,11 +4,13 @@ import en from './locales/en.json'
 import hi from './locales/hi.json'
 import te from './locales/te.json'
 import dealboardEn from './games/dealboard/content/en.json'
+import dealboardLessons from './games/dealboard/content/lessons.json'
+import dealboardPlay from './games/dealboard/content/play.json'
 import { useGame } from './store/game'
 
 void i18n.use(initReactI18next).init({
   // game namespaces ship in English first; hi/te fall back to it until translated
-  resources: { en: { translation: en, dealboard: dealboardEn }, hi: { translation: hi }, te: { translation: te } },
+  resources: { en: { translation: en, dealboard: { ...dealboardEn, ...dealboardPlay, ...dealboardLessons } }, hi: { translation: hi }, te: { translation: te } },
   lng: useGame.getState().language,
   fallbackLng: 'en',
   interpolation: { escapeValue: false },

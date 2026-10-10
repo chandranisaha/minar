@@ -59,3 +59,26 @@ Source: `Deal Board build spec.pdf`, Lite mode first. Engine lives in `src/games
   player, so dice, Chance draws, news, the emergency turn and all six company paths are fixed by the seed alone.
 - Unspecified values chosen: margin noise 0.3 pt, user noise 2%, CEO buy chance 12% (sound) or 2-3% (traps), PayEasy down-round vs
   failure is a seeded coin flip, and the broad fall is Q8, Q9 or Q10 (spec: "the seed may shift it by one quarter").
+
+## Deal Board: decisions, lessons and scoring (steps 3-5)
+- **Colour sets are measured in money, not in company count.** The six companies each sit in their own sector, so "two in one colour"
+  can never happen. A concentration warning shows above 40% of net worth in one company, and lesson 6 (too many eggs) fires when over
+  half of the invested money is in one sector.
+- **Lessons fire at the end of the quarter, never mid-decision**, at most one per quarter (the rest queue), at most twice per run, and
+  each (lesson, company) pair only once. "Earned it" cards (sold before a fall, passed on a trap) appear at most once per year.
+- **Replay this quarter**: one rewind per year (turns 1-4, 5-8, 9-12), same seed, same market, same luck. It restores the start of
+  the quarter the lesson came from; lessons already seen stay seen.
+- **Research** counts lights revealed before each purchase (founder questions plus Banker clues). **Skepticism** judges each trap
+  met (PayEasy, QuickRide, MedLink, SteelWorks) against its "tell" quarter: the first quarter with two red flags (a deflecting founder
+  counts as a red flag), else the first loss-making quarter. Passing never scores less than 1; buying on a rumour costs half a point.
+- **Spread** is the average largest sector share while invested (35% or less = 20, 80% or more = 0), capped at 10 if the player held
+  fewer than two companies in most of quarters 5-12. Never investing scores 0, so passing on everything cannot clear the stage.
+- **Bank**: the clue reveals one real light of any company for free; the loan is ₹20,000 at ₹600 a quarter, repayable any time and
+  cleared from cash at the end of quarter 12 (any remainder is subtracted from net worth).
+- **Family emergency** ends the quarter it fires in: if cash is short the player must sell, and a sale at a loss or in a market dip
+  teaches lesson 9. If nothing can be sold the shortfall becomes a loan.
+- **Jail** (panic selling): 70% or more of invested money sold in a quarter with a broad market fall and no red-light company sold.
+  The player cannot buy next quarter and lesson 7 fires.
+- Lesson 16 text says "owning several of them" instead of "three companies in the same sector" because each sector here has one company.
+- Hub link: a judgement score of 60 or more lights the lamp; the best score and the matching skills (risk sense, patience, saving) are
+  kept in the hub store and are never lowered.

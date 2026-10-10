@@ -14,9 +14,13 @@ interface GameState {
   /** null = automatic (decided from device + reduced-motion) */
   liteMode: boolean | null
   skills: Record<Skill, number>
+  /** best judgement score (0-100) per pillar */
+  pillarScores: Partial<Record<PillarId, number>>
   setLanguage: (l: Lang) => void
   setPersona: (p: PersonaId) => void
   completePillar: (p: PillarId) => void
+  /** keeps the best score and raises the matching skills (never lowers them) */
+  recordPillar: (p: PillarId, total: number, parts: { spread: number; skepticism: number; calm: number; habits: number }) => void
   setStorySeen: (v: boolean) => void
   setCelebrated: (v: boolean) => void
   setLite: (v: boolean) => void
@@ -38,6 +42,7 @@ export const useGame = create<GameState>()(
       celebrated: false,
       liteMode: null,
       skills: zeroSkills,
+      pillarScores: {},
       setLanguage: (language) => set({ language }),
       setPersona: (persona) => {
         const p = PERSONAS[persona]
@@ -50,6 +55,19 @@ export const useGame = create<GameState>()(
         const done = [...s.completedPillars, id]
         set({ completedPillars: done, savedAmount: Math.min(s.goalAmount, s.startAmount + step * done.length) })
       },
+      recordPillar: (id, total, parts) =>
+        set((s) => {
+          const best = (a: number, b: number) => Math.max(a, Math.round(b))
+          return {
+            pillarScores: { ...s.pillarScores, [id]: Math.max(s.pillarScores?.[id] ?? 0, total) },
+            skills: {
+              ...s.skills,
+              riskSense: best(s.skills.riskSense, ((parts.spread + parts.skepticism) / 40) * 100),
+              patience: best(s.skills.patience, (parts.calm / 20) * 100),
+              saving: best(s.skills.saving, (parts.habits / 20) * 100),
+            },
+          }
+        }),
       setStorySeen: (storySeen) => set({ storySeen }),
       setCelebrated: (celebrated) => set({ celebrated }),
       setLite: (liteMode) => set({ liteMode }),

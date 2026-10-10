@@ -158,6 +158,15 @@ export interface Decision {
   reason?: string
   tabsOpened: string[]
   questionsAsked: string[]
+  /** share price at the decision */
+  price?: number
+  /** lights the player had seen before deciding (founder questions + banker clues), 0-2 */
+  flips?: number
+  /** SELL: gain after fees as a fraction, and quarters held */
+  gain?: number
+  held?: number
+  /** INVEST: a rumour card named this company this quarter */
+  rumour?: boolean
 }
 
 export interface Lesson {

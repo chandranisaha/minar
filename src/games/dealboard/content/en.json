@@ -50,7 +50,7 @@
     "rent": { "name": "Rent Day", "body": "Every company you own pays this quarter's rent: its profit.", "empty": "You do not own any companies yet, so no rent arrives." },
     "tax": { "name": "Tax", "body": "Fees paid so far: {{fees}}. Every buy and every sell costs 1%." },
     "parking": { "name": "Free Parking", "short": "Parking", "body": "Idle cash has lost {{lost}} to rising prices so far. Cash loses 1% a quarter while it waits." },
-    "chest": { "name": "Community Chest", "short": "Chest", "body": "Your family is fine this quarter. A cushion of cash is what keeps it that way." }
+    "chest": { "name": "Community Chest", "short": "Chest", "body": "A chest of family news. A cushion of cash is what makes bad news easier to handle.", "warn": "A family emergency arrives at the end of this quarter. Be ready." }
   },
   "auction": {
     "pitching": "Now pitching",

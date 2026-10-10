@@ -2,8 +2,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { inr } from '../../../content/data'
 import { useGame } from '../../../store/game'
-import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
-import type { Banner, Card, CompanyId, TileKind } from '../engine/types'
+import type { Banner, Card, TileKind } from '../engine/types'
 import { TILE_TONE, TileIcon } from './icons'
 
 export const useInr = () => {
@@ -16,14 +15,14 @@ export function Sheet({ eyebrow, title, icon, tone, children, actions }: { eyebr
   return (
     <section className="paper db-sheet anim-pop relative overflow-hidden p-4" aria-live="polite">
       {tone && <div className="absolute inset-x-0 top-0 h-2 border-b-2 border-ink" style={{ background: tone }} />}
-      <div className="mt-1 flex items-start gap-3">
-        {icon && <div className="mt-0.5 shrink-0">{icon}</div>}
+      <div className="mt-1 flex items-center gap-3">
+        {icon && <div className="shrink-0">{icon}</div>}
         <div className="min-w-0 flex-1">
           {eyebrow && <div className="db-eyebrow lang-fit text-[#8a5a2b]">{eyebrow}</div>}
           <h2 className="font-sign lang-fit m-0 text-[20px] leading-tight">{title}</h2>
-          {children && <div className="mt-1.5 text-[15px] leading-snug">{children}</div>}
         </div>
       </div>
+      {children && <div className="mt-2 text-[15px] leading-snug">{children}</div>}
       {actions && <div className="mt-3 flex flex-wrap items-center justify-end gap-2">{actions}</div>}
     </section>
   )
@@ -58,30 +57,6 @@ export function ChanceCard({ card }: { card: Card }) {
         <div className="mt-1 text-[14px] opacity-75">{t(`cards.${card.key}.detail`)}</div>
       </div>
       {rumour && <span className="db-stamp absolute bottom-2 right-3 text-[#C9506F]">{t('cards.unverified')}</span>}
-    </div>
-  )
-}
-
-/** Property card for a pitching company (the four lights arrive in step 3). */
-export function CompanyCard({ id, price }: { id: CompanyId; price: number }) {
-  const { t } = useTranslation('dealboard')
-  const money = useInr()
-  const co = COMPANY[id]
-  return (
-    <div className="overflow-hidden rounded-xl border-[3px] border-ink bg-jasmine" style={{ boxShadow: '3px 4px 0 #2B1A17' }}>
-      <div className="flex items-baseline justify-between gap-2 border-b-[3px] border-ink px-3 py-2" style={{ background: SECTOR_COLOUR[co.sector] }}>
-        <span className="font-sign lang-fit truncate text-[18px] text-jasmine" style={{ textShadow: '1.5px 1.5px 0 #2B1A17' }}>{t(`companies.${id}.name`)}</span>
-        <span className="shrink-0 text-[11px] font-extrabold uppercase tracking-wider text-jasmine">{t(`sectors.${co.sector}`)}</span>
-      </div>
-      <div className="px-3 py-2.5">
-        <div className="text-[15px] font-semibold italic">“{t(`companies.${id}.slogan`)}”</div>
-        <div className="mt-2 rounded-lg border-2 border-ink bg-white/60 px-2.5 py-1.5 text-[14px]">
-          <span className="font-extrabold">{t(`companies.${id}.founder`)}:</span> {t(`companies.${id}.line`)}
-        </div>
-        <div className="mt-2 flex justify-end text-[13px]">
-          <span className="rounded-full border-2 border-ink bg-mustard px-2 py-0.5 font-extrabold">{t('perShare', { price: money(price) })}</span>
-        </div>
-      </div>
     </div>
   )
 }

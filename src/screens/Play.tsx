@@ -32,11 +32,12 @@ export default function Play() {
   const nav = useNavigate()
   const completed = useGame((s) => s.completedPillars)
   const complete = useGame((s) => s.completePillar)
+  const recordPillar = useGame((s) => s.recordPillar)
   const p = PILLARS.find((x) => x.id === pillar)
   if (!p) return <Navigate to="/" replace />
   const id: PillarId = p.id
   // pillar 3 is a full game with its own table, header and guardrail banner
-  if (id === 'invest') return <DealBoard onExit={() => iris.go('/')} />
+  if (id === 'invest') return <DealBoard onExit={() => iris.go('/')} onComplete={(sc) => { recordPillar('invest', sc.total, sc); if (sc.cleared) complete('invest') }} />
   const done = completed.includes(id)
   const Shop = SHOPS[id]
   return (
