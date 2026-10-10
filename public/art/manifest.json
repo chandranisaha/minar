@@ -138,5 +138,35 @@
   "w": 1500,
   "h": 955,
   "src": "Charminar at Golden Hour Bazaar.png"
+ },
+ "char-seller-arrange": {
+  "w": 245,
+  "h": 298,
+  "src": "Bangle Seller Character Sheet.png"
+ },
+ "char-seller-hold": {
+  "w": 255,
+  "h": 300,
+  "src": "Bangle Seller Character Sheet.png"
+ },
+ "char-seller-laugh": {
+  "w": 208,
+  "h": 285,
+  "src": "Bangle Seller Character Sheet.png"
+ },
+ "char-seller-rest": {
+  "w": 240,
+  "h": 276,
+  "src": "Bangle Seller Character Sheet.png"
+ },
+ "char-seller-pick": {
+  "w": 306,
+  "h": 297,
+  "src": "Bangle Seller Character Sheet.png"
+ },
+ "char-seller-stand": {
+  "w": 273,
+  "h": 500,
+  "src": "Bangle Seller Character Sheet.png"
  }
 }

@@ -37,10 +37,10 @@ PROP_BOXES = {
 
 PROP_ERASE = {'tree': [(415, 500, 655, 720)]}  # sheet-space rects to blank before cutting (a bicycle overlaps the tree box)
 
-def cut_props(path):
+def cut_props(path, boxes=None, prefix='prop-'):
     sheet = Image.open(path).convert('RGBA')
     names = []
-    for name, box in PROP_BOXES.items():
+    for name, box in (boxes or PROP_BOXES).items():
         part = sheet.crop(box)
         for ex0, ey0, ex1, ey1 in PROP_ERASE.get(name, []):
             arr0 = np.array(part)
@@ -58,11 +58,17 @@ def cut_props(path):
         part = part.crop(part.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
         if part.width > 700:
             part = part.resize((700, round(part.height * 700 / part.width)), Image.LANCZOS)
-        slot = 'prop-' + name
+        slot = prefix + name
         part.save(os.path.join(out, slot + '.webp'), 'WEBP', quality=88, method=6)
         manifest[slot] = {'w': part.width, 'h': part.height, 'src': os.path.basename(path)}
         names.append(slot)
     return names
+
+# character sheets: pose boxes on the 1536x1024 sheet -> /art/char-<who>-<pose>.webp
+SELLER_BOXES = {
+    'arrange': (480, 520, 725, 825), 'hold': (1270, 495, 1525, 795), 'laugh': (950, 515, 1158, 800),
+    'rest': (725, 525, 965, 805), 'pick': (5, 510, 315, 810), 'stand': (32, 5, 305, 515),
+}
 
 SKIP = ['character asset sheet', 'character game asset']
 
@@ -75,10 +81,20 @@ mf_path = os.path.join(out, 'manifest.json')
 manifest = json.load(open(mf_path)) if os.path.exists(mf_path) else {}
 
 done, unmatched = [], []
-for fn in sorted(os.listdir(src)):
+files = []
+for dp, _, fns in os.walk(src):
+    for f in fns:
+        files.append(os.path.relpath(os.path.join(dp, f), src))
+for fn in sorted(files):
     if not fn.lower().endswith(('.png', '.webp', '.jpg', '.jpeg')):
         continue
     low = fn.lower()
+    if os.environ.get('ART_ONLY') and os.environ['ART_ONLY'].lower() not in low:
+        continue
+    if 'bangle seller' in low:
+        for nm in cut_props(os.path.join(src, fn), SELLER_BOXES, 'char-seller-'):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
     if any(s in low for s in SKIP):
         continue
     if 'prop collection' in low:

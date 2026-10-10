@@ -1,4 +1,4 @@
-import { memo, type CSSProperties, type ReactNode } from 'react'
+import { memo, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PILLARS, type PillarId } from '../content/data'
 import { CharminarSvg } from '../art/Charminar'
@@ -39,6 +39,33 @@ const SIGN: Partial<Record<PillarId, { key: string; x: number; y: number; color:
   save: { key: 'world.chai', x: 0.515, y: 0.15, color: '#E8B04A', size: 17, rot: 0 },
   invest: { key: 'world.pearls', x: 0.625, y: 0.17, color: '#7A2A22', size: 21, rot: 0 },
 }
+/** painted shopkeepers (from character sheets): idle poses alternate, the hover pose plays the reaction */
+const ART_KEEPER: Partial<Record<PillarId, { idle: string[]; hover: string; ref: string; width: number; drop: number }>> = {
+  plan: { idle: ['char-seller-arrange', 'char-seller-hold'], hover: 'char-seller-laugh', ref: 'char-seller-hold', width: 0.5, drop: 26 },
+}
+
+function ArtKeeper({ a, cfg, active, cx, counter, sw, sh }: { a: Record<string, { w: number; h: number }>; cfg: NonNullable<(typeof ART_KEEPER)[PillarId]>; active: boolean; cx: number; counter: number; sw: number; sh: number }) {
+  const [f, setF] = useState(0)
+  useEffect(() => {
+    if (active) return
+    const id = window.setInterval(() => setF((x) => (x + 1) % cfg.idle.length), 1500)
+    return () => window.clearInterval(id)
+  }, [active, cfg.idle.length])
+  const name = active ? cfg.hover : cfg.idle[f]
+  const m = a[name]
+  const ref = a[cfg.ref]
+  if (!m || !ref) return null
+  const k = (sw * cfg.width) / ref.w // same sheet scale for every pose
+  const w = m.w * k, h = m.h * k
+  return (
+    <div style={{ position: 'absolute', left: cx * sw - w / 2, top: counter * sh - h + cfg.drop, width: w, height: h, clipPath: `inset(-60px -60px ${cfg.drop}px -60px)` }}>
+      <div key={String(active)} className={active ? 'anim-squash' : 'anim-bob'} style={{ width: '100%', height: '100%', transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+        <img src={`/art/${name}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
+      </div>
+    </div>
+  )
+}
+
 const KEEPER_LOOK: Record<PillarId, string> = { plan: 'bangle', save: 'chai', invest: 'pearl', safe: 'upi' }
 
 function Lamp({ lit, x, y }: { lit: boolean; x: number; y: number }) {
@@ -212,11 +239,15 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
         return (
           <Obj key={p.id} x={L.x + L.w / 2 - sw / 2} y={L.base + 8 - sh} w={sw} h={sh} z={L.base}>
             <img src={`/art/shop-${p.id}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
-            <div style={{ position: 'absolute', left: k.cx * sw - tw / 2, top: k.counter * sh - visible, width: tw, height: th, clipPath: `inset(-40px -40px ${th - visible}px -40px)` }}>
-              <div key={String(react[p.id])} className={react[p.id] ? 'anim-squash' : 'anim-bob'} style={{ width: '100%', height: '100%', transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
-                <Toon look={LOOKS[KEEPER_LOOK[p.id]]} mood={k.mood} excited={react[p.id]} wave={p.id === 'plan' && !react[p.id]} shifty={p.id === 'safe'} width={tw} height={th} />
+            {ART_KEEPER[p.id] && art[ART_KEEPER[p.id]!.ref] ? (
+              <ArtKeeper a={art} cfg={ART_KEEPER[p.id]!} active={react[p.id]} cx={k.cx} counter={k.counter} sw={sw} sh={sh} />
+            ) : (
+              <div style={{ position: 'absolute', left: k.cx * sw - tw / 2, top: k.counter * sh - visible, width: tw, height: th, clipPath: `inset(-40px -40px ${th - visible}px -40px)` }}>
+                <div key={String(react[p.id])} className={react[p.id] ? 'anim-squash' : 'anim-bob'} style={{ width: '100%', height: '100%', transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+                  <Toon look={LOOKS[KEEPER_LOOK[p.id]]} mood={k.mood} excited={react[p.id]} wave={p.id === 'plan' && !react[p.id]} shifty={p.id === 'safe'} width={tw} height={th} />
+                </div>
               </div>
-            </div>
+            )}
             {SIGN[p.id] && (
               <div className="font-sign lang-fit" style={{ position: 'absolute', left: SIGN[p.id]!.x * sw, top: SIGN[p.id]!.y * sh, transform: `translate(-50%,-50%) rotate(${SIGN[p.id]!.rot}deg)`, fontSize: SIGN[p.id]!.size, color: SIGN[p.id]!.color, whiteSpace: 'nowrap', textShadow: SIGN[p.id]!.color === '#E8B04A' ? '1px 1px 0 #2B1A17' : '1px 1px 0 rgba(255,243,214,.7)' }}>
                 {t(SIGN[p.id]!.key)}
