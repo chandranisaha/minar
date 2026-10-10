@@ -8,12 +8,12 @@ import type { BillId, Run } from './types'
 export type Step =
   | 'entry' | 'walkin' | 'goal' | 'predict1' | 'meet' | 'payday' | 'bignight0'
   | 'bill:auto' | 'window' | 'bill:data' | 'trolley' | 'predict2' | 'plates' | 'worth'
-  | 'bignight' | 'teja' | 'bill:lunch' | 'rain' | 'pay' | 'tally' | 'thennow' | 'onechange'
+  | 'bignight' | 'teja' | 'bill:lunch' | 'rain' | 'pay' | 'pay2' | 'tally' | 'thennow' | 'onechange'
 
 export const ORDER: Step[] = [
   'entry', 'walkin', 'goal', 'predict1', 'meet', 'payday', 'bignight0',
   'bill:auto', 'window', 'bill:data', 'trolley', 'predict2', 'plates', 'worth',
-  'bignight', 'teja', 'bill:lunch', 'rain', 'pay', 'tally', 'thennow', 'onechange',
+  'bignight', 'teja', 'bill:lunch', 'rain', 'pay', 'pay2', 'tally', 'thennow', 'onechange',
 ]
 
 export function applies(s: Step, run: Run, monthsDone: number): boolean {
@@ -28,6 +28,8 @@ export function applies(s: Step, run: Run, monthsDone: number): boolean {
       return run.month > 1 && !run.bigNight && popped(run).length > 0
     case 'bignight':
       return !run.bigNight && popped(run).length > 0
+    case 'pay2':
+      return !!run.extra
     case 'thennow':
       return monthsDone >= 2
     default:
@@ -48,7 +50,7 @@ export function phaseOf(s: Step): 0 | 1 | 2 | 3 | 4 {
   if (s === 'bill:auto' || s === 'window') return 1
   if (s === 'bill:data' || s === 'trolley' || s === 'predict2' || s === 'plates' || s === 'worth') return 2
   if (s === 'bignight' || s === 'teja' || s === 'bill:lunch') return 3
-  if (s === 'rain' || s === 'pay') return 4
+  if (s === 'rain' || s === 'pay' || s === 'pay2') return 4
   return 0
 }
 
@@ -56,7 +58,7 @@ export function phaseOf(s: Step): 0 | 1 | 2 | 3 | 4 {
 export function dayOf(s: Step): number {
   const map: Partial<Record<Step, number>> = {
     payday: 1, bignight0: 1, 'bill:auto': 3, window: 3, 'bill:data': 9, trolley: 9, predict2: 11, plates: 11, worth: 11,
-    bignight: 14, teja: 16, 'bill:lunch': 20, rain: 23, pay: 23, tally: 30, thennow: 30, onechange: 30,
+    bignight: 14, teja: 16, 'bill:lunch': 20, rain: 23, pay: 23, pay2: 26, tally: 30, thennow: 30, onechange: 30,
   }
   return map[s] ?? 1
 }

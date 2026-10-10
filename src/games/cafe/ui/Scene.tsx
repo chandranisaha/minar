@@ -19,6 +19,7 @@ export const GOAL_ART: Record<string, string> = { earphones: `${C}/goal-earphone
 export interface Player { gender: 'girl' | 'boy'; persona: string | null }
 export const playerFace = (p: Player) => `${ART}/avatar/${p.gender}-${p.persona ?? 'school'}-face.webp`
 
+export const CLOUD_NAME = ['far', 'near', 'closer', 'close', 'overhead']
 export type Mood = 'neutral' | 'think' | 'talk' | 'worry' | 'relax' | 'phone' | 'happy' | 'read'
 /** seated poses per mood. Indexes are columns on the painted seated sheets. */
 const SEAT: Record<'girl' | 'boy', Record<Mood, number>> = {
@@ -35,12 +36,14 @@ export interface SceneProps {
   saucers?: [number | null, number | null]
   vendor?: string
   beat?: 'calm' | 'freeze' | 'crack' | 'table' | null
-  focus?: 'emergency' | 'spend' | 'save' | 'plates' | 'teja' | 'bottle' | null
+  focus?: 'emergency' | 'spend' | 'save' | 'plates' | 'teja' | 'bottle' | 'cloud' | null
   platesCount?: number
   /** bumps whenever a coin lands in a jar, so the scene can clink */
   pulse?: { jar: 'spend' | 'save' | 'emergency'; n: number } | null
   /** Ammamma's envelope: on the counter, sliding over, or on the table */
-  letter?: 'counter' | 'slide' | 'table' | null
+  letter?: 'counter' | null
+  /** override the cloud stage (the intro) */
+  cloudStage?: number | null
   /** the intro plays fizz values on the table bottles */
   demo?: { fun: number; friends: number } | null
   reached?: boolean
@@ -104,18 +107,15 @@ export function Bottle({ x, y, v, kind, h = 46, lite }: { x: number; y: number; 
   )
 }
 
-function Cloud({ stage, dark }: { stage: number; dark: boolean }) {
-  const cx = [80, 72, 62, 56, 56][stage]
-  const cy = [52, 58, 64, 70, 70][stage]
-  const k = [0.25, 0.35, 0.48, 0.62, 0.8][stage]
-  const c = dark ? '#5E6B78' : '#A9BCC6'
-  return (
-    <g transform={`translate(${cx} ${cy}) scale(${k})`} className="cafe-drift">
-      {[[-30, 4, 20], [-8, -8, 26], [18, 0, 22], [36, 8, 16], [0, 10, 24]].map(([x, y, r], i) => (
-        <circle key={i} cx={x} cy={y} r={r} fill={c} stroke={INK} strokeWidth={1.5 / k} />
-      ))}
-    </g>
-  )
+/** the five painted storm clouds: the same cloud, closer and darker every part of the month */
+const CLOUD_ASPECT = [239 / 371, 310 / 424, 307 / 440, 362 / 440, 410 / 440]
+const CLOUD_H = [30, 40, 50, 62, 78]
+function Cloud({ stage, big }: { stage: number; big?: boolean }) {
+  const h = big ? 104 : CLOUD_H[stage]
+  const w = h * CLOUD_ASPECT[stage]
+  const x = big ? 20 : 74 - w / 2
+  const y = big ? 8 : 38 + (4 - stage) * 2
+  return <image href={`${C}/cloud-${stage}.webp`} x={x} y={y} width={w} height={h} preserveAspectRatio="xMidYMid meet" className="cafe-drift" />
 }
 
 /** Ammamma's envelope: cream, a red seal, notes peeking out */
@@ -134,13 +134,13 @@ function Envelope({ x, y }: { x: number; y: number }) {
   )
 }
 
-export function Scene({ step, run, player, saucers = [null, null], vendor, beat = null, focus = null, platesCount = 0, pulse = null, demo = null, letter = null, reached = false, lite }: SceneProps) {
+export function Scene({ step, run, player, saucers = [null, null], vendor, beat = null, focus = null, platesCount = 0, pulse = null, demo = null, letter = null, cloudStage: cloudOver = null, reached = false, lite }: SceneProps) {
   const fz = demo ?? run.fizz
   const bg = lite ? `${ART}/cafe-interior-lite.webp` : `${ART}/cafe-interior.webp`
-  const stage = cloudStage(step)
-  const raining = step === 'pay' || (step === 'rain' && beat !== 'calm')
+  const stage = cloudOver ?? cloudStage(step)
+  const raining = step === 'pay' || step === 'pay2' || (step === 'rain' && beat !== 'calm')
   const flash = step === 'rain' && beat === 'freeze'
-  const cracked = (step === 'rain' && (beat === 'crack' || beat === 'table')) || step === 'pay' || step === 'tally'
+  const cracked = (step === 'rain' && (beat === 'crack' || beat === 'table')) || step === 'pay' || step === 'pay2' || step === 'tally'
   const phoneOff = step === 'rain' && beat !== 'calm' && beat !== null
   const lent = run.lent
   const dim = (k: SceneProps['focus']) => (focus && focus !== k ? 0.35 : 1)
@@ -148,8 +148,7 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
   const showTeja = step === 'teja' || (focus === 'teja' && lent > 0)
   const chachaPose = beat === 'freeze' || beat === 'crack' ? 'shock' : ['predict1', 'predict2', 'worth', 'bignight', 'bignight0'].includes(step) ? 'think' : 'idle'
   const mood = moodFor(step, beat, reached)
-  const env = letter ?? (['goal', 'predict1', 'meet', 'payday'].includes(step) && run.month === 1 && !run.payday ? 'table' : null)
-  const envelope = env === 'table'
+  const env = letter
   const clink = (j: 'spend' | 'save' | 'emergency') => (pulse?.jar === j ? 'cafe-clink' : undefined)
   const umbrellaOpen = raining && (run.rainPaid.emergency ?? 0) > 0
   return (
@@ -167,7 +166,7 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
       {/* the window and the street */}
       <g clipPath="url(#cafe-win)">
         {(raining || stage >= 3) && <rect width="120" height="170" fill={raining ? '#40566A' : '#6F8796'} opacity={raining ? 0.3 : 0.22} />}
-        <Cloud stage={stage} dark={stage >= 3} />
+        <Cloud stage={stage} />
         {raining && !lite && (
           <g className="cafe-rain">
             {[20, 72, 124].map((y) => <image key={y} href={`${C}/rain.webp`} x={-10} y={y} width={150} height={52} preserveAspectRatio="xMidYMid slice" opacity=".9" />)}
@@ -175,6 +174,11 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
         )}
         {vendor && VENDOR[vendor] && <image key={vendor} href={VENDOR[vendor]} x={20} y={86} height={84} width={78} preserveAspectRatio="xMidYMax meet" className="cafe-pop" />}
       </g>
+      {focus === 'cloud' && (
+        <g filter="url(#cafe-glow)" className="cafe-cloudhl">
+          <Cloud stage={stage} big />
+        </g>
+      )}
       {flash && <rect width="480" height="270" fill="#FFFFFF" opacity=".55" className="cafe-flash" />}
       {flash && <image href={`${C}/lightning.webp`} x={34} y={30} width={60} height={90} preserveAspectRatio="xMidYMid meet" className="cafe-flash" />}
 
@@ -220,9 +224,7 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
       <image href={`${C}/bistro-chair-r.webp`} x={350} y={188} width={46} height={72} preserveAspectRatio="xMidYMax meet" opacity=".95" />
 
       {/* on the table: Ammamma's envelope until payday is split */}
-      {env === 'table' && <g transform="translate(296 172) scale(1.5) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
-      {env === 'counter' && <g transform="translate(392 166) scale(1.2) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
-      {env === 'slide' && <g transform="translate(296 172)"><g className="cafe-envslide"><g transform="scale(1.5) translate(-18 -2)"><Envelope x={0} y={0} /></g></g></g>}
+      {env === 'counter' && <g transform="translate(386 164) scale(1.15) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
       {/* the tumbler (Spend) */}
       <g opacity={dim('spend')} filter={glow('spend')} className={clink('spend')}>
         <image href={`${C}/tumbler.webp`} x={270} y={166} width={22} height={24} preserveAspectRatio="xMidYMax meet" />
@@ -257,7 +259,7 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
         </g>
       )}
       {/* a spinning coin on the table once the money is split */}
-      {!envelope && step !== 'entry' && <image href={`${C}/coin.webp`} x={280} y={194} width="9" height="9" className="cafe-spin" />}
+      {env !== 'counter' && step !== 'entry' && <image href={`${C}/coin.webp`} x={280} y={194} width="9" height="9" className="cafe-spin" />}
 
       {/* Yusuf, cart and all: the painted picture already includes the trolley */}
       {step === 'trolley' && (

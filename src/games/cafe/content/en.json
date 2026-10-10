@@ -200,10 +200,6 @@
       "name": "Cold drink",
       "line": "Cold drink, ₹20."
     },
-    "coins": {
-      "name": "Game coins",
-      "line": "Game coins, ₹30."
-    },
     "biscuit": {
       "name": "Biscuits",
       "line": "Biscuits, ₹10."
@@ -211,6 +207,10 @@
     "ice": {
       "name": "Ice cream",
       "line": "Ice cream, ₹30."
+    },
+    "tiffin": {
+      "name": "Tiffin box",
+      "line": "Hot tiffin box, ₹30."
     }
   },
   "trolley": {
@@ -348,7 +348,16 @@
     "oBetween": "Paid from Emergency and Spend. Your goal is safe.",
     "oSave": "Paid from Save. The surprise ate into your goal.",
     "oQuick": "Done fast. But you pay back ₹{{r}}. That's ₹{{e}} extra.",
-    "oMore": "Emergency money covered it, with some left over!"
+    "oMore": "Emergency money covered it, with some left over!",
+    "first6": "Auto drivers are on strike. You need another ride.",
+    "bill6": "Taxi to college",
+    "first7": "A friend is having a birthday. You need a gift.",
+    "bill7": "Friend's birthday gift",
+    "first8": "A bad cold. You need medicine.",
+    "bill8": "Medicine from the pharmacy",
+    "again": "And the cloud isn't done. One more.",
+    "watch": "Look up. That cloud is right above us now.",
+    "watchS": "Whatever it carries is about to land."
   },
   "tally": {
     "settleNone": "You don't owe anyone anything. Great!",
@@ -474,7 +483,10 @@
       "2": "New tyre ₹{{x}}, from {{from}}",
       "3": "Lab fee ₹{{x}}, from {{from}}",
       "4": "Wedding gift and autos ₹{{x}}, from {{from}}",
-      "5": "Doctor and medicine ₹{{x}}, from {{from}}"
+      "5": "Doctor and medicine ₹{{x}}, from {{from}}",
+      "6": "Taxi ₹{{x}}, from {{from}}",
+      "7": "Birthday gift ₹{{x}}, from {{from}}",
+      "8": "Medicine ₹{{x}}, from {{from}}"
     },
     "day": "Day {{d}}"
   },
@@ -488,7 +500,10 @@
     "walkedAway": "You waited and saved ₹{{x}}. Nice.",
     "marble": "You spent ₹{{x}} on fun early, so the bottle never popped.",
     "saidOne": "You guessed one surprise. You were right!",
-    "saidIdk": "You said no idea. Now you know: surprises happen."
+    "saidIdk": "You said no idea. Now you know: surprises happen.",
+    "oneButTwo": "You said one surprise. The cloud had two.",
+    "saidTwo": "You said two or more. You read the cloud well.",
+    "twoButOne": "You said two or more. It was just one this time."
   },
   "cards": {
     "borrow": {
@@ -680,7 +695,9 @@
     "why5": "If a bottle fills up, it pops and you get the Big Night. If your mood ends low, your report says so, and it's a sign to plan a small treat.",
     "alert": "Almost full!",
     "stake": "Keep all three stars lit and reach your goal for a Perfect Month.",
-    "risk": "A full bottle pops. The Big Night takes ₹60 to ₹100 out of your money."
+    "risk": "A full bottle pops. The Big Night takes ₹60 to ₹100 out of your money.",
+    "cloud": "Surprise cloud",
+    "cloudNear": "Close!"
   },
   "meet": {
     "p1": "This is your Wants bottle. Every time you say no to something you want, it gets a little fizzier.",
@@ -689,15 +706,19 @@
     "p2s": "Skipping plans with friends builds it up.",
     "p3": "Say yes to something and the bottle settles. Say no again and again, and it keeps filling.",
     "p3s": "It isn't a number to manage. It's how much you're holding back.",
-    "p4": "When a bottle is full, it pops. Then it's the Big Night: spend ₹60 to ₹100, go for half, or stay home.",
-    "p4s": "Stay home and the fizz comes with you into next month, bigger.",
+    "p4": "When a bottle is full, it pops.",
+    "p4s": "That's when the Big Night happens.",
     "p5": "And this is your mood. Treats, friends and kindness lift it. A month of only no's wears it down.",
     "p5s": "It doesn't change your money. It shows in your report at the end.",
     "p6": "Wants cost money too. When Spend runs out, the rest comes out of your goal.",
     "p6s": "Bills can't be skipped. Wants can. That's the real choice this month.",
     "go": "Got it, let's start",
     "p7": "Keep both bottles calm and your mood good, and you earn three stars. Three stars and your goal make a Perfect Month.",
-    "p7s": "That's the real win. Reaching the money alone is only part of it."
+    "p7s": "That's the real win. Reaching the money alone is only part of it.",
+    "p9": "The Big Night: everyone is going out and you're asked to join. It costs ₹60 to ₹100.",
+    "p9s": "Go, go for half, or stay home. Staying home saves money, but the fizz comes with you into next month.",
+    "p8": "See the cloud outside the window? That's your surprise cloud. It creeps closer every part of the month.",
+    "p8s": "When it's right above us, a surprise bill lands. Sometimes one, sometimes two. So keep some Emergency money."
   },
   "letter": {
     "tap": "Tap to open",

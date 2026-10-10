@@ -2,19 +2,21 @@ import { useEffect, useState } from 'react'
 import { moodStage } from '../engine/mood'
 import { useStage } from '../state/stage'
 import { useCafe } from '../state/store'
-import { Btn, Caption } from './kit'
+import { Btn, Caption, MoodFace } from './kit'
 import { useCt } from './text'
 
 /** fizz values the demo walks through (a presentation loop; nothing here touches the run) */
 const UP = [0, 30, 55, 80, 100]
 const DOWN = [80, 55, 30, 10]
 
-type Page = { key: string; who: 'chacha'; kinds: ('fun' | 'friends')[]; loop: number[]; mood?: boolean }
+type Page = { key: string; who: 'chacha'; kinds: ('fun' | 'friends')[]; loop: number[]; mood?: boolean; cloud?: boolean }
 const PAGES: Page[] = [
   { key: 'p1', who: 'chacha', kinds: ['fun'], loop: UP },
   { key: 'p2', who: 'chacha', kinds: ['friends'], loop: UP },
   { key: 'p3', who: 'chacha', kinds: ['fun', 'friends'], loop: DOWN },
   { key: 'p4', who: 'chacha', kinds: ['fun'], loop: [100] },
+  { key: 'p9', who: 'chacha', kinds: [], loop: [] },
+  { key: 'p8', who: 'chacha', kinds: [], loop: [], cloud: true },
   { key: 'p5', who: 'chacha', kinds: [], loop: [], mood: true },
   { key: 'p7', who: 'chacha', kinds: [], loop: [] },
   { key: 'p6', who: 'chacha', kinds: [], loop: [] },
@@ -33,6 +35,7 @@ export function Meet() {
   const page = PAGES[i]
   const v = page.loop.length ? page.loop[Math.min(k, page.loop.length - 1)] : 0
   const [mood, setMood] = useState(50)
+  const [cl, setCl] = useState(0)
 
   useEffect(() => { setK(0) }, [i])
   useEffect(() => {
@@ -43,9 +46,15 @@ export function Meet() {
   useEffect(() => {
     const fun = page.kinds.includes('fun') ? v : 0
     const friends = page.kinds.includes('friends') ? v : 0
-    setStage({ demo: page.kinds.length ? { fun, friends } : null, focus: page.kinds.length ? 'bottle' : null })
-  }, [page, v, setStage])
-  useEffect(() => () => setStage({ demo: null, focus: null }), [setStage])
+    setStage({ demo: page.kinds.length ? { fun, friends } : null, focus: page.kinds.length ? 'bottle' : page.cloud ? 'cloud' : null, cloud: page.cloud ? cl : null })
+  }, [page, v, cl, setStage])
+  useEffect(() => () => setStage({ demo: null, focus: null, cloud: null }), [setStage])
+  useEffect(() => {
+    if (!page.cloud) return
+    setCl(0)
+    const id = window.setInterval(() => setCl((c) => (c + 1) % 5), 1300)
+    return () => window.clearInterval(id)
+  }, [page])
   useEffect(() => {
     if (!page.mood) return
     const seq = [50, 82, 64, 18, 50]
@@ -67,9 +76,10 @@ export function Meet() {
           </div>
         ))}
         {page.kinds.length > 0 && <div className="cafe-meet-word">{stage(v)}</div>}
+        {page.cloud && <img src={`/art/cafe/cloud-${cl}.webp`} alt="" className="cafe-meet-cloud" draggable={false} />}
         {page.mood && (
           <div className="cafe-meet-mood">
-            <span className="text-[34px]">{['😞', '😕', '😐', '🙂', '😄'][s]}</span>
+            <MoodFace stage={s} size={64} />
             <div className="cafe-gauge-bar is-mood"><b style={{ width: `${Math.max(6, mood)}%` }} /></div>
             <div className="text-[12px] font-bold">{t(`gauge.m${s}`)}</div>
           </div>

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { LangSwitch } from '../../../components/Hud'
 import { GOAL, quickRepay } from '../engine/content'
 import { paid, paymentError, paymentTotal, startingPayment } from '../engine/economy'
-import { dayOf, phaseOf, type Step } from '../engine/flow'
+import { cloudStage, dayOf, phaseOf, type Step } from '../engine/flow'
 import type { Payment, Run, Source } from '../engine/types'
 import { useGame } from '../../../store/game'
 import { balance, starCount } from '../engine/balance'
@@ -10,7 +10,7 @@ import { moodOf, moodStage } from '../engine/mood'
 import { stageOf } from '../engine/pressure'
 import { useStage } from '../state/stage'
 import { useCafe } from '../state/store'
-import { playerFace } from './Scene'
+import { GOAL_ART, playerFace, seatSprite, type Mood } from './Scene'
 import { useCt } from './text'
 
 /* ------------------------------------------------------------------ buttons */
@@ -28,6 +28,20 @@ export function Btn({ children, onClick, kind = 'main', disabled, label, classNa
 /** a painted item icon from the sticker sheet */
 export function Icon({ id, size = 44, className = '' }: { id: string; size?: number; className?: string }) {
   return <img className={`cafe-icon ${className}`} src={`/art/cafe/icon-${id}.webp`} alt="" width={size} height={size} draggable={false} />
+}
+
+const MOOD_POSE: Mood[] = ['worry', 'think', 'neutral', 'talk', 'happy']
+const MOOD_FACE = ['shock', 'glance', 'neutral', 'pleased', 'laugh']
+/** the mood face, drawn straight onto the page: the painted expressions for the girl, her seated pose's head for the boy */
+export function MoodFace({ stage, size = 30 }: { stage: number; size?: number }) {
+  const gender = useGame((s) => s.gender)
+  const persona = useGame((s) => s.persona)
+  if (gender === 'girl') return <img key={stage} className="cafe-moodpng" src={`/art/faces/${MOOD_FACE[stage]}.png`} alt="" style={{ height: size }} draggable={false} />
+  return (
+    <span className="cafe-moodface" style={{ width: size, height: size }} aria-hidden>
+      <img key={stage} src={seatSprite({ gender, persona }, MOOD_POSE[stage])} alt="" draggable={false} />
+    </span>
+  )
 }
 
 export type Who = 'chacha' | 'teja' | 'yusuf' | 'scene' | 'note' | 'vendor' | 'phone' | 'friends' | 'you'
@@ -164,7 +178,6 @@ function Gauges({ run }: { run: Run }) {
   const ms = moodStage(m)
   const bal = balance(run)
   const risk = stageOf(run.fizz.fun) >= 3 || stageOf(run.fizz.friends) >= 3
-  const face = ['😞', '😕', '😐', '🙂', '😄'][ms]
   const bottle = (kind: 'fun' | 'friends', label: string) => {
     const v = run.fizz[kind]
     const s = stageOf(v)
@@ -186,7 +199,7 @@ function Gauges({ run }: { run: Run }) {
         {bottle('fun', t('gauge.wants'))}
         {bottle('friends', t('gauge.friends'))}
         <div className="cafe-gauge">
-          <span className="cafe-gauge-face" aria-hidden>{face}</span>
+          <MoodFace stage={ms} size={32} />
           <div className="min-w-0 flex-1">
             <div className="cafe-gauge-label"><span className={`cafe-star ${bal.mood ? 'on' : ''}`} aria-hidden>★</span>{t('gauge.mood')}<span>{t(`gauge.m${ms}`)}</span></div>
             <div className="cafe-gauge-bar is-mood" role="img" aria-label={`${t('gauge.mood')}: ${t(`gauge.m${ms}`)}`}><b style={{ width: `${Math.max(6, m)}%` }} /></div>
@@ -226,7 +239,9 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
   const day = dayOf(step)
   const phase = phaseOf(step)
   const pct = Math.min(1, run.jars.save / GOAL)
-  const showGauges = ['window', 'bill:data', 'trolley', 'predict2', 'plates', 'worth', 'bignight', 'teja', 'bill:lunch', 'rain', 'pay', 'tally'].includes(step)
+  const cloudS = cloudStage(step)
+  const cloudNear = cloudS >= 3
+  const showGauges = ['window', 'bill:data', 'trolley', 'predict2', 'plates', 'worth', 'bignight', 'teja', 'bill:lunch', 'rain', 'pay', 'pay2', 'tally'].includes(step)
   const chip = (k: 'spend' | 'save' | 'emergency', icon: string) => (
     <span className={`cafe-jarchip ${focus === k ? 'is-hot' : focus ? 'is-dim' : ''}`}>
       <img src={`/art/cafe/${icon}.webp`} alt="" className="h-5 w-5 object-contain" draggable={false} /><small>{t(`jars.${k}`)}</small>₹{run.jars[k]}
@@ -236,7 +251,7 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
     <div className="cafe-hud">
       <div className="cafe-hud-row">
         <div className="ink-chip flex min-w-0 items-center gap-2 py-1 pl-2 pr-3" aria-label={`${t('hud.goal')}: ${t(`goals.${run.goal}`)} ${t('hud.of', { a: run.jars.save, b: GOAL })}`}>
-          <span className="text-[16px]" aria-hidden>📌</span>
+          <img src={GOAL_ART[run.goal]} alt="" className="h-7 w-7 object-contain" draggable={false} />
           <div className="min-w-0">
             <div className="truncate text-[11px] font-bold uppercase tracking-wide opacity-70">{t(`goals.${run.goal}`)}</div>
             <div className="text-[13px] font-bold tabular-nums">{t('hud.of', { a: run.jars.save, b: GOAL })}</div>
@@ -257,7 +272,12 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
         <button type="button" className="ink-chip grid h-10 w-10 place-items-center" aria-label={t('hud.pause')} onClick={() => setPaused(true)}>⏸</button>
       </div>
       {step !== 'payday' && (
-        <div className="cafe-jars">{chip('spend', 'tumbler')}{chip('save', 'gullak')}{chip('emergency', 'umbrella-closed')}</div>
+        <div className="cafe-jars">
+          {chip('spend', 'tumbler')}{chip('save', 'gullak')}{chip('emergency', 'umbrella-closed')}
+          <span className={`cafe-jarchip cafe-cloudchip ${cloudNear ? 'is-hot' : ''} ${focus === 'cloud' ? 'is-hot' : ''}`}>
+            <img src={`/art/cafe/cloud-${cloudS}.webp`} alt="" className="h-6 w-auto object-contain" draggable={false} /><small>{t('gauge.cloud')}</small>
+          </span>
+        </div>
       )}
       {showGauges && <Gauges run={run} />}
     </div>

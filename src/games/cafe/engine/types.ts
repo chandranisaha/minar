@@ -108,6 +108,9 @@ export interface Run {
   spendBeforeTeja?: number
   hasCover: boolean
   surprise: { id: number; bill: number }
+  /** the cloud sometimes drops a second, smaller surprise */
+  extra: { id: number; bill: number } | null
+  rainPaid2: Payment
   rainPaid: Payment
   /** total borrowed on Quick Cash and what it costs to repay */
   loan: { borrowed: number; repay: number }

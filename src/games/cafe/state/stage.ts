@@ -8,8 +8,10 @@ export interface StageState {
   beat: SceneProps['beat']
   focus: SceneProps['focus']
   plates: number
-  /** Ammamma's envelope: on Chacha's counter, sliding over, or on the table */
-  letter: 'counter' | 'slide' | 'table' | null
+  /** Ammamma's envelope stays with Chacha */
+  letter: 'counter' | null
+  /** the intro can show any cloud stage */
+  cloud: number | null
   /** the intro plays the bottles itself: fizz values to show instead of the run's */
   demo: { fun: number; friends: number } | null
   pulse: { jar: 'spend' | 'save' | 'emergency'; n: number } | null
@@ -26,6 +28,7 @@ export const useStage = create<StageState>()((set, get) => ({
   focus: null,
   plates: 0,
   letter: null,
+  cloud: null,
   demo: null,
   pulse: null,
   clink: (jar) => set((st) => ({ pulse: { jar, n: (st.pulse?.n ?? 0) + 1 } })),
@@ -35,5 +38,5 @@ export const useStage = create<StageState>()((set, get) => ({
     s[i] = v
     set({ saucers: s })
   },
-  reset: () => set({ saucers: [null, null], vendor: undefined, beat: null, focus: null, pulse: null, demo: null, letter: null }),
+  reset: () => set({ saucers: [null, null], vendor: undefined, beat: null, focus: null, pulse: null, demo: null, letter: null, cloud: null }),
 }))

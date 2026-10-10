@@ -17,6 +17,9 @@ export const WAVES: string[][] = raw.waves
 export const TROLLEY_ITEMS = raw.trolley as TrolleyItemDef[]
 export const BILL_DEFS = raw.bills as BillDef[]
 export const SURPRISES = raw.surprises as SurpriseDef[]
+/** small second surprises: the cloud sometimes drops twice */
+export const EXTRAS = raw.extras as SurpriseDef[]
+export const EXTRA_CHANCE: number = raw.extraChance
 
 export const windowItem = (id: string): WindowItemDef => {
   const it = WINDOW_ITEMS.find((w) => w.id === id)

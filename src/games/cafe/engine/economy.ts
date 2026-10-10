@@ -1,7 +1,7 @@
 import { draw, rngFor } from '../../../lib/rng'
 import {
   BIG_NIGHT_CARRY_COST, BIG_NIGHT_COST, BILL_DEFS, COIN, FIZZ_START, GOAL, INCOME, QUICK_MAX, SURPRISES, TROLLEY_ITEMS, WAVES,
-  billDef, quickRepay, surpriseDef, trolleyItem, windowItem,
+  billDef, EXTRA_CHANCE, EXTRAS, quickRepay, surpriseDef, trolleyItem, windowItem,
 } from './content'
 import { decline, popped, release } from './pressure'
 import type {
@@ -62,7 +62,9 @@ export function newRun({ seed, goal, month = 1, carry = {}, lastSurprise }: NewR
     gift: 0,
     hasCover: false,
     surprise: { id: surprise.id, bill: surprise.bill },
+    extra: draw(seed, 'extra') < EXTRA_CHANCE ? (({ id, bill }) => ({ id, bill }))(EXTRAS[Math.floor(draw(seed, 'extraWhich') * EXTRAS.length)]) : null,
     rainPaid: {},
+    rainPaid2: {},
     loan: { borrowed: 0, repay: 0 },
     ledger: [],
     ledgerOpened: 0,
@@ -289,6 +291,20 @@ export function payRain(run: Run, p: Payment): Run {
   r = { ...r, rainPaid: { ...p } }
   const e = paid(p, 'emergency')
   return line(r, { day: 23, key: `rain.${run.surprise.id}`, vars: { x: bill, from: sourceList(p) }, note: e >= 100 ? 'dry' : e === 0 ? 'wet' : undefined })
+}
+
+export const extraBill = (run: Run): number => run.extra?.bill ?? 0
+
+/** the second, smaller surprise (only when the cloud dropped twice) */
+export function payExtra(run: Run, p: Payment): Run {
+  if (!run.extra) throw new Error('no second surprise this month')
+  const bill = run.extra.bill
+  const err = paymentError(run, bill, p, { quick: true })
+  if (err) throw new Error(`extra: ${err}`)
+  let r = applyPayment(run, bill, p, 'rain')
+  if (paid(p, 'quick') && !run.fineOpened) r = { ...r, borrowedWithoutReading: true }
+  r = { ...r, rainPaid2: { ...p } }
+  return line(r, { day: 26, key: `rain.${run.extra.id}`, vars: { x: bill, from: sourceList(p) } })
 }
 
 /* ------------------------------------------------------------------ small records */

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { GOAL, QUICK_TABLE } from '../engine/content'
-import { littleTotal, openFinePrint, paid, payRain, rainBill } from '../engine/economy'
+import { extraBill, littleTotal, openFinePrint, paid, payExtra, payRain, rainBill } from '../engine/economy'
 import { stageOf } from '../engine/pressure'
 import type { Payment, Run, SceneFocus } from './rainTypes'
 import { useStage } from '../state/stage'
@@ -12,7 +12,7 @@ import { useCt } from './text'
  * Round 5, Phase 4, the finale: the calm, the freeze, the crack, and the table speaks.
  * Every beat is presentation only and Pause freezes it.
  */
-const RAIN_ICON: Record<number, string> = { 1: 'phone', 2: 'tyre', 3: 'lab', 4: 'gift', 5: 'pills' }
+const RAIN_ICON: Record<number, string> = { 1: 'phone', 2: 'tyre', 3: 'lab', 4: 'gift', 5: 'pills', 6: 'auto', 7: 'gift', 8: 'pills' }
 
 export function RainRound() {
   const { t, stage } = useCt()
@@ -36,7 +36,7 @@ export function RainRound() {
   ]
 
   useEffect(() => {
-    setStage({ beat: beat === 'reveal' ? 'crack' : beat, focus: beat === 'table' ? table[ti]?.focus ?? null : null, plates: run.trolley.filter((x) => x.action === 'ok').length })
+    setStage({ beat: beat === 'reveal' ? 'crack' : beat, focus: beat === 'calm' ? 'cloud' : beat === 'table' ? table[ti]?.focus ?? null : null, plates: run.trolley.filter((x) => x.action === 'ok').length })
   }, [beat, ti]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => setStage({ beat: null, focus: null }), [setStage])
 
@@ -52,7 +52,7 @@ export function RainRound() {
   if (beat === 'calm' || beat === 'freeze' || beat === 'crack') {
     return (
       <div className="flex flex-col gap-3">
-        <Caption who="scene" text={t(`rain.${beat}`)} />
+        <Caption who="scene" text={t(`rain.${beat}`)} sub={beat === 'calm' ? `${t('rain.watch')} ${t('rain.watchS')}` : undefined} />
         <div className="flex justify-end"><Btn kind="ghost" onClick={() => setBeat('reveal')}>{t('hud.skip')}</Btn></div>
       </div>
     )
@@ -85,7 +85,7 @@ export function RainRound() {
 }
 
 /** the pay panel: four sources around the bill, Quick Cash with its fine print */
-export function Pay() {
+export function Pay({ second = false }: { second?: boolean }) {
   const { t } = useCt()
   const run = useCafe((s) => s.run)
   const apply = useCafe((s) => s.apply)
@@ -94,14 +94,30 @@ export function Pay() {
   const [guess, setGuess] = useState<number | null>(run.predict3 ?? null)
   const [pending, setPending] = useState<Payment | null>(null)
   const [outcome, setOutcome] = useState<string | null>(null)
-  const bill = rainBill(run)
+  const bill = second ? extraBill(run) : rainBill(run)
+  const sid = second ? run.extra?.id ?? 6 : run.surprise.id
+  const [seen, setSeen] = useState(!second)
 
   const finish = (p: Payment) => {
     const before = run
-    apply((r) => payRain(r, p))
+    apply((r) => (second ? payExtra(r, p) : payRain(r, p)))
     setOutcome(outcomeLine(before, p, bill, t))
   }
 
+  if (!seen) {
+    return (
+      <div className="flex flex-col gap-3">
+        <Caption text={`${t('rain.again')} ${t(`rain.first${sid}`)}`} />
+        <div className="cafe-bill is-rain">
+          <span className="cafe-bill-stamp">{t('bill.stamp')}</span>
+          <Icon id={RAIN_ICON[sid]} size={64} className="mx-auto" />
+          <div className="text-[15px] font-bold">{t(`rain.bill${sid}`)}</div>
+          <div className="font-display text-[30px] leading-none">₹{bill}</div>
+        </div>
+        <div className="flex justify-end"><Btn onClick={() => setSeen(true)}>{t('hud.next')} ▸</Btn></div>
+      </div>
+    )
+  }
   if (outcome) {
     return (
       <div className="flex flex-col gap-3">
@@ -157,11 +173,11 @@ export function Pay() {
         run={run}
         amount={bill}
         quick
-        title={`${t(`rain.bill${run.surprise.id}`)} · ₹${bill}`}
+        title={`${t(`rain.bill${sid}`)} · ₹${bill}`}
         notes={
           <>
-            {run.lent > 0 && <div className="cafe-note-card">🔒 {t('rain.tejaCard', { x: run.lent })}</div>}
-            <button type="button" className="cafe-note-card text-left" onClick={() => setQc(run.fineOpened ? 'flip' : 'ask')}>⚡ {t('jars.quick')}: {t('rain.qcPitch', { x: bill })}</button>
+            {run.lent > 0 && <div className="cafe-note-card">{t('rain.tejaCard', { x: run.lent })}</div>}
+            <button type="button" className="cafe-note-card text-left" onClick={() => setQc(run.fineOpened ? 'flip' : 'ask')}><img src="/art/cafe/bolt.webp" alt="" className="mr-1 inline h-5 w-5 align-middle" draggable={false} />{t('jars.quick')}: {t('rain.qcPitch', { x: bill })}</button>
           </>
         }
         beforePay={(p) => {

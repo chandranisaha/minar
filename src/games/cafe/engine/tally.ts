@@ -167,10 +167,13 @@ function callbacks(run: Run, little: number): Tally['callbacks'] {
     [run.bigNight?.choice === 'stay', 'stayed', {}],
     [payday.emergency === 0, 'brave', {}],
     [run.predict1 === 'none', 'saidNone', {}],
+    [run.predict1 === 'one' && !run.extra, 'saidOne', {}],
+    [run.predict1 === 'one' && !!run.extra, 'oneButTwo', {}],
+    [run.predict1 === 'two' && !!run.extra, 'saidTwo', {}],
+    [run.predict1 === 'two' && !run.extra, 'twoButOne', {}],
     [run.predict2 !== undefined && guessBand(little) > run.predict2, 'yusuf', { x: little, band: run.predict2 ?? 0 }],
     [dropped.length > 0, 'walkedAway', { x: dropped.reduce((a, w) => a + windowItem(w.itemId).price, 0) }],
     [!run.bigNight && fizzBoughtEarly.length > 0, 'marble', { x: fizzBoughtEarly.reduce((a, w) => a + windowItem(w.itemId).price, 0) }],
-    [run.predict1 === 'one', 'saidOne', {}],
     [run.predict1 === 'idk', 'saidIdk', {}],
   ]
   return all.filter(([ok]) => ok).slice(0, 2).map(([, key, vars]) => ({ key, vars }))

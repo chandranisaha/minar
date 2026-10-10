@@ -5,7 +5,7 @@ import { EXPERIMENTS, type Experiment, type MonthSummary, type Tally as TallyT }
 import { balance, isPerfect, starCount, STARS } from '../engine/balance'
 import { moodOf, moodStage } from '../engine/mood'
 import { useCafe } from '../state/store'
-import { Btn, Caption } from './kit'
+import { Btn, Caption, MoodFace } from './kit'
 import { useCt } from './text'
 
 type Page = 'settle' | 'headline' | 'report' | 'reading' | 'notes' | 'cards' | 'chit' | 'close'
@@ -62,7 +62,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
       [t('tally.cushion'), `₹${tally.cushionUsed + tally.cushionKept}`, t('tally.cushionSplit', { u: tally.cushionUsed, k: tally.cushionKept })],
       [t('tally.cost'), `₹${tally.extra + tally.lentOut}`, t('tally.costSplit', { e: tally.extra, l: tally.lentOut })],
       [t('tally.balance'), '★'.repeat(starCount(balance(run))) + '☆'.repeat(3 - starCount(balance(run))), starCount(balance(run)) === 3 ? t('tally.bAll') : t('tally.bFail', { list: STARS.filter((k) => !balance(run)[k]).map((k) => t(`gauge.${k}`)).join(', ') })],
-      [t('tally.mood'), ['😞', '😕', '😐', '🙂', '😄'][moodStage(moodOf(run))], t(`tally.mm${moodStage(moodOf(run))}`)],
+      [t('tally.mood'), '', t(`tally.mm${moodStage(moodOf(run))}`)],
     ]
     return (
       <div className="flex flex-col gap-2">
@@ -71,7 +71,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
           {rows.map(([k, v, sub]) => (
             <div key={k} className="cafe-report-row">
               <span className="font-bold">{k}</span>
-              <span className="text-right"><span className="font-extrabold tabular-nums">{v}</span>{sub && <span className="block text-[11.5px] opacity-70">{sub}</span>}</span>
+              <span className="text-right">{k === t('tally.mood') ? <MoodFace stage={moodStage(moodOf(run))} size={40} /> : <span className="font-extrabold tabular-nums">{v}</span>}{sub && <span className="block text-[11.5px] opacity-70">{sub}</span>}</span>
             </div>
           ))}
           <div className="mt-1 text-[12px] opacity-80">{t('tally.gladMeh', { g: tally.glad, m: tally.mehTotal })}</div>
@@ -131,7 +131,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
         </div>
         <p className="m-0 text-[12.5px] opacity-75">{t('tally.nobody')}</p>
         <div className="flex justify-end gap-2">
-          <Btn kind="cream" onClick={() => setKept(true)} disabled={kept}>✂ {t('tally.keep')}</Btn>
+          <Btn kind="cream" onClick={() => setKept(true)} disabled={kept}>{t('tally.keep')}</Btn>
           <Btn onClick={go}>{t('hud.next')} ▸</Btn>
         </div>
       </div>
@@ -142,7 +142,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
       <Caption text={t('tally.close')} />
       {run.lent > 0 && <p className="m-0 text-[12.5px] opacity-80">{run.month === 2 ? t('replay.tejaEpilogue2', { x: run.lent }) : t('replay.tejaEpilogue1')}</p>}
       <div className="flex flex-wrap justify-end gap-2">
-        <Btn kind="cream" onClick={() => setLedgerOpen(true)}>📒 {t('tally.seeWhere')}</Btn>
+        <Btn kind="cream" onClick={() => setLedgerOpen(true)}><img src="/art/cafe/book-closed.webp" alt="" className="mr-1 inline h-5 w-5 align-middle" draggable={false} />{t('tally.seeWhere')}</Btn>
         <Btn kind="cream" onClick={onExit}>{t('tally.done')}</Btn>
         <Btn onClick={() => restart()}>↻ {t('tally.playAgain')}</Btn>
       </div>

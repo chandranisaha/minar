@@ -82,6 +82,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
       case 'teja': return <Teja key={`teja-${run.month}`} />
       case 'rain': return <RainRound key={`rain-${run.month}`} />
       case 'pay': return <Pay />
+      case 'pay2': return <Pay key={`pay2-${run.month}`} second />
       case 'tally': return <TallyRound key={`tally-${run.month}`} onFinish={finish} onExit={onExit} />
       case 'thennow': return <ThenNow />
       case 'onechange': return <OneChange onExit={onExit} />
@@ -94,7 +95,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
       {step !== 'entry' && <Hud step={step} run={run} />}
       <div className="cafe-main" data-busy={isBusy(step) && step !== 'entry' ? '1' : undefined}>
         <div className="cafe-stage" aria-hidden={step === 'entry'}>
-          <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} demo={stage.demo} letter={stage.letter} reached={run.jars.save >= 250} lite={lite} />
+          <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} demo={stage.demo} letter={stage.letter} cloudStage={stage.cloud} reached={run.jars.save >= 250} lite={lite} />
         </div>
         <div className="cafe-dock">
           <div className="cafe-dock-inner">

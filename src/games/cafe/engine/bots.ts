@@ -1,7 +1,7 @@
 import { trolleyItem, windowItem } from './content'
 import {
   billAmount, buyWindow, chooseBigNight, chooseTeja, confirmPayday, declineWindow, guessBand, littleTotal, newRun, openBigNight,
-  payBill, payRain, paymentError, rainBill, tejaAvailable, trolleyOk, trolleySkip, bigNightPrice, openFinePrint,
+  payBill, payRain, payExtra, extraBill, paymentError, rainBill, tejaAvailable, trolleyOk, trolleySkip, bigNightPrice, openFinePrint,
 } from './economy'
 import { popped } from './pressure'
 import { settle } from './tally'
@@ -79,11 +79,12 @@ export function playMonth(s: Strategy, seed = 'BOT', run0?: Run): { run: Run; ta
   run = bill(run, 'lunch')
   if (s.readFine) run = openFinePrint(run)
   run = payRain(run, payWith(run, rainBill(run), s.pay.rain, true) ?? payWith(run, rainBill(run), ['emergency', 'spend', 'save', 'quick'], true)!)
+  if (run.extra) run = payExtra(run, payWith(run, extraBill(run), s.pay.rain, true) ?? payWith(run, extraBill(run), ['emergency', 'spend', 'save', 'quick'], true)!)
   return { run, tally: settle(run) }
 }
 
 const BILL: Source[] = ['spend', 'save', 'emergency']
-const SKIP_ALL = { chai: 'skip', samosa: 'skip', cold: 'skip', coins: 'skip', biscuit: 'skip', ice: 'skip' } as const
+const SKIP_ALL = { chai: 'skip', samosa: 'skip', cold: 'skip', tiffin: 'skip', biscuit: 'skip', ice: 'skip' } as const
 
 /** the five reference playstyles in the design doc (section 3) */
 export const REFERENCE: Record<string, Strategy> = {
@@ -97,7 +98,7 @@ export const REFERENCE: Record<string, Strategy> = {
   B_spendsEarly: {
     split: { save: 250, emergency: 50, spend: 300 },
     window: { gamepack: 'buy', jacket: 'pass', match: 'buy', cover: 'buy' },
-    trolley: { chai: 'ok', samosa: 'ok', cold: 'ok', coins: 'ok', biscuit: 'ok', ice: 'ok' },
+    trolley: { chai: 'ok', samosa: 'ok', cold: 'ok', tiffin: 'ok', biscuit: 'ok', ice: 'ok' },
     bigNight: 'go', teja: 'no',
     pay: { bill: BILL, want: ['spend'], rain: ['emergency', 'spend', 'save'] },
   },
@@ -118,7 +119,7 @@ export const REFERENCE: Record<string, Strategy> = {
   E_quickCash: {
     split: { save: 250, emergency: 0, spend: 350 },
     window: { gamepack: 'buy', jacket: 'pass', match: 'buy', cover: 'pass' },
-    trolley: { chai: 'ok', samosa: 'ok', cold: 'ok', coins: 'ok', biscuit: 'ok', ice: 'ok' },
+    trolley: { chai: 'ok', samosa: 'ok', cold: 'ok', tiffin: 'ok', biscuit: 'ok', ice: 'ok' },
     bigNight: 'go', teja: 'no',
     pay: { bill: BILL, want: ['spend'], rain: ['spend', 'quick'] },
   },

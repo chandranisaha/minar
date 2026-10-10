@@ -6,6 +6,7 @@ import { useStage } from '../state/stage'
 import { useCafe } from '../state/store'
 import { Btn, Caption, Script } from './kit'
 import { Letter } from './Letter'
+import { GOAL_ART } from './Scene'
 import { useCt } from './text'
 
 /** Entry card: names the café, what the player will learn, and the guardrails. */
@@ -20,7 +21,7 @@ export function Entry({ onExit }: { onExit: () => void }) {
       <p className="m-0 text-[14px]">{t('entry.boss')}</p>
       <p className="m-0 text-[13.5px] opacity-85">{t('entry.objective')}</p>
       <div className="flex flex-wrap justify-center gap-2 text-[12px] font-bold">
-        <span className="ink-chip px-2.5 py-1">⏱ {t('entry.time')}</span>
+        <span className="ink-chip px-2.5 py-1">{t('entry.time')}</span>
         <span className="ink-chip px-2.5 py-1">{t('entry.note')}</span>
       </div>
       <div className="flex justify-center"><LangSwitch /></div>
@@ -41,7 +42,7 @@ export function WalkIn() {
   const [part, setPart] = useState<'a' | 'letter' | 'b'>('a')
   useEffect(() => { setStage({ letter: 'counter' }); return () => setStage({ letter: null }) }, [setStage])
   if (part === 'letter') {
-    return <Letter onDone={() => { setStage({ letter: 'table' }); setPart('b') }} />
+    return <Letter onDone={() => { setStage({ letter: null }); setPart('b') }} />
   }
   if (part === 'a') {
     return (
@@ -51,7 +52,7 @@ export function WalkIn() {
           { text: t('r0.l2') },
           { text: t('r0.give') },
         ]}
-        onDone={() => { setStage({ letter: 'slide' }); window.setTimeout(() => setPart('letter'), 1100) }}
+        onDone={() => setPart('letter')}
       />
     )
   }
@@ -68,7 +69,6 @@ export function WalkIn() {
   )
 }
 
-const GOAL_ICON: Record<GoalId, string> = { earphones: '🎧', trip: '🚌', controller: '🎮' }
 
 export function GoalPick() {
   const { t } = useCt()
@@ -83,7 +83,7 @@ export function GoalPick() {
         {GOALS.map((g) => (
           <button key={g} type="button" role="radio" aria-checked={picked === g} className={`cafe-goal ${picked === g ? 'is-on' : ''}`}
             onClick={() => { setPicked(g); apply((r: Run) => ({ ...r, goal: g })) }}>
-            <span className="text-[30px]" aria-hidden>{GOAL_ICON[g]}</span>
+            <img src={GOAL_ART[g]} alt="" className="h-12 w-auto object-contain" draggable={false} />
             <span className="text-[13px] font-bold leading-tight">{t(`goals.${g}`)}</span>
             <span className="text-[12px] font-bold text-[#C97B4A]">₹{GOAL}</span>
           </button>
