@@ -44,7 +44,7 @@ def put(kind, art_names, n, w_range, minroad, minnode, rim=False, spacing=150):
         a = random.choice(art_names); w = random.uniform(*w_range)
         placed.append(dict(art=a, wx=p[0], wy=p[1], x=round(p[0] / W * 100, 2), y=round(p[1] / H * 100, 2), w=round(w), kind=kind)); got += 1
 names = lambda pre, ids=None: [k for k in man if k.startswith(pre) and (ids is None or int(k.split('-')[-1]) in ids)]
-put('tree', names('deco-tree', [2, 3, 5, 6, 1, 4, 7]), 12, (210, 290), 105, 170, spacing=190)
+put('tree', names('deco-tree', [2, 3, 5, 6, 1, 4, 7]), 6, (210, 280), 105, 170, spacing=260)
 put('tree', ['deco-tree-0'], 1, (360, 400), 170, 230, spacing=300)
 put('rock', names('deco-rock'), 9, (150, 230), 85, 150, rim=True, spacing=170)
 put('bush', names('deco-bush', [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13]), 22, (110, 170), 80, 130, spacing=95)

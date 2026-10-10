@@ -322,7 +322,11 @@ export function IslandMap() {
       onWheel={onWheel}
       onScroll={(e) => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0 }}
     >
+      <div className="sea" aria-hidden />
+      <div className="sea-waves" aria-hidden />
       <div ref={worldEl} style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', willChange: 'transform' }}>
+        {art['island-foam'] && <img src="/art/island-foam.webp" alt="" draggable={false} className="idle foam" style={{ position: 'absolute', left: -(70 / 1342) * WORLD.w, top: -(70 / 1139) * WORLD.h, width: WORLD.w * (1482 / 1342), height: WORLD.h * (1279 / 1139), pointerEvents: 'none', zIndex: 0 }} />}
+        <div className="idle float-island" style={{ position: 'absolute', inset: 0 }}>
         <ArtSlot name={raw.ground} className="absolute inset-0 h-full w-full" fallback={<IslandArt done={completed as NodeId[]} allDone={allDone} />} />
 
         {/* decor: trees, rocks, bushes (tools/scatter.py). Depth by their base line. */}
@@ -403,7 +407,7 @@ export function IslandMap() {
           return (
             <div key={n.id}>
               {(isPillar || n.kind === 'goal') && (
-                <div style={{ position: 'absolute', left: x + 36, top: y + 12 - 215, width: 142, height: 215, pointerEvents: 'none', zIndex: Math.round(y) + 5, filter: 'drop-shadow(0 4px 3px rgba(58,42,36,.25))' }}>
+                <div style={{ position: 'absolute', left: x + 30, top: y + 20 - 330, width: 215, height: 330, pointerEvents: 'none', zIndex: Math.round(y) + 5, filter: 'drop-shadow(0 4px 3px rgba(58,42,36,.25))' }}>
                   {n.id === 'plan' && firstTime && completed.length === 0 && <div className="idle ring" style={{ position: 'absolute', left: -14, right: -14, bottom: -8, height: 40, borderRadius: '50%', border: '3px solid #D9573F' }} />}
                   <img src={`/art/${n.kind === 'goal' ? (allDone ? 'flag-done' : 'flag-locked') : isDone ? 'flag-done' : 'flag-open'}.webp`} alt="" draggable={false} className="idle flagwave" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transformOrigin: '50% 100%' }} />
                 </div>
@@ -452,6 +456,7 @@ export function IslandMap() {
             {Array.from({ length: 9 }, (_, i) => <span key={i} className="petal" style={{ left: `${30 + i * 5}%`, animationDelay: `${i * 0.9}s` }} />)}
           </div>
         )}
+        </div>
       </div>
 
       {touch && <Joystick />}

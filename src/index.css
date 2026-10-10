@@ -111,3 +111,17 @@ html[data-lite="true"] .gate-glow { animation: none; }
 
 @keyframes flagwave { 0%,100% { transform: skewX(0) } 50% { transform: skewX(1.6deg) } }
 .idle.flagwave { animation: flagwave 2s steps(8) infinite; }
+
+/* sea: deep-to-shallow gradient sampled from the painting, with two drifting layers of ripple strokes */
+.sea { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #5ACBEA 0%, #41B9E4 45%, #2FA2D4 100%); }
+.sea-waves { position: absolute; inset: -120px; pointer-events: none; opacity: .5;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='160'><g fill='none' stroke='white' stroke-width='3' stroke-linecap='round' opacity='.7'><path d='M10 40 q22 -14 44 0 t44 0'/><path d='M170 110 q22 -14 44 0 t44 0'/><path d='M200 30 q16 -10 32 0 t32 0' opacity='.6'/><path d='M40 130 q16 -10 32 0 t32 0' opacity='.6'/></g></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='460' height='240'><g fill='none' stroke='%23d9f4ff' stroke-width='4' stroke-linecap='round' opacity='.55'><path d='M60 70 q30 -18 60 0 t60 0'/><path d='M300 180 q30 -18 60 0 t60 0'/></g></svg>");
+  background-size: 320px 160px, 460px 240px; animation: sea-drift 14s steps(56) infinite; }
+@keyframes sea-drift { from { background-position: 0 0, 0 0 } to { background-position: 320px 80px, -460px 120px } }
+@keyframes float-island { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+@keyframes foam-pulse { 0%,100% { opacity: .85; transform: scale(1) } 50% { opacity: .4; transform: scale(1.012) } }
+.idle.float-island { animation: float-island 5s steps(25) infinite; }
+.idle.foam { animation: foam-pulse 3.2s steps(16) infinite; transform-origin: 50% 55%; }
+html[data-lite="true"] .sea-waves { animation: none; }
+@media (prefers-reduced-motion: reduce) { .sea-waves { animation: none; } }
