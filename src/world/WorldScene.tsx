@@ -44,6 +44,7 @@ const SIGN: Partial<Record<PillarId, { key: string; x: number; y: number; color:
 interface ArtKeeperCfg { idle: string; hover: string; ref: string; width: number; drop?: number; anchor?: number }
 const ART_KEEPER: Partial<Record<PillarId, ArtKeeperCfg>> = {
   plan: { idle: 'char-seller-arrange', hover: 'char-seller-hold', ref: 'char-seller-hold', width: 0.34, drop: 20 },
+  invest: { idle: 'char-pearl-idle', hover: 'char-pearl-show', ref: 'char-pearl-idle', width: 0.3, drop: 40 },
   save: { idle: 'char-cafe-worried', hover: 'char-cafe-relieved', ref: 'char-cafe-worried', width: 0.3, anchor: 0.79 },
 }
 

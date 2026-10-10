@@ -72,6 +72,8 @@ SELLER_BOXES = {
 
 CAFE_BOXES = {'worried': (668, 650, 922, 1008), 'relieved': (934, 662, 1178, 1008)}
 
+PEARL_BOXES = {'idle': (10, 470, 200, 735), 'show': (800, 470, 962, 700)}
+
 SKIP = ['character asset sheet', 'character game asset']
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -95,6 +97,10 @@ for fn in sorted(files):
         continue
     if 'caf' in low and 'character' in low:
         for nm in cut_props(os.path.join(src, fn), CAFE_BOXES, 'char-cafe-'):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
+    if 'pearl merchant' in low and 'character' in low:
+        for nm in cut_props(os.path.join(src, fn), PEARL_BOXES, 'char-pearl-'):
             done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
         continue
     if 'bangle seller' in low:

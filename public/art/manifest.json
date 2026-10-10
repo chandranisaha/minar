@@ -178,5 +178,15 @@
   "w": 244,
   "h": 337,
   "src": "South Asian Caf\u00e9 Character Asset Sheet.png"
+ },
+ "char-pearl-idle": {
+  "w": 190,
+  "h": 264,
+  "src": "Elderly Pearl Merchant Character Sheet.png"
+ },
+ "char-pearl-show": {
+  "w": 162,
+  "h": 230,
+  "src": "Elderly Pearl Merchant Character Sheet.png"
  }
 }
