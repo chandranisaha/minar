@@ -138,7 +138,8 @@
   "report2": {
     "decisions": "మీ నిర్ణయాలు",
     "decisionsBody": "బాగా జరిగినవి, మెరుగుపరచుకోవాల్సినవి.",
-    "analytics": "మీ విశ్లేషణ"
+    "analytics": "మీ విశ్లేషణ",
+    "overview": "సారాంశం"
   },
   "pick": {
     "ev": {

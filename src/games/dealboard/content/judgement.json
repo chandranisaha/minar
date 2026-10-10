@@ -138,7 +138,8 @@
   "report2": {
     "decisions": "Your decisions",
     "decisionsBody": "What went well and what to improve.",
-    "analytics": "Your analytics"
+    "analytics": "Your analytics",
+    "overview": "Overview"
   },
   "pick": {
     "ev": {

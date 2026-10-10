@@ -138,7 +138,8 @@
   "report2": {
     "decisions": "आपके फ़ैसले",
     "decisionsBody": "क्या अच्छा रहा और क्या सुधारें।",
-    "analytics": "आपका विश्लेषण"
+    "analytics": "आपका विश्लेषण",
+    "overview": "सार"
   },
   "pick": {
     "ev": {
