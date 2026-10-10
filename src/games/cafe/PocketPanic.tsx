@@ -89,7 +89,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
   return (
     <div className="cafe" data-slow={slow ? 'true' : undefined}>
       <div className="cafe-stage" aria-hidden={step === 'entry'}>
-        <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} lite={lite} />
+        <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} reached={run.jars.save >= 250} lite={lite} />
       </div>
       {step !== 'entry' && <Hud step={step} run={run} />}
       <div className="cafe-dock">

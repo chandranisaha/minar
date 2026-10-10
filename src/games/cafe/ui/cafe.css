@@ -1,18 +1,16 @@
 /* Pocket Panic: café stage + panel. Warm, calm to look at; stepped motion; every effect off under reduced motion / Lite. */
 .cafe { position: absolute; inset: 0; background: #22180F; color: #3A2A24; overflow: hidden; }
 
-/* the picture takes whatever height the dialogue leaves; on narrow screens the camera pans to whoever matters */
-.cafe { display: flex; flex-direction: column; }
-.cafe-stage { position: relative; flex: 1 1 0; min-height: 30svh; overflow: hidden; container-type: size; background: #22180F; }
-.cafe-stage::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 14%; background: linear-gradient(transparent, rgba(34, 24, 15, .55)); pointer-events: none; }
-.cafe-svg { position: absolute; top: 0; left: 0; height: 100%; width: auto; aspect-ratio: 16 / 9; transform: translateX(clamp(calc(100cqw - 100%), calc(50cqw - var(--cx, .5) * 100%), 0px)); transition: transform .9s cubic-bezier(.4, 0, .2, 1); }
-@container (min-aspect-ratio: 16 / 9) { .cafe-svg { width: 100%; height: auto; top: 50%; transform: translateY(-50%); } }
+/* picture on top, always whole; the subtitle dock sits underneath and never covers it */
+.cafe { display: flex; flex-direction: column; background: #1E150E; }
+.cafe-stage { position: relative; flex: none; width: 100%; aspect-ratio: 16 / 9; max-height: 46svh; container-type: size; background: #1E150E; }
+.cafe-svg { display: block; width: min(100cqw, calc(100cqh * 16 / 9)); height: auto; margin: 0 auto; border-radius: 0 0 14px 14px; }
 @media (min-width: 700px) {
-  .cafe-stage { position: absolute; inset: 0 0 auto 0; height: 100svh; flex: none; }
+  .cafe-stage { flex: 1 1 0; min-height: 0; aspect-ratio: auto; max-height: none; display: grid; place-items: center; }
 }
 
-/* top bar over the picture */
-.cafe-hud { position: absolute; top: 0; left: 0; right: 0; z-index: 20; display: flex; flex-direction: column; gap: 6px; padding: max(8px, env(safe-area-inset-top)) 10px 18px; background: linear-gradient(rgba(34, 24, 15, .75), rgba(34, 24, 15, .35) 70%, transparent); }
+/* top bar: above the picture, not over it */
+.cafe-hud { order: -1; flex: none; z-index: 20; display: flex; flex-direction: column; gap: 6px; padding: max(8px, env(safe-area-inset-top)) 10px 8px; background: #2A1D12; }
 .cafe-hud-row { display: flex; align-items: center; gap: 8px; }
 .cafe-month { flex: 1; min-width: 0; color: #FBF0D2; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
 .cafe-month-bar { position: relative; height: 8px; margin-top: 3px; border-radius: 4px; background: rgba(251, 240, 210, .25); border: 1.5px solid #FBF0D2; }
@@ -24,12 +22,12 @@
 .cafe-jarchip.is-hot { transform: scale(1.08); box-shadow: 0 0 0 3px #FFE9A8; }
 .cafe-jarchip.is-dim { opacity: .55; }
 
-/* the dialogue + controls sit under the picture (a floating card on wide screens) */
-.cafe-dock { position: relative; z-index: 10; flex: none; display: flex; flex-direction: column; max-height: 64svh; }
-.cafe-dock-inner { overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px max(10px, env(safe-area-inset-bottom)); background: #FBF3DE; border-top: 2px solid #3A2A24; border-radius: 20px 20px 0 0; margin-top: -16px; box-shadow: 0 -10px 30px rgba(0, 0, 0, .35); }
+/* the subtitle dock: dialogue + controls, under the picture */
+.cafe-dock { position: relative; z-index: 10; flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.cafe-dock-inner { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px max(10px, env(safe-area-inset-bottom)); background: #FBF3DE; border-top: 3px solid #3A2A24; box-shadow: 0 -6px 18px rgba(0, 0, 0, .35); }
 @media (min-width: 700px) {
-  .cafe-dock { position: absolute; left: 50%; bottom: 14px; width: min(760px, calc(100vw - 32px)); transform: translateX(-50%); max-height: 64svh; }
-  .cafe-dock-inner { border: 2px solid #3A2A24; border-radius: 20px; padding: 16px 18px; margin-top: 0; }
+  .cafe-dock { flex: none; max-height: 47svh; }
+  .cafe-dock-inner { padding: 14px max(18px, calc((100% - 760px) / 2)) 12px; }
 }
 .cafe-foot { margin: 8px 0 0; font-size: 10.5px; color: #3A2A24; opacity: .55; text-align: center; }
 
@@ -185,3 +183,23 @@ html[data-lite='true'] .cafe *, .cafe .is-lite * { animation: none !important; }
 
 @keyframes cafe-rainfall2 { from { transform: translateY(-20px) } to { transform: translateY(20px) } }
 .cafe-rain { animation: cafe-rainfall2 .6s linear infinite !important; }
+
+/* ---- coins and the little scene animations ---- */
+.cafe-coin { width: 22px; height: 22px; object-fit: contain; background: none; border: none; border-radius: 0; filter: drop-shadow(0 1px 0 rgba(58, 42, 36, .5)); }
+.cafe-coin.is-drag { position: fixed; z-index: 70; width: 34px; height: 34px; pointer-events: none; }
+.cafe-flycoin { position: fixed; z-index: 80; width: 22px; height: 22px; pointer-events: none; animation: cafe-fly .52s cubic-bezier(.3, .6, .4, 1) both; }
+@keyframes cafe-fly { 0% { transform: translate(0, 0) scale(1) rotateY(0) } 55% { transform: translate(calc(var(--dx) * .55), calc(var(--dy) * .55 - 46px)) scale(1.25) rotateY(180deg) } 100% { transform: translate(var(--dx), var(--dy)) scale(.7) rotateY(360deg); opacity: .15 } }
+.cafe-jarimg { height: 44px; width: auto; max-width: 56px; object-fit: contain; }
+.cafe-jar.is-pop .cafe-jarimg { animation: cafe-clinkk .35s ease; }
+@keyframes cafe-clinkk { 0%, 100% { transform: none } 30% { transform: scale(1.18) rotate(-6deg) } 60% { transform: scale(1.1) rotate(5deg) } }
+.cafe-clink { animation: cafe-clinkk .4s ease; transform-box: fill-box; transform-origin: center bottom; }
+.cafe-drop { animation: cafe-dropk .55s cubic-bezier(.5, 0, 1, .6) both; }
+@keyframes cafe-dropk { from { transform: translateY(-14px); opacity: 1 } to { transform: translateY(34px); opacity: 0 } }
+.cafe-spin { animation: cafe-spink 2.2s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes cafe-spink { 0% { transform: scaleX(1) } 25% { transform: scaleX(.1) } 50% { transform: scaleX(-1) } 75% { transform: scaleX(.1) } 100% { transform: scaleX(1) } }
+.cafe-fall { animation: cafe-fallk .5s cubic-bezier(.5, 0, 1, .7) both; }
+@keyframes cafe-fallk { from { transform: translateY(-60px) rotate(-30deg) } to { transform: none } }
+.cafe-swap { animation: cafe-swapk .3s ease both; transform-box: fill-box; transform-origin: center bottom; }
+@keyframes cafe-swapk { from { opacity: 0; transform: translateY(4px) scale(.97) } to { opacity: 1; transform: none } }
+.cafe-bob { animation: cafe-bob 1.6s ease-in-out infinite; transform-box: fill-box; }
+.cafe-say.is-note { background-image: url(/art/cafe/scroll.webp); background-size: 100% 100%; }

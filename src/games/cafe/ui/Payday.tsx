@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useStage } from '../state/stage'
 import { COIN, INCOME } from '../engine/content'
 import { confirmPayday, jarsTotal } from '../engine/economy'
 import type { Jars } from '../engine/types'
@@ -7,11 +8,13 @@ import { Btn, Caption, Script } from './kit'
 import { useCt } from './text'
 
 type JarKey = keyof Jars
-const JARS: { k: JarKey; icon: string }[] = [
-  { k: 'spend', icon: '🥛' },
-  { k: 'save', icon: '🏺' },
-  { k: 'emergency', icon: '☂️' },
+const JARS: { k: JarKey; img: string }[] = [
+  { k: 'spend', img: '/art/cafe/tumbler.webp' },
+  { k: 'save', img: '/art/cafe/gullak.webp' },
+  { k: 'emergency', img: '/art/cafe/umbrella-closed.webp' },
 ]
+
+interface Flyer { id: number; dx: number; dy: number; x: number; y: number }
 
 /** Chacha's reaction to the split: the first matching row, describing what he sees, never judging it */
 function reactionKey(j: Jars): string {
@@ -40,11 +43,23 @@ export function Payday() {
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null)
   const jarRefs = useRef<Partial<Record<JarKey, HTMLDivElement | null>>>({})
   const left = INCOME - jarsTotal(j)
+  const pileRef = useRef<HTMLDivElement | null>(null)
+  const [flyers, setFlyers] = useState<Flyer[]>([])
+  const fid = useRef(0)
+  const clink = useStage((st) => st.clink)
+  const fly = (k: JarKey, n: number) => {
+    const a = pileRef.current?.getBoundingClientRect(), b = jarRefs.current[k]?.getBoundingClientRect()
+    if (!a || !b) return
+    const made = Array.from({ length: Math.min(n, 5) }, (_, i) => ({ id: ++fid.current, x: a.left + a.width / 2 + (i - 2) * 8, y: a.top + a.height / 2, dx: b.left + b.width / 2 - (a.left + a.width / 2), dy: b.top + b.height / 2 - (a.top + a.height / 2) }))
+    setFlyers((f) => [...f, ...made])
+    window.setTimeout(() => { setFlyers((f) => f.filter((x) => !made.some((m) => m.id === x.id))); clink(k) }, 520)
+  }
 
   const add = (k: JarKey, d: number) => {
     const v = j[k] + d * COIN
     if (v < 0 || (d > 0 && left < COIN * d)) return
     setJ({ ...j, [k]: v })
+    if (d > 0) fly(k, d)
   }
   const dropAt = (x: number, y: number) => {
     for (const { k } of JARS) {
@@ -75,6 +90,7 @@ export function Payday() {
     <div className="flex flex-col gap-3">
       <Caption text={run.month > 1 ? t('replay.back') : t('r1.hint')} />
       <div
+        ref={pileRef}
         className="cafe-pile"
         aria-label={t('r1.remaining', { x: left })}
         onPointerDown={(e) => { if (left >= COIN) { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); setDrag({ x: e.clientX, y: e.clientY }) } }}
@@ -83,15 +99,16 @@ export function Payday() {
         onPointerCancel={() => setDrag(null)}
       >
         <div className="flex flex-wrap justify-center gap-[3px]">
-          {Array.from({ length: Math.min(60, left / COIN) }, (_, i) => <span key={i} className="cafe-coin" aria-hidden>₹</span>)}
+          {Array.from({ length: Math.min(60, left / COIN) }, (_, i) => <img key={i} src="/art/cafe/coin.webp" className="cafe-coin" alt="" draggable={false} />)}
         </div>
         <div className="mt-1 text-center text-[13px] font-bold">{left ? t('r1.remaining', { x: left }) : t('r1.allPlaced')}</div>
       </div>
-      {drag && <span className="cafe-coin is-drag" style={{ left: drag.x - 14, top: drag.y - 14 }} aria-hidden>₹</span>}
+      {drag && <img src="/art/cafe/coin.webp" className="cafe-coin is-drag" style={{ left: drag.x - 14, top: drag.y - 14 }} alt="" draggable={false} />}
+      {flyers.map((f) => <img key={f.id} src="/art/cafe/coin.webp" alt="" className="cafe-flycoin" style={{ left: f.x - 11, top: f.y - 11, ['--dx' as string]: `${f.dx}px`, ['--dy' as string]: `${f.dy}px` }} />)}
       <div className="grid grid-cols-3 gap-2">
-        {JARS.map(({ k, icon }) => (
+        {JARS.map(({ k, img }) => (
           <div key={k} ref={(el) => { jarRefs.current[k] = el }} className={`cafe-jar is-${k}`}>
-            <span className="text-[24px]" aria-hidden>{icon}</span>
+            <img src={img} alt="" className="cafe-jarimg" draggable={false} />
             <span className="text-[12px] font-bold uppercase">{t(`jars.${k}`)}</span>
             <span className="text-[10.5px] opacity-70">{t(`jars.${k}Place`)}</span>
             <span className="text-[20px] font-extrabold tabular-nums">₹{j[k]}</span>

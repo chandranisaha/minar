@@ -162,7 +162,7 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
   const pct = Math.min(1, run.jars.save / GOAL)
   const chip = (k: 'spend' | 'save' | 'emergency', icon: string) => (
     <span className={`cafe-jarchip ${focus === k ? 'is-hot' : focus ? 'is-dim' : ''}`}>
-      <span aria-hidden>{icon}</span><small>{t(`jars.${k}`)}</small>₹{run.jars[k]}
+      <img src={`/art/cafe/${icon}.webp`} alt="" className="h-5 w-5 object-contain" draggable={false} /><small>{t(`jars.${k}`)}</small>₹{run.jars[k]}
     </span>
   )
   return (
@@ -186,11 +186,11 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
             <span className="cafe-month-fill" style={{ width: `${(day / 30) * 100}%` }} />
           </div>
         </div>
-        <button type="button" className="ink-chip grid h-10 w-10 place-items-center" aria-label={t('hud.ledger')} onClick={() => { setLedgerOpen(true); useCafe.getState().apply((r) => ({ ...r, ledgerOpened: r.ledgerOpened + 1 })) }}>📒</button>
+        <button type="button" className="ink-chip grid h-10 w-10 place-items-center" aria-label={t('hud.ledger')} onClick={() => { setLedgerOpen(true); useCafe.getState().apply((r) => ({ ...r, ledgerOpened: r.ledgerOpened + 1 })) }}><img src="/art/cafe/book-closed.webp" alt="" className="h-7 w-7 object-contain" draggable={false} /></button>
         <button type="button" className="ink-chip grid h-10 w-10 place-items-center" aria-label={t('hud.pause')} onClick={() => setPaused(true)}>⏸</button>
       </div>
       {step !== 'payday' && (
-        <div className="cafe-jars">{chip('spend', '🥛')}{chip('save', '🏺')}{chip('emergency', '☂️')}</div>
+        <div className="cafe-jars">{chip('spend', 'tumbler')}{chip('save', 'gullak')}{chip('emergency', 'umbrella-closed')}</div>
       )}
     </div>
   )
