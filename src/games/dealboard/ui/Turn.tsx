@@ -14,6 +14,7 @@ import { LessonCard } from './LessonCard'
 import { LightChip, MiniChart, lightFacts } from './Lights'
 import { AlertStrip, MarketLine, Sheet, useInr } from './Panels'
 import { FounderFace, FounderProfile } from './Founder'
+import { IconBank, IconCash, IconEye, IconPeople } from './icons'
 import { rivalAlerts } from '../engine/rivals'
 import { WILD_TIP, wildcardFor } from '../engine/wildcards'
 import { ReviewCard } from './Review'
@@ -29,14 +30,14 @@ export interface TurnHandlers {
 }
 
 /** A question you have not asked yet: the check's name and the question, as one tap target. */
-const ASK_ICON: Record<LightKey, string> = { cash: '💰', customers: '👥', debt: '🏦', ceo: '🕵️' }
+const ASK_ICON: Record<LightKey, () => React.ReactElement> = { cash: () => <IconCash />, customers: () => <IconPeople />, debt: () => <IconBank />, ceo: () => <IconEye /> }
 
 /** One check on the company: an icon, what it looks at, and the plain question it answers. */
 function AskTile({ k, onAsk, disabled }: { k: LightKey; onAsk: () => void; disabled: boolean }) {
   const { t } = useTranslation('dealboard')
   return (
     <button type="button" disabled={disabled} onClick={onAsk} className="flex min-h-16 items-center gap-2.5 rounded-lg border-2 border-ink px-2.5 py-1.5 text-left leading-tight" style={{ background: '#FFF3D6', opacity: disabled ? 0.5 : 1 }}>
-      <span className="shrink-0 text-[22px]" aria-hidden>{ASK_ICON[k]}</span>
+      <span className="shrink-0" aria-hidden>{ASK_ICON[k]()}</span>
       <span className="min-w-0">
         <span className="block text-[13px] font-extrabold">{t(`lights.${k}.name`)}</span>
         <span className="block text-[12px] font-semibold opacity-75">{t(`pitch3.${k}`)}</span>

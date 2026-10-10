@@ -218,7 +218,7 @@
     "founder": "Founder",
     "story": "Read their story",
     "career": "Career",
-    "look": "Look closer",
+    "look": "Spot the clue",
     "close": "Close",
     "ask": "Do your homework",
     "askLeft": "{{n}} of 2 checks left",
@@ -228,6 +228,10 @@
     "customers": "Do customers stay and pay?",
     "debt": "Does it owe a lot?",
     "ceo": "Is the boss selling shares?",
-    "stars": "Research"
+    "stars": "Research",
+    "ageL": "Age",
+    "yrsL": "Years working",
+    "startsL": "Startups",
+    "clue": "Clue"
   }
 }
