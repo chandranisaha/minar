@@ -190,6 +190,12 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
     return () => window.clearTimeout(id)
   }, [quiet, run.turn, lite, dispatch])
 
+  // saves from before the one-decision-per-quarter flow can sit in the retired 'manage' phase: close that quarter so the panel is never blank
+  const stale = run.phase === 'manage'
+  useEffect(() => {
+    if (stale) dispatch({ type: 'endTurn' })
+  }, [stale, dispatch])
+
   const roll = () => {
     if (lite) return dispatch({ type: 'roll' })
     setRolling(true)
