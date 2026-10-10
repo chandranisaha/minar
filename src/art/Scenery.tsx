@@ -158,7 +158,6 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false }: { 
 
       {/* ground */}
       <rect x="-420" y="580" width="1840" height="820" fill={`url(#${id}-ground)`} />
-      <rect x="-420" y="580" width="1840" height="820" fill={`url(#${id}-cob)`} opacity=".55" />
       <ellipse cx="500" cy="880" rx="400" ry="330" fill={`url(#${id}-plaza)`} />
       {/* painted lane edges */}
       <path d="M70 585 V1290 M930 585 V1290" stroke="#A8693A" strokeWidth="6" opacity=".5" />

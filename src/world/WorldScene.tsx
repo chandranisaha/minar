@@ -66,15 +66,44 @@ function Seal() {
   )
 }
 
-/** painted street-wall clusters along both lane edges; two building styles (a, b) alternate */
-const SIDE_BUILDINGS: { art: string; side: 'left' | 'right'; base: number; h: number }[] = [
-  { art: 'bld-b-left', side: 'left', base: 760, h: 440 },
-  { art: 'bld-a-left', side: 'left', base: 1050, h: 430 },
-  { art: 'bld-b-left', side: 'left', base: 1340, h: 430 },
-  { art: 'bld-a-right', side: 'right', base: 760, h: 440 },
-  { art: 'bld-b-right', side: 'right', base: 1050, h: 430 },
-  { art: 'bld-a-right', side: 'right', base: 1340, h: 430 },
+/** painted street-wall clusters along both lane edges, three layers deep (far, back, front) so no gaps show.
+ * Two building styles (a, b); back/far layers reuse the same art flipped and permuted. */
+interface SB { art: string; side: 'left' | 'right'; base: number; h: number; dx: number; flip?: boolean }
+const FRONT: SB[] = [
+  { art: 'bld-b-left', side: 'left', base: 760, h: 440, dx: 0 },
+  { art: 'bld-a-left', side: 'left', base: 1050, h: 430, dx: 0 },
+  { art: 'bld-b-left', side: 'left', base: 1340, h: 430, dx: 0 },
+  { art: 'bld-a-right', side: 'right', base: 760, h: 440, dx: 0 },
+  { art: 'bld-b-right', side: 'right', base: 1050, h: 430, dx: 0 },
+  { art: 'bld-a-right', side: 'right', base: 1340, h: 430, dx: 0 },
 ]
+const BACK: SB[] = [
+  { art: 'bld-a-right', side: 'left', base: 640, h: 420, dx: 95, flip: true },
+  { art: 'bld-b-right', side: 'left', base: 910, h: 430, dx: 120, flip: true },
+  { art: 'bld-a-right', side: 'left', base: 1190, h: 430, dx: 100, flip: true },
+  { art: 'bld-b-right', side: 'left', base: 1440, h: 430, dx: 120, flip: true },
+  { art: 'bld-b-left', side: 'right', base: 640, h: 420, dx: 95, flip: true },
+  { art: 'bld-a-left', side: 'right', base: 910, h: 430, dx: 120, flip: true },
+  { art: 'bld-b-left', side: 'right', base: 1190, h: 430, dx: 100, flip: true },
+  { art: 'bld-a-left', side: 'right', base: 1440, h: 430, dx: 120, flip: true },
+]
+const FAR: SB[] = [
+  { art: 'bld-a-left', side: 'left', base: 560, h: 430, dx: 260 },
+  { art: 'bld-b-left', side: 'left', base: 850, h: 430, dx: 270 },
+  { art: 'bld-a-left', side: 'left', base: 1140, h: 430, dx: 260 },
+  { art: 'bld-b-left', side: 'left', base: 1430, h: 430, dx: 270 },
+  { art: 'bld-a-right', side: 'right', base: 560, h: 430, dx: 260 },
+  { art: 'bld-b-right', side: 'right', base: 850, h: 430, dx: 270 },
+  { art: 'bld-a-right', side: 'right', base: 1140, h: 430, dx: 260 },
+  { art: 'bld-b-right', side: 'right', base: 1430, h: 430, dx: 270 },
+]
+const SIDE_BUILDINGS: SB[] = [...FAR, ...BACK, ...FRONT]
+
+/** plaza tile placement: the medallion (at 50% x, 49% y of the tile) sits exactly on the plaza centre (500, 938) */
+const PLAZA = (() => {
+  const w = 1287, h = 777
+  return { w, h, left: 500 - w * 0.5, top: 938 - h * 0.49 }
+})()
 
 /** a painted prop standing on its base line, centred on cx; size comes from the import manifest */
 function Prop({ a, name, cx, base, w, z }: { a: Record<string, { w: number; h: number }>; name: string; cx: number; base: number; w: number; z: number }) {
@@ -105,13 +134,23 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
         const bh = b.h
         const bw = Math.round((bh * a.w) / a.h)
         return (
-          <Obj key={i} x={b.side === 'left' ? 82 - bw : 918} y={b.base - bh} w={bw} h={bh} z={1}>
-            <img src={`/art/${b.art}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
+          <Obj key={i} x={b.side === 'left' ? 82 - bw - b.dx : 918 + b.dx} y={b.base - bh} w={bw} h={bh} z={1}>
+            <img src={`/art/${b.art}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block', transform: b.flip ? 'scaleX(-1)' : undefined }} />
           </Obj>
         )
       })}
       {art['deco-rangoli'] && (
-        <img src="/art/deco-rangoli.webp" alt="" draggable={false} style={{ position: 'absolute', left: -85, top: 580, width: 1170, height: 706, zIndex: 0, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', left: -1500, top: 580, width: 4000, height: 710, overflow: 'hidden', zIndex: 0, pointerEvents: 'none' }}>
+          {[-1, 0, 1].map((k) => (
+            <img
+              key={k}
+              src="/art/deco-rangoli.webp"
+              alt=""
+              draggable={false}
+              style={{ position: 'absolute', width: PLAZA.w, height: PLAZA.h, left: PLAZA.left - -1500 + k * PLAZA.w, top: PLAZA.top - 580, transform: k ? 'scaleX(-1)' : undefined }}
+            />
+          ))}
+        </div>
       )}
 
       {/* door rings on the ground */}
