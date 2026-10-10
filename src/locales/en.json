@@ -1,0 +1,84 @@
+{
+  "app": { "title": "Money Mohalla", "tagline": "One year. One goal. Four lanes of the bazaar." },
+  "lang": { "en": "EN", "hi": "हि", "te": "తె", "label": "Language" },
+  "pillars": {
+    "plan": { "name": "Plan & Budget", "hook": "Needs, wants, and a plan for every ₹.", "game": "Weekly Budget" },
+    "save": { "name": "Save & Manage", "hook": "Two bad weeks are coming. Ready?", "game": "Two Bad Weeks" },
+    "invest": { "name": "Understand Investing", "hook": "Risk, time, and a little magic called compounding.", "game": "Risk & Time Lab" },
+    "safe": { "name": "Stay Financially Safe", "hook": "Spot the scam before it spots you.", "game": "Spot the Scam" }
+  },
+  "world": {
+    "bangles": "BANGLES",
+    "chai": "IRANI CHAI",
+    "pearls": "PEARLS",
+    "recharge": "RECHARGE",
+    "offer": "OFFER!",
+    "flowers": "FLOWERS",
+    "charminar": "CHARMINAR"
+  },
+  "hud": {
+    "goal": "Goal",
+    "saved": "saved",
+    "of": "of",
+    "lite": "Lite mode",
+    "liteOn": "Lite: on",
+    "liteOff": "Lite: off",
+    "replay": "Replay story",
+    "language": "Language",
+    "persona": "You",
+    "startHere": "Start here",
+    "enter": "Enter",
+    "walkHint": "Tap anywhere to walk. Tap a shop to go in.",
+    "keysHint": "Arrow keys / WASD to walk · Enter to go in",
+    "completed": "Done",
+    "illustrative": "Illustrative amounts. Not real offers or advice."
+  },
+  "personas": {
+    "school": { "name": "School student", "blurb": "Class 12. Saving for coaching and exam fees.", "goalFor": "Coaching and exam fees" },
+    "college": { "name": "College student", "blurb": "First year done. Tuition and hostel are next.", "goalFor": "Tuition and hostel fees" },
+    "earner": { "name": "First-generation earner", "blurb": "First job. Family counts on you. Saving for a skills course.", "goalFor": "Skills course fee" },
+    "startsWith": "Starts with"
+  },
+  "story": {
+    "b1": { "title": "One Year. One Goal.", "caption": "Hyderabad wakes up. The pigeons are early. So are you." },
+    "b2": { "title": "Choose your player", "caption": "Who is walking into the bazaar today?" },
+    "b3": { "title": "Nani's flower stall", "caption": "Nani presses a small cloth bundle into your hands.", "quote": "This is what we could save. The rest is up to you.", "sign": "Nani" },
+    "b4": { "title": "The Goal", "caption": "Fee due in 12 months. Fill the bar, one smart choice at a time.", "receipt": "FEE RECEIPT", "amount": "Amount due", "deadline": "Due in 12 months", "paid": "Paid so far", "stamp": "DUE" },
+    "b5": { "title": "The bazaar opens", "caption": "Four doors. Four lessons. All yours.", "ask": "Where will you go first?" },
+    "step": "Scene {{n}} of 5"
+  },
+  "buttons": {
+    "start": "Start",
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back",
+    "go": "Let's go!",
+    "replay": "Replay story",
+    "backToCharminar": "Back to Charminar",
+    "markComplete": "Mark as complete",
+    "lite": "Lite mode",
+    "rewind": "Rewind"
+  },
+  "play": {
+    "chapter": "Chapter {{n}}",
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "This lane of the bazaar opens soon. For now, the lamp on the minaret can be lit with the button below.",
+    "done": "Lamp lit! Head back to the Charminar.",
+    "goalBar": "Goal bar",
+    "rewindNote": "Rewind is coming: every mistake can be retried, no penalty."
+  },
+  "recap": {
+    "heading": "Recap",
+    "sampleTitle": "Opportunity cost",
+    "sampleBody": "Every time you pick one thing, you give up another. Naming that trade-off makes the next choice easier.",
+    "skills": "Skills you practised"
+  },
+  "celebrate": {
+    "title": "Goal reached!",
+    "body": "Four lamps lit. Nani is proud of you.",
+    "nani": "Shabash!",
+    "again": "Keep exploring"
+  },
+  "dashboard": { "title": "Dashboard", "body": "Your skills will show up here soon." },
+  "lang_notice": "Language"
+}

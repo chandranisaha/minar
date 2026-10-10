@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@import "@fontsource/chango/400.css";
+@import "@fontsource/bowlby-one/400.css";
+@import "@fontsource/rozha-one/400.css";
+@import "@fontsource/noto-sans/500.css";
+@import "@fontsource/noto-sans/800.css";
+@import "@fontsource/noto-sans-devanagari/500.css";
+@import "@fontsource/noto-sans-devanagari/800.css";
+@import "@fontsource/noto-sans-devanagari/900.css";
+@import "@fontsource/noto-sans-telugu/500.css";
+@import "@fontsource/noto-sans-telugu/800.css";
+@import "@fontsource/noto-sans-telugu/900.css";
+
+/* ---- Design tokens (see DESIGN.md) ---- */
+@theme {
+  --color-terracotta: #d9632e;
+  --color-marigold: #f28c28;
+  --color-mustard: #e8b04a;
+  --color-jasmine: #fff3d6;
+  --color-sky: #5bb5d6;
+  --color-teal: #2f6f73;
+  --color-sage: #3f7a3a;
+  --color-coral: #d8503a;
+  --color-pink: #e5457a;
+  --color-gold: #d9a520;
+  --color-dusk: #1e2a44;
+  --color-ink: #2b1a17;
+  --color-maroon: #7a2a22;
+  --font-display: "Chango", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
+  --font-sign: "Bowlby One", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
+  --font-body: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
+  --shadow-flat: 4px 4px 0 var(--color-ink);
+  --shadow-flat-sm: 2px 3px 0 var(--color-ink);
+}
+
+:root { color-scheme: light; --ink: #2b1a17; --lang-scale: 1; }
+html[lang="hi"] { --lang-scale: .9; }
+html[lang="te"] { --lang-scale: .86; }
+html, body, #root { height: 100%; margin: 0; background: #2b1a17; }
+body {
+  font-family: var(--font-body); font-weight: 500; color: var(--ink);
+  overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+/* display text switches to a script-aware face */
+html[lang="hi"] .font-display, html[lang="hi"] .font-sign { font-family: "Rozha One", "Noto Sans Devanagari", sans-serif; font-weight: 400; }
+html[lang="te"] .font-display, html[lang="te"] .font-sign { font-family: "Noto Sans Telugu", sans-serif; font-weight: 900; line-height: 1.25; }
+.lang-fit { font-size: calc(1em * var(--lang-scale)); }
+
+/* ---- Inked, hand-cut UI primitives ---- */
+.ink-btn {
+  min-height: 48px; min-width: 48px; padding: 0 18px; cursor: pointer;
+  font-family: var(--font-sign); font-size: 16px; color: var(--color-ink); letter-spacing: .02em;
+  background: var(--color-mustard); border: 3px solid var(--color-ink);
+  border-radius: 14px 10px 16px 9px / 10px 15px 9px 14px;
+  box-shadow: var(--shadow-flat); transition: transform .08s steps(2), box-shadow .08s steps(2);
+}
+.ink-btn:hover { transform: translate(-1px,-2px) rotate(-1deg); box-shadow: 5px 6px 0 var(--color-ink); }
+.ink-btn:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--color-ink); }
+.ink-btn:focus-visible, button:focus-visible { outline: 4px solid var(--color-pink); outline-offset: 3px; }
+.ink-btn.pink { background: var(--color-pink); color: var(--color-jasmine); }
+.ink-btn.teal { background: var(--color-sky); }
+.ink-btn.cream { background: var(--color-jasmine); }
+.ink-chip {
+  background: var(--color-jasmine); border: 3px solid var(--color-ink); box-shadow: var(--shadow-flat-sm);
+  border-radius: 12px 9px 13px 8px / 9px 13px 8px 12px; color: var(--color-ink);
+}
+.paper { background: var(--color-jasmine); border: 4px solid var(--color-ink); border-radius: 6px 10px 5px 11px; box-shadow: 6px 7px 0 var(--color-ink); }
+
+/* ---- stepped animation primitives: ~10fps "on twos/threes" ---- */
+@keyframes bob { 0%,100% { transform: translateY(0) scale(1,1) } 50% { transform: translateY(-5px) scale(.97,1.04) } }
+@keyframes bob-sm { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+@keyframes sway { 0%,100% { transform: rotate(-3deg) } 50% { transform: rotate(3deg) } }
+@keyframes pulse-step { 0%,100% { transform: scale(1) } 50% { transform: scale(1.08) } }
+@keyframes blink-sign { 0%,49% { opacity: 1 } 50%,100% { opacity: .25 } }
+@keyframes twinkle { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+@keyframes hop { 0%,60%,100% { transform: translateY(0) } 70% { transform: translateY(-9px) } 80% { transform: translateY(0) } 88% { transform: translateY(-5px) } }
+@keyframes steam { 0% { transform: translateY(0); opacity: .9 } 100% { transform: translateY(-26px) scale(1.5); opacity: 0 } }
+@keyframes squash-pop { 0% { transform: scale(1,1) } 25% { transform: scale(1.22,.74) } 50% { transform: scale(.86,1.28) translateY(-14px) } 75% { transform: scale(1.1,.9) } 100% { transform: scale(1,1) } }
+@keyframes unfurl { 0% { transform: scaleY(0); } 60% { transform: scaleY(1.12); } 100% { transform: scaleY(1); } }
+@keyframes pop-in { 0% { transform: scale(0) rotate(-8deg) } 60% { transform: scale(1.15) rotate(3deg) } 100% { transform: scale(1) rotate(0) } }
+@keyframes spark { 0% { transform: scale(0) } 40% { transform: scale(1.4) } 100% { transform: scale(0) } }
+@keyframes firework { 0% { transform: scale(.1); opacity: 1 } 70% { opacity: 1 } 100% { transform: scale(1); opacity: 0 } }
+@keyframes bounce-arrow { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+@keyframes fly-away { 0% { transform: translate(0,0) scale(1) } 100% { transform: translate(var(--fx), var(--fy)) scale(.4) } }
+@keyframes flicker { 0%,100% { opacity: .9 } 30% { opacity: .5 } 60% { opacity: 1 } }
+
+.anim-bob { animation: bob .9s steps(9) infinite; transform-origin: 50% 100%; }
+.anim-bob-sm { animation: bob-sm .8s steps(6) infinite; }
+.anim-sway { animation: sway 2.4s steps(12) infinite; transform-origin: 50% 0; }
+.anim-pulse { animation: pulse-step 1s steps(8) infinite; }
+.anim-blink { animation: blink-sign .9s steps(1) infinite; }
+.anim-twinkle { animation: twinkle 1.4s steps(2) infinite; }
+.anim-hop { animation: hop 3.6s steps(18) infinite; }
+.anim-squash { animation: squash-pop .55s steps(11) 1; transform-origin: 50% 100%; }
+.anim-unfurl { animation: unfurl .35s steps(7) 1 both; transform-origin: 50% 0; }
+.anim-pop { animation: pop-in .45s steps(9) 1 both; }
+
+html[data-lite="true"] .grain, html[data-lite="true"] .scratches { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-sway, .anim-hop, .anim-twinkle, .anim-pulse, .anim-blink, .anim-bob, .anim-bob-sm { animation: none !important; }
+}
+
+@keyframes shifty { 0%,35% { transform: translateX(-2px) } 45%,85% { transform: translateX(3px) } 100% { transform: translateX(-2px) } }
+.toon-shifty { animation: shifty 2.6s steps(1) infinite; }
+@keyframes walk-bob { 0%,100% { transform: translateY(0) scale(1,1) } 50% { transform: translateY(-4px) scale(.95,1.06) } }
+.anim-walk { animation: walk-bob .28s steps(3) infinite; transform-origin: 50% 100%; }
+@keyframes idle-breathe { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.015,.985) } }
+.anim-idle { animation: idle-breathe 1.2s steps(4) infinite; transform-origin: 50% 100%; }
