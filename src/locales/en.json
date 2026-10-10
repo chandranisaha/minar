@@ -83,7 +83,10 @@
     },
     "b2": {
       "title": "Who is heading out?",
-      "caption": "Pick the person you will be this year."
+      "caption": "Pick the person you will be this year.",
+      "look": "Look",
+      "girl": "Girl",
+      "boy": "Boy"
     },
     "b3": {
       "title": "Nani's flower stall",

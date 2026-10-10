@@ -615,5 +615,247 @@
   62,
   11.2,
   1.9
+ ],
+ "decor": [
+  {
+   "art": "deco-tree-6",
+   "x": 73.5,
+   "y": 73.53,
+   "w": 211,
+   "kind": "tree",
+   "solid": [
+    1.23,
+    0.52
+   ]
+  },
+  {
+   "art": "deco-tree-1",
+   "x": 37.5,
+   "y": 28.82,
+   "w": 204,
+   "kind": "tree",
+   "solid": [
+    1.19,
+    0.5
+   ]
+  },
+  {
+   "art": "deco-tree-5",
+   "x": 15.5,
+   "y": 31.18,
+   "w": 234,
+   "kind": "tree",
+   "solid": [
+    1.37,
+    0.57
+   ]
+  },
+  {
+   "art": "deco-tree-3",
+   "x": 15.5,
+   "y": 61.76,
+   "w": 249,
+   "kind": "tree",
+   "solid": [
+    1.45,
+    0.61
+   ]
+  },
+  {
+   "art": "deco-tree-3",
+   "x": 75.5,
+   "y": 51.18,
+   "w": 206,
+   "kind": "tree",
+   "solid": [
+    1.2,
+    0.5
+   ]
+  },
+  {
+   "art": "deco-tree-4",
+   "x": 86.5,
+   "y": 31.18,
+   "w": 210,
+   "kind": "tree",
+   "solid": [
+    1.23,
+    0.51
+   ]
+  },
+  {
+   "art": "deco-tree-4",
+   "x": 52.5,
+   "y": 75.88,
+   "w": 258,
+   "kind": "tree",
+   "solid": [
+    1.51,
+    0.63
+   ]
+  },
+  {
+   "art": "deco-rock-3",
+   "x": 84.5,
+   "y": 72.35,
+   "w": 160,
+   "kind": "rock",
+   "solid": [
+    2.0,
+    0.78
+   ]
+  },
+  {
+   "art": "deco-rock-6",
+   "x": 82.5,
+   "y": 87.65,
+   "w": 183,
+   "kind": "rock",
+   "solid": [
+    2.29,
+    0.9
+   ]
+  },
+  {
+   "art": "deco-rock-0",
+   "x": 42.5,
+   "y": 81.76,
+   "w": 170,
+   "kind": "rock",
+   "solid": [
+    2.12,
+    0.83
+   ]
+  },
+  {
+   "art": "deco-rock-4",
+   "x": 90.5,
+   "y": 57.06,
+   "w": 174,
+   "kind": "rock",
+   "solid": [
+    2.17,
+    0.85
+   ]
+  },
+  {
+   "art": "deco-rock-6",
+   "x": 77.5,
+   "y": 66.47,
+   "w": 157,
+   "kind": "rock",
+   "solid": [
+    1.96,
+    0.77
+   ]
+  },
+  {
+   "art": "deco-rock-2",
+   "x": 59.5,
+   "y": 79.41,
+   "w": 183,
+   "kind": "rock",
+   "solid": [
+    2.29,
+    0.9
+   ]
+  },
+  {
+   "art": "deco-rock-2",
+   "x": 35.5,
+   "y": 86.47,
+   "w": 162,
+   "kind": "rock",
+   "solid": [
+    2.02,
+    0.79
+   ]
+  },
+  {
+   "art": "deco-rock-0",
+   "x": 3.5,
+   "y": 53.53,
+   "w": 194,
+   "kind": "rock",
+   "solid": [
+    2.42,
+    0.95
+   ]
+  },
+  {
+   "art": "deco-rock-5",
+   "x": 45.5,
+   "y": 40.59,
+   "w": 152,
+   "kind": "rock",
+   "solid": [
+    1.9,
+    0.75
+   ]
+  },
+  {
+   "art": "deco-bush-2",
+   "x": 78.5,
+   "y": 75.88,
+   "w": 103,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-12",
+   "x": 71.5,
+   "y": 79.41,
+   "w": 105,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-6",
+   "x": 10.5,
+   "y": 31.18,
+   "w": 123,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-0",
+   "x": 19.5,
+   "y": 35.88,
+   "w": 101,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-4",
+   "x": 68.5,
+   "y": 54.71,
+   "w": 110,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-1",
+   "x": 37.5,
+   "y": 21.76,
+   "w": 129,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-13",
+   "x": 37.5,
+   "y": 34.71,
+   "w": 136,
+   "kind": "bush",
+   "solid": null
+  },
+  {
+   "art": "deco-bush-13",
+   "x": 82.5,
+   "y": 35.88,
+   "w": 119,
+   "kind": "bush",
+   "solid": null
+  }
  ]
 }

@@ -5,6 +5,7 @@ import { PERSONAS, SKILLS, type Lang, type PersonaId, type PillarId, type Skill 
 interface GameState {
   language: Lang
   persona: PersonaId | null
+  gender: 'girl' | 'boy'
   startAmount: number
   goalAmount: number
   savedAmount: number
@@ -16,6 +17,7 @@ interface GameState {
   skills: Record<Skill, number>
   setLanguage: (l: Lang) => void
   setPersona: (p: PersonaId) => void
+  setGender: (g: 'girl' | 'boy') => void
   completePillar: (p: PillarId) => void
   setStorySeen: (v: boolean) => void
   setCelebrated: (v: boolean) => void
@@ -30,6 +32,7 @@ export const useGame = create<GameState>()(
     (set, get) => ({
       language: 'en',
       persona: null,
+      gender: 'girl',
       startAmount: 0,
       goalAmount: 0,
       savedAmount: 0,
@@ -39,6 +42,7 @@ export const useGame = create<GameState>()(
       liteMode: null,
       skills: zeroSkills,
       setLanguage: (language) => set({ language }),
+      setGender: (gender) => set({ gender }),
       setPersona: (persona) => {
         const p = PERSONAS[persona]
         set({ persona, startAmount: p.start, goalAmount: p.goal, savedAmount: p.start, completedPillars: [], celebrated: false })

@@ -83,6 +83,36 @@ PEARL_BOXES = {'idle': (10, 470, 200, 735), 'show': (800, 470, 962, 700)}
 
 HACKER_BOXES = {'idle': (750, 672, 902, 852), 'point': (10, 672, 232, 852)}
 
+NPC_BOXES = {
+    'bangle-stand': (20, 10, 160, 340), 'bangle-sit': (1322, 210, 1536, 345),
+    'chai-stand': (15, 345, 150, 670), 'chai-sit': (1362, 365, 1536, 670),
+    'pearl-stand': (10, 680, 160, 1005), 'pearl-sit': (1330, 795, 1536, 1012),
+}
+
+KN_BOXES = {'kiosk-stand': (15, 15, 165, 408), 'kiosk-phone': (550, 10, 735, 400), 'nani-stand': (15, 575, 170, 870), 'nani-wave': (722, 575, 925, 870)}
+
+def cut_components(path, prefix, min_area=5000, dil=2, maxw=620):
+    # splits a sheet of separate items into one image each, ordered top-left to bottom-right
+    sheet = Image.open(path).convert('RGBA')
+    a = np.array(sheet.getchannel('A')) > 12
+    lab, n = ndi.label(ndi.binary_dilation(a, iterations=dil))
+    boxes = []
+    for i, sl in enumerate(ndi.find_objects(lab)):
+        if (sl[0].stop - sl[0].start) * (sl[1].stop - sl[1].start) >= min_area:
+            boxes.append((round(sl[0].start / 170), sl[1].start, i + 1, sl))
+    names = []
+    for k, (_, _, lid, sl) in enumerate(sorted(boxes)):
+        m = (lab[sl] == lid) & ndi.binary_dilation(a[sl], iterations=2)
+        arr = np.array(sheet.crop((sl[1].start, sl[0].start, sl[1].stop, sl[0].stop)))
+        arr[..., 3] = np.where(m, arr[..., 3], 0)
+        part = Image.fromarray(arr, 'RGBA'); part = part.crop(part.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
+        if part.width > maxw: part = part.resize((maxw, round(part.height * maxw / part.width)), Image.LANCZOS)
+        nm = f'{prefix}-{k}'
+        part.save(os.path.join(out, nm + '.webp'), 'WEBP', quality=88, method=6)
+        manifest[nm] = {'w': part.width, 'h': part.height, 'src': os.path.basename(path)}
+        names.append(nm)
+    return names
+
 SKIP = ['character asset sheet', 'character game asset']
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -108,6 +138,20 @@ for fn in sorted(files, key=lambda q: os.path.basename(q)):
         continue
     if 'caf' in low and 'character' in low:
         for nm in cut_props(os.path.join(src, fn), CAFE_BOXES, 'char-cafe-'):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
+    comp = [('tree asset', 'deco-tree'), ('rock clusters', 'deco-rock'), ('garden asset', 'deco-bush'), ('street prop', 'deco-prop'), ('dock and rowboat', 'deco-dock')]
+    hit = next((pre for key, pre in comp if key in low), None)
+    if hit:
+        for nm in cut_components(fn, hit, maxw=760 if hit == 'deco-dock' else 520):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
+    if 'kiosk guy and nani' in low:
+        for nm in cut_props(fn, KN_BOXES, 'npc-'):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
+    if 'market npc' in low:
+        for nm in cut_props(fn, NPC_BOXES, 'npc-'):
             done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
         continue
     if 'twin fantasy gates' in low:

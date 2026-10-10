@@ -64,11 +64,20 @@ function B2Persona() {
   const lang = useGame((s) => s.language)
   const persona = useGame((s) => s.persona)
   const setPersona = useGame((s) => s.setPersona)
+  const gender = useGame((s) => s.gender)
+  const setGender = useGame((s) => s.setGender)
   const ids = Object.keys(PERSONAS) as PersonaId[]
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
       <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
         <TitleCard title={t('story.b2.title')}>{t('story.b2.caption')}</TitleCard>
+        <div className="ink-chip mx-auto inline-flex p-0.5" role="radiogroup" aria-label={t('story.b2.look')}>
+          {(['girl', 'boy'] as const).map((g) => (
+            <button key={g} type="button" role="radio" aria-checked={gender === g} onClick={() => setGender(g)} className="h-10 min-w-24 rounded-full px-4 text-[14px] font-bold" style={{ background: gender === g ? '#3A2A24' : 'transparent', color: gender === g ? '#FBF0D2' : '#3A2A24', border: 0, cursor: 'pointer' }}>
+              {t(`story.b2.${g}`)}
+            </button>
+          ))}
+        </div>
         <div className="flex flex-col gap-2.5" role="radiogroup" aria-label={t('story.b2.title')}>
           {ids.map((id) => {
             const sel = persona === id
@@ -82,7 +91,7 @@ function B2Persona() {
                 className="paper flex w-full items-center gap-3 p-2.5 text-left"
                 style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FBF3DF' : '#FBF0D2', borderColor: sel ? '#D9573F' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s' }}
               >
-                <img src={`/art/avatar/${id}-face.webp`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] object-cover object-top" />
+                <img src={`/art/avatar/${gender}-${id}-face.webp`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] object-cover object-top" />
                 <div className="min-w-0 flex-1">
                   <div className="font-display lang-fit text-[18px] leading-tight">{t(`personas.${id}.name`)}</div>
                   <div className="mt-0.5 text-[13px] leading-snug opacity-85">{t(`personas.${id}.blurb`)}</div>
@@ -104,11 +113,22 @@ function B3Flowers() {
   const { t } = useTranslation()
   const lang = useGame((s) => s.language)
   const start = useGame((s) => s.startAmount)
-  const m = useManifest()['story-flowers']
+  const man = useManifest()
+  const m = man['story-flowers']
+  const nani = !!man['npc-nani-wave']
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#F8EBCB, #F2DFB0)' }}>
       <div className="mx-auto flex min-h-full max-w-[520px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
-        {m && <img src="/art/story-flowers.webp" alt="" draggable={false} className="fade-in w-full" style={{ filter: 'drop-shadow(0 8px 14px rgba(58,42,36,.25))' }} />}
+        {m && (
+          <div className="fade-in relative w-full">
+            <img src="/art/story-flowers.webp" alt="" draggable={false} className="block w-full" style={{ filter: 'drop-shadow(0 8px 14px rgba(58,42,36,.25))' }} />
+            {nani && (
+              <div className="anim-float absolute" style={{ left: '38%', bottom: '4%', width: '24%' }}>
+                <img src="/art/npc-nani-wave.webp" alt="" draggable={false} className="block w-full" />
+              </div>
+            )}
+          </div>
+        )}
         <div className="paper rise relative mx-auto -mt-6 w-[92%] px-4 py-3 text-center" style={{ animationDelay: '.5s' }}>
           <p className="m-0 text-[17px] font-bold leading-snug">“{t('story.b3.quote')}”</p>
           <p className="m-0 mt-1 text-[13px] opacity-75">{t('story.b3.caption')}</p>

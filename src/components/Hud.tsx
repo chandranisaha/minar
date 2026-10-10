@@ -38,11 +38,12 @@ export function GoalBar({ className = '' }: { className?: string }) {
 
 export function PersonaChip() {
   const persona = useGame((s) => s.persona)
+  const gender = useGame((s) => s.gender)
   const { t } = useTranslation()
   if (!persona) return null
   return (
     <div className="ink-chip grid h-11 w-11 place-items-center overflow-hidden p-0" title={t(`personas.${persona}.name`)}>
-      <img src={`/art/avatar/${persona}-face.webp`} alt={t(`personas.${persona}.name`)} className="h-full w-full object-cover object-top" draggable={false} />
+      <img src={`/art/avatar/${gender}-${persona}-face.webp`} alt={t(`personas.${persona}.name`)} className="h-full w-full object-cover object-top" draggable={false} />
     </div>
   )
 }

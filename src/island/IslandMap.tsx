@@ -32,6 +32,15 @@ function avatarFrame(dir: Dir, moving: boolean, f: number): { n: number; flip: b
   return { n: moving ? 2 + f : 2, flip: dir === 'left' }
 }
 
+/** shopkeepers from the NPC sheets: a fixed floating idle pose; the reaction pose plays only while the player is at the stall.
+ * fx/fy = where the figure's feet sit inside the building image (fractions); w = figure width in world px; cut = bottom fraction hidden behind a counter */
+const KEEPERS: Record<string, { idle: string; hover: string; dx: number; dy: number; h: number }> = {
+  plan: { idle: 'npc-bangle-stand', hover: 'npc-bangle-stand', dx: 120, dy: 34, h: 180 },
+  save: { idle: 'npc-chai-stand', hover: 'npc-chai-stand', dx: -105, dy: 40, h: 176 },
+  invest: { idle: 'npc-pearl-stand', hover: 'npc-pearl-stand', dx: 120, dy: 20, h: 176 },
+  safe: { idle: 'npc-kiosk-stand', hover: 'npc-kiosk-phone', dx: -100, dy: 30, h: 184 },
+}
+
 let lastPos: number[] | null = null // survives entering a pillar and coming back
 
 /** A flag on a pole: white while incomplete, antique gold with a tick once the place is done. */
@@ -60,6 +69,8 @@ export function IslandMap() {
   setGateOpen(allDone) // closed gate = solid, open gate = walk through
   const art = useManifest()
   const persona = useGame((q) => q.persona) ?? 'school'
+  const gender = useGame((q) => q.gender)
+  const who = `${gender}-${persona}`
   const avatar = useAvatarSizes()
   const debug = useMemo(() => new URLSearchParams(window.location.search).has('debug'), [])
 
@@ -85,7 +96,7 @@ export function IslandMap() {
   S.current.cardOpen = card !== null
   S.current.avatar = avatar
   S.current.gateOpen = allDone
-  S.current.persona = persona
+  S.current.persona = who
   S.current.cardFor = card
 
   /* ---------------------------------------------------------------- viewport / scale */
@@ -330,6 +341,15 @@ export function IslandMap() {
       <div ref={worldEl} style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', willChange: 'transform' }}>
         <ArtSlot name={raw.ground} className="absolute inset-0 h-full w-full" fallback={<IslandArt done={completed as NodeId[]} allDone={allDone} />} />
 
+        {/* decor: trees, rocks, bushes (tools/scatter.py). Depth by their base line. */}
+        {raw.decor.map((q, i) => {
+          const m = art[q.art]
+          if (!m) return null
+          const [dx, dy] = px([q.x, q.y])
+          const h = (q.w * m.h) / m.w
+          return <img key={i} src={`/art/${q.art}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: dx - q.w / 2, top: dy - h, width: q.w, height: h, zIndex: Math.round(dy), pointerEvents: 'none' }} />
+        })}
+
         {/* buildings: painted cutouts when present (shop-*.webp), a quiet placeholder otherwise. Layered by their base line. */}
         {raw.buildings.map((b) => {
           const [bx, by] = px([b.x, b.y])
@@ -349,7 +369,30 @@ export function IslandMap() {
               </div>
             )
           }
-          if (art[b.art]) return img(b.art)
+          if (art[b.art]) {
+            const k = KEEPERS[b.id]
+            const hasK = k && art[k.idle] && art[k.hover]
+            const on = active === b.id || card === b.id
+            const nm = on ? k?.hover : k?.idle
+            const m = nm ? art[nm] : null
+            return (
+              <div key={b.id}>
+                {img(b.art)}
+                {hasK && m && (() => {
+                  const kh = k.h, kw = (kh * m.w) / m.h
+                  const [nx, ny] = px([NODES.find((n) => n.id === b.id)!.x, NODES.find((n) => n.id === b.id)!.y])
+                  return (
+                    <div style={{ position: 'absolute', left: nx + k.dx - kw / 2, top: ny + k.dy - kh, width: kw, height: kh, zIndex: Math.max(Math.round(ny + k.dy), Math.round(by) + 2), pointerEvents: 'none' }}>
+                      <div style={{ position: 'absolute', left: '15%', right: '15%', bottom: -3, height: 12, borderRadius: '50%', background: 'rgba(58,42,36,.28)' }} />
+                      <div className={on ? 'anim-float-fast' : 'anim-float'} style={{ width: '100%', height: '100%' }}>
+                        <img key={nm} src={`/art/${nm}.webp`} alt="" draggable={false} className={on ? 'anim-squash' : undefined} style={{ width: '100%', height: '100%', display: 'block', transformOrigin: '50% 100%' }} />
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            )
+          }
           return (
             <svg key={b.id} width={WORLD.w} height={WORLD.h} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: Math.round(by), pointerEvents: 'none' }} aria-hidden>
               <g transform={`translate(${bx} ${by}) scale(1.6)`}>
@@ -406,7 +449,7 @@ export function IslandMap() {
           <div style={{ position: 'absolute', left: '20%', right: '20%', bottom: -2, height: 14, borderRadius: '50%', background: 'rgba(58,42,36,.3)' }} />
           <div ref={heroBob} className="hero-idle" style={{ width: '100%', height: '100%' }}>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-              <img ref={heroImg} src={avatar ? `/art/avatar/${persona}-0.webp` : '/art/chibi/down_0.png'} alt="" draggable={false} style={{ display: 'block', height: avatar ? undefined : '100%', objectFit: 'contain' }} />
+              <img ref={heroImg} src={avatar ? `/art/avatar/${who}-0.webp` : '/art/chibi/down_0.png'} alt="" draggable={false} style={{ display: 'block', height: avatar ? undefined : '100%', objectFit: 'contain' }} />
             </div>
           </div>
         </div>

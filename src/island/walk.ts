@@ -27,7 +27,7 @@ const roadR = (raw.roadHalfWidth / 100) * WORLD.w
 const segs = (raw.edges as string[][]).map(([a, b]) => [wp(a), wp(b)])
 const ell = (e: number[]) => ({ cx: (e[0] / 100) * WORLD.w, cy: (e[1] / 100) * WORLD.h, rx: (e[2] / 100) * WORLD.w, ry: (e[3] / 100) * WORLD.h })
 const areas = raw.areas.map(ell)
-const blockers = raw.blockers.map(ell)
+const blockers = [...raw.blockers, ...raw.decor.filter((q) => q.solid).map((q) => [q.x, q.y - 0.4, q.solid![0], q.solid![1]])].map(ell)
 const inEll = (x: number, y: number, e: { cx: number; cy: number; rx: number; ry: number }) => ((x - e.cx) / e.rx) ** 2 + ((y - e.cy) / e.ry) ** 2 <= 1
 
 const MT = maskData.t
