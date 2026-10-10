@@ -220,9 +220,7 @@
     "career": "Career",
     "look": "Spot the clue",
     "close": "Close",
-    "ask": "Do your homework",
-    "askLeft": "{{n}} of 2 checks left",
-    "askNone": "Checks done",
+    "ask": "Research",
     "tip": "Each check shows one real number about the company. Checking before you invest raises your Research score.",
     "cash": "Will it run out of money?",
     "customers": "Do customers stay and pay?",
@@ -232,6 +230,7 @@
     "ageL": "Age",
     "yrsL": "Years working",
     "startsL": "Startups",
-    "clue": "Clue"
+    "clue": "Clue",
+    "checksLeft": "checks left"
   }
 }

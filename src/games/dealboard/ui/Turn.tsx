@@ -64,20 +64,20 @@ function Pitch({ run, m, id, dispatch, onPass, onTrade }: { run: RunState; m: Ma
         <div className="flex items-center gap-2 border-b-[3px] border-ink px-3 py-2" style={{ background: SECTOR_COLOUR[COMPANY[id].sector] }}>
           <Mark id={id} size={30} />
           <span className="min-w-0 flex-1 leading-tight">
-            <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.12em] text-jasmine/85">{t('pitch3.new')} · {t(`sectors.${COMPANY[id].sector}`)}</span>
+            <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.12em] text-jasmine/85">{t('pitch3.new')}</span>
             <span className="font-sign lang-fit block truncate text-[19px] text-jasmine" style={{ textShadow: '1.5px 1.5px 0 #2B1A17' }}>{t(`companies.${id}.name`)}</span>
           </span>
           <span className="shrink-0 rounded-full border-2 border-ink bg-mustard px-2 py-0.5 text-[12px] font-extrabold">{t('perShare', { price: money(hist[q].price) })}</span>
         </div>
         <div className="space-y-2 px-3 py-2.5">
-          <p className="m-0 text-[15px] font-bold leading-snug">{t(`what.${id}`)}</p>
+          <p className="m-0 text-[15px] font-bold leading-snug"><span className="mr-2 inline-block rounded-full border-2 border-ink px-2 py-0 align-middle text-[10px] font-extrabold uppercase leading-5 tracking-wider" style={{ background: SECTOR_COLOUR[COMPANY[id].sector], color: '#FFF3D6', textShadow: '1px 1px 0 #2B1A17' }}>{t(`sectors.${COMPANY[id].sector}`)}</span>{t(`what.${id}`)}</p>
           <p className="m-0 text-[14px] leading-snug"><span className="text-[11px] font-extrabold uppercase tracking-wider text-[#8a5a2b]">{t('pitch3.pitch')}</span><br />{t(`claims.${id}`)}</p>
           <button type="button" onClick={() => setProfile(true)} className="mt-3 flex min-h-14 w-full items-center gap-2.5 rounded-lg border-2 border-ink bg-white/70 px-2 py-1.5 text-left">
             <span className="shrink-0 overflow-hidden rounded-lg border-2 border-ink"><FounderFace id={id} size={40} /></span>
             <span className="min-w-0 flex-1 leading-tight">
               <span className="block text-[11px] font-extrabold uppercase tracking-wider opacity-60">{t('pitch3.founder')}</span>
               <span className="block truncate text-[14px] font-extrabold">{t(`founders.${id}.name`)}</span>
-              <span className="block truncate text-[12px] opacity-70">{t(`founders.${id}.role`)}</span>
+              <span className="block text-[12px] leading-tight opacity-70">{t(`founders.${id}.role`)}</span>
             </span>
             <span className="shrink-0 text-[12px] font-extrabold underline decoration-2 underline-offset-4">{t('pitch3.story')} ›</span>
           </button>
@@ -86,7 +86,7 @@ function Pitch({ run, m, id, dispatch, onPass, onTrade }: { run: RunState; m: Ma
       {profile && <FounderProfile id={id} onClose={() => setProfile(false)} />}
 
       <div>
-        <InfoHeader title={<span>{t('pitch3.ask')} <span className="ml-1 text-[#B8860B]" aria-label={t('pitch3.stars')}>{'★'.repeat(asked.length)}{'☆'.repeat(left)}</span> · {left > 0 ? t('pitch3.askLeft', { n: left }) : t('pitch3.askNone')}</span>}>{t('pitch3.tip')}</InfoHeader>
+        <InfoHeader title={<span className="inline-flex flex-wrap items-center gap-2">{t('pitch3.ask')}<span className="rounded-full border-[2.5px] border-ink px-2.5 py-0.5 text-[15px] font-extrabold leading-tight" style={{ background: left > 0 ? '#E8B04A' : '#E9D3A6', boxShadow: '2px 2px 0 #2B1A17' }}>{left}/2</span><span className="font-body text-[12px] font-extrabold normal-case tracking-normal opacity-75" style={{ fontFamily: 'var(--font-body)' }}>{t('pitch3.checksLeft')}</span></span>}>{t('pitch3.tip')}</InfoHeader>
         <div className="mt-1.5 grid grid-cols-2 gap-1.5" role="group" aria-label={t('lights.title')}>
           {LIGHT_KEYS.map((k) => (known.includes(k) ? <LightChip key={k} k={k} state={founderAnswer(lights, id, k)} /> : <AskTile key={k} k={k} disabled={left <= 0} onAsk={() => dispatch({ type: 'ask', companyId: id, light: k })} />))}
         </div>

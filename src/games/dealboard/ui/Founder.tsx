@@ -6,6 +6,7 @@ import { IconSearch } from './icons'
 
 /** Painted portraits (background removed). Founders without one fall back to the drawn face below. */
 const PHOTO: Partial<Record<CompanyId, string>> = {
+  dailyBasket: '/art/founders/dailyBasket.webp',
   solarGrid: '/art/founders/solarGrid.webp',
   payEasy: '/art/founders/payEasy.webp',
   quickRide: '/art/founders/quickRide.webp',
@@ -13,7 +14,7 @@ const PHOTO: Partial<Record<CompanyId, string>> = {
 }
 
 const LOOKS: Record<CompanyId, { skin: string; hair: string; shirt: string; style: 'bun' | 'short' | 'bald' | 'long'; glasses?: boolean; beard?: boolean }> = {
-  dailyBasket: { skin: '#C98B63', hair: '#3a2a24', shirt: '#F28C28', style: 'bun' },
+  dailyBasket: { skin: '#C98B63', hair: '#3a2a24', shirt: '#F28C28', style: 'short', beard: true },
   payEasy: { skin: '#E0AA80', hair: '#1f1a17', shirt: '#7C5BC4', style: 'short', glasses: true },
   solarGrid: { skin: '#B97B55', hair: '#2b2623', shirt: '#E8B04A', style: 'short', beard: true },
   medLink: { skin: '#D69B72', hair: '#2b1a17', shirt: '#2F8F8F', style: 'long' },

@@ -10,7 +10,7 @@
       "X": "No answer"
     },
     "cash": {
-      "name": "Cash left",
+      "name": "Bank balance",
       "ask": "Will the money run out soon?",
       "explain": "How many months the company can pay its bills before its cash runs out.",
       "G": "Profitable, or 12 months or more of cash.",
