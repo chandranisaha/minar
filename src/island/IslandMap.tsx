@@ -9,14 +9,28 @@ import { Gate, IslandArt, Kiosk } from './IslandArt'
 import { Joystick } from './Joystick'
 import { joy, useTouchUi } from './input'
 import { NODES, WORLD, nodeById, px, type IslandNode, type NodeId } from './data'
-import { canStand, grid, COLS, ROWS, T, pathTo } from './walk'
+import { canStand, grid, COLS, ROWS, T, pathTo, setGateOpen, gateEntry } from './walk'
 
 type Dir = 'down' | 'up' | 'left' | 'right'
 const SPEED = 560 // world px / second
-const HERO_H = 175
-const HERO_W = 140
+const HERO_H = 190
+const HERO_W = 150
 const DOOR_R = 120 // stepping this close to a place offers to go in
 const WATER = '#41B9E4' // matches the painted water at the island edge
+
+type AvSizes = Record<string, number[]>
+let avSizes: AvSizes | null = null
+function useAvatarSizes() {
+  const [m, setM] = useState<AvSizes | null>(avSizes)
+  useEffect(() => { if (!avSizes) void fetch('/art/avatar/sizes.json').then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) { avSizes = j; setM(j) } }).catch(() => {}) }, [])
+  return m
+}
+/** avatar frame for a heading: down/up use front/back, left is the right-facing walk mirrored */
+function avatarFrame(dir: Dir, moving: boolean, f: number): { n: number; flip: boolean } {
+  if (dir === 'down') return { n: moving ? 4 + f : 0, flip: false }
+  if (dir === 'up') return { n: moving ? 6 + f : 1, flip: false }
+  return { n: moving ? 2 + f : 2, flip: dir === 'left' }
+}
 
 let lastPos: number[] | null = null // survives entering a pillar and coming back
 
@@ -43,7 +57,10 @@ export function IslandMap() {
   const setCelebrated = useGame((s) => s.setCelebrated)
   const allDone = completed.length >= 4
   const touch = useTouchUi()
+  setGateOpen(allDone) // closed gate = solid, open gate = walk through
   const art = useManifest()
+  const persona = useGame((q) => q.persona) ?? 'school'
+  const avatar = useAvatarSizes()
   const debug = useMemo(() => new URLSearchParams(window.location.search).has('debug'), [])
 
   const box = useRef<HTMLDivElement>(null)
@@ -63,9 +80,12 @@ export function IslandMap() {
   const S = useRef({
     x: startPt[0], y: startPt[1], path: [] as { x: number; y: number }[], dir: 'down' as Dir, t: 0,
     camX: 0, camY: 0, keys: new Set<string>(), pending: null as NodeId | null, near: null as NodeId | null,
-    fit: 0.4, zoom: 1, scale: 0, vw: 390, vh: 844, maxZoom: 2, ptrs: new Map<number, { x: number; y: number }>(), pinch: 0, down: false, lastRepath: 0, dismissed: null as NodeId | null, cardOpen: false, cardFor: null as NodeId | null, ready: false,
+    avatar: null as AvSizes | null, persona: 'school', fit: 0.4, zoom: 1, scale: 0, vw: 390, vh: 844, maxZoom: 2, ptrs: new Map<number, { x: number; y: number }>(), pinch: 0, down: false, lastRepath: 0, dismissed: null as NodeId | null, cardOpen: false, cardFor: null as NodeId | null, gateOpen: false, through: false, ready: false,
   })
   S.current.cardOpen = card !== null
+  S.current.avatar = avatar
+  S.current.gateOpen = allDone
+  S.current.persona = persona
   S.current.cardFor = card
 
   /* ---------------------------------------------------------------- viewport / scale */
@@ -172,12 +192,30 @@ export function IslandMap() {
         else if (moving && !s.pending && s.dismissed !== n) { setCard(n); s.dismissed = null }
       }
       lastPos = [s.x, s.y]
+      if (s.gateOpen && Math.hypot(s.x - gateEntry.x, s.y - gateEntry.y) < gateEntry.r && !s.through) { s.through = true; setCelebrated(true); nav('/dashboard') }
       if (s.cardFor && s.near !== s.cardFor) { s.cardFor = null; setCard(null) }
 
       // hero
       const frame = moving ? Math.floor(s.t * 6) % 2 : 0
       if (heroEl.current) { heroEl.current.style.transform = `translate3d(${s.x - HERO_W / 2}px, ${s.y - HERO_H}px, 0)`; heroEl.current.style.zIndex = String(Math.floor(s.y)) }
-      if (heroImg.current) { const src = `/art/chibi/${s.dir}_${frame}.png`; if (!heroImg.current.src.endsWith(src)) heroImg.current.src = src }
+      if (heroImg.current) {
+        const sz = s.avatar
+        if (sz) {
+          const { n, flip } = avatarFrame(s.dir, moving, frame)
+          const dim = sz[`${s.persona}-${n}`], ref = sz[`${s.persona}-0`]
+          if (dim && ref) {
+            const k = HERO_H / ref[1]
+            const src = `/art/avatar/${s.persona}-${n}.webp`
+            if (!heroImg.current.src.endsWith(src)) heroImg.current.src = src
+            heroImg.current.style.height = `${dim[1] * k}px`
+            heroImg.current.style.width = `${dim[0] * k}px`
+            heroImg.current.style.transform = flip ? 'scaleX(-1)' : 'none'
+          }
+        } else {
+          const src = `/art/chibi/${s.dir}_${frame}.png`
+          if (!heroImg.current.src.endsWith(src)) heroImg.current.src = src
+        }
+      }
       if (heroBob.current) heroBob.current.className = moving ? 'hero-walk' : 'hero-idle'
 
       // camera: centred when the island fits, otherwise it follows the hero
@@ -271,6 +309,7 @@ export function IslandMap() {
   /* ---------------------------------------------------------------- render */
   const labelFor = (n: IslandNode) => t(n.labelKey)
   const active = hover ?? near
+  const gateOpenNow = allDone && (active === 'gate' || card === 'gate')
   const monument = art.monument
   const inv = 1 / (S.current.fit * zoom || 1)
   void vpTick
@@ -301,12 +340,12 @@ export function IslandMap() {
             return <img key={name} src={`/art/${name}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: bx - b.w / 2, top: by - h, width: b.w, height: h, zIndex: Math.round(by), pointerEvents: 'none', ...extra }} />
           }
           if (b.id === 'gate' && art['gate-closed'] && art['gate-open']) {
-            // the gate swings open (stepped cross-fade + warm glow) once all four lessons are complete
+            // the gate swings open (image replaced with the open one) when the player steps up to it, once all four lessons are done
             return (
               <div key={b.id}>
                 {allDone && <div className="gate-glow" style={{ position: 'absolute', left: bx - 200, top: by - 330, width: 400, height: 330, zIndex: Math.round(by) - 1, pointerEvents: 'none' }} />}
-                {img('gate-closed')}
-                {img('gate-open', { opacity: allDone ? 1 : 0, transition: 'opacity 1.1s steps(8)', zIndex: Math.round(by) + 1 })}
+                {img('gate-closed', { opacity: gateOpenNow ? 0 : 1, transition: 'opacity .5s steps(5)' })}
+                {img('gate-open', { opacity: gateOpenNow ? 1 : 0, transition: 'opacity .5s steps(5)', zIndex: Math.round(by) + 1 })}
               </div>
             )
           }
@@ -366,7 +405,9 @@ export function IslandMap() {
         <div ref={heroEl} style={{ position: 'absolute', left: 0, top: 0, width: HERO_W, height: HERO_H, pointerEvents: 'none', willChange: 'transform' }}>
           <div style={{ position: 'absolute', left: '20%', right: '20%', bottom: -2, height: 14, borderRadius: '50%', background: 'rgba(58,42,36,.3)' }} />
           <div ref={heroBob} className="hero-idle" style={{ width: '100%', height: '100%' }}>
-            <img ref={heroImg} src="/art/chibi/down_0.png" alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', display: 'block' }} />
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+              <img ref={heroImg} src={avatar ? `/art/avatar/${persona}-0.webp` : '/art/chibi/down_0.png'} alt="" draggable={false} style={{ display: 'block', height: avatar ? undefined : '100%', objectFit: 'contain' }} />
+            </div>
           </div>
         </div>
 

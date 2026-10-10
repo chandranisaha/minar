@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { LANGS, PERSONAS, inr, type Lang } from '../content/data'
+import { LANGS, inr, type Lang } from '../content/data'
 import { useGame, useLite } from '../store/game'
 
 export function Coin({ size = 24 }: { size?: number }) {
@@ -42,7 +42,7 @@ export function PersonaChip() {
   if (!persona) return null
   return (
     <div className="ink-chip grid h-11 w-11 place-items-center overflow-hidden p-0" title={t(`personas.${persona}.name`)}>
-      <img src={`/art/faces/${PERSONAS[persona].face}.png`} alt={t(`personas.${persona}.name`)} className="h-full w-full object-cover object-top" draggable={false} />
+      <img src={`/art/avatar/${persona}-face.webp`} alt={t(`personas.${persona}.name`)} className="h-full w-full object-cover object-top" draggable={false} />
     </div>
   )
 }

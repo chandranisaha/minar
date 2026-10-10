@@ -4,7 +4,7 @@ const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } }))
 await p.addInitScript(() => localStorage.setItem('money-mohalla-v1', JSON.stringify({ state: { language: 'en', persona: 'college', startAmount: 4000, goalAmount: 30000, savedAmount: 4000, completedPillars: [], storySeen: true, celebrated: false, liteMode: null }, version: 0 })))
 await p.goto('http://localhost:5173/', { waitUntil: 'networkidle' })
 await p.waitForTimeout(1500)
-const pos = () => p.evaluate(() => { const m = document.querySelector('img[src*="/art/chibi/"]').parentElement.parentElement.style.transform.match(/translate3d\(([-\d.]+)px, ([-\d.]+)px/); return [Math.round(+m[1] + 70), Math.round(+m[2] + 175)] })
+const pos = () => p.evaluate(() => { const m = document.querySelector('img[src*="/art/avatar/"]:not([src*="face"])').parentElement.parentElement.parentElement.style.transform.match(/translate3d\(([-\d.]+)px, ([-\d.]+)px/); return [Math.round(+m[1] + 75), Math.round(+m[2] + 190)] })
 const pct = ([x, y]) => `${(x / 24).toFixed(0)}%, ${(y / 20.4).toFixed(0)}%`
 console.log('start', pct(await pos()))
 // click-to-walk to every place, check she arrives and a card opens

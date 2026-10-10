@@ -82,7 +82,7 @@ function B2Persona() {
                 className="paper flex w-full items-center gap-3 p-2.5 text-left"
                 style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FBF3DF' : '#FBF0D2', borderColor: sel ? '#D9573F' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s' }}
               >
-                <img src={`/art/faces/${PERSONAS[id].face}.png`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] object-cover object-top" />
+                <img src={`/art/avatar/${id}-face.webp`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] object-cover object-top" />
                 <div className="min-w-0 flex-1">
                   <div className="font-display lang-fit text-[18px] leading-tight">{t(`personas.${id}.name`)}</div>
                   <div className="mt-0.5 text-[13px] leading-snug opacity-85">{t(`personas.${id}.blurb`)}</div>

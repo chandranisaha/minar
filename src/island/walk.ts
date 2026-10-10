@@ -95,3 +95,13 @@ export const pathTo = (sx: number, sy: number, tx: number, ty: number): { x: num
   if (out.length && walkableAt(tx, ty)) out[out.length - 1] = { x: tx, y: ty }
   return out
 }
+
+/** The college gate is solid while closed. Opening it frees the doorway cells. */
+const gateRect = { x0: (raw.gateBlock[0] / 100) * WORLD.w, y0: (raw.gateBlock[1] / 100) * WORLD.h, x1: (raw.gateBlock[2] / 100) * WORLD.w, y1: (raw.gateBlock[3] / 100) * WORLD.h }
+const gateCells: [number, number][] = []
+for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const x = c * T + T / 2, y = r * T + T / 2; if (grid[r][c] === 0 && x >= gateRect.x0 && x <= gateRect.x1 && y >= gateRect.y0 && y <= gateRect.y1) gateCells.push([r, c]) }
+export const setGateOpen = (open: boolean) => {
+  for (const [r, c] of gateCells) grid[r][c] = open ? 0 : 1
+  es.setGrid(grid)
+}
+export const gateEntry = { x: (raw.gateEntry[0] / 100) * WORLD.w, y: (raw.gateEntry[1] / 100) * WORLD.h, r: (raw.gateEntry[2] / 100) * WORLD.w }
