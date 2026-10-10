@@ -8,6 +8,7 @@ import { useGame } from '../store/game'
 import { saveResult } from '../lib/gameResult'
 
 const FestivalCountdown = lazy(() => import('../games/festival/FestivalCountdown'))
+const PocketPanic = lazy(() => import('../games/cafe/PocketPanic'))
 
 /** Pillar 1. `?demo` starts Demo mode (seed DEMO); `?cohort=CODE` tags the result for the NGO view. */
 function PlanGame() {
@@ -22,6 +23,26 @@ function PlanGame() {
         onComplete={(r) => {
           saveResult(r)
           if (r.minaretLit) complete('plan')
+        }}
+        onExit={() => nav('/')}
+      />
+    </Suspense>
+  )
+}
+
+/** Pillar 2, Pocket Panic: a boss fight where the boss is the month. `?demo` starts a fresh seeded month. */
+function SaveGame() {
+  const nav = useNavigate()
+  const [params] = useSearchParams()
+  const complete = useGame((s) => s.completePillar)
+  return (
+    <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-[#3E6461] text-[20px] text-[#FBF0D2]">…</div>}>
+      <PocketPanic
+        seed={params.has('demo') ? 'DEMO' : undefined}
+        cohortCode={params.get('cohort') ?? 'local'}
+        onComplete={(r) => {
+          saveResult(r)
+          if (r.minaretLit) complete('save')
         }}
         onExit={() => nav('/')}
       />
@@ -66,6 +87,7 @@ export default function Play() {
   const p = PILLARS.find((x) => x.id === pillar)
   if (!p) return <Navigate to="/" replace />
   if (p.id === 'plan') return <PlanGame />
+  if (p.id === 'save') return <SaveGame />
   const id: PillarId = p.id
   const done = completed.includes(id)
   return (

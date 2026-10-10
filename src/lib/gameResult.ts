@@ -2,7 +2,7 @@
  * Shared contract every pillar game reports through `onComplete`. No personal data: a cohort code and a seed only.
  * The shell stores results on the device so an NGO facilitator view can aggregate them later.
  */
-export type GameId = 'festival' | 'payrun' | 'invest' | 'safe'
+export type GameId = 'festival' | 'payrun' | 'cafe' | 'invest' | 'safe'
 
 export interface GameResult {
   game: GameId
