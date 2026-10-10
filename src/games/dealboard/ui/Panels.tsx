@@ -53,7 +53,7 @@ export function ChanceCard({ card }: { card: Card }) {
         <span className="font-sign lang-fit text-[14px] tracking-[.18em] uppercase">{rumour ? t('cards.rumour') : t('cards.news')}</span>
         <span className="font-sign text-[18px]">{rumour ? '?' : '✓'}</span>
       </div>
-      <div className="px-3 py-3">
+      <div className={`px-3 pt-3 ${rumour ? 'pb-9' : 'pb-3'}`}>
         <div className="text-[16px] font-extrabold leading-snug">{t(`cards.${card.key}.head`)}</div>
         <div className="mt-1 text-[14px] opacity-75">{t(`cards.${card.key}.detail`)}</div>
       </div>
