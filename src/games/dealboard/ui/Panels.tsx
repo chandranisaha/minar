@@ -55,7 +55,7 @@ export function AlertStrip({ children, tag }: { children: React.ReactNode; tag?:
   const { t } = useTranslation('dealboard')
   return (
     <div className="db-flash red flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2" style={{ background: '#F5D9CF' }} role="status">
-      <span className="font-sign mt-0.5 rounded border-2 border-ink bg-[#C8442F] px-1.5 text-[10px] leading-5 text-jasmine">{tag ?? t('alert.tag')}</span>
+      <span className="font-sign mt-0.5 shrink-0 whitespace-nowrap rounded border-2 border-ink bg-[#C8442F] px-1.5 text-[10px] leading-5 text-jasmine">{tag ?? t('alert.tag')}</span>
       <span className="text-[14px] font-semibold leading-snug">{children}</span>
     </div>
   )

@@ -195,8 +195,8 @@
   },
   "bonus": {
     "title": "Bonus question",
-    "sub": "Answer for a little extra: ₹{{x}}.",
-    "right": "Right! ₹{{x}} added to your cash.",
+    "sub": "A quick check on what you just learned.",
+    "right": "Right!",
     "wrong": "Not quite. Here is why:",
     "skip": "Skip",
     "q": {

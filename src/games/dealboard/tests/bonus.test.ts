@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { act, newRun, pitchFor, marketFor } from '../engine/run'
-import { BONUS_CASH, bonusFor } from '../engine/bonus'
+import { bonusFor } from '../engine/bonus'
 import type { Action } from '../engine/run'
 import en from '../content/judgement.json'
 
@@ -13,7 +13,7 @@ const toQuarter2 = (seed: string) => {
 }
 
 describe('bonus question', () => {
-  test('none in quarter 1; one in later quarters; right answer pays once', () => {
+  test('none in quarter 1; one in later quarters; answered once, no cash either way', () => {
     const r1 = act(newRun('b1'), { type: 'brief' } as Action)
     expect(bonusFor(r1)).toBeNull()
     let r = toQuarter2('b1')
@@ -25,8 +25,10 @@ describe('bonus question', () => {
     expect(wrong.cash).toBe(before)
     expect(bonusFor(wrong)).toBeNull()
     const right = act(r, { type: 'bonus', choice: 0 })
-    expect(right.cash).toBe(before + BONUS_CASH)
-    expect(act(right, { type: 'bonus', choice: 0 }).cash).toBe(before + BONUS_CASH)
+    expect(right.cash).toBe(before)
+    expect(right.bonus?.[2]).toBe(true)
+    expect(wrong.bonus?.[2]).toBe(false)
+    expect(bonusFor(right)).toBeNull()
   })
 
   test('every question has all its text', () => {

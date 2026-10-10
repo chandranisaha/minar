@@ -79,7 +79,7 @@ export function Board({ run, m, tokenAt, pitching, onOpen, children }: { run: Ru
       })}
       <div className="db-centre">{children}</div>
       <div className="db-token" style={{ left: `calc(8px + (100% - 16px) * ${(tc + 0.5) / 5})`, top: `calc(8px + (100% - 16px) * ${(tr + 0.5) / 5})` }}>
-        <Pawn />
+        <span key={tokenAt} className="db-hop"><Pawn /></span>
       </div>
       {hover !== null && RING[hover].kind === 'lot' && !touch && (
         <div style={hoverStyle(...cellOf(hover))}><HoverCard run={run} m={m} id={m.picked[(RING[hover] as { index: number }).index]} touch={false} /></div>

@@ -35,7 +35,12 @@ export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: Ma
   const value = h ? holdingValueAt(run, m, id, q) : 0
   const gain = h ? value - h.cost : 0
   // real company events so far (raising money, a down-round, layoffs, a shutdown), not invented headlines
-  const events = status === 'unmet' ? [] : hist.slice(1, q + 1).flatMap((x) => x.events.map((e) => ({ q: x.q, e })))
+  const raw = status === 'unmet' ? [] : hist.slice(1, q + 1).flatMap((x) => x.events.map((e) => ({ q: x.q, e })))
+  // the same event in several quarters (a hype company raising money again and again) is one line: first quarter, last quarter, how many times
+  const events = [...new Set(raw.map((x) => x.e))].map((e) => {
+    const qs = raw.filter((x) => x.e === e).map((x) => x.q)
+    return { e, first: qs[0], last: qs[qs.length - 1], n: qs.length }
+  }).sort((a, b) => a.last - b.last)
   const tradeable = !!h && run.phase === 'desk' && !hist[q].failed
   const known = (run.unlocked[id] ?? []) as LightKey[]
   return (
@@ -88,8 +93,8 @@ export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: Ma
           {events.length === 0 ? <p className="m-0 text-[13px] opacity-65">{t('dossier.noNews')}</p> : (
             <ul className="m-0 list-none space-y-1.5 p-0">
               {events.slice(-4).map((x) => (
-                <li key={`${x.q}-${x.e}`} className="rounded-lg border-2 border-ink bg-white/60 px-2.5 py-1.5 text-[13px] leading-snug">
-                  <span className="opacity-60">{t('quarterShort', { n: x.q })}</span> {t(`companies.${id}.name`)} {t(`quarterResults.ev.${x.e}`)}
+                <li key={x.e} className="rounded-lg border-2 border-ink bg-white/60 px-2.5 py-1.5 text-[13px] leading-snug">
+                  <span className="opacity-60">{x.n > 1 ? `${t('quarterShort', { n: x.first })}–${t('quarterShort', { n: x.last })} ×${x.n}` : t('quarterShort', { n: x.last })}</span> {t(`companies.${id}.name`)} {t(`quarterResults.ev.${x.e}`)}
                 </li>
               ))}
             </ul>

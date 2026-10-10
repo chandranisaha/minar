@@ -1,5 +1,5 @@
 import type { CompanyId, Decision, LightKey, MarketRun } from './types'
-import { BONUS_CASH, bonusFor } from './bonus'
+import { bonusFor } from './bonus'
 import { TURNS, YEAR_ENDS } from './board'
 import { TUNING } from './companies'
 import { EMERGENCY_COST } from './events'
@@ -261,7 +261,7 @@ export function act(run: RunState, a: Action): RunState {
     case 'bonus': {
       if (!bonusFor(run)) return run
       const right = a.choice === 0
-      return { ...run, cash: run.cash + (right ? BONUS_CASH : 0), bonus: { ...(run.bonus ?? {}), [run.turn]: right } }
+      return { ...run, bonus: { ...(run.bonus ?? {}), [run.turn]: right } }
     }
 
     case 'rewind': {
