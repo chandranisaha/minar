@@ -16,7 +16,7 @@ export function FilmOverlay() {
   }, [lite])
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-[90]">
-      <div className="absolute inset-0" style={{ backgroundImage: PAPER, opacity: 0.32, mixBlendMode: 'multiply' }} />
+      <div className="absolute inset-0" style={{ backgroundImage: PAPER, opacity: 0.2, mixBlendMode: 'multiply' }} />
       {!lite && <div className="grain absolute inset-0" style={{ backgroundImage: PAPER, backgroundSize: '140px 140px', opacity: 0.05, mixBlendMode: 'multiply' }} />}
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 45%, transparent 70%, rgba(58,42,36,.08) 100%)' }} />
     </div>

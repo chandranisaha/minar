@@ -42,7 +42,7 @@ export function route(a: NodeId, b: NodeId): Segment[] {
 }
 
 export const PALETTE = {
-  ink: '#3A2A24', paper: '#F3E9D2', water: '#BFD9E3', water2: '#A8CBD8', stone: '#E8DCC0', stoneShade: '#D2C4A3',
-  terracotta: '#C97B4A', ochre: '#D9A84E', sage: '#8FAE7A', green: '#5E8A5A', granite: '#8C8590', granite2: '#A39BA3',
-  coral: '#C8604A', gold: '#C79A2E', rock: '#9A8878', rock2: '#7E6F66',
+  ink: '#3A2A24', paper: '#F8EBCB', water: '#92C9D3', water2: '#6EB7C9', stone: '#F2DFB0', stoneShade: '#DEC48C',
+  terracotta: '#D8683A', ochre: '#E8AB3A', sage: '#8DB45E', green: '#4E9050', granite: '#8E7C98', granite2: '#AC9CB4',
+  coral: '#D9573F', gold: '#D9A520', rock: '#A9826A', rock2: '#86604E',
 } as const

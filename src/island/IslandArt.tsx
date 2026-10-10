@@ -37,7 +37,7 @@ const Awning = ({ x, y, w, a, b, n = 5 }: { x: number; y: number; w: number; a: 
 }
 
 const Tree = ({ x, y, s = 1, tone = 0 }: { x: number; y: number; s?: number; tone?: number }) => {
-  const c = [P.green, P.sage, '#779A68'][tone % 3]
+  const c = [P.green, P.sage, '#6FA55A'][tone % 3]
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`} stroke={INK} strokeWidth={W} strokeLinejoin="round">
       <ellipse cx="0" cy="4" rx="34" ry="11" fill={INK} opacity=".14" stroke="none" />
@@ -78,7 +78,7 @@ const Figure = ({ x, y, c }: { x: number; y: number; c: string }) => (
 
 const Marigold = ({ x, y }: { x: number; y: number }) => (
   <g transform={`translate(${x} ${y})`} stroke={INK} strokeWidth={1}>
-    {[[-12, 0], [0, -6], [12, 0], [-5, 7], [7, 7]].map(([a, b], i) => <circle key={i} cx={a} cy={b} r="7" fill={i % 2 ? P.ochre : '#D88A3A'} />)}
+    {[[-12, 0], [0, -6], [12, 0], [-5, 7], [7, 7]].map(([a, b], i) => <circle key={i} cx={a} cy={b} r="7" fill={i % 2 ? P.ochre : '#E8862F'} />)}
   </g>
 )
 
@@ -93,10 +93,10 @@ const Wall = ({ pts }: { pts: number[][] }) => (
 /* ------------------------------------------------------------------ landmarks */
 
 function BangleMarket({ x, y }: { x: number; y: number }) {
-  const cols = [P.coral, P.ochre, '#6E9AA8', P.sage, '#B07AA0']
+  const cols = [P.coral, P.ochre, '#4F9DB5', P.sage, '#C0679A']
   const stall = (dx: number, dy: number, a: string, b: string, k: number) => (
     <g key={k} transform={`translate(${dx} ${dy})`}>
-      <Box x={0} y={0} w={74} d={50} h={46} top="#EADFC4" left="#D9C9A6" right="#E6D7B8" />
+      <Box x={0} y={0} w={74} d={50} h={46} top="#F4E3BC" left="#E3CB98" right="#EED9AA" />
       <Awning x={-2} y={-34} w={80} a={a} b={b} n={5} />
       {cols.map((c, i) => <ellipse key={i} cx={12 + i * 12} cy={-14 - i * 6 + 6} rx="4" ry="7" fill="none" stroke={c} strokeWidth="3.4" />)}
     </g>
@@ -104,9 +104,9 @@ function BangleMarket({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <ellipse cx="0" cy="12" rx="150" ry="46" fill={INK} opacity=".1" />
-      {stall(-96, 14, P.coral, '#F3E9D2', 0)}
-      {stall(-10, 38, P.ochre, '#F3E9D2', 1)}
-      {stall(58, -16, '#6E9AA8', '#F3E9D2', 2)}
+      {stall(-96, 14, P.coral, '#F8EBCB', 0)}
+      {stall(-10, 38, P.ochre, '#F8EBCB', 1)}
+      {stall(58, -16, '#4F9DB5', '#F8EBCB', 2)}
     </g>
   )
 }
@@ -115,9 +115,9 @@ function Cafe({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <ellipse cx="6" cy="14" rx="120" ry="38" fill={INK} opacity=".1" />
-      <Box x={0} y={0} w={122} d={92} h={84} top="#D9A07A" left="#E3CFA4" right="#EBDDB8" />
+      <Box x={0} y={0} w={122} d={92} h={84} top="#E08A5A" left="#F0DAA6" right="#F6E6BC" />
       <path d="M26 -8 V-46 Q26 -62 44 -62 Q62 -62 62 -46 V-8Z" transform="translate(6 -14)" fill="#4A3A34" stroke={INK} strokeWidth={W} />
-      <Awning x={0} y={-60} w={124} a={P.green} b="#F3E9D2" n={6} />
+      <Awning x={0} y={-60} w={124} a={P.green} b="#F8EBCB" n={6} />
       <path d="M70 -62 H100 L98 -48 H72Z" fill="#E9DEC2" stroke={INK} strokeWidth={1.2} />
       <ellipse cx="-30" cy="22" rx="20" ry="8" fill="#F1E8D4" stroke={INK} strokeWidth={W} />
       <ellipse cx="34" cy="34" rx="20" ry="8" fill="#F1E8D4" stroke={INK} strokeWidth={W} />
@@ -135,7 +135,7 @@ function PearlShop({ x, y, glow }: { x: number; y: number; glow: boolean }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <ellipse cx="4" cy="14" rx="110" ry="34" fill={INK} opacity=".1" />
-      <Box x={0} y={0} w={112} d={90} h={98} top="#C7B79A" left="#E7DAC0" right="#EFE4CB" />
+      <Box x={0} y={0} w={112} d={90} h={98} top="#D9B98A" left="#F3E2B8" right="#F8EBCB" />
       <path d="M26 -2 V-52 Q26 -72 44 -72 Q62 -72 62 -52 V-2Z" transform="translate(8 -2)" fill="#4A3A34" stroke={INK} strokeWidth={W} />
       <rect x="76" y="-76" width="20" height="26" rx="4" fill={glow ? '#FFEFB5' : '#F2E6B8'} stroke={INK} strokeWidth={W} transform="skewY(-26.5)" />
       {glow && <circle cx="86" cy="-86" r="26" fill="#FFF0B0" opacity=".28" />}
@@ -152,10 +152,10 @@ function Kiosk({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <ellipse cx="2" cy="12" rx="90" ry="28" fill={INK} opacity=".1" />
-      <Box x={0} y={0} w={84} d={62} h={70} top="#9FB9B0" left="#CFE0D8" right="#DDEAE2" />
+      <Box x={0} y={0} w={84} d={62} h={70} top="#6FB5AE" left="#B9E0D6" right="#CDEBE0" />
       <rect x="10" y="-52" width="52" height="34" rx="3" fill="#3C4A52" stroke={INK} strokeWidth={W} transform="skewY(-26.5)" />
       <g transform="translate(36 -42)">
-        <rect x="-8" y="-14" width="16" height="26" rx="3" fill="#F3E9D2" stroke={INK} strokeWidth={1.2} transform="skewY(-26.5)" />
+        <rect x="-8" y="-14" width="16" height="26" rx="3" fill="#F8EBCB" stroke={INK} strokeWidth={1.2} transform="skewY(-26.5)" />
       </g>
       <path d="M-4 -78 H64 L58 -68 H2Z" fill={P.terracotta} stroke={INK} strokeWidth={W} strokeLinejoin="round" />
       <g transform="translate(94 -30)">
@@ -173,7 +173,7 @@ function CharminarPlaza({ x, y }: { x: number; y: number }) {
       <path d={`M${cx - w} ${base} L${cx - w * 0.7} ${base - h} H${cx - 2} V${base}Z`} fill="#D9CCAA" opacity=".7" />
       {[0.3, 0.55, 0.8].map((k) => <rect key={k} x={cx - w * 1.05} y={base - h * k} width={w * 2.1} height="6" rx="3" fill="#EFE3C6" />)}
       <rect x={cx - w * 1.1} y={base - h - 12} width={w * 2.2} height="14" rx="3" fill="#E4D5B2" />
-      <path d={`M${cx - w * 0.9} ${base - h - 12} Q${cx} ${base - h - 40} ${cx + w * 0.9} ${base - h - 12}Z`} fill="#F3E9D2" />
+      <path d={`M${cx - w * 0.9} ${base - h - 12} Q${cx} ${base - h - 40} ${cx + w * 0.9} ${base - h - 12}Z`} fill="#F8EBCB" />
       <circle cx={cx} cy={base - h - 40} r="4" fill={P.gold} />
     </g>
   )
@@ -196,7 +196,7 @@ function CharminarPlaza({ x, y }: { x: number; y: number }) {
         {[-100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100].map((c) => <path key={c} d={`M${c - 8} -30 L${c} -42 L${c + 8} -30Z`} fill="#EFE3C6" stroke={INK} strokeWidth="1" />)}
         {mina(-122, 26, 150, 12)}
         {mina(122, 26, 150, 12)}
-        <path d="M-26 -42 Q0 -86 26 -42Z" fill="#F3E9D2" stroke={INK} strokeWidth={W} />
+        <path d="M-26 -42 Q0 -86 26 -42Z" fill="#F8EBCB" stroke={INK} strokeWidth={W} />
         <circle cx="0" cy="-86" r="4" fill={P.gold} />
       </g>
     </g>
@@ -212,8 +212,8 @@ function Dock({ x, y }: { x: number; y: number }) {
       {[20, 50, 80, 110].map((t) => <path key={t} d={`M${t} ${-t / 2 + 8} l14 7`} stroke="#8E6A46" strokeWidth="2" fill="none" />)}
       <g transform="translate(138 -42)"><rect x="-4" y="-18" width="8" height="18" rx="3" fill="#6B5848" /></g>
       <g className="idle bob" transform="translate(120 -2)">
-        <path d="M-34 0 Q0 22 38 -2 L30 -10 H-26Z" fill="#C97B4A" />
-        <path d="M-26 -10 H30" stroke="#F3E9D2" strokeWidth="4" />
+        <path d="M-34 0 Q0 22 38 -2 L30 -10 H-26Z" fill="#D8683A" />
+        <path d="M-26 -10 H30" stroke="#F8EBCB" strokeWidth="4" />
       </g>
     </g>
   )
@@ -251,7 +251,7 @@ export const IslandArt = memo(function IslandArt({ done, allDone, className }: P
   raw.boulders.forEach((t, i) => { const [x, y] = T(t); add(`b${i}`, t, <Boulder key={`b${i}`} x={x} y={y} s={0.8 + (i % 3) * 0.2} />) })
   raw.lamps.forEach((t, i) => { const [x, y] = T(t); add(`l${i}`, t, <Lamp key={`l${i}`} x={x} y={y} />) })
   raw.marigolds.forEach((t, i) => { const [x, y] = T(t); add(`m${i}`, t, <Marigold key={`m${i}`} x={x} y={y} />) })
-  raw.figures.forEach((t, i) => { const [x, y] = T(t); add(`f${i}`, t, <Figure key={`f${i}`} x={x} y={y} c={[P.coral, '#6E9AA8', P.ochre, P.sage][i % 4]} />) })
+  raw.figures.forEach((t, i) => { const [x, y] = T(t); add(`f${i}`, t, <Figure key={`f${i}`} x={x} y={y} c={[P.coral, '#4F9DB5', P.ochre, P.sage][i % 4]} />) })
   const mk = (nid: NodeId, el: (x: number, y: number) => ReactNode, k = 1.5) => { const n = nodeById(nid); const [x, y] = A(nid); add(nid, [n.art.x, n.art.y], <g key={`s-${nid}`} transform={`translate(${x} ${y}) scale(${k}) translate(${-x} ${-y})`}>{el(x, y)}</g>) }
   mk('plan', (x, y) => <BangleMarket key="plan" x={x} y={y} />)
   mk('save', (x, y) => <Cafe key="save" x={x} y={y} />)
@@ -273,9 +273,12 @@ export const IslandArt = memo(function IslandArt({ done, allDone, className }: P
           </filter>
         )}
         <linearGradient id={`${id}-g`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#A5C08C" /><stop offset="1" stopColor={P.sage} />
+          <stop offset="0" stopColor="#B9CF78" /><stop offset="1" stopColor={P.sage} />
         </linearGradient>
         <clipPath id={`${id}-land`}><path d={sil} /></clipPath>
+        <radialGradient id={`${id}-sun`} cx="0.22" cy="0.12" r="0.85">
+          <stop offset="0" stopColor="#FFE9A8" stopOpacity=".55" /><stop offset=".5" stopColor="#FFD27A" stopOpacity=".12" /><stop offset="1" stopColor="#D9683A" stopOpacity=".1" />
+        </radialGradient>
       </defs>
 
       {/* water */}
@@ -295,10 +298,10 @@ export const IslandArt = memo(function IslandArt({ done, allDone, className }: P
 
       <g filter={lite ? undefined : `url(#${id}-w)`}>
         {/* soft shadow of the island on the water */}
-        <path d={sil} transform="translate(26 150)" fill="#6C93A4" opacity=".22" />
-        <path d={sil} transform="translate(14 112)" fill="#6C93A4" opacity=".2" />
+        <path d={sil} transform="translate(26 150)" fill="#3F8AA3" opacity=".22" />
+        <path d={sil} transform="translate(14 112)" fill="#3F8AA3" opacity=".2" />
         {/* cliff: layered rock with moss */}
-        {[[0, 96, P.rock2], [0, 66, P.rock], [0, 38, '#B3A08E']].map(([x, y, c], i) => (
+        {[[0, 96, P.rock2], [0, 66, P.rock], [0, 38, '#C29A7E']].map(([x, y, c], i) => (
           <path key={i} d={sil} transform={`translate(${x} ${y})`} fill={c as string} stroke={INK} strokeWidth={W} strokeLinejoin="round" />
         ))}
         <g clipPath={`url(#${id}-land)`} />
@@ -310,6 +313,7 @@ export const IslandArt = memo(function IslandArt({ done, allDone, className }: P
         })}
         {/* the land */}
         <path d={sil} fill={`url(#${id}-g)`} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+        <path d={sil} fill={`url(#${id}-sun)`} />
         <path d={sil} transform="translate(0 -6)" fill="none" stroke="#fff" strokeOpacity=".25" strokeWidth="6" strokeLinejoin="round" />
 
         {/* raised granite ledge for the college gate + short stair */}
@@ -340,7 +344,7 @@ export const IslandArt = memo(function IslandArt({ done, allDone, className }: P
         {/* pond */}
         <g transform={`translate(${px([86, 58])[0]} ${px([86, 58])[1]})`} stroke={INK} strokeWidth={W}>
           <ellipse cx="0" cy="6" rx="92" ry="40" fill={P.stoneShade} />
-          <ellipse cx="0" cy="0" rx="86" ry="36" fill="#A9CCD6" />
+          <ellipse cx="0" cy="0" rx="86" ry="36" fill="#7FC4D2" />
           <path className="idle twinkle" d="M-40 -2 q12 -8 24 0 M10 8 q12 -8 24 0" fill="none" stroke="#fff" strokeWidth="2.4" opacity=".7" strokeLinecap="round" />
         </g>
 

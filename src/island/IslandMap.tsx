@@ -16,11 +16,11 @@ function Marker({ done, pulse, locked }: { done: boolean; pulse?: boolean; locke
   return (
     <svg width="90" height="150" viewBox="0 0 90 150" style={{ overflow: 'visible', display: 'block' }} aria-hidden>
       <ellipse cx="22" cy="144" rx="22" ry="7" fill="#3A2A24" opacity=".2" />
-      {pulse && <ellipse className="idle ring" cx="22" cy="142" rx="40" ry="14" fill="none" stroke="#C8604A" strokeWidth="3" />}
+      {pulse && <ellipse className="idle ring" cx="22" cy="142" rx="40" ry="14" fill="none" stroke="#D9573F" strokeWidth="3" />}
       <path d="M22 144 V18" stroke="#3A2A24" strokeWidth="5" strokeLinecap="round" />
-      <circle cx="22" cy="14" r="6" fill="#C79A2E" stroke="#3A2A24" strokeWidth="2" />
+      <circle cx="22" cy="14" r="6" fill="#D9A520" stroke="#3A2A24" strokeWidth="2" />
       <g className="idle flag" style={{ transformOrigin: '24px 24px' }}>
-        <path d="M24 24 H80 Q70 40 80 56 H24Z" fill={done ? '#C79A2E' : locked ? '#CFC7B3' : '#FBF6EA'} stroke="#3A2A24" strokeWidth="2.4" strokeLinejoin="round" />
+        <path d="M24 24 H80 Q70 40 80 56 H24Z" fill={done ? '#D9A520' : locked ? '#CFC7B3' : '#FBF6EA'} stroke="#3A2A24" strokeWidth="2.4" strokeLinejoin="round" />
         {done && <path d="M40 42 l8 8 l16 -18" fill="none" stroke="#3A2A24" strokeWidth="4.4" strokeLinecap="round" strokeLinejoin="round" />}
       </g>
     </svg>
@@ -197,7 +197,7 @@ export function IslandMap() {
     <div
       ref={box}
       className="absolute inset-0 touch-none overflow-hidden"
-      style={{ background: '#BFD9E3', cursor: 'grab' }}
+      style={{ background: '#8FCBD8', cursor: 'grab' }}
       onWheel={onWheel}
       onPointerDown={onDown}
       onPointerMove={onMove}

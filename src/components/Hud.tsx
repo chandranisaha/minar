@@ -7,7 +7,7 @@ import { useGame, useLite } from '../store/game'
 export function Coin({ size = 24 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden className="shrink-0">
-      <circle cx="20" cy="20" r="17" fill="#D9A84E" stroke="#3A2A24" strokeWidth="2.2" />
+      <circle cx="20" cy="20" r="17" fill="#E8AB3A" stroke="#3A2A24" strokeWidth="2.2" />
       <circle cx="20" cy="20" r="12" fill="none" stroke="#3A2A24" strokeWidth="1.2" opacity=".5" />
       <text x="20" y="27" textAnchor="middle" fontSize="18" fontWeight="800" fill="#3A2A24" fontFamily="serif">₹</text>
     </svg>
@@ -28,7 +28,7 @@ export function GoalBar({ className = '' }: { className?: string }) {
         <div className="whitespace-nowrap text-[13px] font-bold leading-none">
           {inr(saved, lang)} <span className="opacity-55">/ {inr(goal, lang)}</span>
         </div>
-        <div className="mt-1 h-[3px] w-full overflow-hidden rounded-full bg-[#E3D6B6]" role="progressbar" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={Math.round(saved)}>
+        <div className="mt-1 h-[3px] w-full overflow-hidden rounded-full bg-[#EAD6A0]" role="progressbar" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={Math.round(saved)}>
           <div className="h-full rounded-full bg-gold" style={{ width: `${pct * 100}%`, transition: 'width .6s steps(8)' }} />
         </div>
       </div>
@@ -60,7 +60,7 @@ export function LangSwitch() {
           onClick={() => setLanguage(l)}
           aria-pressed={lang === l}
           className="h-10 min-w-11 rounded-full px-2.5 text-[14px] font-bold"
-          style={{ background: lang === l ? '#3A2A24' : 'transparent', color: lang === l ? '#F6EDD8' : '#3A2A24', border: 0, cursor: 'pointer' }}
+          style={{ background: lang === l ? '#3A2A24' : 'transparent', color: lang === l ? '#FBF0D2' : '#3A2A24', border: 0, cursor: 'pointer' }}
         >
           {t(`lang.${l}`)}
         </button>

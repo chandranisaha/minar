@@ -12,7 +12,7 @@ import { WORLD, nodeById, px } from '../island/data'
 import { stepped } from '../lib/stepped'
 
 const LAST = 3
-const bgSky = 'linear-gradient(#BFD9E3, #F3E9D2 70%)'
+const bgSky = 'linear-gradient(#92C9D3, #F8EBCB 70%)'
 
 function useSize(ref: React.RefObject<HTMLElement | null>) {
   const [s, set] = useState({ w: 390, h: 844 })
@@ -44,7 +44,7 @@ function B1Island({ w, h }: { w: number; h: number }) {
     return () => a.forEach((x) => x.stop())
   }, [w, h, sc, tx, ty])
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: '#BFD9E3' }}>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
       <motion.div style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', x: tx, y: ty, scale: sc, willChange: 'transform' }}>
         <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={[]} allDone={false} />} />
       </motion.div>
@@ -80,15 +80,15 @@ function B2Persona() {
                 aria-checked={sel}
                 onClick={() => setPersona(id)}
                 className="paper flex w-full items-center gap-3 p-2.5 text-left"
-                style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FBF3DF' : '#F6EDD8', borderColor: sel ? '#C8604A' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s' }}
+                style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FBF3DF' : '#FBF0D2', borderColor: sel ? '#D9573F' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s' }}
               >
-                <img src={`/art/faces/${PERSONAS[id].face}.png`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#E8DCC0] object-cover object-top" />
+                <img src={`/art/faces/${PERSONAS[id].face}.png`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] object-cover object-top" />
                 <div className="min-w-0 flex-1">
                   <div className="font-display lang-fit text-[18px] leading-tight">{t(`personas.${id}.name`)}</div>
                   <div className="mt-0.5 text-[13px] leading-snug opacity-85">{t(`personas.${id}.blurb`)}</div>
                   <div className="mt-1 text-[12px] font-bold text-gold">{t('personas.startsWith')} {inr(PERSONAS[id].start, lang)}</div>
                 </div>
-                <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full border-[1.5px] border-ink text-[13px]" style={{ background: sel ? '#C8604A' : 'transparent', color: '#FBF6EA' }} aria-hidden>{sel ? '✓' : ''}</div>
+                <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full border-[1.5px] border-ink text-[13px]" style={{ background: sel ? '#D9573F' : 'transparent', color: '#FBF6EA' }} aria-hidden>{sel ? '✓' : ''}</div>
               </button>
             )
           })}
@@ -106,14 +106,14 @@ function B3Flowers() {
   const start = useGame((s) => s.startAmount)
   const m = useManifest()['story-flowers']
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#F3E9D2, #E8DCC0)' }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#F8EBCB, #F2DFB0)' }}>
       <div className="mx-auto flex min-h-full max-w-[520px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
         {m && <img src="/art/story-flowers.webp" alt="" draggable={false} className="fade-in w-full" style={{ filter: 'drop-shadow(0 8px 14px rgba(58,42,36,.25))' }} />}
         <div className="paper rise relative mx-auto -mt-6 w-[92%] px-4 py-3 text-center" style={{ animationDelay: '.5s' }}>
           <p className="m-0 text-[17px] font-bold leading-snug">“{t('story.b3.quote')}”</p>
           <p className="m-0 mt-1 text-[13px] opacity-75">{t('story.b3.caption')}</p>
-          <div className="mx-auto mt-2 inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-[#E8DCC0] px-3 py-1 text-[14px] font-bold">
-            <svg width="22" height="22" viewBox="0 0 92 92" aria-hidden><path d="M8 60 Q4 26 36 18 Q60 10 82 34 Q92 60 70 82 Q40 94 8 60Z" fill="#F3E9D2" stroke="#3A2A24" strokeWidth="5" strokeLinejoin="round" /></svg>
+          <div className="mx-auto mt-2 inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] px-3 py-1 text-[14px] font-bold">
+            <svg width="22" height="22" viewBox="0 0 92 92" aria-hidden><path d="M8 60 Q4 26 36 18 Q60 10 82 34 Q92 60 70 82 Q40 94 8 60Z" fill="#F8EBCB" stroke="#3A2A24" strokeWidth="5" strokeLinejoin="round" /></svg>
             +{inr(start, lang)}
           </div>
         </div>
@@ -166,7 +166,7 @@ function B4Letter() {
 function Cover({ onStart, w, h }: { onStart: () => void; w: number; h: number }) {
   const { t } = useTranslation()
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: '#BFD9E3' }}>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
       <div style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', transform: `translate(${(w - WORLD.w * Math.max(w / WORLD.w, h / WORLD.h) * 1.15) / 2}px, ${h * 0.12}px) scale(${Math.max(w / WORLD.w, h / WORLD.h) * 1.15})`, opacity: 0.95 }}>
         <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={[]} allDone={false} />} />
       </div>
@@ -215,7 +215,7 @@ export default function Story() {
   }, [next, back, finish])
 
   return (
-    <div ref={frame} className="absolute inset-0 overflow-hidden" style={{ background: '#BFD9E3' }}>
+    <div ref={frame} className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
       <div key={step} className="fade-in absolute inset-0">
         {step === -1 && <Cover onStart={next} w={w} h={h} />}
         {step === 0 && <B1Island w={w} h={h} />}

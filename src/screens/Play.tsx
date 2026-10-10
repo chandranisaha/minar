@@ -10,10 +10,10 @@ function PillarIcon({ id }: { id: PillarId }) {
   const p = { fill: 'none', stroke: '#3A2A24', strokeWidth: 2.6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
   return (
     <svg viewBox="0 0 64 64" width="84" height="84" aria-hidden>
-      {id === 'plan' && (<g {...p}><ellipse cx="32" cy="34" rx="18" ry="22" fill="#D9A84E" /><ellipse cx="32" cy="34" rx="11" ry="15" fill="#F6EDD8" /><path d="M20 22 q12 -8 24 0" /></g>)}
-      {id === 'save' && (<g {...p}><path d="M14 26 H46 L42 50 H18Z" fill="#F6EDD8" /><path d="M46 30 q10 0 8 8 q-2 6 -10 6" /><path d="M24 20 q-4 -6 0 -10 M32 20 q-4 -6 0 -10 M40 20 q-4 -6 0 -10" /></g>)}
+      {id === 'plan' && (<g {...p}><ellipse cx="32" cy="34" rx="18" ry="22" fill="#E8AB3A" /><ellipse cx="32" cy="34" rx="11" ry="15" fill="#FBF0D2" /><path d="M20 22 q12 -8 24 0" /></g>)}
+      {id === 'save' && (<g {...p}><path d="M14 26 H46 L42 50 H18Z" fill="#FBF0D2" /><path d="M46 30 q10 0 8 8 q-2 6 -10 6" /><path d="M24 20 q-4 -6 0 -10 M32 20 q-4 -6 0 -10 M40 20 q-4 -6 0 -10" /></g>)}
       {id === 'invest' && (<g {...p}><circle cx="32" cy="34" r="17" fill="#FBF6EA" /><path d="M24 26 q4 -5 10 -3" /><path d="M14 54 H50" /></g>)}
-      {id === 'safe' && (<g {...p}><rect x="20" y="8" width="24" height="48" rx="5" fill="#F6EDD8" /><path d="M28 14 H36" /><circle cx="32" cy="46" r="2.4" /><path d="M32 22 V36" stroke="#C8604A" strokeWidth="4.4" /><circle cx="32" cy="40.5" r="1.8" fill="#C8604A" stroke="#C8604A" /></g>)}
+      {id === 'safe' && (<g {...p}><rect x="20" y="8" width="24" height="48" rx="5" fill="#FBF0D2" /><path d="M28 14 H36" /><circle cx="32" cy="46" r="2.4" /><path d="M32 22 V36" stroke="#D9573F" strokeWidth="4.4" /><circle cx="32" cy="40.5" r="1.8" fill="#D9573F" stroke="#D9573F" /></g>)}
     </svg>
   )
 }
@@ -26,7 +26,7 @@ function RecapCard() {
       <div className="font-display lang-fit mt-1 text-[21px] leading-tight">{t('recap.sampleTitle')}</div>
       <p className="mb-2 mt-1 text-[14px] leading-snug">{t('recap.sampleBody')}</p>
       <div className="flex flex-wrap gap-1.5">
-        {SKILLS.slice(0, 3).map((s) => <span key={s} className="rounded-full border border-ink bg-[#E8DCC0] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">{s}</span>)}
+        {SKILLS.slice(0, 3).map((s) => <span key={s} className="rounded-full border border-ink bg-[#F2DFB0] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">{s}</span>)}
       </div>
     </div>
   )
@@ -44,7 +44,7 @@ export default function Play() {
   const id: PillarId = p.id
   const done = completed.includes(id)
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#BFD9E3, #F3E9D2 60%)' }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#92C9D3, #F8EBCB 60%)' }}>
       <TopHud replay={false} />
       <div className="mx-auto flex min-h-full max-w-xl flex-col items-center gap-4 px-4 pb-16 pt-24">
         <div className="w-full">

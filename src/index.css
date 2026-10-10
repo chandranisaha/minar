@@ -13,17 +13,17 @@
 
 /* ---- Design tokens (see DESIGN.md): muted, never neon ---- */
 @theme {
-  --color-paper: #f3e9d2;
-  --color-water: #bfd9e3;
-  --color-water-deep: #a8cbd8;
-  --color-stone: #e8dcc0;
-  --color-terracotta: #c97b4a;
-  --color-ochre: #d9a84e;
-  --color-sage: #8fae7a;
-  --color-green: #5e8a5a;
-  --color-granite: #8c8590;
-  --color-coral: #c8604a;
-  --color-gold: #c79a2e;
+  --color-paper: #F8EBCB;
+  --color-water: #92C9D3;
+  --color-water-deep: #6EB7C9;
+  --color-stone: #F2DFB0;
+  --color-terracotta: #D8683A;
+  --color-ochre: #E8AB3A;
+  --color-sage: #86B35F;
+  --color-green: #4E9050;
+  --color-granite: #8E7C98;
+  --color-coral: #D9573F;
+  --color-gold: #D9A520;
   --color-ink: #3a2a24;
   --font-display: "DM Serif Display", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", Georgia, serif;
   --font-body: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
@@ -32,7 +32,7 @@
 :root { color-scheme: light; --ink: #3a2a24; --lang-scale: 1; }
 html[lang="hi"] { --lang-scale: .95; }
 html[lang="te"] { --lang-scale: .92; }
-html, body, #root { height: 100%; margin: 0; background: #bfd9e3; }
+html, body, #root { height: 100%; margin: 0; background: #92C9D3; }
 body {
   font-family: var(--font-body); font-weight: 500; color: var(--ink);
   overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
@@ -45,11 +45,11 @@ html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }
 
 /* ---- calm paper UI: thin ink outline, small radius, soft flat shadow ---- */
 .paper {
-  background: #f6edd8; border: 1.5px solid var(--ink); border-radius: 8px;
+  background: #FBF0D2; border: 1.5px solid var(--ink); border-radius: 8px;
   box-shadow: 0 2px 0 rgba(58,42,36,.35), 0 8px 18px rgba(58,42,36,.16);
 }
 .ink-chip {
-  background: #f6edd8; border: 1.5px solid var(--ink); border-radius: 999px; color: var(--ink);
+  background: #FBF0D2; border: 1.5px solid var(--ink); border-radius: 999px; color: var(--ink);
   box-shadow: 0 2px 0 rgba(58,42,36,.3);
 }
 .ink-btn {
@@ -60,7 +60,7 @@ html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }
 }
 .ink-btn:hover { transform: translateY(-1px); }
 .ink-btn:active { transform: translateY(1px); box-shadow: none; }
-.ink-btn.cream { background: #f6edd8; color: var(--ink); }
+.ink-btn.cream { background: #FBF0D2; color: var(--ink); }
 .ink-btn.pink { background: var(--color-terracotta); }
 .ink-btn:disabled { opacity: .4; cursor: default; transform: none; }
 button:focus-visible { outline: 3px solid var(--color-coral); outline-offset: 3px; }
@@ -74,7 +74,7 @@ button:focus-visible { outline: 3px solid var(--color-coral); outline-offset: 3p
 .island-label {
   position: absolute; white-space: nowrap; pointer-events: none; padding: 6px 14px;
   font-family: var(--font-display); font-size: 22px; color: var(--ink);
-  background: #f6edd8; border: 1.5px solid var(--ink); border-radius: 6px; transform-origin: 50% 100%;
+  background: #FBF0D2; border: 1.5px solid var(--ink); border-radius: 6px; transform-origin: 50% 100%;
 }
 @keyframes ring-pulse { 0%,100% { opacity: .15; transform: scale(.9) } 50% { opacity: .9; transform: scale(1.12) } }
 @keyframes flag { 0%,100% { transform: skewY(0) } 50% { transform: skewY(4deg) } }
@@ -88,7 +88,7 @@ button:focus-visible { outline: 3px solid var(--color-coral); outline-offset: 3p
 .idle.twinkle { animation: twinkle 3s steps(6) infinite; }
 .idle.steam { animation: steam 2.2s steps(8) infinite; }
 .petal {
-  position: absolute; top: 0; width: 22px; height: 14px; border-radius: 80% 0 80% 0; background: #D88A3A;
+  position: absolute; top: 0; width: 22px; height: 14px; border-radius: 80% 0 80% 0; background: #E8862F;
   border: 1.2px solid var(--ink); animation: petal 11s linear infinite; opacity: 0;
 }
 @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
