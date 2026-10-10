@@ -2,9 +2,9 @@ import { describe, expect, test } from 'vitest'
 import en from '../content/en.json'
 import hi from '../content/hi.json'
 import te from '../content/te.json'
-import { FESTIVAL_DEFS, INVITE_DEFS, STALL_DEFS } from '../engine/content'
-import { LESSON_ORDER } from '../engine/lessons'
-import { ITEMS, POCKETS } from '../engine/types'
+import { FESTIVAL_DEFS, INVITE_DEFS, SHOP_DEFS } from '../engine/content'
+import { IDEAS } from '../engine/explain'
+import { ITEMS, JARS } from '../engine/types'
 
 type Tree = { [k: string]: string | Tree }
 const flat = (o: Tree, pre = ''): Record<string, string> =>
@@ -21,19 +21,32 @@ describe('strings (content as data, language-ready)', () => {
   })
 
   test('every content id has its strings', () => {
-    for (const f of FESTIVAL_DEFS) for (const i of ITEMS) expect(EN[`festivals.${f.id}.items.${i}`]).toBeTruthy()
-    for (const p of POCKETS) expect(EN[`pockets.${p}.name`]).toBeTruthy()
-    for (const s of STALL_DEFS) expect(EN[`stalls.${s.id}.name`]).toBeTruthy()
-    for (const inv of INVITE_DEFS) {
-      expect(EN[`invites.${inv.key}.text`]).toBeTruthy()
-      if (inv.swap != null) expect(EN[`invites.${inv.key}.swap`]).toBeTruthy()
+    for (const f of FESTIVAL_DEFS) for (const i of ITEMS) expect(EN[`festivals.${f.id}.items.${i}`], `${f.id}.${i}`).toBeTruthy()
+    for (const j of JARS) expect(EN[`jars.${j}.name`]).toBeTruthy()
+    for (const s of SHOP_DEFS) {
+      expect(EN[`shops.${s.id}.name`]).toBeTruthy()
+      if (s.haggle !== 'none') expect(EN[`haggle.${s.id}.counter`], s.id).toBeTruthy()
     }
-    for (const l of LESSON_ORDER) for (const part of ['l1', 'l2', 'l3', 'term', 'more']) expect(EN[`lesson.${l}.${part}`]).toBeTruthy()
+    for (const inv of INVITE_DEFS) {
+      expect(EN[`invites.${inv.id}.text`]).toBeTruthy()
+      expect(EN[`invites.${inv.id}.yes`]).toBeTruthy()
+      expect(EN[`invites.${inv.id}.no`]).toBeTruthy()
+      if (inv.swap != null) expect(EN[`invites.${inv.id}.swap`]).toBeTruthy()
+    }
+    for (const i of IDEAS) {
+      expect(EN[`ideas.${i}.name`], i).toBeTruthy()
+      expect(EN[`ideas.${i}.rule`], i).toBeTruthy()
+    }
   })
 
   test('the guardrail line is present in every language', () => {
     expect(EN.guardrail).toBe('Made-up prices. Real life is different.')
     expect(flat(hi as Tree).guardrail).toBeTruthy()
     expect(flat(te as Tree).guardrail).toBeTruthy()
+  })
+
+  test('no real brand or app names in any language file', () => {
+    const banned = /(paytm|phonepe|gpay|google pay|zomato|swiggy|amazon|flipkart|hdfc|sbi|icici|zerodha|groww|upstox)/i
+    for (const file of [en, hi, te]) expect(JSON.stringify(file)).not.toMatch(banned)
   })
 })

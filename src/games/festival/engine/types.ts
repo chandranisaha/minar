@@ -1,75 +1,61 @@
 export type Day = 1 | 2 | 3
-export type PocketId = 'ghar' | 'gift' | 'masti' | 'bus' | 'loose'
-export type ItemId = 'sweets' | 'decor' | 'outfit' | 'small' | 'gift'
-export type StallId = 'daamfix' | 'chacha' | 'aunty' | 'megasale' | 'sasta'
+export type JarId = 'needs' | 'gift' | 'fun' | 'spare'
+export type ItemId = 'sweets' | 'outfit' | 'gift' | 'decor'
+export type ShopId = 'daamfix' | 'chacha' | 'aunty' | 'megasale' | 'sasta'
 export type FestivalId = 'diwali' | 'eid' | 'bonalu' | 'sankranti' | 'christmas'
+export type FriendId = 'arjun' | 'ayesha' | 'sunny'
 export type Quality = 'good' | 'low'
 export type Reply = 'yes' | 'swap' | 'no'
-export type SurpriseId = 'S1' | 'S2' | 'S3' | 'S4'
-export type OfferResult = 'accept' | 'counter' | 'insult' | 'closed'
 
-export const POCKETS: PocketId[] = ['ghar', 'gift', 'masti', 'bus', 'loose']
-export const LIST_ITEMS: ItemId[] = ['sweets', 'decor', 'outfit', 'small']
-export const ITEMS: ItemId[] = ['sweets', 'decor', 'outfit', 'small', 'gift']
-export const STALLS: StallId[] = ['daamfix', 'chacha', 'aunty', 'megasale', 'sasta']
+export const JARS: JarId[] = ['needs', 'gift', 'fun', 'spare']
+export const NEEDS: ItemId[] = ['sweets', 'outfit', 'decor']
+export const ITEMS: ItemId[] = ['sweets', 'outfit', 'gift', 'decor']
+export const DAYS: Day[] = [1, 2, 3]
 
-export type Pockets = Record<PocketId, number>
+export type Jars = Record<JarId, number>
+export const zeroJars = (): Jars => ({ needs: 0, gift: 0, fun: 0, spare: 0 })
+export const sumJars = (j: Jars) => JARS.reduce((a, k) => a + j[k], 0)
 
+/**
+ * Everything the player does is one of these. Events with a `card` and a terminal kind
+ * (buy, later, without, invite, surprise, ringtoss, seen) resolve that card.
+ */
 export type GameEvent =
-  | { kind: 'plan'; day: Day; pockets: Pockets }
-  | { kind: 'visit'; day: Day; stall: StallId }
-  | { kind: 'offer'; day: Day; stall: StallId; item: ItemId; offer: number; result: OfferResult; counter?: number }
-  | { kind: 'walkaway'; day: Day; stall: StallId; item: ItemId; callback?: number }
-  | { kind: 'buy'; day: Day; stall: StallId; item: ItemId; price: number; quality: Quality }
-  | { kind: 'raid'; day: Day; from: PocketId; to: PocketId; amount: number; reason: string }
-  | { kind: 'invite'; day: Day; id: string; reply: Reply; cost: number }
-  | { kind: 'ringtoss'; day: Day; win: boolean }
-  | { kind: 'surprise'; day: Day; id: SurpriseId; choice: string; cost: number }
-  | { kind: 'bus'; day: Day; paid: boolean }
-  | { kind: 'repay'; day: Day | 4; who: 'ayesha' | 'sunny'; amount: number }
+  | { kind: 'plan'; jars: Jars }
+  | { kind: 'borrow'; day: Day; card: string; from: JarId; to: JarId; amount: number }
+  | { kind: 'haggle'; day: Day; card: string; shop: ShopId; item: ItemId; result: 'counter' | 'refuse'; price: number }
+  | { kind: 'buy'; day: Day; card: string; item: ItemId; shop: ShopId; price: number; quality: Quality }
+  | { kind: 'later'; day: Day; card: string; item: ItemId }
+  | { kind: 'without'; day: Day; card: string; item: ItemId }
+  | { kind: 'invite'; day: Day; card: string; id: string; reply: Reply; cost: number }
+  | { kind: 'surprise'; day: Day; card: string; id: 'mamu' | 'torn'; choice: 'pay' | 'rebuy' | 'old'; cost: number }
+  | { kind: 'ringtoss'; day: Day; card: string; play: boolean; win: boolean }
+  | { kind: 'seen'; day: Day; card: string }
+  | { kind: 'repay'; amount: number }
   | { kind: 'end' }
 
-export interface Owned {
-  stall: StallId
-  day: Day
-  price: number
-  quality: Quality
-  torn?: boolean
-}
+export const TERMINAL = new Set<GameEvent['kind']>(['buy', 'later', 'without', 'invite', 'surprise', 'ringtoss', 'seen'])
 
-export interface Raid {
-  day: Day
-  from: PocketId
-  to: PocketId
-  amount: number
-  reason: string
-}
+export interface Owned { shop: ShopId; day: Day; price: number; quality: Quality; torn?: boolean }
 
 export interface GameState {
-  pockets: Pockets
-  /** day-1 plan plus any free morning rebalancing on days 2 and 3 */
-  planned: Pockets
-  spent: Pockets
-  raidedIn: Pockets
-  raidedOut: Pockets
-  raids: Raid[]
+  jars: Jars
+  planned: Jars
+  spent: Jars
+  borrowedIn: Jars
+  borrowedOut: Jars
+  borrowed: number
+  /** cards whose payment needed borrowing */
+  borrowCards: string[]
   owned: Partial<Record<ItemId, Owned>>
+  without: ItemId[]
   friendship: number
-  walked: Day[]
-  ringTossPlays: Record<Day, number>
-  teddy: boolean
+  swaps: number
   sunnyLent: number
   sunnyRepaid: number | null
-  ayeshaCovered: boolean | null
-  ayeshaRepaid: boolean
-  mamuPaidFrom: PocketId[] | null
-  s1: 'rebuy' | 'old' | 'festival' | null
-  swaps: number
-  mastiSpent: number
-  moneyIn: number
-  moneyOut: number
+  mamu: 'spare' | 'borrowed' | null
+  tornChoice: 'rebuy' | 'old' | null
+  ringTossPlays: number
+  teddy: boolean
   ended: boolean
 }
-
-export const zeroPockets = (): Pockets => ({ ghar: 0, gift: 0, masti: 0, bus: 0, loose: 0 })
-export const sumPockets = (p: Pockets) => POCKETS.reduce((a, k) => a + p[k], 0)

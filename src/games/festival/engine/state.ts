@@ -1,165 +1,127 @@
 import { RULES, invite, item } from './content'
-import { POCKETS, zeroPockets, type Day, type GameEvent, type GameState, type PocketId, type Pockets } from './types'
+import { JARS, sumJars, zeroJars, type Day, type GameEvent, type GameState, type JarId } from './types'
 
 export function initialState(): GameState {
   return {
-    pockets: { ...zeroPockets(), loose: RULES.startMoney },
-    planned: zeroPockets(),
-    spent: zeroPockets(),
-    raidedIn: zeroPockets(),
-    raidedOut: zeroPockets(),
-    raids: [],
+    jars: { ...zeroJars(), spare: RULES.startMoney },
+    planned: zeroJars(),
+    spent: zeroJars(),
+    borrowedIn: zeroJars(),
+    borrowedOut: zeroJars(),
+    borrowed: 0,
+    borrowCards: [],
     owned: {},
+    without: [],
     friendship: RULES.friendship.start,
-    walked: [],
-    ringTossPlays: { 1: 0, 2: 0, 3: 0 },
-    teddy: false,
+    swaps: 0,
     sunnyLent: 0,
     sunnyRepaid: null,
-    ayeshaCovered: null,
-    ayeshaRepaid: false,
-    mamuPaidFrom: null,
-    s1: null,
-    swaps: 0,
-    mastiSpent: 0,
-    moneyIn: RULES.startMoney,
-    moneyOut: 0,
+    mamu: null,
+    tornChoice: null,
+    ringTossPlays: 0,
+    teddy: false,
     ended: false,
   }
 }
 
 export class EngineError extends Error {}
 
-const clampF = (n: number) => Math.max(0, Math.min(100, n))
+const clamp = (n: number) => Math.max(0, Math.min(100, n))
 
-/** Take money out of one pocket. Shortfalls must already have been covered by raid events. */
-function pay(s: GameState, pocket: PocketId, amount: number): GameState {
+/** Take money out of a jar. A shortfall must already have been covered by borrow events. */
+function pay(s: GameState, jar: JarId, amount: number): GameState {
   if (amount < 0) throw new EngineError('negative payment')
-  if (s.pockets[pocket] < amount) throw new EngineError(`pocket ${pocket} short: has ${s.pockets[pocket]}, needs ${amount}`)
-  return {
-    ...s,
-    pockets: { ...s.pockets, [pocket]: s.pockets[pocket] - amount },
-    spent: { ...s.spent, [pocket]: s.spent[pocket] + amount },
-    moneyOut: s.moneyOut + amount,
-    mastiSpent: pocket === 'masti' ? s.mastiSpent + amount : s.mastiSpent,
-  }
+  if (s.jars[jar] < amount) throw new EngineError(`${jar} jar short: has ${s.jars[jar]}, needs ${amount}`)
+  return { ...s, jars: { ...s.jars, [jar]: s.jars[jar] - amount }, spent: { ...s.spent, [jar]: s.spent[jar] + amount } }
 }
 
-/** Pure reducer. Screens never touch money directly; they append events. */
+/** Pure reducer: screens never touch money, they append events. */
 export function applyEvent(s: GameState, e: GameEvent): GameState {
   switch (e.kind) {
     case 'plan': {
-      const total = POCKETS.reduce((a, k) => a + e.pockets[k], 0)
-      const have = POCKETS.reduce((a, k) => a + s.pockets[k], 0)
-      if (total !== have) throw new EngineError(`plan must place exactly ${have}, got ${total}`)
-      if (POCKETS.some((k) => e.pockets[k] < 0)) throw new EngineError('negative pocket in plan')
-      if (e.day === 1 && sumPlanned(s) === 0) return { ...s, pockets: { ...e.pockets }, planned: { ...e.pockets } }
-      // later mornings: rebalancing is planning, so the plan shifts by what moved (not logged as a raid)
-      const planned = { ...s.planned }
-      for (const k of POCKETS) planned[k] += e.pockets[k] - s.pockets[k]
-      return { ...s, pockets: { ...e.pockets }, planned }
+      if (sumJars(e.jars) !== sumJars(s.jars)) throw new EngineError('plan must place all the money')
+      if (JARS.some((k) => e.jars[k] < 0)) throw new EngineError('negative jar')
+      return { ...s, jars: { ...e.jars }, planned: { ...e.jars } }
     }
-    case 'raid': {
-      if (e.amount <= 0 || s.pockets[e.from] < e.amount) throw new EngineError(`raid from ${e.from} too large`)
+    case 'borrow': {
+      if (e.amount <= 0 || s.jars[e.from] < e.amount) throw new EngineError(`borrow from ${e.from} too large`)
       return {
         ...s,
-        pockets: { ...s.pockets, [e.from]: s.pockets[e.from] - e.amount, [e.to]: s.pockets[e.to] + e.amount },
-        raidedOut: { ...s.raidedOut, [e.from]: s.raidedOut[e.from] + e.amount },
-        raidedIn: { ...s.raidedIn, [e.to]: s.raidedIn[e.to] + e.amount },
-        raids: [...s.raids, { day: e.day, from: e.from, to: e.to, amount: e.amount, reason: e.reason }],
+        jars: { ...s.jars, [e.from]: s.jars[e.from] - e.amount, [e.to]: s.jars[e.to] + e.amount },
+        borrowedOut: { ...s.borrowedOut, [e.from]: s.borrowedOut[e.from] + e.amount },
+        borrowedIn: { ...s.borrowedIn, [e.to]: s.borrowedIn[e.to] + e.amount },
+        borrowed: s.borrowed + e.amount,
+        borrowCards: s.borrowCards.includes(e.card) ? s.borrowCards : [...s.borrowCards, e.card],
       }
     }
     case 'buy': {
-      const def = item(e.item)
-      const prev = s.owned[e.item]
-      if (prev && !prev.torn) throw new EngineError(`${e.item} already owned`)
-      const next = pay(s, def.pocket, e.price)
-      return { ...next, owned: { ...next.owned, [e.item]: { stall: e.stall, day: e.day, price: e.price, quality: e.quality } } }
+      const o = s.owned[e.item]
+      if (o && !o.torn) throw new EngineError(`${e.item} already bought`)
+      const next = pay(s, item(e.item).jar, e.price)
+      return { ...next, owned: { ...next.owned, [e.item]: { shop: e.shop, day: e.day, price: e.price, quality: e.quality } } }
     }
+    case 'without':
+      return { ...s, without: [...s.without, e.item] }
     case 'invite': {
       const def = invite(e.id)
       const f = RULES.friendship
       const delta = e.reply === 'yes' ? f.yes : e.reply === 'swap' ? f.swap : (def.noFriendship ?? f.no)
-      const next = e.cost > 0 ? pay(s, 'masti', e.cost) : s
+      const next = e.cost > 0 ? pay(s, 'fun', e.cost) : s
       return {
         ...next,
-        friendship: clampF(next.friendship + delta),
+        friendship: clamp(next.friendship + delta),
         swaps: next.swaps + (e.reply === 'swap' ? 1 : 0),
         sunnyLent: def.loan ? next.sunnyLent + e.cost : next.sunnyLent,
       }
     }
-    case 'ringtoss': {
-      const next = pay(s, 'masti', RULES.ringToss.cost)
-      return { ...next, ringTossPlays: { ...next.ringTossPlays, [e.day]: next.ringTossPlays[e.day] + 1 }, teddy: next.teddy || e.win }
-    }
     case 'surprise': {
-      if (e.id === 'S1') {
-        if (e.choice === 'rebuy') {
-          const next = pay(s, 'ghar', e.cost)
-          return { ...next, s1: 'rebuy', owned: { ...next.owned, outfit: { stall: 'daamfix', day: e.day, price: e.cost, quality: 'good' } } }
-        }
-        const o = s.owned.outfit
-        return { ...s, s1: e.choice === 'festival' ? 'festival' : 'old', owned: o ? { ...s.owned, outfit: { ...o, torn: true } } : s.owned }
+      if (e.id === 'mamu') {
+        return { ...pay(s, 'spare', e.cost), mamu: s.borrowCards.includes(e.card) ? 'borrowed' : 'spare' }
       }
-      if (e.id === 'S2') {
-        const next = pay(s, 'loose', e.cost)
-        return { ...next, mamuPaidFrom: s.raids.filter((r) => r.reason === 'S2').map((r) => r.from) }
+      // torn outfit: rebuy a good one at the fixed shop, or wear old clothes
+      const o = s.owned.outfit!
+      if (e.choice === 'rebuy') {
+        const next = pay(s, 'needs', e.cost)
+        return { ...next, tornChoice: 'rebuy', owned: { ...next.owned, outfit: { shop: 'daamfix', day: e.day, price: e.cost, quality: 'good' } } }
       }
-      if (e.id === 'S3') {
-        const covered = e.choice === 'cover'
-        const next = covered ? pay(s, 'masti', e.cost) : s
-        const f = RULES.friendship
-        return { ...next, ayeshaCovered: covered, friendship: clampF(next.friendship + (covered ? f.coverAyesha : f.refuseAyesha)) }
-      }
-      return s // S4 is cosmetic
+      return { ...s, tornChoice: 'old', owned: { ...s.owned, outfit: { ...o, torn: true } } }
     }
-    case 'bus': {
-      if (!e.paid) return { ...s, walked: [...s.walked, e.day] }
-      return pay(s, 'bus', RULES.busFare)
+    case 'ringtoss': {
+      if (!e.play) return s
+      const next = pay(s, 'fun', RULES.ringToss.cost)
+      return { ...next, ringTossPlays: next.ringTossPlays + 1, teddy: next.teddy || e.win }
     }
-    case 'repay': {
-      const pockets = { ...s.pockets, loose: s.pockets.loose + e.amount }
-      if (e.who === 'ayesha') return { ...s, pockets, moneyIn: s.moneyIn + e.amount, ayeshaRepaid: true }
-      return { ...s, pockets, moneyIn: s.moneyIn + e.amount, sunnyRepaid: e.amount }
+    case 'repay':
+      return { ...s, jars: { ...s.jars, spare: s.jars.spare + e.amount }, sunnyRepaid: e.amount }
+    case 'end': {
+      // a cheap outfit bought on day 3 tears on festival morning, with no time to replace it
+      const o = s.owned.outfit
+      const owned = o && o.quality === 'low' && !o.torn && o.day === 3 ? { ...s.owned, outfit: { ...o, torn: true } } : s.owned
+      return { ...s, owned, ended: true }
     }
-    case 'end':
-      return { ...s, ended: true }
-    case 'visit':
-    case 'offer':
-    case 'walkaway':
+    case 'haggle':
+    case 'later':
+    case 'seen':
       return s
   }
 }
 
-function sumPlanned(s: GameState) {
-  return POCKETS.reduce((a, k) => a + s.planned[k], 0)
-}
-
 export const replay = (log: GameEvent[]): GameState => log.reduce(applyEvent, initialState())
-
-export const wallet = (s: GameState): Pockets => ({ ...s.pockets })
-export const walletTotal = (s: GameState) => POCKETS.reduce((a, k) => a + s.pockets[k], 0)
-
-/** Can the whole wallet cover this? If not, the purchase shows "Not enough money". */
+export const walletTotal = (s: GameState) => sumJars(s.jars)
+export const shortfall = (s: GameState, jar: JarId, amount: number) => Math.max(0, amount - s.jars[jar])
 export const canAfford = (s: GameState, amount: number) => walletTotal(s) >= amount
 
-/** How much a payment from `pocket` is short by (0 = no raid needed). */
-export const shortfall = (s: GameState, pocket: PocketId, amount: number) => Math.max(0, amount - s.pockets[pocket])
-
-/**
- * Build the raid events that cover a shortfall from a preferred order of source pockets.
- * Used by bots and Demo mode; real players pick each source on the Raid sheet.
- */
-export function autoRaids(s: GameState, to: PocketId, amount: number, order: PocketId[], day: Day, reason: string): GameEvent[] | null {
+/** Borrow events that cover a shortfall from jars in the given order (bots and demo; players pick on the Borrow sheet). */
+export function autoBorrow(s: GameState, to: JarId, amount: number, order: JarId[], day: Day, card: string): GameEvent[] | null {
   let need = shortfall(s, to, amount)
   if (!need) return []
   if (!canAfford(s, amount)) return null
   const out: GameEvent[] = []
   for (const from of order) {
     if (from === to || need <= 0) continue
-    const take = Math.min(need, s.pockets[from])
+    const take = Math.min(need, s.jars[from])
     if (take > 0) {
-      out.push({ kind: 'raid', day, from, to, amount: take, reason })
+      out.push({ kind: 'borrow', day, card, from, to, amount: take })
       need -= take
     }
   }

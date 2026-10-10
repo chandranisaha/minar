@@ -1,35 +1,24 @@
-import { RULES, STALL_DEFS, invitesFor, stall, type InviteDef } from './content'
-import { callbackFor, offerFor, respond, stallState, isClosed, type OfferButton } from './bargain'
-import { festivalMorningEvents, morningEvents, needsS1, ringTossWin, s1RebuyPrice, visitsLeft } from './flow'
-import { priceFor } from './prices'
-import { applyEvent, autoRaids, initialState, walletTotal } from './state'
-import { item as itemDef } from './content'
-import type { Day, GameEvent, GameState, ItemId, PocketId, Pockets, Reply, StallId } from './types'
+import { mulberry32, hashString } from '../../../lib/rng'
+import { RULES, item, shop, type InviteDef } from './content'
+import { currentCard, festivalMorning, ringTossWin, type Card } from './deck'
+import { haggle, sticker } from './shop'
+import { applyEvent, autoBorrow, initialState, walletTotal } from './state'
+import type { GameEvent, GameState, JarId, Jars, Reply, ShopId } from './types'
 
 /**
- * Balancing bots. They play through the same engine and flow helpers the screens use,
- * so if the rules or prices drift, the bot tests catch it.
+ * Balancing bots. They play through the same engine and deck the screens use,
+ * so if prices or rules drift, the bot tests catch it. Demo mode replays two of them.
  */
-export interface Ctx {
-  seed: string
-  day: Day
-  log: GameEvent[]
-  state: () => GameState
-  push: (e: GameEvent) => void
-  /** cover any shortfall with raids in the bot's order, then log `e`. false = not enough money */
-  payWith: (pocket: PocketId, amount: number, reason: string, e: GameEvent) => boolean
-}
+type ShopChoice = { buy: ShopId; haggle: boolean } | 'later' | 'without'
 
 export interface Policy {
   name: string
-  plan: Pockets
-  raidOrder: PocketId[]
-  shop: (ctx: Ctx) => void
+  plan: Jars
+  borrowOrder: JarId[]
+  shop: (card: Extract<Card, { type: 'shop' }>, s: GameState, seed: string) => ShopChoice
   invite: (inv: InviteDef) => Reply
-  coverAyesha: boolean
-  ringTosses: (day: Day) => number
-  walkWhenBusShort: boolean
-  rebuyTornOutfit: boolean
+  rebuyTorn: boolean
+  ringToss: boolean
 }
 
 export function runBot(seed: string, p: Policy): GameEvent[] {
@@ -39,137 +28,117 @@ export function runBot(seed: string, p: Policy): GameEvent[] {
     s = applyEvent(s, e)
     log.push(e)
   }
-  const mk = (day: Day): Ctx => ({
-    seed, day, log, state: () => s, push,
-    payWith: (pocket, amount, reason, e) => {
-      const raids = autoRaids(s, pocket, amount, p.raidOrder, day, reason)
-      if (!raids) return false
-      raids.forEach(push)
-      push(e)
-      return true
-    },
-  })
-
-  for (const day of [1, 2, 3] as Day[]) {
-    const ctx = mk(day)
-    morningEvents(log, day).forEach(push)
-    if (day === 3 && needsS1(s)) {
-      const price = s1RebuyPrice()
-      const ok = p.rebuyTornOutfit && ctx.payWith('ghar', price, 'S1', { kind: 'surprise', day, id: 'S1', choice: 'rebuy', cost: price })
-      if (!ok) push({ kind: 'surprise', day, id: 'S1', choice: 'old', cost: 0 })
-    }
-    if (day === 1) push({ kind: 'plan', day, pockets: { ...p.plan } })
-
-    p.shop(ctx)
-
-    for (const inv of invitesFor(day)) {
-      let reply = p.invite(inv)
-      if (reply === 'swap' && inv.swap == null) reply = 'yes'
-      const cost = reply === 'yes' ? inv.yes : reply === 'swap' ? inv.swap! : 0
-      const e: GameEvent = { kind: 'invite', day, id: inv.id, reply, cost }
-      if (cost === 0) push(e)
-      else if (!ctx.payWith('masti', cost, `invite:${inv.id}`, e)) push({ ...e, reply: 'no', cost: 0 })
-    }
-    if (day === 2) {
-      const e: GameEvent = { kind: 'surprise', day, id: 'S3', choice: 'cover', cost: RULES.ayeshaFare }
-      if (!(p.coverAyesha && ctx.payWith('masti', RULES.ayeshaFare, 'S3', e))) push({ ...e, choice: 'refuse', cost: 0 })
-    }
-    for (let k = 0; k < Math.min(RULES.ringToss.playsPerEvening, p.ringTosses(day)); k++) {
-      if (!ctx.payWith('masti', RULES.ringToss.cost, 'ringtoss', { kind: 'ringtoss', day, win: ringTossWin(seed, day, k) })) break
-    }
-    if (day === 2) {
-      const cost = Math.min(RULES.mamuCost, walletTotal(s))
-      ctx.payWith('loose', cost, 'S2', { kind: 'surprise', day, id: 'S2', choice: 'pay', cost })
-    }
-    if (s.pockets.bus >= RULES.busFare) push({ kind: 'bus', day, paid: true })
-    else if (p.walkWhenBusShort || !ctx.payWith('bus', RULES.busFare, 'bus', { kind: 'bus', day, paid: true })) push({ kind: 'bus', day, paid: false })
+  const payWith = (jar: JarId, amount: number, card: Card, e: GameEvent) => {
+    const borrows = autoBorrow(s, jar, amount, p.borrowOrder, card.day, card.id)
+    if (!borrows) return false
+    borrows.forEach(push)
+    push(e)
+    return true
   }
-  festivalMorningEvents(seed, log).forEach(push)
+
+  push({ kind: 'plan', jars: { ...p.plan } })
+  for (let card = currentCard(log); card; card = currentCard(log)) {
+    const { day, id } = card
+    switch (card.type) {
+      case 'banner':
+        push({ kind: 'seen', day, card: id })
+        break
+      case 'shop': {
+        let c = p.shop(card, s, seed)
+        if (c === 'later' && !card.canLater) c = cheapestBuy(card)
+        if (c === 'later') { push({ kind: 'later', day, card: id, item: card.item }); break }
+        if (c === 'without') { push({ kind: 'without', day, card: id, item: card.item }); break }
+        let price = sticker(card.item, c.buy, day)
+        if (c.haggle) {
+          const h = haggle(seed, card.item, c.buy, day)
+          if (h) { push({ kind: 'haggle', day, card: id, shop: c.buy, item: card.item, result: h.result, price: h.price }); price = h.price }
+        }
+        const buy: GameEvent = { kind: 'buy', day, card: id, item: card.item, shop: c.buy, price, quality: shop(c.buy).quality }
+        if (!payWith(item(card.item).jar, price, card, buy)) push({ kind: 'without', day, card: id, item: card.item })
+        break
+      }
+      case 'invite': {
+        const inv = card.invite
+        let reply = p.invite(inv)
+        if (reply === 'swap' && inv.swap == null) reply = 'yes'
+        const cost = reply === 'yes' ? inv.yes : reply === 'swap' ? inv.swap! : 0
+        const e: GameEvent = { kind: 'invite', day, card: id, id: inv.id, reply, cost }
+        if (cost === 0 || !payWith('fun', cost, card, e)) push(cost === 0 ? e : { ...e, reply: 'no', cost: 0 })
+        break
+      }
+      case 'mamu': {
+        const cost = Math.min(RULES.mamuCost, walletTotal(s))
+        payWith('spare', cost, card, { kind: 'surprise', day, card: id, id: 'mamu', choice: 'pay', cost })
+        break
+      }
+      case 'torn': {
+        const ok = p.rebuyTorn && payWith('needs', card.rebuy, card, { kind: 'surprise', day, card: id, id: 'torn', choice: 'rebuy', cost: card.rebuy })
+        if (!ok) push({ kind: 'surprise', day, card: id, id: 'torn', choice: 'old', cost: 0 })
+        break
+      }
+      case 'ringtoss': {
+        const e: GameEvent = { kind: 'ringtoss', day, card: id, play: true, win: ringTossWin(seed) }
+        if (!(p.ringToss && payWith('fun', RULES.ringToss.cost, card, e))) push({ kind: 'ringtoss', day, card: id, play: false, win: false })
+        break
+      }
+    }
+  }
+  festivalMorning(seed, log).forEach(push)
   return log
 }
 
 // ---------- shopping strategies ----------
 
-/** Try one stall with a button sequence; returns the final price it would get, without logging. */
-function simulate(log: GameEvent[], st: StallId, it: ItemId, day: Day, opener: OfferButton): { price: number; offers: GameEvent[]; closed?: boolean } | null {
-  if (!stall(st).bargain) return { price: priceFor(it, st, day)!, offers: [] }
-  if (isClosed(log, st, day)) return null
-  const ss = stallState(log, st, it, day)
-  const offer = offerFor(ss.sticker, opener)
-  const r = respond(ss, offer)
-  const ev: GameEvent = { kind: 'offer', day, stall: st, item: it, offer, result: r.result, counter: r.counter }
-  if (r.result === 'accept') return { price: offer, offers: [ev] }
-  if (r.result === 'closed') return { price: Infinity, offers: [ev], closed: true }
-  return { price: r.counter!, offers: [ev] }
+const priceAfterHaggle = (seed: string, card: Extract<Card, { type: 'shop' }>, sh: ShopId) =>
+  haggle(seed, card.item, sh, card.day)?.price ?? sticker(card.item, sh, card.day)
+
+/** Compare the good shops, ask for less where you can, buy the lowest. */
+function bestBargain(card: Extract<Card, { type: 'shop' }>, _s: GameState, seed: string): ShopChoice {
+  const good = item(card.item).shops.filter((sh) => shop(sh).quality === 'good')
+  const best = good.sort((a, b) => priceAfterHaggle(seed, card, a) - priceAfterHaggle(seed, card, b))[0]
+  return { buy: best, haggle: shop(best).haggle !== 'none' }
 }
 
-function buyAt(ctx: Ctx, st: StallId, it: ItemId, opener: OfferButton | null): boolean {
-  const { day, log } = ctx
-  if (visitsLeft(log, day) <= 0) return false
-  ctx.push({ kind: 'visit', day, stall: st })
-  const sim = opener ? simulate(log, st, it, day, opener) : { price: priceFor(it, st, day)!, offers: [] }
-  if (!sim) return false
-  sim.offers.forEach(ctx.push)
-  if (sim.closed) return false
-  return ctx.payWith(itemDef(it).pocket, sim.price, `buy:${it}`, { kind: 'buy', day, stall: st, item: it, price: sim.price, quality: stall(st).quality })
-}
-
-const sellers = (it: ItemId) => STALL_DEFS.filter((d) => d.sells.includes(it))
-
-/** Planner/Hoarder: look at every stall, then buy each item where a Fair opener (then accepting the counter) is cheapest; ties go to Daam Fix. */
-export function shopBestBargain(ctx: Ctx) {
-  if (ctx.day !== 1) return
-  for (const d of STALL_DEFS) ctx.push({ kind: 'visit', day: 1, stall: d.id })
-  for (const it of ['sweets', 'decor', 'outfit', 'small', 'gift'] as ItemId[]) {
-    let best: { st: StallId; price: number; bargain: boolean } | null = null
-    for (const d of sellers(it)) {
-      if (d.quality !== 'good') continue
-      const sim = simulate(ctx.log, d.id, it, 1, 'fair')
-      if (sim && (!best || sim.price < best.price)) best = { st: d.id, price: sim.price, bargain: d.bargain }
-    }
-    if (best) buyAt(ctx, best.st, it, best.bargain ? 'fair' : null)
-  }
-}
-
-/** Impulsive: needs on day 3 at the cheapest sticker, paying the sticker. */
-export function shopImpulsive(ctx: Ctx) {
-  if (ctx.day !== 3) return
-  for (const it of ['sweets', 'decor', 'outfit', 'small', 'gift'] as ItemId[]) {
-    if (ctx.state().owned[it]) continue
-    const d = sellers(it).sort((a, b) => priceFor(it, a.id, 3)! - priceFor(it, b.id, 3)!)[0]
-    buyAt(ctx, d.id, it, null)
-  }
-}
-
-/** Bargain hunter: lowest sticker, always opens with Low, accepts the counter; if the stall closes, next-lowest sticker. Big items first. */
-export function shopBargainHunter(ctx: Ctx) {
-  if (ctx.day !== 1) return
-  for (const it of ['sweets', 'outfit', 'gift', 'decor', 'small'] as ItemId[]) {
-    const order = sellers(it).sort((a, b) => priceFor(it, a.id, 1)! - priceFor(it, b.id, 1)!)
-    for (const d of order) {
-      if (isClosed(ctx.log, d.id, 1)) continue
-      if (buyAt(ctx, d.id, it, d.bargain ? 'low' : null)) break
-    }
-  }
-}
-
-/** Not a bot from the spec: a walk-away at Aunty's to exercise the seeded call-back. */
-export function walkawayAt(ctx: Ctx, st: StallId, it: ItemId) {
-  const cb = callbackFor(ctx.seed, ctx.log, st, it, ctx.day)
-  ctx.push({ kind: 'walkaway', day: ctx.day, stall: st, item: it, callback: cb })
-  return cb
-}
-
-const SENSIBLE = RULES.sensiblePlan
+/** Lowest sticker on the card, including the cheap-and-flimsy shop. */
+const cheapestBuy = (card: Extract<Card, { type: 'shop' }>): ShopChoice => ({
+  buy: [...item(card.item).shops].sort((a, b) => sticker(card.item, a, card.day) - sticker(card.item, b, card.day))[0],
+  haggle: false,
+})
 
 export const PLANNER: Policy = {
-  name: 'planner', plan: SENSIBLE, raidOrder: ['masti', 'loose', 'gift', 'ghar', 'bus'], shop: shopBestBargain,
-  invite: (inv) => (inv.loan ? 'swap' : 'swap'), coverAyesha: true, ringTosses: () => 0, walkWhenBusShort: false, rebuyTornOutfit: true,
+  name: 'planner', plan: RULES.sensiblePlan, borrowOrder: ['spare', 'fun', 'gift', 'needs'],
+  shop: bestBargain, invite: () => 'swap', rebuyTorn: true, ringToss: false,
 }
-export const HOARDER: Policy = { ...PLANNER, name: 'hoarder', invite: () => 'no', coverAyesha: false }
+export const HOARDER: Policy = { ...PLANNER, name: 'hoarder', invite: () => 'no' }
 export const IMPULSIVE: Policy = {
-  name: 'impulsive', plan: { ghar: 900, gift: 240, masti: 800, bus: 60, loose: 0 }, raidOrder: ['loose', 'bus', 'gift', 'ghar', 'masti'],
-  shop: shopImpulsive, invite: () => 'yes', coverAyesha: true, ringTosses: () => 3, walkWhenBusShort: true, rebuyTornOutfit: false,
+  name: 'impulsive', plan: { needs: 700, gift: 200, fun: 900, spare: 200 }, borrowOrder: ['spare', 'gift', 'needs', 'fun'],
+  // wants first: puts the list off, then grabs the lowest sticker on day 3; buys the gift wherever the sign is loudest
+  shop: (card) => (card.item === 'gift' ? { buy: 'megasale', haggle: false } : card.canLater ? 'later' : cheapestBuy(card)),
+  invite: () => 'yes', rebuyTorn: false, ringToss: true,
 }
-export const BARGAIN_HUNTER: Policy = { ...PLANNER, name: 'bargain', shop: shopBargainHunter }
-export const BOTS = [PLANNER, IMPULSIVE, HOARDER, BARGAIN_HUNTER]
+export const BARGAIN_HUNTER: Policy = {
+  ...PLANNER, name: 'bargain',
+  shop: (card) => ({ ...(cheapestBuy(card) as { buy: ShopId }), haggle: true }),
+}
+
+/** Plays a random but legal game: for the "money is never lost or made up" test. */
+export function randomPolicy(rngSeed: string): Policy {
+  const r = mulberry32(hashString(rngSeed))
+  const pick = <T,>(xs: T[]) => xs[Math.floor(r() * xs.length)]
+  const cut = [r(), r(), r()].sort()
+  const toStep = (x: number) => Math.round((x * RULES.startMoney) / RULES.step) * RULES.step
+  const a = toStep(cut[0]), b = toStep(cut[1]), c = toStep(cut[2])
+  return {
+    name: 'random', plan: { needs: a, gift: b - a, fun: c - b, spare: RULES.startMoney - c },
+    borrowOrder: [...(['needs', 'gift', 'fun', 'spare'] as JarId[])].sort(() => r() - 0.5),
+    shop: (card) => {
+      const x = r()
+      if (x < 0.15) return 'later'
+      if (x < 0.22) return 'without'
+      return { buy: pick(item(card.item).shops), haggle: r() < 0.5 }
+    },
+    invite: () => pick(['yes', 'swap', 'no'] as Reply[]),
+    rebuyTorn: r() < 0.5,
+    ringToss: r() < 0.5,
+  }
+}

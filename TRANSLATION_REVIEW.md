@@ -25,9 +25,9 @@ exists in all three files, but not the wording. Please review especially:
 
 | Key | English | Concern |
 | --- | --- | --- |
-| `pockets.*.name` | Ghar, Gift jar, Masti, Loose change | Telugu uses ఇల్లు / మస్తీ / చిల్లర; check "మస్తీ" reads naturally to Hyderabad students. |
-| `raid.*` | "raid" (taking money from another pocket) | Rendered as निकासी / తీయడం (taking out), not a literal "raid". |
-| `lesson.*.term` | Opportunity cost, Emergency buffer | Same textbook-term concern as `recap.sampleTitle` above. |
-| `stalls.*.hello`, `stall.insult` | Shopkeeper lines | Should sound like light, natural Hyderabadi bazaar talk in each language. |
+| `jars.*` | Needs, Gift, Fun, Spare | Telugu uses అవసరాలు / బహుమతి / సరదా / మిగులు; check these read naturally for money jars. |
+| `borrow.*` | "borrow from another jar" | Rendered as उधार लो / అప్పు తీసుకో; it means moving money between your own jars, so check it doesn't sound like a loan from a person. |
+| `ideas.*.name` | Opportunity cost, Emergency buffer, Comparison shopping | Plain phrases were used instead of textbook terms; confirm they land with students. |
+| `shops.*.hello`, `haggle.*` | Shopkeeper lines | Should sound like light, natural Hyderabadi bazaar talk in each language. |
 | `festivals.*.items` | Item names per festival | Check each festival's items with someone who celebrates it. |
-| `invites.panipuri.text` | "Your turn to treat us to pani puri!" | Check the "treat" idiom in Telugu. |
+| `invites.*` | Friends' messages | Casual register ("bhai", "bro"); check it matches how 16-year-olds actually talk. |

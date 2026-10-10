@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { LessonHit } from '../engine/lessons'
-import { POCKETS, sumPockets, type PocketId, type Pockets } from '../engine/types'
+import { useEffect, useId, useState, type ReactNode } from 'react'
+import { Toon, type Mood, type ToonLook } from '../../../art/Toon'
+import { JARS, type JarId, type Jars } from '../engine/types'
 import { useFestival } from '../state/store'
+import { JAR_COLOR } from './looks'
 import { useFt } from './useFt'
 
 export function GuardrailFooter() {
@@ -13,91 +14,92 @@ export function GuardrailFooter() {
   )
 }
 
-const ICON: Record<PocketId, ReactNode> = {
-  // shopping bag
-  ghar: (
-    <g>
-      <path d="M8 14 H32 L30 35 H10Z" fill="#E5457A" stroke="#2B1A17" strokeWidth="2.6" strokeLinejoin="round" />
-      <path d="M14 15 V10 Q20 3 26 10 V15" fill="none" stroke="#2B1A17" strokeWidth="2.6" strokeLinecap="round" />
-    </g>
-  ),
-  // small jar with a bow
-  gift: (
-    <g>
-      <path d="M11 12 H29 V15 Q33 18 32 26 Q31 35 20 35 Q9 35 8 26 Q7 18 11 15Z" fill="#5BB5D6" stroke="#2B1A17" strokeWidth="2.6" strokeLinejoin="round" />
-      <path d="M20 12 L13 6 L13 13Z M20 12 L27 6 L27 13Z" fill="#E5457A" stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" />
-      <circle cx="20" cy="25" r="4" fill="#D9A520" stroke="#2B1A17" strokeWidth="1.8" />
-    </g>
-  ),
-  // ticket
-  masti: (
-    <g transform="rotate(-12 20 20)">
-      <path d="M5 12 H35 V17 Q31 20 35 23 V28 H5 V23 Q9 20 5 17Z" fill="#F28C28" stroke="#2B1A17" strokeWidth="2.6" strokeLinejoin="round" />
-      <path d="M14 13 V27" stroke="#2B1A17" strokeWidth="1.6" strokeDasharray="2 2" />
-      <path d="M22 17 l1.5 3 3 .4 -2.2 2 .6 3 -2.9 -1.5 -2.9 1.5 .6 -3 -2.2 -2 3 -.4z" fill="#FFF3D6" stroke="#2B1A17" strokeWidth="1" />
-    </g>
-  ),
-  // shoe
-  bus: (
-    <g>
-      <path d="M6 28 Q5 18 12 14 L18 18 Q26 20 33 24 Q36 27 34 31 H7Z" fill="#2F6F73" stroke="#2B1A17" strokeWidth="2.6" strokeLinejoin="round" />
-      <path d="M7 31 H34" stroke="#2B1A17" strokeWidth="3" />
-      <path d="M15 19 l3 -2 M17 22 l3 -2" stroke="#FFF3D6" strokeWidth="1.8" strokeLinecap="round" />
-    </g>
-  ),
-  // coins
-  loose: (
-    <g>
-      <ellipse cx="15" cy="28" rx="10" ry="5" fill="#D9A520" stroke="#2B1A17" strokeWidth="2.4" />
-      <ellipse cx="15" cy="24" rx="10" ry="5" fill="#F0C24A" stroke="#2B1A17" strokeWidth="2.4" />
-      <ellipse cx="26" cy="20" rx="10" ry="5" fill="#D9A520" stroke="#2B1A17" strokeWidth="2.4" />
-      <ellipse cx="26" cy="16" rx="10" ry="5" fill="#F0C24A" stroke="#2B1A17" strokeWidth="2.4" />
-    </g>
-  ),
-}
-
-export function PocketIcon({ id, size = 34 }: { id: PocketId; size?: number }) {
+/** A glass jar whose coin level drops as money leaves. `full` is what 100% means (the planned amount). */
+export function Jar({ id, amount, full, size = 64 }: { id: JarId; amount: number; full: number; size?: number }) {
+  const clip = useId()
+  const level = full > 0 ? Math.max(0, Math.min(1, amount / full)) : 0
+  const top = 22 + (1 - level) * 50
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden className="shrink-0">
-      {ICON[id]}
+    <svg width={size} height={size * 1.15} viewBox="0 0 64 74" aria-hidden className="shrink-0">
+      <defs>
+        <clipPath id={clip}><path d="M12 18 H52 Q58 24 57 44 Q56 70 32 70 Q8 70 7 44 Q6 24 12 18Z" /></clipPath>
+      </defs>
+      <path d="M12 18 H52 Q58 24 57 44 Q56 70 32 70 Q8 70 7 44 Q6 24 12 18Z" fill="#FFF8E6" />
+      <g clipPath={`url(#${clip})`}>
+        <rect x="0" y={top} width="64" height="74" fill={JAR_COLOR[id]} opacity=".9" style={{ transition: 'y .5s steps(5)' }} />
+        {level > 0.05 && [14, 26, 38, 50].map((x, i) => <ellipse key={x} cx={x} cy={top + 3 + (i % 2) * 2} rx="6" ry="2.6" fill="#F0C24A" stroke="#2B1A17" strokeWidth="1.2" style={{ transition: 'cy .5s steps(5)' }} />)}
+      </g>
+      <path d="M12 18 H52 Q58 24 57 44 Q56 70 32 70 Q8 70 7 44 Q6 24 12 18Z" fill="none" stroke="#2B1A17" strokeWidth="3" />
+      <rect x="10" y="8" width="44" height="11" rx="3" fill={JAR_COLOR[id]} stroke="#2B1A17" strokeWidth="3" />
+      <path d="M15 26 Q13 40 16 54" stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" opacity=".7" />
     </svg>
   )
 }
 
-/** Wallet: total of every pocket. Money leaving flashes red with a down arrow (never colour alone). */
-export function WalletStrip({ pockets, compact = false }: { pockets: Pockets; compact?: boolean }) {
+/** The four jars, always on screen while playing. Money leaving shows a falling "▼ ₹X" chip (never colour alone). */
+export function JarShelf({ jars, planned, highlight }: { jars: Jars; planned: Jars; highlight?: JarId }) {
   const { t, money } = useFt()
-  const total = sumPockets(pockets)
-  const prev = useRef(total)
-  const [delta, setDelta] = useState<number | null>(null)
+  const [prev, setPrev] = useState(jars)
+  const [delta, setDelta] = useState<Partial<Record<JarId, number>>>({})
+  // adjust state while rendering when the jars change (React's pattern for deriving from a changed prop)
+  if (jars !== prev) {
+    const d: Partial<Record<JarId, number>> = {}
+    for (const j of JARS) if (jars[j] !== prev[j]) d[j] = jars[j] - prev[j]
+    setPrev(jars)
+    if (Object.keys(d).length) setDelta(d)
+  }
   useEffect(() => {
-    const d = total - prev.current
-    prev.current = total
-    if (!d) return
-    setDelta(d)
-    const id = window.setTimeout(() => setDelta(null), 1600)
+    if (!Object.keys(delta).length) return
+    const id = window.setTimeout(() => setDelta({}), 1700)
     return () => window.clearTimeout(id)
-  }, [total])
+  }, [delta])
   return (
-    <div className="ink-chip flex flex-wrap items-center gap-x-3 gap-y-1 px-2.5 py-1.5" role="group" aria-label={t('wallet')}>
-      <span className="font-sign lang-fit text-[13px]">{t('wallet')} {money(total)}</span>
-      {delta != null && (
-        <span key={delta + ':' + total} className="anim-pop rounded-md px-1.5 text-[12px] font-extrabold" style={{ background: delta < 0 ? '#F7C9C0' : '#CDE8C4', color: delta < 0 ? '#7A2A22' : '#2B4A1E' }}>
-          {delta < 0 ? '▼' : '▲'} {money(Math.abs(delta))}
-        </span>
-      )}
-      {!compact && (
-        <span className="flex flex-wrap gap-x-2.5 gap-y-1">
-          {POCKETS.map((p) => (
-            <span key={p} className="flex items-center gap-0.5 text-[12px] font-extrabold" title={t(`pockets.${p}.name`)}>
-              <PocketIcon id={p} size={20} />
-              <span className="sr-only">{t(`pockets.${p}.name`)}</span>
-              {money(pockets[p])}
+    <div className="grid grid-cols-4 gap-1" role="group" aria-label={t('jars.label')}>
+      {JARS.map((j) => (
+        <div key={j} className="relative flex flex-col items-center rounded-lg pb-0.5" style={{ background: highlight === j ? 'rgba(232,176,74,.45)' : undefined }}>
+          <Jar id={j} amount={jars[j]} full={Math.max(planned[j], jars[j], 1)} size={32} />
+          <span className="font-sign lang-fit text-[10px] leading-tight">{t(`jars.${j}.name`)}</span>
+          <span className="text-[12px] font-extrabold leading-tight">{money(jars[j])}</span>
+          {delta[j] != null && (
+            <span key={`${j}${delta[j]}${jars[j]}`} className="fc-fly pointer-events-none absolute -top-1 right-0 rounded-md border-2 border-ink px-1 text-[11px] font-extrabold" style={{ background: delta[j]! < 0 ? '#F7C9C0' : '#CDE8C4', color: delta[j]! < 0 ? '#7A2A22' : '#2B4A1E' }}>
+              {delta[j]! < 0 ? '▼' : '▲'}{money(Math.abs(delta[j]!))}
             </span>
-          ))}
-        </span>
-      )}
+          )}
+        </div>
+      ))}
     </div>
+  )
+}
+
+/** Friendship: three faces that smile or frown (0 to 100, starts at 60). */
+export function FriendMeter({ friendship }: { friendship: number }) {
+  const { t } = useFt()
+  const mood = friendship >= 60 ? 'happy' : friendship >= 40 ? 'meh' : 'sad'
+  const hair = { arjun: '#F28C28', ayesha: '#3F7A3A', sunny: '#5BB5D6' }
+  return (
+    <div className="flex items-center gap-1.5" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={friendship} aria-label={t('friendship')}>
+      <div className="flex -space-x-1.5">
+        {(['arjun', 'ayesha', 'sunny'] as const).map((f) => (
+          <svg key={f} width="24" height="24" viewBox="0 0 30 30" aria-hidden>
+            <circle cx="15" cy="15" r="12.5" fill="#C98552" stroke="#2B1A17" strokeWidth="2.4" />
+            <path d="M4 12 Q6 2 15 3 Q24 2 26 12 Q20 7 15 8 Q10 7 4 12Z" fill={hair[f]} stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" />
+            <circle cx="11" cy="15" r="1.7" fill="#2B1A17" />
+            <circle cx="19" cy="15" r="1.7" fill="#2B1A17" />
+            <path d={mood === 'happy' ? 'M10 19 Q15 24 20 19' : mood === 'meh' ? 'M10 21 H20' : 'M10 22 Q15 17 20 22'} fill="none" stroke="#2B1A17" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        ))}
+      </div>
+      <span className="text-[11px] font-extrabold">{t(`friendshipMood.${mood}`)}</span>
+    </div>
+  )
+}
+
+/** A character portrait from the hub's rubber-hose rig. */
+export function Portrait({ look, mood = 'happy', size = 72, wave, excited, shifty, armsUp }: { look: ToonLook; mood?: Mood; size?: number; wave?: boolean; excited?: boolean; shifty?: boolean; armsUp?: boolean }) {
+  return (
+    <svg width={size} height={size * 1.5} viewBox="0 0 100 150" aria-hidden className="shrink-0" style={{ overflow: 'visible' }}>
+      <Toon look={look} mood={mood} wave={wave} excited={excited} shifty={shifty} armsUp={armsUp} width={100} height={150} />
+    </svg>
   )
 }
 
@@ -122,89 +124,42 @@ export function Sheet({ children, label, onClose }: { children: ReactNode; label
 export function ToastHost() {
   const toast = useFestival((s) => s.toast)
   const showToast = useFestival((s) => s.showToast)
-  const { t, money, itemName } = useFt()
+  const { t } = useFt()
   useEffect(() => {
     if (!toast) return
-    const id = window.setTimeout(() => showToast(null), 3200)
+    const id = window.setTimeout(() => showToast(null), 2600)
     return () => window.clearTimeout(id)
   }, [toast, showToast])
   if (!toast) return null
-  const v = toast.vars ?? {}
-  const text = t(toast.key, {
-    ...v,
-    stall: v.stall ? t(`stalls.${v.stall}.name`) : undefined,
-    item: v.item ? itemName(String(v.item)) : undefined,
-    money: v.price != null ? money(Number(v.price)) : undefined,
-  })
   return (
     <div className="pointer-events-none fixed inset-x-0 top-24 z-[60] flex justify-center px-4" role="status" aria-live="polite">
-      <div className="ink-chip anim-pop max-w-sm px-4 py-2.5 text-center text-[15px] font-extrabold" style={{ background: '#FFE08A' }}>
-        {text}
-      </div>
+      <div className="ink-chip anim-pop max-w-sm px-4 py-2.5 text-center text-[15px] font-extrabold" style={{ background: '#FFE08A' }}>{t(toast)}</div>
     </div>
   )
 }
 
-/** Three friend faces that smile or frown with the friendship meter (0 to 100, starts at 60). */
-export function FriendFaces({ friendship }: { friendship: number }) {
-  const { t } = useFt()
-  const mood = friendship >= 60 ? 'happy' : friendship >= 40 ? 'meh' : 'sad'
-  const colors = { arjun: '#F28C28', ayesha: '#3F7A3A', sunny: '#5BB5D6' }
+/** Paper bunting strung across the top of the bazaar. */
+export function Bunting() {
+  const colors = ['#E5457A', '#E8B04A', '#2F6F73', '#F28C28', '#5BB5D6', '#3F7A3A']
   return (
-    <div className="flex items-center gap-2" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={friendship} aria-label={t('mela.friendship')}>
-      <div className="flex -space-x-1.5">
-        {(['arjun', 'ayesha', 'sunny'] as const).map((f) => (
-          <svg key={f} width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-            <circle cx="15" cy="15" r="12.5" fill="#C98552" stroke="#2B1A17" strokeWidth="2.4" />
-            <path d="M4 12 Q6 2 15 3 Q24 2 26 12 Q20 7 15 8 Q10 7 4 12Z" fill={colors[f]} stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" />
-            <circle cx="11" cy="15" r="1.7" fill="#2B1A17" />
-            <circle cx="19" cy="15" r="1.7" fill="#2B1A17" />
-            <path d={mood === 'happy' ? 'M10 19 Q15 24 20 19' : mood === 'meh' ? 'M10 21 H20' : 'M10 22 Q15 17 20 22'} fill="none" stroke="#2B1A17" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        ))}
-      </div>
-      <div className="h-3 w-20 overflow-hidden rounded-full border-2 border-ink bg-[#E9D3A6]">
-        <div className="h-full" style={{ width: `${friendship}%`, background: friendship >= 60 ? '#3F7A3A' : friendship >= 40 ? '#E8B04A' : '#D8503A' }} />
-      </div>
-      <span className="text-[12px] font-extrabold">{friendship}</span>
-    </div>
+    <svg className="pointer-events-none block h-7 w-full" viewBox="0 0 360 28" preserveAspectRatio="none" aria-hidden>
+      <path d="M0 4 Q180 16 360 4" fill="none" stroke="#2B1A17" strokeWidth="1.6" />
+      {Array.from({ length: 18 }, (_, i) => {
+        const x = 6 + i * 20
+        const y = 4 + Math.sin((x / 360) * Math.PI) * 6
+        return <path key={i} d={`M${x} ${y} L${x + 14} ${y} L${x + 7} ${y + 13}Z`} fill={colors[i % colors.length]} stroke="#2B1A17" strokeWidth="1.4" strokeLinejoin="round" />
+      })}
+    </svg>
   )
 }
 
-/** Lesson card: three lines plus Learn more. The real-life term appears only here, after the player felt it. */
-export function LessonCard({ hit, tilt = 0 }: { hit: LessonHit; tilt?: number }) {
-  const { t, money, itemName } = useFt()
-  const [more, setMore] = useState(false)
-  const v = hit.vars
-  const moneyKeys = ['m', 'r', 'p', 'c', 'cheap', 'new', 'extra', 'x']
-  const vars: Record<string, string | number> = {}
-  for (const [k, x] of Object.entries(v)) vars[k] = moneyKeys.includes(k) ? money(Number(x)) : x
-  if (v.item) vars.item = itemName(String(v.item))
-  if (v.pocket) vars.pocket = t(`pockets.${v.pocket}.name`)
-  if (v.stall) vars.stall = t(`stalls.${v.stall}.name`)
-  const line1 = hit.id === 'buffer' && hit.variant === 'good' ? t('lesson.buffer.good') : t(`lesson.${hit.id}.l1`, vars)
-  return (
-    <div className="paper p-4 text-left" style={{ transform: `rotate(${tilt}deg)` }}>
-      <div className="font-sign lang-fit text-[12px] tracking-[.2em] text-pink">{t(`lesson.${hit.id}.term`)}</div>
-      <p className="m-0 mt-1 text-[15px] font-extrabold leading-snug">{line1}</p>
-      <p className="m-0 mt-1 text-[14px] leading-snug">{t(`lesson.${hit.id}.l2`)}</p>
-      <p className="font-sign lang-fit m-0 mt-2 text-[17px]">“{t(`lesson.${hit.id}.l3`)}”</p>
-      <button type="button" className="mt-2 min-h-12 text-[13px] font-extrabold underline" aria-expanded={more} onClick={() => setMore(!more)}>
-        {more ? t('lesson.less') : t('lesson.learnMore')}
-      </button>
-      {more && <p className="m-0 text-[14px] leading-snug">{t(`lesson.${hit.id}.more`)}</p>}
-    </div>
-  )
-}
-
-/** Skyline strip (Old City rooftops, Charminar in the distance) behind every outdoor screen. */
+/** Old City rooftops (Charminar in the distance) behind every outdoor screen. */
 export function Rooftops({ night = false }: { night?: boolean }) {
   const fill = night ? '#2A3658' : '#E7A86B'
   const back = night ? '#1E2A44' : '#F2C48D'
   return (
     <svg className="pointer-events-none fixed inset-x-0 bottom-0 h-40 w-full" viewBox="0 0 360 160" preserveAspectRatio="xMidYMax slice" aria-hidden>
       <g fill={back} stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" opacity=".9">
-        {/* Charminar in the distance */}
         <path d="M150 160 V96 H210 V160Z" />
         <path d="M156 96 V58 Q158 50 160 58 V96 M200 96 V58 Q202 50 204 58 V96" />
         <path d="M170 96 Q180 74 190 96" fill={night ? '#121A2E' : '#C9875A'} />
@@ -214,11 +169,21 @@ export function Rooftops({ night = false }: { night?: boolean }) {
       <g fill={fill} stroke="#2B1A17" strokeWidth="2.4" strokeLinejoin="round">
         <path d="M0 160 V112 H34 V100 H62 V122 H92 V108 H128 V128 H150 V160Z" />
         <path d="M210 160 V118 H238 V104 H266 V124 H296 V98 H330 V116 H360 V160Z" />
-        <path d="M70 108 Q77 96 84 108 M300 98 Q313 84 326 98" fill="none" />
       </g>
       {[[12, 124], [44, 112], [104, 120], [222, 128], [250, 114], [308, 108], [340, 126]].map(([x, y]) => (
         <rect key={x} x={x} y={y} width="8" height="11" fill={night ? '#FFD25A' : '#2B1A17'} opacity={night ? 0.9 : 0.55} />
       ))}
     </svg>
   )
+}
+
+export function FestivalBadge({ id, size = 40 }: { id: string; size?: number }) {
+  const motif: Record<string, ReactNode> = {
+    diwali: <g><path d="M8 26 Q20 36 32 26 Q30 22 20 22 Q10 22 8 26Z" fill="#D9632E" stroke="#2B1A17" strokeWidth="2.4" /><path d="M20 21 Q14 13 20 5 Q26 13 20 21Z" fill="#F28C28" stroke="#2B1A17" strokeWidth="2" /></g>,
+    eid: <g><path d="M24 6 A14 14 0 1 0 30 30 A11 11 0 1 1 24 6Z" fill="#E8B04A" stroke="#2B1A17" strokeWidth="2.4" /><path d="M30 12 l1.4 3 3 .4 -2.2 2 .6 3 -2.8 -1.5 -2.8 1.5 .6 -3 -2.2 -2 3 -.4z" fill="#FFF3D6" stroke="#2B1A17" strokeWidth="1.2" /></g>,
+    bonalu: <g><path d="M10 34 H30 L27 18 H13Z" fill="#D9632E" stroke="#2B1A17" strokeWidth="2.4" /><path d="M13 18 Q20 12 27 18" fill="#E8B04A" stroke="#2B1A17" strokeWidth="2" /><path d="M20 14 Q16 8 20 3 Q24 8 20 14Z" fill="#F28C28" stroke="#2B1A17" strokeWidth="1.8" /></g>,
+    sankranti: <g><path d="M20 3 L34 18 L20 33 L6 18Z" fill="#E5457A" stroke="#2B1A17" strokeWidth="2.4" strokeLinejoin="round" /><path d="M20 3 V33 M6 18 H34" stroke="#2B1A17" strokeWidth="1.4" /><path d="M20 33 Q16 37 22 39" fill="none" stroke="#2B1A17" strokeWidth="1.6" /></g>,
+    christmas: <g><path d="M20 3 l4.7 10 10.8 1.2 -8 7.4 2.3 10.6 -9.8 -5.6 -9.8 5.6 2.3 -10.6 -8 -7.4 10.8 -1.2z" fill="#E8B04A" stroke="#2B1A17" strokeWidth="2.4" strokeLinejoin="round" /></g>,
+  }
+  return <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden className="shrink-0">{motif[id]}</svg>
 }

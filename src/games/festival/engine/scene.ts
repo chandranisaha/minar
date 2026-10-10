@@ -1,34 +1,31 @@
 import { walletTotal } from './state'
 import type { GameState } from './types'
 
-export type Layer =
-  | { id: 'sweets'; on: boolean }
-  | { id: 'lights'; level: 'full' | 'half' | 'dark' }
-  | { id: 'brother'; newOutfit: boolean }
-  | { id: 'small'; on: boolean }
-  | { id: 'gift'; on: boolean }
-  | { id: 'friends'; visit: boolean }
-  | { id: 'teddy' }
-  | { id: 'worried' }
-  | { id: 'sunny'; repaid: number }
-  | { id: 'gullak'; amount: number }
+export interface Scene {
+  lights: 'full' | 'half' | 'dark'
+  sweets: boolean
+  brother: 'new' | 'old' | 'torn'
+  gift: boolean
+  friends: boolean
+  teddy: boolean
+  mamu: boolean
+  sunny: number | null
+  gullak: number
+}
 
-/** The festival-morning room, as an ordered list of layers. Each layer depends on a choice. */
-export function festivalScene(s: GameState): Layer[] {
+/** The festival room, from the state. It fills in live during play, and is the first result on festival morning. */
+export function festivalScene(s: GameState): Scene {
   const decor = s.owned.decor
   const outfit = s.owned.outfit
-  const layers: Layer[] = [
-    { id: 'lights', level: !decor ? 'dark' : decor.quality === 'low' ? 'half' : 'full' },
-    { id: 'sweets', on: !!s.owned.sweets },
-    { id: 'small', on: !!s.owned.small },
-    { id: 'brother', newOutfit: !!outfit && !outfit.torn },
-    { id: 'gift', on: !!s.owned.gift },
-    { id: 'friends', visit: s.friendship >= 60 },
-  ]
-  if (s.teddy) layers.push({ id: 'teddy' })
-  if (s.walked.length) layers.push({ id: 'worried' })
-  if (s.sunnyLent > 0) layers.push({ id: 'sunny', repaid: s.sunnyRepaid ?? 0 })
-  const left = walletTotal(s)
-  if (left > 0) layers.push({ id: 'gullak', amount: left })
-  return layers
+  return {
+    lights: !decor ? 'dark' : decor.quality === 'low' ? 'half' : 'full',
+    sweets: !!s.owned.sweets,
+    brother: !outfit ? 'old' : outfit.torn ? 'torn' : 'new',
+    gift: !!s.owned.gift,
+    friends: s.friendship >= 60,
+    teddy: s.teddy,
+    mamu: s.mamu != null,
+    sunny: s.sunnyLent > 0 ? (s.sunnyRepaid ?? 0) : null,
+    gullak: s.ended ? walletTotal(s) : 0,
+  }
 }
