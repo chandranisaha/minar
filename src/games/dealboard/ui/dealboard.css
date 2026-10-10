@@ -233,7 +233,7 @@ html[data-lite="true"] .db-hop { animation: none; }
 .db-root .font-sign { font-family: var(--font-sign); }
 html[lang="hi"] .db-root .font-display, html[lang="hi"] .db-root .font-sign { font-family: "Rozha One", "Noto Sans Devanagari", sans-serif; font-weight: 400; }
 html[lang="te"] .db-root .font-display, html[lang="te"] .db-root .font-sign { font-family: "Noto Sans Telugu", sans-serif; font-weight: 900; line-height: 1.25; }
-.db-root .lang-fit { zoom: 1; font-size: calc(1em * var(--lang-scale)); }
+.db-root .lang-fit:not(.label) { zoom: 1; font-size: calc(1em * var(--lang-scale)); }
 .db-root .bg-jasmine { background-color: #fff3d6; }
 .db-root .text-jasmine { color: #fff3d6; }
 .db-root .bg-mustard { background-color: #e8b04a; }

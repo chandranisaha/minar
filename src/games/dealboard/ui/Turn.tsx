@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { hashSeed } from '../engine/rng'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { EMERGENCY_COST } from '../engine/events'
 import { explainQuarter } from '../engine/explain'
@@ -28,12 +29,20 @@ export interface TurnHandlers {
 }
 
 /** A question you have not asked yet: the check's name and the question, as one tap target. */
-function AskTile({ k, onAsk, disabled }: { k: LightKey; onAsk: () => void; disabled: boolean }) {
+const ASK_ICON: Record<LightKey, string> = { cash: '💰', customers: '👥', debt: '🏦', ceo: '🕵️' }
+
+/** One plain question; the wording rotates by company and run so the four tiles never read the same way twice. */
+function AskTile({ k, id, seed, onAsk, disabled }: { k: LightKey; id: CompanyId; seed: string; onAsk: () => void; disabled: boolean }) {
   const { t } = useTranslation('dealboard')
+  const variant = ['ask', 'ask2', 'ask3'][hashSeed(`${seed}:${id}:${k}`) % 3]
+  const founder = t(`companies.${id}.founder`).split(',')[0]
   return (
-    <button type="button" disabled={disabled} onClick={onAsk} className="min-h-14 rounded-lg border-2 border-ink px-2 py-1.5 text-left leading-tight" style={{ background: '#FFF3D6', opacity: disabled ? 0.5 : 1 }}>
-      <span className="block text-[10px] font-extrabold uppercase tracking-wider opacity-60">{t(`lights.${k}.name`)}</span>
-      <span className="block text-[13px] font-bold">{t(`lights.${k}.ask`)}</span>
+    <button type="button" disabled={disabled} onClick={onAsk} className="flex min-h-16 items-center gap-2.5 rounded-lg border-2 border-ink px-2.5 py-1.5 text-left leading-tight" style={{ background: '#FFF3D6', opacity: disabled ? 0.5 : 1 }}>
+      <span className="shrink-0 text-[22px]" aria-hidden>{ASK_ICON[k]}</span>
+      <span className="min-w-0">
+        <span className="block text-[10px] font-extrabold uppercase tracking-wider opacity-60">{t(`lights.${k}.name`)}</span>
+        <span className="block text-[13px] font-bold">{t(`lights.${k}.${variant}`, { founder })}</span>
+      </span>
     </button>
   )
 }
@@ -67,7 +76,7 @@ function Pitch({ run, m, id, dispatch, onPass, onTrade }: { run: RunState; m: Ma
       <div>
         <InfoHeader title={`${t('pitch.ask')} · ${left > 0 ? t('pitch.askLeft', { n: left }) : t('pitch.askNone')}`}>{t('pitch.tip')}</InfoHeader>
         <div className="mt-1.5 grid grid-cols-2 gap-1.5" role="group" aria-label={t('lights.title')}>
-          {LIGHT_KEYS.map((k) => (known.includes(k) ? <LightChip key={k} k={k} state={founderAnswer(lights, id, k)} /> : <AskTile key={k} k={k} disabled={left <= 0} onAsk={() => dispatch({ type: 'ask', companyId: id, light: k })} />))}
+          {LIGHT_KEYS.map((k) => (known.includes(k) ? <LightChip key={k} k={k} state={founderAnswer(lights, id, k)} /> : <AskTile key={k} k={k} id={id} seed={run.seed} disabled={left <= 0} onAsk={() => dispatch({ type: 'ask', companyId: id, light: k })} />))}
         </div>
       </div>
 
