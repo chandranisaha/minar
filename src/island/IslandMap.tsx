@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import type { PillarId } from '../content/data'
 import { useGame } from '../store/game'
 import { ArtSlot, useManifest } from '../art/ArtSlot'
-import { IslandArt } from './IslandArt'
+import raw from '../content/island.json'
+import { Gate, IslandArt, Kiosk } from './IslandArt'
 import { Joystick } from './Joystick'
 import { joy, useTouchUi } from './input'
 import { NODES, WORLD, nodeById, px, type IslandNode, type NodeId } from './data'
@@ -63,9 +64,10 @@ export function IslandMap() {
   const S = useRef({
     x: startPt[0], y: startPt[1], path: [] as { x: number; y: number }[], dir: 'down' as Dir, t: 0,
     camX: 0, camY: 0, keys: new Set<string>(), pending: null as NodeId | null, near: null as NodeId | null,
-    fit: 0.4, zoom: 1, scale: 0, vw: 390, vh: 844, maxZoom: 2, ptrs: new Map<number, { x: number; y: number }>(), pinch: 0, down: false, lastRepath: 0, dismissed: null as NodeId | null, cardOpen: false, ready: false,
+    fit: 0.4, zoom: 1, scale: 0, vw: 390, vh: 844, maxZoom: 2, ptrs: new Map<number, { x: number; y: number }>(), pinch: 0, down: false, lastRepath: 0, dismissed: null as NodeId | null, cardOpen: false, cardFor: null as NodeId | null, ready: false,
   })
   S.current.cardOpen = card !== null
+  S.current.cardFor = card
 
   /* ---------------------------------------------------------------- viewport / scale */
   useEffect(() => {
@@ -130,15 +132,24 @@ export function IslandMap() {
       let analog = 1
       if (!dx && !dy && joy.active) { dx = joy.x; dy = joy.y; analog = Math.min(1, Math.hypot(dx, dy)) }
       let moving = false
-      if ((dx || dy) && !s.cardOpen) {
+      if (dx || dy) {
         s.path = []; s.pending = null
         const len = Math.hypot(dx, dy)
         const mx = (dx / len) * SPEED * analog * dt, my = (dy / len) * SPEED * analog * dt
-        if (canStand(s.x + mx, s.y)) s.x += mx
-        if (canStand(s.x, s.y + my)) s.y += my
+        if (canStand(s.x + mx, s.y + my)) { s.x += mx; s.y += my }
+        else {
+          // blocked: slide along the wall, or steer around it (roads are diagonal in this view)
+          let moved = false
+          for (const a of [0.3, -0.3, 0.6, -0.6, 0.9, -0.9, 1.2, -1.2, 1.57, -1.57]) {
+            const c = Math.cos(a), sn = Math.sin(a)
+            const rx = mx * c - my * sn, ry = mx * sn + my * c
+            if (canStand(s.x + rx, s.y + ry)) { s.x += rx; s.y += ry; moved = true; break }
+          }
+          if (!moved) { if (canStand(s.x + mx, s.y)) s.x += mx; else if (canStand(s.x, s.y + my)) s.y += my }
+        }
         moving = true
         s.dir = Math.abs(dx) > Math.abs(dy) * 0.9 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up'
-      } else if (s.path.length && !s.cardOpen) {
+      } else if (s.path.length) {
         const tg = s.path[0]
         const vx = tg.x - s.x, vy = tg.y - s.y
         const dist = Math.hypot(vx, vy), step = SPEED * dt
@@ -162,6 +173,7 @@ export function IslandMap() {
         else if (moving && !s.pending && s.dismissed !== n) { setCard(n); s.dismissed = null }
       }
       lastPos = [s.x, s.y]
+      if (s.cardFor && s.near !== s.cardFor) { s.cardFor = null; setCard(null) }
 
       // hero
       const frame = moving ? Math.floor(s.t * 6) % 2 : 0
@@ -195,7 +207,6 @@ export function IslandMap() {
       const key = norm(e)
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's'].includes(key)) {
         if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return
-        if (S.current.cardOpen) return
         e.preventDefault()
         S.current.keys.add(key)
         setFirstTime(false)
@@ -279,12 +290,32 @@ export function IslandMap() {
       onScroll={(e) => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0 }}
     >
       <div ref={worldEl} style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', willChange: 'transform' }}>
-        <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={completed as NodeId[]} allDone={allDone} />} />
+        <ArtSlot name={raw.ground} className="absolute inset-0 h-full w-full" fallback={<IslandArt done={completed as NodeId[]} allDone={allDone} />} />
+
+        {/* buildings: painted cutouts when present (shop-*.webp), a quiet placeholder otherwise. Layered by their base line. */}
+        {raw.buildings.map((b) => {
+          const a = art[b.art]
+          const [bx, by] = px([b.x, b.y])
+          if (a) {
+            const h = (b.w * a.h) / a.w
+            return <img key={b.id} src={`/art/${b.art}.webp`} alt="" draggable={false} style={{ position: 'absolute', left: bx - b.w / 2, top: by - h, width: b.w, height: h, zIndex: Math.round(by), pointerEvents: 'none' }} />
+          }
+          return (
+            <svg key={b.id} width={WORLD.w} height={WORLD.h} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible', zIndex: Math.round(by), pointerEvents: 'none' }} aria-hidden>
+              <g transform={`translate(${bx} ${by}) scale(1.6)`}>
+                {b.id === 'safe' && <Kiosk x={0} y={0} />}
+                {b.id === 'gate' && <Gate x={0} y={0} open={allDone} />}
+              </g>
+            </svg>
+          )
+        })}
 
         {/* the Charminar stands on the plaza; the hero walks behind / in front of it by y */}
-        {monument && (
-          <img src="/art/monument.webp" alt="" draggable={false} style={{ position: 'absolute', left: 925, top: 520, width: 650, height: (650 * monument.h) / monument.w, zIndex: 1180, pointerEvents: 'none' }} />
-        )}
+        {monument && (() => {
+          const w = raw.monument.w, h = (w * monument.h) / monument.w
+          const [mx, my] = px([raw.monument.x, raw.monument.y])
+          return <img src="/art/monument.webp" alt="" draggable={false} style={{ position: 'absolute', left: mx - w / 2, top: my - h * 0.78, width: w, height: h, zIndex: Math.round(my + 120), pointerEvents: 'none' }} />
+        })()}
 
         {/* places: marker flag + hit area. Positions come from island.json; swapping art never breaks them. */}
         {NODES.map((n) => {
@@ -354,7 +385,7 @@ export function IslandMap() {
 
       {/* paper card for the place you stepped up to */}
       {card && (
-        <div className="absolute inset-x-0 z-40 flex justify-center px-3" style={{ bottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+        <div className="absolute inset-x-0 z-40 flex justify-center px-3" style={{ bottom: touch ? 'calc(176px + env(safe-area-inset-bottom))' : 'max(16px, env(safe-area-inset-bottom))' }}>
           <div className="paper rise w-full max-w-[420px] p-4 text-left" role="dialog" aria-label={labelFor(nodeById(card))}>
             {card === 'gate' ? (
               <>

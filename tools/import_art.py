@@ -13,14 +13,17 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 RULES = [  # (keywords any-of, slot, max width)
-    (['island background', 'island-bg', 'diorama'], 'island-bg', 2400),
+    (['jewel bazaar'], 'shop-invest', 900),
+    (['tea terrace'], 'shop-save', 900),
+    (['colourful bangles'], 'shop-plan', 900),
+    (['island background', 'island-bg', 'waterfall bazaar'], 'island-bg', 2400),
     (['game map', 'island terrain'], 'island-terrain', 2400),
     (['mosque pavilion', 'monument'], 'monument', 1400),
     (['golden hour'], 'scene-charminar', 1500),
     (['charminar'], 'charminar', 1000),
-    (['bangle'], 'shop-plan', 640),
-    (['chai', 'irani', 'cafe', 'café'], 'shop-save', 640),
-    (['pearl'], 'shop-invest', 640),
+    (['bangle'], 'shop-plan', 900),
+    (['chai', 'irani', 'cafe', 'café', 'tea terrace'], 'shop-save', 900),
+    (['pearl', 'jewel'], 'shop-invest', 900),
     (['recharge', 'kiosk', 'upi', 'phone shop', 'mobile'], 'shop-safe', 640),
     (['rangoli', 'plaza tile'], 'deco-rangoli', 900),
     (['cityscape', 'skyline', 'sunset'], 'bg-skyline', 1600),
@@ -29,7 +32,7 @@ RULES = [  # (keywords any-of, slot, max width)
     (['nani', 'grandmother', 'grandma'], 'nani', 600),
 ]
 # two-sided alley frames: split at the widest empty gap into <slot>-left / <slot>-right
-SPLIT = [(['mediterranean', 'open centre'], 'bld-a', 0.12), (['old-town', 'sunlit'], 'bld-b', 0.0)]  # (keywords, slot, crop-bottom fraction)
+SPLIT = [(['open centre'], 'bld-a', 0.12), (['old-town', 'sunlit'], 'bld-b', 0.0)]  # (keywords, slot, crop-bottom fraction)
 # sheet of loose props: cut by box (x0,y0,x1,y1 on the 1536x1024 sheet), keep the largest blob in each box
 PROP_BOXES = {
     'tree': (5, 5, 655, 720), 'lamp': (10, 445, 190, 1000), 'bicycle': (420, 405, 815, 700), 'lights': (110, 760, 470, 1000),

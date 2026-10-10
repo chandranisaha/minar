@@ -30,9 +30,9 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   await page.keyboard.down('ArrowRight'); await page.waitForTimeout(500); await page.keyboard.up('ArrowRight')
   const h1 = await hero()
   h0 !== h1 ? ok(`${tag}: arrow keys walk freely`) : fail(`${tag}: keys did not move the hero`)
-  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(2500); await page.keyboard.up('ArrowDown')
-  const h2 = await hero(); await page.keyboard.down('ArrowDown'); await page.waitForTimeout(600); await page.keyboard.up('ArrowDown')
-  ;(await hero()) === h2 ? ok(`${tag}: collision stops the hero at the island edge`) : fail(`${tag}: walked off the island`)
+  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(3500); await page.keyboard.up('ArrowDown')
+  const ph = await page.evaluate(() => { const m = document.querySelector('img[src*="/art/chibi/"]').parentElement.parentElement.style.transform.match(/translate3d\(([-\d.]+)px, ([-\d.]+)px/); return [+m[1] + 70, +m[2] + 175] })
+  ph[1] < 2040 * 0.9 && ph[0] > 0 && ph[0] < 2400 ? ok(`${tag}: collision keeps the hero on the island`) : fail(`${tag}: walked off the island`)
   if (w < 600) {
     const box = await page.locator('[role=application]').boundingBox()
     const cx = box.x + box.width / 2, cy = box.y + box.height / 2

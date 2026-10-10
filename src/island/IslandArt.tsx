@@ -148,7 +148,7 @@ function PearlShop({ x, y, glow }: { x: number; y: number; glow: boolean }) {
   )
 }
 
-function Kiosk({ x, y }: { x: number; y: number }) {
+export function Kiosk({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <ellipse cx="2" cy="12" rx="90" ry="28" fill={INK} opacity=".1" />
@@ -219,7 +219,7 @@ function Dock({ x, y }: { x: number; y: number }) {
   )
 }
 
-function Gate({ x, y, open }: { x: number; y: number; open: boolean }) {
+export function Gate({ x, y, open }: { x: number; y: number; open: boolean }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <ellipse cx="0" cy="12" rx="120" ry="34" fill={INK} opacity=".12" />
