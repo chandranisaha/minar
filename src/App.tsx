@@ -8,9 +8,14 @@ import Dashboard from './screens/Dashboard'
 import { isDevMode } from './lib/dev'
 import { SCREENS } from './ui/screens'
 import { ToastHost } from './ui/wire/ToastHost'
+import Home, { hasEntered, useAutosave } from './home/Home'
 
 export default function App() {
   const loc = useLocation()
+  // the home screen comes first in every new tab; picking or starting a game sets this and reloads into it
+  const entered = hasEntered()
+  useAutosave(entered)
+  if (!entered) return <div className="fixed inset-0 overflow-hidden bg-water"><Home /></div>
   return (
     <>
       <div className="fixed inset-0 overflow-hidden bg-water">

@@ -3,6 +3,7 @@ import { chromium } from 'playwright'
 const b = await chromium.launch()
 for (const id of ['plan', 'save', 'invest', 'safe']) {
   const p = await b.newPage({ viewport: { width: 390, height: 844 } })
+  await p.addInitScript(() => sessionStorage.setItem('mm-entered', '1')) // skip the home screen
   const errs = []
   p.on('pageerror', (e) => errs.push(String(e).slice(0, 160)))
   p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text().slice(0, 160)) })

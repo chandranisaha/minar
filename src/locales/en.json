@@ -109,7 +109,7 @@
       "paid": "Paid so far",
       "stamp": "DUE"
     },
-    "step": "Scene {{n}} of 7",
+    "step": "Scene {{n}} of 6",
     "rotate": "Turn your phone upright to play the story.",
     "b5": {
       "title": "The bazaar opens",
@@ -437,5 +437,27 @@
     "brighten": "Worth replaying: {{names}}",
     "share": "Download share card",
     "shareTitle": "My Money Mohalla goal"
+  },
+  "home": {
+    "tagline": "Learn money, one lane at a time.",
+    "new": "New game",
+    "load": "Load game",
+    "noSaves": "No saved games yet.",
+    "play": "Play",
+    "rename": "Rename",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "start": "Start",
+    "saved": "Saved games",
+    "menu": "Home",
+    "nameLabel": "Name this game",
+    "defaultName": "Game {{n}}",
+    "firstName": "My game",
+    "places": "{{n}} of 4 places",
+    "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+    "deleteYes": "Yes, delete",
+    "title": "Money Mohalla"
   }
 }

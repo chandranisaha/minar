@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LANGS, inr, type Lang } from '../content/data'
 import { useGame, useLite } from '../store/game'
+import { goHome } from '../home/Home'
 import { useHappyView } from '../features/happy/hooks'
 import { FaceGlyph } from '../ui/wire/icons'
 import { MomentsSheet } from '../ui/wire/MomentsSheet'
@@ -124,6 +125,7 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
           ) : (
             <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={() => setConfirm(true)}>{t('hud.resetProgress')}</button>
           )}
+          <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={goHome}>⌂ {t('home.menu')}</button>
           {replay && (
             <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={() => nav('/story?replay=1')}>
               ↺ {t('hud.replay')}

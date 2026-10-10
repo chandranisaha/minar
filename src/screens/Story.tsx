@@ -272,7 +272,7 @@ export default function Story() {
   const persona = useGame((s) => s.persona)
   const setPersona = useGame((s) => s.setPersona)
   const setSeen = useGame((s) => s.setStorySeen)
-  const [step, setStep] = useState(-1) // -1 = cover, 0..3 = the four beats
+  const [step, setStep] = useState(1) // the story opens on choosing your avatar; the cover and the opening island beat are skipped
   const frame = useRef<HTMLDivElement>(null)
   const { w, h } = useSize(frame)
 
@@ -284,7 +284,7 @@ export default function Story() {
 
   const canNext = step === 1 ? !!persona : true
   const next = useCallback(() => { if (!canNext) return; if (step >= LAST) finish(); else setStep((s) => s + 1) }, [canNext, step, finish])
-  const back = useCallback(() => setStep((s) => Math.max(0, s - 1)), [])
+  const back = useCallback(() => setStep((s) => Math.max(1, s - 1)), [])
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
@@ -320,9 +320,9 @@ export default function Story() {
 
       {step >= 0 && (
         <div className="absolute inset-x-0 bottom-0 z-40 flex items-center justify-between gap-2 p-3" style={{ paddingBottom: 'max(14px, env(safe-area-inset-bottom))' }}>
-          <button type="button" className="ink-btn cream" onClick={back} disabled={step === 0} aria-label={t('buttons.back')}>◂</button>
-          <div className="flex items-center gap-2" role="img" aria-label={t('story.step', { n: step + 1 })}>
-            {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ width: i === step ? 22 : 8, height: 8, borderRadius: 4, background: i <= step ? '#3A2A24' : 'rgba(58,42,36,.25)', transition: 'width .25s' }} />)}
+          <button type="button" className="ink-btn cream" onClick={back} disabled={step <= 1} aria-label={t('buttons.back')}>◂</button>
+          <div className="flex items-center gap-2" role="img" aria-label={t('story.step', { n: step })}>
+            {[1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ width: i === step ? 22 : 8, height: 8, borderRadius: 4, background: i <= step ? '#3A2A24' : 'rgba(58,42,36,.25)', transition: 'width .25s' }} />)}
           </div>
           <button type="button" className="ink-btn" onClick={next} disabled={!canNext}>{step === LAST ? t('buttons.go') : t('buttons.next')} ▸</button>
         </div>
