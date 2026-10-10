@@ -6,6 +6,7 @@ import { useGameHost } from '../../host/useGameHost'
 import { GameErrorBoundary } from './GameErrorBoundary'
 import { ResultScreen } from './ResultScreen'
 import { useGame } from '../../store/game'
+import { WIDE_GAMES } from '../../host/config'
 
 /**
  * The page a pillar game runs inside: entry panel, the game itself, then the result. It holds no business logic
@@ -26,12 +27,13 @@ export function GameHostScreen() {
   const { pillarId, entry, phase, Game, props, resultView } = host
 
   const leave = () => nav('/')
+  const wide = phase === 'playing' && WIDE_GAMES.includes(pillarId)
   const onExit = () => (phase === 'playing' ? setConfirming(true) : leave())
 
   return (
     <div data-testid="game-host" className="absolute inset-0 flex flex-col bg-jasmine text-ink">
       <header className="flex shrink-0 items-center gap-2 border-b-[3px] border-ink bg-paper-tan px-2 py-1" style={{ paddingTop: 'max(4px, env(safe-area-inset-top))' }}>
-        <button type="button" className="ink-btn" style={{ minHeight: 48 }} data-testid="game-exit" onClick={onExit}>
+        <button type="button" className="ink-btn" style={{ minHeight: wide ? 40 : 48 }} data-testid="game-exit" onClick={onExit}>
           ← {t('host.exit')}
         </button>
         <strong style={{ flex: 1, minWidth: 0 }}>{t(entry.nameKey)}</strong>
@@ -44,7 +46,7 @@ export function GameHostScreen() {
 
       {/* the area below the bar: it scrolls for entry/result, and gives a playing game a real, sized, positioned box to fill */}
       <div className="min-h-0 flex-1 overflow-y-auto">
-      <div style={{ width: '100%', maxWidth: 'min(100%, calc(100dvh * 0.62))', margin: '0 auto', position: 'relative', height: phase === 'playing' ? '100%' : undefined }}>
+      <div style={{ width: '100%', maxWidth: wide ? '100%' : 'min(100%, calc(100dvh * 0.62))', margin: '0 auto', position: 'relative', height: phase === 'playing' ? '100%' : undefined }}>
         {confirming && (
           <div role="alertdialog" aria-label={t('host.exit')} data-testid="game-exit-confirm" style={{ padding: 12, display: 'grid', gap: 8 }}>
             <p style={{ margin: 0 }}>{t('host.exitConfirm')}</p>
