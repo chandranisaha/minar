@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import type { Pointer, ReviewEntry, Verdict } from '../engine/review'
+import type { CompanyId } from '../engine/types'
 import { Mark } from './Companies'
 import { useInr } from './Panels'
+import { useReasonFromParams } from './Reasons'
 
 const TONE: Record<Verdict, { bg: string; fg: string; icon: string }> = {
   good: { bg: '#3F7A3A', fg: '#FFF3D6', icon: '✓' },
@@ -16,11 +18,13 @@ const KIND_MARK: Record<Pointer['kind'], string> = { good: '✓', bad: '✕', no
 export function usePointerText() {
   const { t } = useTranslation('dealboard')
   const money = useInr()
-  return (p: Pointer): string => {
+  const reasonFrom = useReasonFromParams()
+  return (p: Pointer, companyId: CompanyId): string => {
     const params: Record<string, string | number> = { ...p.params }
     if (typeof params.checks === 'string') params.checks = params.checks.split(',').map((k) => t(`lights.${k}.name`)).join(', ')
     if (typeof params.sector === 'string') params.sector = t(`sectors.${params.sector}`)
-    if (typeof params.reasonKey === 'string') params.reason = t(`reasons.${params.reasonKey}`)
+    const reason = reasonFrom(p.params, companyId)
+    if (reason) params.reason = reason
     for (const [k, v] of Object.entries(p.params)) if (k.startsWith('r_')) params[k] = money(Number(v))
     return t(`review.${p.key}`, params)
   }
@@ -39,7 +43,6 @@ export function Pointers({ entry }: { entry: ReviewEntry }) {
   const groups = (['good', 'bad', 'note'] as const).map((k) => ({ k, items: entry.pointers.filter((p) => p.kind === k) })).filter((g) => g.items.length)
   return (
     <div className="space-y-2.5 text-[14px] leading-snug">
-      {entry.reason && <p className="m-0 text-[13px] opacity-70">{t('judgement.yourReason', { reason: t(`reasons.${entry.reason}`) })}</p>}
       {groups.map((g) => (
         <div key={g.k}>
           <div className="db-eyebrow" style={{ color: KIND_COLOUR[g.k] }}>{t(`judgement.sections.${g.k}`)}</div>
@@ -47,7 +50,7 @@ export function Pointers({ entry }: { entry: ReviewEntry }) {
             {g.items.map((p) => (
               <li key={p.key} className="flex items-start gap-2">
                 <span className="mt-[1px] w-4 shrink-0 text-center font-extrabold" style={{ color: KIND_COLOUR[g.k] }} aria-hidden>{KIND_MARK[g.k]}</span>
-                <span>{text(p)}</span>
+                <span>{text(p, entry.companyId)}</span>
               </li>
             ))}
           </ul>

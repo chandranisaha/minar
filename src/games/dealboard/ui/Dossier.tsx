@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { knownQuarter, lightsAt, holdingValueAt, type RunState } from '../engine/state'
 import type { CompanyId, LightKey, MarketRun } from '../engine/types'
+import { InfoHeader } from './InfoTip'
 import { LightsPanel } from './Lights'
 import { useInr } from './Panels'
 import { ALL_STATS, ASK_STATS, STAT_GROUPS, StatLocked, StatRow, type StatId } from './Stats'
@@ -47,7 +48,7 @@ export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: Ma
 
         <p className="m-0 text-[15px] font-semibold italic">“{t(`companies.${id}.slogan`)}”</p>
         <p className="m-0 mt-1 text-[13px]"><span className="font-extrabold">{t('dossier.claims')}:</span> {t(`claims.${id}`)}</p>
-        <p className="m-0 mt-1 text-[13px] opacity-75"><span className="font-extrabold">{t(`companies.${id}.founder`).split(',')[0]}:</span> “{t(`companies.${id}.line`)}”</p>
+        <p className="m-0 mt-1 text-[12px] opacity-70">{t(`companies.${id}.founder`)}</p>
 
         {h && (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border-2 border-ink bg-[#F6E6BE] px-3 py-2 text-[14px]">
@@ -78,7 +79,7 @@ export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: Ma
                 </section>
               ))}
             </div>
-            <p className="m-0 mt-3 text-[11px] leading-snug opacity-65"><span className="font-extrabold">{t('dossier.legend')}:</span> {t('stats.tagLegend')}</p>
+            <div className="mt-3"><InfoHeader title={t('dossier.legend')} className="text-[12px] font-extrabold opacity-70">{t('stats.tagLegend')}</InfoHeader></div>
           </>
         )}
 

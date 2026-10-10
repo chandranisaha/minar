@@ -6,6 +6,7 @@ import { marketFor } from '../engine/state'
 import { reviewDecisions } from '../engine/review'
 import { AnalyticsView } from './Analytics'
 import { ReviewCard } from './Review'
+import { InfoHeader } from './InfoTip'
 import { useInr } from './Panels'
 
 const SKILLS = ['research', 'skepticism', 'spread', 'calm', 'habits'] as const
@@ -60,7 +61,6 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
           <div className="text-[11px] font-extrabold uppercase tracking-wider opacity-70">{t('report.of100')}</div>
         </div>
         <div className="min-w-0 text-[14px] leading-snug">
-          <div className="font-extrabold">{t('report.score')}</div>
           <div className="opacity-70">{t('report.passMark', { n: PASS_MARK })}</div>
           <div className="mt-1 font-bold" style={{ color: score.cleared ? '#2f6f4a' : '#8a5a2b' }}>{score.cleared ? '✓ ' + t('report.cleared') : t('report.notCleared')}</div>
         </div>
@@ -68,13 +68,16 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
 
       <div className="mt-2 flex justify-center"><Radar score={score} /></div>
 
-      <div className="db-eyebrow mt-2 text-[#8a5a2b]">{t('report.skillsTitle')}</div>
+      <div className="mt-2">
+        <InfoHeader title={t('report.skillsTitle')}>
+          <ul className="m-0 list-none space-y-1 p-0">{SKILLS.map((k) => <li key={k}><b>{t(`report.skills.${k}.name`)}</b>: {t(`report.skills.${k}.body`)}</li>)}</ul>
+        </InfoHeader>
+      </div>
       <ul className="m-0 mt-1 flex list-none flex-col gap-2 p-0">
         {SKILLS.map((k) => (
           <li key={k}>
             <div className="flex items-baseline justify-between gap-2 text-[14px]"><span className="font-extrabold">{t(`report.skills.${k}.name`)}</span><span className="font-sign text-[14px]">{score[k]} / 20</span></div>
             <div className="h-2.5 overflow-hidden rounded-full border-2 border-ink bg-[#E9D3A6]"><div className="h-full" style={{ width: `${(score[k] / 20) * 100}%`, background: score[k] >= 14 ? '#3F7A3A' : score[k] >= 8 ? '#E8B04A' : '#C8442F' }} /></div>
-            <div className="text-[12px] opacity-70">{t(`report.skills.${k}.body`)}</div>
           </li>
         ))}
       </ul>
@@ -94,9 +97,7 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
       )}
 
       <div className="mt-3 rounded-lg border-2 border-ink bg-white/60 px-3 py-2 text-[13px] leading-snug">
-        <div><span className="font-extrabold">{t('report.netWorth')}:</span> {money(score.netWorth)} · <span className="font-extrabold">{t('report.profit')}:</span> {score.profit >= 0 ? '▲ ' : '▼ '}{money(Math.abs(score.profit))}</div>
-        <div className="opacity-70">{t('report.profitNote')}</div>
-        <div className="mt-1 opacity-80">{t('report.flipsLine', { n: score.counters.flipsPerBuy.toFixed(1) })} {t('report.feesLine', { f: money(score.counters.feesPaid) })} {t('report.concLine', { p: score.counters.concentrationPeak })}</div>
+        <InfoHeader title={<span><span className="font-extrabold">{t('report.netWorth')}:</span> {money(score.netWorth)} · {score.profit >= 0 ? '▲ ' : '▼ '}{money(Math.abs(score.profit))}</span>} className="text-[13px]">{t('report.profitNote')}</InfoHeader>
         {ahead && <div className="mt-1 font-bold">{t('report.luck')}</div>}
         {behind && <div className="mt-1 font-bold">{t('report.unlucky')}</div>}
       </div>
@@ -117,13 +118,11 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
       </details>
 
       <div className="db-eyebrow mt-3 text-[#8a5a2b]">{t('report.toolkit')}</div>
-      <p className="m-0 text-[12px] opacity-70">{t('report.toolkitBody')}</p>
       {toolkit.length ? (
         <ul className="m-0 mt-1.5 flex list-none flex-wrap gap-1.5 p-0">
           {toolkit.map((x) => <li key={x.id} title={x.title} className="rounded-full border-2 border-ink bg-mustard px-2 py-0.5 text-[12px] font-extrabold">{x.term}</li>)}
         </ul>
       ) : <p className="m-0 mt-1 text-[13px] opacity-70">{t('report.toolkitNone')}</p>}
-      {toolkit.length > 0 && <p className="m-0 mt-2 text-[12px] opacity-65">{t('report.lessonsSeen')}: {toolkit.map((x) => x.title).join(' · ')}</p>}
 
       <p className="m-0 mt-3 border-t-2 border-dashed border-ink/30 pt-2 text-[13px] font-semibold italic">{t('report.closing')}</p>
       <div className="mt-3 flex flex-wrap justify-end gap-2">

@@ -1,5 +1,6 @@
 import type { CompanyId } from './types'
 import { COMPANY } from './companies'
+import { reasonCarry } from './reasons'
 import { redFlags } from './lights'
 import { HOUSE, investedAt, lightsAt, sectorShares, type RunState } from './state'
 import type { MarketRun } from './types'
@@ -52,7 +53,7 @@ export function collectLessons(r: RunState, m: MarketRun, ev: QuarterEvents): Le
     if (L.ceo === 'R') add({ id: 3, params: { companyId: id, quarters: `${m.history[id].slice(Math.max(1, q - 2), q + 1).filter((h) => h.ceoTrade === 'SELL').length} of the last 3` } }, `3:${id}`)
     if (L.debt === 'R') add({ id: 4, variant: 'b', params: { companyId: id, debtShare: Math.round((s.debt / Math.max(1, s.revenue * 4)) * 100) } }, `4:${id}`)
     // hype and tips are not evidence: fires when the stated reason was a feeling or something heard
-    if (d.reason === 'friendTold' || d.reason === 'looksHyped') add({ id: 5, params: { companyId: id, reasonKey: d.reason } }, `5:${id}`)
+    if (d.reasonKind === 'feeling') add({ id: 5, params: { companyId: id, ...reasonCarry(d) } }, `5:${id}`)
   }
 
   // held (not only bought) with a red CEO light

@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { TitleCard } from '../../../components/TitleCard'
 import { useGame, useLite } from '../../../store/game'
 import { RING_SIZE, TURNS, quarterTile } from '../engine/board'
-import { houses, invested, marketFor, netWorth, pitchFor, type RunState } from '../engine/run'
+import { invested, marketFor, netWorth, pitchFor, type RunState } from '../engine/run'
 import { computeScore, liveScore, type Score } from '../engine/scoring'
+import { reasonOptions, type ReasonOption } from '../engine/reasons'
 import { knownQuarter, priceAt } from '../engine/state'
 import type { CompanyId, MarketRun } from '../engine/types'
 import { useDealBoard } from '../state/store'
@@ -13,6 +14,7 @@ import { Meet } from './Companies'
 import { Dossier } from './Dossier'
 import { JudgementDialog } from './Judgement'
 import { Sheet, Stat, useInr } from './Panels'
+import { PassDialog } from './Reasons'
 import { Report } from './Report'
 import { TradeDialog, type TradeMode } from './TradeDialog'
 import { TurnPanel } from './Turn'
@@ -58,17 +60,17 @@ function BackButton({ onExit, compact }: { onExit: () => void; compact?: boolean
 function LangPick() {
   const lang = useGame((s) => s.language)
   const setLanguage = useGame((s) => s.setLanguage)
-  const current = lang === 'te' ? 'te' : 'en'
+  const current = lang === 'te' || lang === 'hi' ? lang : 'en'
   return (
-    <div className="ink-chip flex items-center gap-1 p-1" role="group" aria-label="Language / భాష">
-      {([['en', 'English'], ['te', 'తెలుగు']] as const).map(([code, label]) => (
+    <div className="ink-chip flex items-center gap-1 p-1" role="group" aria-label="Language / भाषा / భాష">
+      {([['en', 'English'], ['hi', 'हिन्दी'], ['te', 'తెలుగు']] as const).map(([code, label]) => (
         <button
           key={code}
           type="button"
           aria-pressed={current === code}
           onClick={() => setLanguage(code)}
-          className="h-11 min-w-20 rounded-lg px-3 text-[15px] font-extrabold"
-          style={{ background: current === code ? '#E5457A' : 'transparent', color: current === code ? '#FFF3D6' : '#2B1A17', border: current === code ? '2.5px solid #2B1A17' : '2.5px solid transparent', fontFamily: code === 'te' ? 'var(--font-body)' : undefined }}
+          className="h-11 min-w-16 rounded-lg px-2.5 text-[15px] font-extrabold"
+          style={{ background: current === code ? '#E5457A' : 'transparent', color: current === code ? '#FFF3D6' : '#2B1A17', border: current === code ? '2.5px solid #2B1A17' : '2.5px solid transparent', fontFamily: code !== 'en' ? 'var(--font-body)' : undefined }}
         >
           {label}
         </button>
@@ -143,18 +145,14 @@ function YearEnd({ run, m }: { run: RunState; m: MarketRun }) {
   const grew = cost > 0 && value > cost
   return (
     <Sheet eyebrow="★ ★ ★" title={t('yearEnd.title', { n: year })} actions={<button type="button" className="ink-btn pink" onClick={() => dispatch({ type: 'continue' })}>{last ? t('yearEnd.finish') : t('yearEnd.continue', { n: year + 1 })} ▸</button>}>
-      <p className="m-0">{t('yearEnd.body', { nw: money(netWorth(run, m)), cash: money(run.cash), inv: money(value) })}</p>
-      <p className="m-0 mt-1 text-[13px] opacity-75">{t('yearEnd.drag', { lost: money(run.cashDragLost) })} {t('yearEnd.fees', { fees: money(run.feesPaid) })}</p>
-      <div className="mt-3 rounded-lg border-2 border-ink bg-[#F6E6BE] p-2.5 text-[14px] leading-snug">
-        <div className="db-eyebrow text-[#8a5a2b]">{t('yearEnd2.compounding')}</div>
-        <p className="m-0 mt-0.5 font-semibold">{grew ? t('lite.11.did', { r_a: money(cost), r_b: money(value) }) : t('lite.11.didB')}</p>
-        <p className="m-0 mt-1">{t('lite.11.idea')}</p>
-        <p className="m-0 mt-1 font-extrabold">{t('lite.11.rule')}</p>
-      </div>
-      <div className="mt-2 text-[13px]">
-        <div className="db-eyebrow text-[#8a5a2b]">{t('yearEnd2.houses')}</div>
-        {ids.length === 0 ? <span className="opacity-70">{t('yearEnd2.none')}</span> : ids.map((id) => <div key={id}>{t(`companies.${id}.name`)}: {houses(run.holdings[id]!) >= 5 ? '🏨' : '🏠'.repeat(houses(run.holdings[id]!)) || '–'}</div>)}
-      </div>
+      <p className="m-0 font-semibold">{t('yearEnd.body', { nw: money(netWorth(run, m)), cash: money(run.cash), inv: money(value) })}</p>
+      <details className="group mt-3 rounded-lg border-2 border-ink bg-[#F6E6BE]" open>
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-[13px] font-extrabold [&::-webkit-details-marker]:hidden"><span>{t('yearEnd2.compounding')}</span><span className="transition-transform group-open:rotate-180" aria-hidden>▾</span></summary>
+        <div className="px-3 pb-2.5 text-[14px] leading-snug">
+          <p className="m-0 font-semibold">{grew ? t('lite.11.did', { r_a: money(cost), r_b: money(value) }) : t('lite.11.didB')}</p>
+          <p className="m-0 mt-1 font-extrabold">{t('lite.11.rule')}</p>
+        </div>
+      </details>
     </Sheet>
   )
 }
@@ -168,6 +166,7 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
   const shown = useTokenWalk(quarterTile(run.turn), lite)
   const [study, setStudy] = useState<CompanyId | null>(null)
   const [trade, setTrade] = useState<{ mode: TradeMode; id: CompanyId } | null>(null)
+  const [passFor, setPassFor] = useState<CompanyId | null>(null)
   const [judge, setJudge] = useState(false)
 
   if (!run.briefed) return <Meet m={m} onStart={() => dispatch({ type: 'brief' })} />
@@ -179,7 +178,7 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
   const played = run.phase === 'desk' || run.phase === 'emergency' ? run.turn - 1 : run.turn
   const pitching = run.phase === 'desk' ? pitchFor(run, m) : null
 
-  const confirmTrade = ({ amount, fraction, reason }: { amount: number; fraction: number; reason: string }) => {
+  const confirmTrade = ({ amount, fraction, reason }: { amount: number; fraction: number; reason: ReasonOption }) => {
     if (!trade) return
     if (trade.mode === 'invest') dispatch({ type: 'bid', companyId: trade.id, amount, reason })
     else if (trade.mode === 'buyMore') dispatch({ type: 'buyMore', companyId: trade.id, amount, reason })
@@ -214,13 +213,14 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
         ) : run.phase === 'yearEnd' ? (
           <YearEnd run={run} m={m} />
         ) : (
-          <TurnPanel run={run} m={m} dispatch={dispatch} onRewind={() => dispatch({ type: 'rewind' })} onOpen={setStudy} onTrade={(mode, id) => setTrade({ mode, id })} />
+          <TurnPanel run={run} m={m} dispatch={dispatch} onRewind={() => dispatch({ type: 'rewind' })} onOpen={setStudy} onTrade={(mode, id) => setTrade({ mode, id })} onPass={setPassFor} />
         )}
       </div>
+      {passFor && !trade && <PassDialog companyId={passFor} options={reasonOptions('pass', run, m, passFor)} onCancel={() => setPassFor(null)} onPick={(reason) => { dispatch({ type: 'pass', companyId: passFor, reason }); setPassFor(null) }} />}
       {judge && !trade && <JudgementDialog run={run} m={m} onClose={() => setJudge(false)} />}
       {study && !trade && !judge && <Dossier run={run} m={m} id={study} onClose={() => setStudy(null)} onTrade={(mode) => setTrade({ mode, id: study })} />}
       {trade && (
-        <TradeDialog mode={trade.mode} companyId={trade.id} price={priceAt(m, trade.id, q)} cash={run.cash} holding={run.holdings[trade.id]} blocked={trade.mode !== 'sell' && run.jailedTurn === run.turn} onCancel={() => setTrade(null)} onConfirm={confirmTrade} />
+        <TradeDialog mode={trade.mode} companyId={trade.id} options={reasonOptions(trade.mode, run, m, trade.id)} price={priceAt(m, trade.id, q)} cash={run.cash} holding={run.holdings[trade.id]} blocked={trade.mode !== 'sell' && run.jailedTurn === run.turn} onCancel={() => setTrade(null)} onConfirm={confirmTrade} />
       )}
     </div>
   )

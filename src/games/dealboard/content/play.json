@@ -57,15 +57,14 @@
     "chartTitle": "Last six quarters"
   },
   "pitch": {
-    "askTitle": "Ask the founder",
     "askLeft": "{{n}} of 2 questions left.",
     "askNone": "You have used your 2 questions.",
-    "decide": "Your decision",
     "bid": "Invest",
     "pass": "Pass on this one",
-    "tip": "You can invest without asking anything. Asking costs nothing, and you learn from the answers.",
-    "founderSays": "{{name}} says:",
-    "slogan": "Pitch"
+    "tip": "You get two questions per pitch. Asking costs nothing and every answer shows real numbers. You can also invest without asking, but then you are guessing.",
+    "whyPass": "Why pass?",
+    "ask": "Ask the founder",
+    "more": "More numbers"
   },
   "trade": {
     "invest": "Invest in {{name}}",
@@ -83,32 +82,15 @@
     "shareAll": "All",
     "youBought": "You paid in",
     "gainLoss": "Gain or loss on this part",
-    "why": "Why are you doing this?",
-    "whyHint": "Pick one. It is not marked right or wrong. It helps you look back later.",
+    "why": "Your reason",
+    "whyHint": "Pick the reason closest to your real thinking. Nothing is marked right or wrong here, but it shapes your feedback.",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "notEnough": "Not enough cash for the minimum.",
     "jailed": "You sat out this turn after selling in a panic. You cannot buy until next turn.",
     "min": "Minimum {{min}}"
   },
-  "reasons": {
-    "strongGrowth": "Strong growth",
-    "trustFounder": "Trust the founder",
-    "priceLow": "Price looks low",
-    "scaredLoss": "Scared of loss",
-    "friendTold": "Friend told me",
-    "looksHyped": "Looks hyped",
-    "dataSays": "Data says so",
-    "other": "Other"
-  },
   "portfolio": {
-    "value": "Worth {{v}}",
-    "paidIn": "Paid in {{c}}",
-    "gain": "Gain {{g}}",
-    "loss": "Loss {{g}}",
-    "houses": "{{n}} houses",
-    "hotel": "Hotel",
-    "noHouses": "No houses yet",
     "buyMore": "Buy more",
     "sell": "Sell"
   },
@@ -125,10 +107,10 @@
   "emergency": {
     "eyebrow": "Family emergency",
     "title": "Pay ₹25,000 now",
-    "body": "Your family needs ₹25,000 by the end of this quarter. If your cash is short, you will have to sell something.",
+    "body": "Your family needs ₹25,000 by the end of this quarter.",
     "have": "Cash: {{cash}}",
-    "short": "You are {{x}} short. Sell a property below, then pay.",
-    "ready": "You have enough. Pay now.",
+    "short": "You are {{x}} short. Sell something below, then pay.",
+    "ready": "You have enough.",
     "pay": "Pay ₹25,000",
     "payShort": "Pay what I can",
     "payShortNote": "You cannot cover all of it. The rest becomes a loan.",
@@ -138,7 +120,7 @@
   "lesson": {
     "eyebrow": "Lesson",
     "whatHappened": "What happened",
-    "theIdea": "The idea",
+    "theIdea": "Why it matters",
     "term": "Real-life term",
     "rule": "Rule of thumb",
     "learnMore": "Learn more",
@@ -148,24 +130,19 @@
     "replayHint": "Go back to the start of this quarter and decide again. Same market, same luck.",
     "continue": "Continue",
     "worked": "Worked example",
-    "markets": "In real markets",
     "checks": "What investors check",
-    "calm": "Calm and curious: this is about what the data showed, not about being wrong.",
-    "reason": "Your reason was: {{reason}}"
+    "calm": "This is about what the data showed, not about being wrong. You can replay the quarter once a year."
   },
   "yearEnd2": {
-    "compounding": "Gains earn gains",
-    "houses": "Houses on your properties",
-    "none": "No houses yet. Each ₹10,000 paid into a property adds one."
+    "compounding": "Gains earn gains"
   },
   "report": {
     "title": "Your judgement report",
     "eyebrow": "The Pearl Exchange",
-    "score": "Judgement score",
     "of100": "out of 100",
     "passMark": "Pass mark: {{n}}",
     "cleared": "Stage cleared. Your lamp is lit.",
-    "notCleared": "Not cleared yet. Replay and try new questions.",
+    "notCleared": "Not cleared yet. Replay and ask better questions.",
     "skillsTitle": "Five skills",
     "skills": {
       "research": {
@@ -192,8 +169,8 @@
     "netWorth": "Net worth at the end",
     "profit": "Profit or loss",
     "profitNote": "Shown for information. It never decides the result.",
-    "luck": "You finished ahead, but part of that was luck. Here is what to repeat and what not to.",
-    "unlucky": "You finished behind, but much of your method was sound. Luck decides some quarters.",
+    "luck": "You finished ahead, but part of that was luck.",
+    "unlucky": "You finished behind, but your method was mostly sound.",
     "trapsTitle": "The risky companies you met",
     "trap": {
       "avoided": "Passed on it",
@@ -202,14 +179,9 @@
       "held": "Held through trouble"
     },
     "toolkit": "Your toolkit",
-    "toolkitBody": "Real-life terms you met through your own decisions.",
     "toolkitNone": "Play a few quarters to earn terms for your toolkit.",
-    "lessonsSeen": "Lessons you saw",
     "again": "Play again",
     "back": "Back to the Charminar",
-    "flipsLine": "You ran {{n}} health checks per purchase on average.",
-    "feesLine": "Fees paid: {{f}}.",
-    "concLine": "Most money in one sector at once: {{p}}%.",
     "closing": "Real markets are harder than this game. This teaches how to ask good questions, not what to buy."
   }
 }

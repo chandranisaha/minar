@@ -1,16 +1,16 @@
 {
   "meet": {
-    "eyebrow": "Before the first roll",
-    "title": "Meet today's companies",
-    "intro": "Four made-up companies will pitch to you during this game. Each one tells a story. Your job is to find out which stories hold up.",
-    "headline": "What they say",
+    "title": "Meet the companies",
+    "intro": "Four made-up companies will pitch you. Which stories hold up?",
+    "headline": "They say",
     "tipsTitle": "How this works",
     "tips": [
       "A headline is chosen to impress. Cash, customers and debt show what is really going on.",
-      "Each quarter one company pitches you. Ask two questions to see real numbers with a chart and what they mean.",
+      "Each quarter one company pitches. Ask two questions to see its real numbers.",
       "Tap any company on the board to study it. Your Judgement score updates after every decision."
     ],
-    "start": "Start playing"
+    "start": "Start playing",
+    "eyebrow": "Before the first quarter"
   },
   "claims": {
     "dailyBasket": "18,000 customers, and 88 in every 100 stay.",
@@ -20,33 +20,33 @@
     "steelWorks": "Fifty years of steel, now just ₹40 a share.",
     "quickRide": "Record users every month: 2,50,000 and climbing."
   },
-  "boardHint": "The four corners are the companies. Hover or tap one to see how it is doing.",
+  "boardHint": "Tap a company corner to study it.",
   "why": {
     "title": "Why",
     "market": {
-      "fell": "The whole market fell {{x}}% this quarter. Even healthy companies drop when everyone sells.",
-      "rose": "The whole market rose {{x}}%. A rising tide lifts most prices."
+      "fell": "The whole market fell {{x}}%.",
+      "rose": "The whole market rose {{x}}%."
     },
     "sector": {
       "up": "{{sector}} companies rallied on good news.",
       "down": "{{sector}} companies fell on bad news."
     },
     "event": {
-      "raised": "It raised money from new investors because its cash was running low.",
-      "downRound": "It sold new shares at a much lower price (a down-round). That is usually a sign of trouble, and it shrinks every owner's slice.",
-      "failed": "It ran out of cash and shut down. Its shares are now worth nothing.",
-      "restated": "It cut its user numbers: the headline users were not real customers.",
+      "raised": "It raised money because its cash was running low.",
+      "downRound": "It sold new shares at a much lower price (a down-round): a sign of trouble.",
+      "failed": "It ran out of cash and shut down.",
+      "restated": "It cut its user numbers: they were not real customers.",
       "layoffNews": "It laid off staff, an early sign that business is slowing."
     },
     "profitUp": "Profit rose from ₹{{a}} lakh to ₹{{b}} lakh.",
     "profitDown": "Profit fell from ₹{{a}} lakh to ₹{{b}} lakh.",
     "lossGrew": "The loss grew from ₹{{a}} lakh to ₹{{b}} lakh.",
     "lossShrank": "The loss shrank from ₹{{a}} lakh to ₹{{b}} lakh.",
-    "excitement": "The price rose even though the numbers got worse. That is excitement, not earnings, and excitement fades.",
+    "excitement": "The price rose though the numbers got worse: excitement, not earnings.",
     "customersLeaving": "More customers left ({{b}}) than joined ({{a}}).",
     "runwayShort": "At this pace its cash lasts only about {{n}} more months.",
     "ceoSold": "The CEO sold shares this quarter.",
-    "steady": "Nothing big changed. Small price moves are normal noise."
+    "steady": "Nothing big changed. Small moves are normal noise."
   },
   "stats": {
     "tags": {
@@ -121,16 +121,13 @@
     }
   },
   "dossier": {
-    "meet": "Meet the company",
-    "unmet": "You have not met this company yet. It will pitch when you land on a free Auction tile.",
-    "passed": "You passed on this company. You can only see the numbers you asked for.",
+    "unmet": "Not met yet. It pitches in a coming quarter.",
+    "passed": "You passed on it. You only see the numbers you asked for.",
     "own": "You own {{v}}",
     "news": "In the news",
     "noNews": "No news about this company yet.",
     "close": "Close",
     "claims": "What they say",
-    "learned": "What the numbers say",
-    "askHint": "Ask a question at a pitch to unlock these numbers.",
     "legend": "How to read the tags"
   },
   "hover": {
@@ -138,12 +135,8 @@
     "tap": "Tap to study or trade"
   },
   "pitch2": {
-    "dodged": "They dodged the question. A founder who will not answer with a number is telling you something.",
-    "answer": "{{name}} says:",
-    "ask": "Ask the founder. Choose wisely: you get two questions.",
-    "revealTitle": "What the numbers show",
-    "meaning": "What this tells you",
-    "claim": "What they say"
+    "dodged": "They dodged the question: a warning sign.",
+    "claim": "They say"
   },
   "tileLot": "{{name}}: {{state}}",
   "lotState": {

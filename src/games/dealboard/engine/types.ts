@@ -129,7 +129,11 @@ export interface Decision {
   type: DecisionType
   companyId: CompanyId
   amount?: number
+  /** id of the reason option the player picked, and what it said and meant */
   reason?: string
+  reasonKey?: string
+  reasonKind?: 'evidence' | 'caution' | 'headline' | 'feeling' | 'neutral'
+  reasonParams?: Record<string, string | number>
   tabsOpened: string[]
   questionsAsked: string[]
   /** share price at the decision */

@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { computeAnalytics, type ReasonKind } from '../engine/analytics'
+import { computeAnalytics, type ReasonBucket } from '../engine/analytics'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { START_CASH, type RunState } from '../engine/state'
 import type { MarketRun } from '../engine/types'
 import { Mark } from './Companies'
 import { useInr } from './Panels'
 
-const KIND_COLOUR: Record<ReasonKind, string> = { evidence: '#3F7A3A', feeling: '#C8442F', mixed: '#E8B04A' }
+const KIND_COLOUR: Record<ReasonBucket, string> = { reasoned: '#3F7A3A', headline: '#E8B04A', feeling: '#C8442F', neutral: '#9A8F85' }
 
 function NetWorthChart({ series }: { series: { q: number; networth: number }[] }) {
   const { t } = useTranslation('dealboard')
@@ -126,11 +126,10 @@ export function AnalyticsView({ run, m }: { run: RunState; m: MarketRun }) {
         <>
           <ul className="m-0 flex list-none flex-col gap-1 p-0">
             {a.reasons.map((r) => (
-              <li key={r.key} className="flex items-center gap-2 text-[13px]">
-                <span className="w-32 shrink-0 truncate font-bold">{t(`reasons.${r.key}`)}</span>
+              <li key={r.kind} className="flex items-center gap-2 text-[13px]">
+                <span className="w-24 shrink-0 truncate font-bold">{t(`analytics.kind.${r.kind}`)}</span>
                 <span className="h-3 flex-1 overflow-hidden rounded-full border-2 border-ink bg-[#E9D3A6]"><span className="block h-full" style={{ width: `${(r.count / a.reasons[0].count) * 100}%`, background: KIND_COLOUR[r.kind] }} /></span>
                 <span className="w-6 shrink-0 text-right font-extrabold">{r.count}</span>
-                <span className="w-24 shrink-0 text-[11px] font-extrabold uppercase" style={{ color: KIND_COLOUR[r.kind] }}>{t(`analytics.kind.${r.kind}`)}</span>
               </li>
             ))}
           </ul>

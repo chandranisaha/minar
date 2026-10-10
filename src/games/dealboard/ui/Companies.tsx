@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { holdingValueAt, knownQuarter, lightsAt, type RunState } from '../engine/state'
 import type { CompanyId, MarketRun } from '../engine/types'
+import { InfoHeader } from './InfoTip'
 import { LightChip } from './Lights'
 import { useInr } from './Panels'
 import { TitleCard } from '../../../components/TitleCard'
@@ -56,7 +57,7 @@ export function HoverCard({ run, m, id, touch }: { run: RunState; m: MarketRun; 
   )
 }
 
-/** Introduction before the first quarter: who the four companies are and what they claim. */
+/** Introduction before the first quarter: who the four companies are and the headline each one leads with. */
 export function Meet({ m, onStart }: { m: MarketRun; onStart: () => void }) {
   const { t } = useTranslation('dealboard')
   const tips = t('meet.tips', { returnObjects: true }) as string[]
@@ -75,23 +76,19 @@ export function Meet({ m, onStart }: { m: MarketRun; onStart: () => void }) {
                   <div className="text-[10px] font-extrabold uppercase tracking-wider text-jasmine">{t(`sectors.${co.sector}`)}</div>
                 </div>
               </header>
-              <div className="px-3 py-2.5 text-[14px] leading-snug">
-                <div className="font-semibold italic">“{t(`companies.${id}.slogan`)}”</div>
-                <div className="mt-2 text-[11px] font-extrabold uppercase tracking-wider text-[#8a5a2b]">{t('meet.headline')}</div>
-                <div className="font-extrabold">{t(`claims.${id}`)}</div>
-                <div className="mt-2 text-[13px] opacity-75"><span className="font-extrabold">{t(`companies.${id}.founder`)}</span></div>
+              <div className="px-3 py-2.5">
+                <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#8a5a2b]">{t('meet.headline')}</div>
+                <div className="text-[15px] font-extrabold leading-snug">{t(`claims.${id}`)}</div>
+                <div className="mt-1 text-[12px] opacity-70">{t(`companies.${id}.founder`).split(',')[0]}</div>
               </div>
             </article>
           )
         })}
       </div>
-      <div className="paper p-4">
-        <div className="db-eyebrow text-[#8a5a2b]">{t('meet.tipsTitle')}</div>
-        <ol className="m-0 mt-2 flex list-none flex-col gap-2.5 p-0">
-          {tips.map((s, i) => (
-            <li key={i} className="flex items-start gap-3 text-[14px] leading-snug"><span className="font-sign grid h-7 w-7 shrink-0 place-items-center rounded-full border-[2.5px] border-ink bg-mustard text-[13px]">{i + 1}</span><span>{s}</span></li>
-          ))}
-        </ol>
+      <div className="paper px-4 py-2">
+        <InfoHeader title={t('meet.tipsTitle')}>
+          <ol className="m-0 list-decimal space-y-1 pl-5">{tips.map((s, i) => <li key={i}>{s}</li>)}</ol>
+        </InfoHeader>
       </div>
       <button type="button" className="ink-btn pink self-center px-8 text-[18px]" onClick={onStart}>{t('meet.start')} ▸</button>
     </div>

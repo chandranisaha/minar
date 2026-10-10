@@ -7,9 +7,14 @@ import { explainQuarter } from '../engine/explain'
 import { lightsAt, knownLights } from '../engine/state'
 import { COMPANY, COMPANY_IDS } from '../engine/companies'
 import type { CompanyId, LightKey } from '../engine/types'
+import type { ReasonOption } from '../engine/reasons'
 import enJudgement from '../content/judgement.json'
 import teJudgement from '../content/te/judgement.json'
 
+const DATA: ReasonOption = { id: 'ev.cashProfit', key: 'ev.cashProfit', kind: 'evidence', params: {} }
+const HYPE: ReasonOption = { id: 'fe.hype0', key: 'fe.hype0', kind: 'feeling', params: {} }
+const FEAR: ReasonOption = { id: 'fe.worry', key: 'fe.worry', kind: 'feeling', params: {} }
+const NEUTRAL: ReasonOption = { id: 'ne.needCash', key: 'ne.needCash', kind: 'neutral', params: {} }
 type Market = ReturnType<typeof marketFor>
 type Policy = (run: RunState, m: Market) => Action | null
 
@@ -22,7 +27,7 @@ function play(seed: string, desk: Policy): RunState {
     if (run.phase === 'desk') a = desk(run, m) ?? (pitchFor(run, m) ? { type: 'pass', companyId: pitchFor(run, m)! } : { type: 'hold', companyId: reviewFor(run, m)! })
     else if (run.phase === 'emergency') {
       const ids = Object.keys(run.holdings) as CompanyId[]
-      a = run.cash >= 25000 || !ids.length ? { type: 'payEmergency' } : { type: 'sell', companyId: ids[0], fraction: 1, reason: 'other' }
+      a = run.cash >= 25000 || !ids.length ? { type: 'payEmergency' } : { type: 'sell', companyId: ids[0], fraction: 1, reason: NEUTRAL }
     } else a = { type: 'continue' }
     const next = act(run, a)
     run = next === run ? act(run, { type: 'continue' }) : next
@@ -37,7 +42,7 @@ const investEvery = (amount: number, asks = 0): Policy => (run, m) => {
   const id = pitchFor(run, m)
   if (!id) return { type: 'hold', companyId: reviewFor(run, m)! }
   for (const light of LIGHTS.slice(0, asks)) if (!knownLights(run, id).includes(light)) return { type: 'ask', companyId: id, light }
-  return run.cash >= amount && canBuy(run) ? { type: 'bid', companyId: id, amount, reason: 'looksHyped' } : { type: 'pass', companyId: id }
+  return run.cash >= amount && canBuy(run) ? { type: 'bid', companyId: id, amount, reason: HYPE } : { type: 'pass', companyId: id }
 }
 
 /** Careful player: asks two questions, buys only sound-looking companies, never sells a sound one. */
@@ -47,7 +52,7 @@ const careful: Policy = (run, m) => {
   for (const light of ['cash', 'customers'] as const) if (!knownLights(run, id).includes(light)) return { type: 'ask', companyId: id, light }
   const L = lightsAt(m, id, run.turn - 1)
   const clean = COMPANY[id].sound && (['cash', 'customers'] as const).every((k) => L[k] === 'G')
-  return clean && run.cash >= 25000 ? { type: 'bid', companyId: id, amount: 25000, reason: 'dataSays' } : { type: 'pass', companyId: id }
+  return clean && run.cash >= 25000 ? { type: 'bid', companyId: id, amount: 25000, reason: DATA } : { type: 'pass', companyId: id }
 }
 
 describe('a quarter is one screen with one real decision', () => {
@@ -79,7 +84,7 @@ describe('a quarter is one screen with one real decision', () => {
     const m = marketFor('own-all')
     let run = act(newRun('own-all'), { type: 'brief' })
     for (let q = 1; q <= 4; q++) {
-      run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: 'dataSays' })
+      run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: DATA })
       while (run.phase === 'lesson' || run.phase === 'yearEnd') run = act(run, { type: 'continue' })
     }
     expect(Object.keys(run.holdings)).toHaveLength(4)
@@ -136,11 +141,11 @@ describe('a quarter is one screen with one real decision', () => {
     let run = act(newRun('bid-1'), { type: 'brief' })
     const id = pitchFor(run, m)!
     run = act(run, { type: 'ask', companyId: id, light: 'cash' })
-    const after = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'dataSays' })
+    const after = act(run, { type: 'bid', companyId: id, amount: 10000, reason: DATA })
     expect(after.feesPaid).toBe(100)
     expect(after.holdings[id]!.units).toBeCloseTo(9900 / m.history[id][0].price, 6)
     expect(after.cash).toBe(90000 - Math.round(90000 * 0.01))
-    expect(after.log[0]).toMatchObject({ type: 'INVEST', q: 1, reason: 'dataSays', flips: 1, known: ['cash'] })
+    expect(after.log[0]).toMatchObject({ type: 'INVEST', q: 1, reasonKind: 'evidence', reasonKey: 'ev.cashProfit', flips: 1, known: ['cash'] })
   })
 
   test('selling charges a 1% fee and removes the holding', () => {
@@ -148,7 +153,7 @@ describe('a quarter is one screen with one real decision', () => {
     const id = m.picked[0]
     let run: RunState = { ...act(newRun('sell-1'), { type: 'brief' }), turn: 3, cash: 50000, holdings: { [id]: { units: 100, cost: 50000, since: 1 } } }
     const price = m.history[id][2].price
-    run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: 'dataSays' })
+    run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: DATA })
     expect(run.holdings[id]).toBeUndefined()
     expect(run.feesPaid).toBe(Math.round(100 * price * 0.01))
     expect(run.cash).toBe(50000 + Math.round(100 * price - Math.round(100 * price * 0.01)))
@@ -165,7 +170,7 @@ describe('a quarter is one screen with one real decision', () => {
     const m = marketFor(seed)
     let run = act(newRun(seed), { type: 'brief' })
     const id = pitchFor(run, m)!
-    run = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'looksHyped' })
+    run = act(run, { type: 'bid', companyId: id, amount: 10000, reason: HYPE })
     if (run.phase === 'desk') {
       // no lesson fired; fabricate one from this quarter so the replay path is exercised
       run = { ...run, turn: 1, phase: 'lesson', lesson: { id: 1, params: { companyId: id } }, after: 'desk' }
@@ -204,7 +209,7 @@ describe('lessons come from the player’s own decisions', () => {
       const seed = `les-${i}`
       const m = marketFor(seed)
       if (m.pitchOrder[0] !== 'payEasy') continue
-      const run = act(act(newRun(seed), { type: 'brief' }), { type: 'bid', companyId: 'payEasy', amount: 10000, reason: 'looksHyped' })
+      const run = act(act(newRun(seed), { type: 'brief' }), { type: 'bid', companyId: 'payEasy', amount: 10000, reason: HYPE })
       const ids = [run.lesson, ...run.queue].filter(Boolean).map((l) => l!.id)
       expect(ids).toContain(1)
       expect(ids).toContain(2)
@@ -222,7 +227,7 @@ describe('lessons come from the player’s own decisions', () => {
       const id = 'dailyBasket'
       const price = m.history[id][t - 1].price
       let run: RunState = { ...newRun(`dip-${i}`), briefed: true, turn: t, cash: 50000, holdings: { [id]: { units: 400, cost: 40000, since: 1 } }, turnStartInvested: 400 * price }
-      run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: 'scaredLoss' })
+      run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: FEAR })
       const target = pitchFor(run, m)!
       run = act(run, { type: 'pass', companyId: target })
       expect(run.jails).toBe(1)
@@ -273,7 +278,7 @@ describe('judgement is tracked decision by decision', () => {
       const seed = `blind-${i}`
       const m = marketFor(seed)
       if (m.pitchOrder[0] !== 'payEasy') continue
-      const run = act(act(newRun(seed), { type: 'brief' }), { type: 'bid', companyId: 'payEasy', amount: 10000, reason: 'looksHyped' })
+      const run = act(act(newRun(seed), { type: 'brief' }), { type: 'bid', companyId: 'payEasy', amount: 10000, reason: HYPE })
       const [e] = reviewDecisions(run, m)
       expect(e.verdict).toBe('risky')
       const keys = e.pointers.map((p) => p.key)
@@ -294,7 +299,7 @@ describe('judgement is tracked decision by decision', () => {
       let run = act(newRun(seed), { type: 'brief' })
       run = act(run, { type: 'ask', companyId: id, light: 'cash' })
       run = act(run, { type: 'ask', companyId: id, light: 'customers' })
-      run = act(run, { type: 'bid', companyId: id, amount: 20000, reason: 'dataSays' })
+      run = act(run, { type: 'bid', companyId: id, amount: 20000, reason: DATA })
       const [e] = reviewDecisions(run, m)
       expect(e.verdict).toBe('good')
       expect(e.pointers.filter((p) => p.kind === 'bad')).toHaveLength(0)
@@ -325,7 +330,7 @@ describe('judgement is tracked decision by decision', () => {
     const m = marketFor(seed)
     let run = act(newRun(seed), { type: 'brief' })
     const id = pitchFor(run, m)!
-    run = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'dataSays' })
+    run = act(run, { type: 'bid', companyId: id, amount: 10000, reason: DATA })
     // right after the decision, quarter 1 has closed so its result may show; nothing beyond it
     const [e] = reviewDecisions(run, m)
     const outcome = e.pointers.find((p) => p.key.startsWith('outcomeBuy'))
@@ -405,12 +410,12 @@ describe('analytics', () => {
   test('reasons are split into evidence and feelings', () => {
     let run = act(newRun('rs-1'), { type: 'brief' })
     const m = marketFor('rs-1')
-    run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: 'dataSays' })
+    run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: DATA })
     if (run.phase === 'lesson') run = act(run, { type: 'continue' })
-    run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: 'looksHyped' })
+    run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: HYPE })
     const a = computeAnalytics(run, m)
     expect(a.evidencePct).toBe(0.5)
-    expect(a.reasons.map((r) => r.kind).sort()).toEqual(['evidence', 'feeling'])
+    expect(a.reasons.map((r) => r.kind).sort()).toEqual(['feeling', 'reasoned'])
   })
 
   test('analytics never show quarters that have not been played', () => {
@@ -510,7 +515,7 @@ describe('lesson cards fill every placeholder', () => {
           if (run.phase === 'desk') a = style(run, m) ?? (pitchFor(run, m) ? { type: 'pass', companyId: pitchFor(run, m)! } : { type: 'hold', companyId: reviewFor(run, m)! })
           else if (run.phase === 'emergency') {
             const ids = Object.keys(run.holdings) as CompanyId[]
-            a = run.cash >= 25000 || !ids.length ? { type: 'payEmergency' } : { type: 'sell', companyId: ids[0], fraction: 1, reason: 'scaredLoss' }
+            a = run.cash >= 25000 || !ids.length ? { type: 'payEmergency' } : { type: 'sell', companyId: ids[0], fraction: 1, reason: FEAR }
           } else a = { type: 'continue' }
           const next = act(run, a)
           run = next === run ? act(run, { type: 'continue' }) : next

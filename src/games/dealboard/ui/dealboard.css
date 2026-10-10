@@ -169,3 +169,10 @@ button.db-lot.glow { box-shadow: 0 0 0 3px #E5457A, 3px 3px 0 3px var(--color-in
 .db-judge:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--color-ink); }
 .db-judge:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--color-ink); }
 .db-judge:focus-visible { outline: 4px solid var(--color-pink); outline-offset: 3px; }
+
+/* ⓘ toggles: a small circle with a full-size touch target; the explanation opens right below its heading */
+.db-info-btn { display: grid; place-items: center; width: 44px; height: 44px; margin: -8px -8px -8px 0; background: transparent; cursor: pointer; flex-shrink: 0; }
+.db-info-btn > span { display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--color-ink); border-radius: 50%; background: var(--cream); font: 800 13px/1 var(--font-body); color: var(--color-ink); }
+.db-info-btn:hover > span, .db-info-btn[aria-expanded="true"] > span { background: var(--brass); }
+.db-info-btn:focus-visible { outline: 4px solid var(--color-pink); outline-offset: -4px; border-radius: 12px; }
+.db-info-panel { margin-top: 4px; padding: 8px 12px; background: #F6E6BE; border: 2px solid var(--color-ink); border-radius: 8px; font-size: 13px; line-height: 1.4; font-weight: 600; }

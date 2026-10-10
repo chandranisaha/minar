@@ -3,6 +3,7 @@ import { TURNS, YEAR_ENDS } from './board'
 import { TUNING } from './companies'
 import { EMERGENCY_COST } from './events'
 import { redFlags } from './lights'
+import type { ReasonOption } from './reasons'
 import { collectEarned, collectLessons, houseCard, type LessonRef, type QuarterEvents } from './lessons'
 import {
   CASH_DRAG, MIN_BID, reviewFor, TRADE_FEE, decisionQ, investedAt, knownLights, knownQuarter, lightsAt, marketFor,
@@ -14,17 +15,17 @@ export * from './state'
 export type Action =
   | { type: 'brief' }
   | { type: 'ask'; companyId: CompanyId; light: LightKey }
-  | { type: 'bid'; companyId: CompanyId; amount: number; reason: string }
-  | { type: 'pass'; companyId: CompanyId }
-  | { type: 'buyMore'; companyId: CompanyId; amount: number; reason: string }
-  | { type: 'sell'; companyId: CompanyId; fraction: number; reason: string }
+  | { type: 'bid'; companyId: CompanyId; amount: number; reason: ReasonOption }
+  | { type: 'pass'; companyId: CompanyId; reason?: ReasonOption | null }
+  | { type: 'buyMore'; companyId: CompanyId; amount: number; reason: ReasonOption }
+  | { type: 'sell'; companyId: CompanyId; fraction: number; reason: ReasonOption }
   | { type: 'repay' }
   | { type: 'hold'; companyId: CompanyId }
   | { type: 'payEmergency' }
   | { type: 'continue' }
   | { type: 'rewind' }
 
-export const REASONS = ['strongGrowth', 'trustFounder', 'priceLow', 'scaredLoss', 'friendTold', 'looksHyped', 'dataSays', 'other'] as const
+const why = (r: ReasonOption | null | undefined) => (r ? { reason: r.id, reasonKey: r.key, reasonKind: r.kind, reasonParams: r.params } : {})
 
 const strip = (r: RunState): Omit<RunState, 'checkpoints'> => {
   const { checkpoints: _c, ...rest } = r
@@ -44,7 +45,7 @@ const decision = (run: RunState, type: Decision['type'], companyId: CompanyId, e
   ...extra,
 })
 
-function buy(run: RunState, m: MarketRun, id: CompanyId, amount: number, reason: string): RunState {
+function buy(run: RunState, m: MarketRun, id: CompanyId, amount: number, reason: ReasonOption): RunState {
   const q = knownQuarter(run)
   const price = priceAt(m, id, q)
   if (price <= 0 || amount < MIN_BID || amount > run.cash || !canBuy(run) || run.phase !== 'desk') return run
@@ -64,13 +65,13 @@ function buy(run: RunState, m: MarketRun, id: CompanyId, amount: number, reason:
     trades: run.trades + 1,
     pitched: run.pitched.includes(id) ? run.pitched : [...run.pitched, id],
     log: [...run.log, decision(run, 'INVEST', id, {
-      amount, reason, price, flips: Math.min(2, known.length), known,
+      amount, ...why(reason), price, flips: Math.min(2, known.length), known,
       share: shares.length ? Math.max(...shares) : 0, positions: Object.keys(holdings).length, cashAfter: after.cash, size: nw > 0 ? amount / nw : 0,
     })],
   }
 }
 
-function sell(run: RunState, m: MarketRun, id: CompanyId, fraction: number, reason: string): RunState {
+function sell(run: RunState, m: MarketRun, id: CompanyId, fraction: number, reason: ReasonOption): RunState {
   const h = run.holdings[id]
   const q = knownQuarter(run)
   if (!h || fraction <= 0) return run
@@ -95,7 +96,7 @@ function sell(run: RunState, m: MarketRun, id: CompanyId, fraction: number, reas
     soldThisTurn: run.soldThisTurn + gross,
     soldRed: run.soldRed || redFlags(lightsAt(m, id, q)) > 0,
     emergencySales: forced ? [...run.emergencySales, sale] : run.emergencySales,
-    log: [...run.log, decision(run, 'SELL', id, { amount: Math.round(gross), reason, price, gain, held: decisionQ(run) - h.since, forced })],
+    log: [...run.log, decision(run, 'SELL', id, { amount: Math.round(gross), ...why(reason), price, gain, held: decisionQ(run) - h.since, forced })],
   }
 }
 
@@ -207,7 +208,7 @@ export function act(run: RunState, a: Action): RunState {
       return finish({
         ...run,
         pitched: run.pitched.includes(a.companyId) ? run.pitched : [...run.pitched, a.companyId],
-        log: [...run.log, decision(run, 'REJECT', a.companyId, { price: priceAt(m, a.companyId, knownQuarter(run)), flips: Math.min(2, known.length), known })],
+        log: [...run.log, decision(run, 'REJECT', a.companyId, { price: priceAt(m, a.companyId, knownQuarter(run)), flips: Math.min(2, known.length), known, ...why(a.reason) })],
       }, m)
     }
 
