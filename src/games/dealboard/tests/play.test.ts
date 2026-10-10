@@ -61,10 +61,12 @@ describe('decisions and consequences', () => {
     const id = pitchFor(run, m)!
     if (tileAt(run, m) !== 'auction') return
     const after = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'dataSays' })
-    expect(after.cash).toBe(90000)
+    // the quarter closes straight away: idle cash then loses 1%
+    expect(after.cash).toBe(90000 - Math.round(90000 * 0.01))
     expect(after.feesPaid).toBe(100)
     expect(after.holdings[id]!.units).toBeCloseTo(9900 / m.history[id][0].price, 6)
-    expect(after.phase).toBe('manage')
+    expect(after.phase).not.toBe('land')
+    expect(after.owners[m.positions[run.turn]]).toBe(id)
   })
 
   test('founder questions are limited to two lights per pitch', () => {
@@ -102,10 +104,10 @@ describe('decisions and consequences', () => {
     if (bankTurn < 1) return
     let run: RunState = { ...newRun(seed), turn: bankTurn, phase: 'land' }
     run = act(run, { type: 'loan' })
-    expect(run.cash).toBe(120000)
     expect(run.loan).toBe(20000)
-    run = act(run, { type: 'endTurn' })
     expect(run.loanInterest).toBe(600)
+    expect(run.cash).toBe(Math.round((120000 - 600) * 0.99))
+    expect(run.recap?.bank).toBe('loan')
   })
 
   test('rewind restores the start of the quarter once a year', () => {
@@ -141,7 +143,6 @@ describe('lessons fire from the player’s own decisions (spec acceptance tests)
     const t = firstAuction(m)
     let run: RunState = { ...newRun(seed), turn: t, phase: 'land', turnStartInvested: 0 }
     run = act(run, { type: 'bid', companyId: 'payEasy', amount: 10000, reason: 'looksHyped' })
-    run = act(run, { type: 'endTurn' })
     const ids = [run.lesson, ...run.queue].filter(Boolean).map((l) => l!.id)
     expect(ids).toContain(1)
     expect(ids).toContain(2)
@@ -152,7 +153,7 @@ describe('lessons fire from the player’s own decisions (spec acceptance tests)
     const m = marketFor(seed)
     const t = m.fallQ
     const id = 'dailyBasket' as CompanyId
-    let run: RunState = { ...newRun(seed), turn: t - 1, phase: 'news', cash: 50000, holdings: { [id]: { units: 400, cost: 40000, since: 1 } }, checkpoints: {} }
+    let run: RunState = { ...newRun(seed), turn: t - 1, phase: 'news', cash: 50000, holdings: { [id]: { units: 400, cost: 40000, since: 1 } }, checkpoints: {}, turnStartInvested: 400 * m.history[id][t - 1].price }
     run = act(run, { type: 'roll' })
     run = { ...run, phase: 'manage' }
     run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: 'scaredLoss' })

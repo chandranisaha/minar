@@ -42,7 +42,7 @@ export function TradeDialog({ mode, companyId, price, cash, holding, blocked, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label={t(`trade.${mode}`, { name })} onKeyDown={(e) => e.key === 'Escape' && onCancel()}>
-      <div ref={ref} tabIndex={-1} className="paper db-sheet anim-pop max-h-[92vh] w-full max-w-[460px] overflow-y-auto p-4 outline-none">
+      <div ref={ref} tabIndex={-1} className="paper db-sheet db-in max-h-[92vh] w-full max-w-[460px] overflow-y-auto p-4 outline-none">
         <div className="-mx-4 -mt-4 mb-3 border-b-[3px] border-ink px-4 py-2" style={{ background: SECTOR_COLOUR[COMPANY[companyId].sector] }}>
           <h2 className="font-sign lang-fit m-0 text-[18px] text-jasmine" style={{ textShadow: '1.5px 1.5px 0 #2B1A17' }}>{t(`trade.${mode}`, { name })}</h2>
         </div>

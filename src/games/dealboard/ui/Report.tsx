@@ -43,7 +43,7 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
   const ahead = score.profit > 0 && score.total < 75
   const behind = score.profit < 0 && score.total >= PASS_MARK
   return (
-    <section className="paper db-sheet anim-pop relative overflow-hidden p-4" aria-live="polite">
+    <section className="paper db-sheet db-in relative overflow-hidden p-4" aria-live="polite">
       <div className="absolute inset-x-0 top-0 h-2 border-b-2 border-ink" style={{ background: score.cleared ? '#3F7A3A' : '#E8B04A' }} />
       <div className="db-eyebrow mt-1 text-[#8a5a2b]">★ ★ ★ {t('report.eyebrow')}</div>
       <h2 className="font-sign lang-fit m-0 text-[22px] leading-tight">{t('report.title')}</h2>

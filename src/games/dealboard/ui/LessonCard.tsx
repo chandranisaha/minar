@@ -54,7 +54,7 @@ export function LessonCard({ run, onContinue, onReplay }: { run: RunState; onCon
   const title = earned ? t('earned.title') : t(`${base}.title`)
   const tone = earned ? '#3F7A3A' : '#C9506F'
   return (
-    <section className="paper db-sheet anim-pop relative overflow-hidden p-4" aria-live="polite">
+    <section className="paper db-sheet db-in relative overflow-hidden p-4" aria-live="polite">
       <div className="absolute inset-x-0 top-0 h-2 border-b-2 border-ink" style={{ background: tone }} />
       <div className="mt-1 flex items-center gap-2">
         <span className="font-sign grid h-8 w-8 shrink-0 place-items-center rounded-full border-[2.5px] border-ink text-[15px] text-jasmine" style={{ background: tone }} aria-hidden>{earned ? '★' : '✎'}</span>

@@ -13,7 +13,7 @@ export const useInr = () => {
 /** Cream sheet under the board: one decision at a time. */
 export function Sheet({ eyebrow, title, icon, tone, children, actions }: { eyebrow?: ReactNode; title: ReactNode; icon?: ReactNode; tone?: string; children?: ReactNode; actions?: ReactNode }) {
   return (
-    <section className="paper db-sheet anim-pop relative overflow-hidden p-4" aria-live="polite">
+    <section className="paper db-sheet db-in relative overflow-hidden p-4" aria-live="polite">
       {tone && <div className="absolute inset-x-0 top-0 h-2 border-b-2 border-ink" style={{ background: tone }} />}
       <div className="mt-1 flex items-center gap-3">
         {icon && <div className="shrink-0">{icon}</div>}

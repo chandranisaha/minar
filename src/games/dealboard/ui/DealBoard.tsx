@@ -3,11 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { TitleCard } from '../../../components/TitleCard'
 import { useLite } from '../../../store/game'
 import { BOARD, TURNS } from '../engine/board'
-import { houses, invested, marketFor, netWorth, type RunState } from '../engine/run'
+import { houses, invested, marketFor, needsDecision, netWorth, type RunState } from '../engine/run'
 import { computeScore, type Score } from '../engine/scoring'
 import type { CompanyId, MarketRun } from '../engine/types'
 import { useDealBoard } from '../state/store'
 import { Board } from './Board'
+import { CompanyStrip, Meet } from './Companies'
+import { Dossier } from './Dossier'
+import { TradeDialog, type TradeMode } from './TradeDialog'
+import { knownQuarter, priceAt } from '../engine/state'
 import { Die } from './Dice'
 import { Report } from './Report'
 import { Sheet, Stat, useInr } from './Panels'
@@ -141,6 +145,8 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
   const arrived = shown === target
   const [rolling, setRolling] = useState(false)
   const [face, setFace] = useState(1)
+  const [study, setStudy] = useState<CompanyId | null>(null)
+  const [trade, setTrade] = useState<{ mode: TradeMode; id: CompanyId } | null>(null)
   const timer = useRef(0)
   useEffect(() => () => window.clearTimeout(timer.current), [])
   // cosmetic tumbling faces while the die rolls
@@ -149,6 +155,14 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
     const id = window.setInterval(() => setFace((f) => (f % 6) + 1), 110)
     return () => window.clearInterval(id)
   }, [rolling])
+
+  // tiles that need no decision resolve themselves a moment after the token lands: what happened is told in the next briefing
+  const quiet = run.phase === 'land' && arrived && !needsDecision(run, m)
+  useEffect(() => {
+    if (!quiet) return
+    const id = window.setTimeout(() => dispatch({ type: 'resolve' }), lite ? 250 : 900)
+    return () => window.clearTimeout(id)
+  }, [quiet, run.turn, lite, dispatch])
 
   const roll = () => {
     if (lite) return dispatch({ type: 'roll' })
@@ -159,33 +173,53 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
     }, ROLL_MS)
   }
 
+  if (!run.briefed) return <Meet m={m} onStart={() => dispatch({ type: 'brief' })} />
+
   const nextQ = run.phase === 'news' ? run.turn + 1 : run.turn
   const lastRoll = run.turn > 0 ? m.rolls[run.turn - 1] : 1
   const dieFace = rolling ? face : lastRoll
   const score = run.phase === 'done' ? computeScore(run, m) : null
+  const q = knownQuarter(run)
+
+  const confirmTrade = ({ amount, fraction, reason }: { amount: number; fraction: number; reason: string }) => {
+    if (!trade) return
+    if (trade.mode === 'invest') dispatch({ type: 'bid', companyId: trade.id, amount, reason })
+    else if (trade.mode === 'buyMore') dispatch({ type: 'buyMore', companyId: trade.id, amount, reason })
+    else dispatch({ type: 'sell', companyId: trade.id, fraction, reason })
+    setTrade(null)
+    if (trade.mode === 'sell' && fraction >= 1) setStudy(null)
+  }
 
   return (
-    // phones: header, board, sheet stacked; wide screens: board beside the sheet so every decision stays near the board
+    // phones: header, companies, board, sheet stacked; wide screens: board beside the sheet
     <div className="mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-5">
       <Header run={run} m={m} onExit={onExit} />
-      <Board tokenAt={shown} current={run.phase === 'land' && arrived ? target : null}>
-        <div className="db-eyebrow text-[#E8B04A]">{t('quarter', { n: Math.min(TURNS, Math.max(1, nextQ)) })}</div>
-        <div className="db-wordmark">{t('title')}</div>
-        <div className="db-rule" />
-        <div className="flex flex-wrap justify-center gap-1" aria-hidden>
-          {Array.from({ length: TURNS }, (_, i) => <span key={i} className={`db-pip ${i < run.turn ? 'on' : ''}`} />)}
-        </div>
-        <Die value={dieFace} rolling={rolling} size={48} label={t('rolled', { n: lastRoll })} />
-      </Board>
+      <div className="flex flex-col gap-2">
+        <CompanyStrip run={run} m={m} onOpen={setStudy} />
+        <Board run={run} m={m} tokenAt={shown} current={run.phase === 'land' && arrived ? target : null} onOpen={setStudy}>
+          <div className="db-eyebrow text-[#E8B04A]">{t('quarter', { n: Math.min(TURNS, Math.max(1, nextQ)) })}</div>
+          <div className="db-wordmark">{t('title')}</div>
+          <div className="db-rule" />
+          <div className="flex flex-wrap justify-center gap-1" aria-hidden>
+            {Array.from({ length: TURNS }, (_, i) => <span key={i} className={`db-pip ${i < run.turn ? 'on' : ''}`} />)}
+          </div>
+          <Die value={dieFace} rolling={rolling} size={48} label={t('rolled', { n: lastRoll })} />
+        </Board>
+        <p className="m-0 text-center text-[12px] text-jasmine/80">{t('boardHint')}</p>
+      </div>
       <div className="lg:sticky lg:top-3 lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto lg:pr-1">
         {run.phase === 'done' && score ? (
           <Report run={run} score={score} onComplete={onComplete ?? NOOP} onAgain={() => quit()} onExit={onExit} />
         ) : run.phase === 'yearEnd' ? (
           <YearEnd run={run} m={m} />
         ) : (
-          <TurnPanel run={run} m={m} arrived={arrived} rolling={rolling} dispatch={dispatch} onRoll={roll} onRewind={() => dispatch({ type: 'rewind' })} />
+          <TurnPanel run={run} m={m} arrived={arrived} rolling={rolling} dispatch={dispatch} onRoll={roll} onRewind={() => dispatch({ type: 'rewind' })} onOpen={setStudy} onTrade={(mode, id) => setTrade({ mode, id })} />
         )}
       </div>
+      {study && !trade && <Dossier run={run} m={m} id={study} onClose={() => setStudy(null)} onTrade={(mode) => setTrade({ mode, id: study })} />}
+      {trade && (
+        <TradeDialog mode={trade.mode} companyId={trade.id} price={priceAt(m, trade.id, q)} cash={run.cash} holding={run.holdings[trade.id]} blocked={trade.mode !== 'sell' && run.jailedTurn === (run.phase === 'news' ? run.turn + 1 : run.turn)} onCancel={() => setTrade(null)} onConfirm={confirmTrade} />
+      )}
     </div>
   )
 }

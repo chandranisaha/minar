@@ -82,3 +82,20 @@ Source: `Deal Board build spec.pdf`, Lite mode first. Engine lives in `src/games
 - Lesson 16 text says "owning several of them" instead of "three companies in the same sector" because each sector here has one company.
 - Hub link: a judgement score of 60 or more lights the lamp; the best score and the matching skills (risk sense, patience, saving) are
   kept in the hub store and are never lowered.
+
+## Deal Board redesign: fewer taps, more reading (after player feedback)
+Feedback: "too complicated, I'm not learning, just tapping buttons; show stats, introduce the companies, put bought companies on the board
+with hover stats, and stop starting and ending a quarter every two seconds."
+- **One decision per quarter.** The briefing (news, last quarter's recap, roll) leads straight to the tile. Only the Auction pitch and the
+  Bank ask for a decision. Every other tile resolves itself on arrival and is explained in the next briefing's recap. There is no "End the
+  quarter" or "Next" button any more (about 2 to 3 taps a quarter, down from about 5).
+- **Trading happens from the board, any time before or after the roll.** A company you buy claims the Auction tile you landed on (sector
+  band, mark, gain badge). Hover shows live stats, click opens the study sheet with Buy more and Sell. The portfolio list is gone.
+  Selling everything returns the tile to the Auction pool. Trades made in the briefing belong to the coming quarter.
+- **Meet the companies.** Before the first roll the player sees the four companies of that run with the headline claims a pitch would
+  make. Real numbers appear only through questions, so the lesson is "headline versus data".
+- **Pitch answers teach.** Each of the two questions opens real statistics with a six-quarter chart and a one-line meaning, tagged
+  early-warning, looks-back or easy-to-inflate. A founder who dodges shows no numbers and is called out as a warning sign.
+- **Every quarter explains itself.** The recap lists each holding's move with up to three plain-language reasons computed from the
+  engine's inputs (market, sector, company events, profit, customers, runway, CEO, "excitement not earnings").
+- Founder-question scoring is unchanged: research is still judged by lights asked before buying.

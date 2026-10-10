@@ -1,0 +1,102 @@
+import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
+import { knownLights, knownQuarter, lightsAt, holdingValueAt, type RunState } from '../engine/state'
+import type { CompanyId, LightKey, MarketRun } from '../engine/types'
+import { LightsPanel } from './Lights'
+import { useInr } from './Panels'
+import { ALL_STATS, ASK_STATS, STAT_GROUPS, StatLocked, StatRow, type StatId } from './Stats'
+import { useState } from 'react'
+import type { TradeMode } from './TradeDialog'
+
+/** Which statistics the player can see for a company right now. */
+export function visibleStats(run: RunState, id: CompanyId): StatId[] {
+  if (run.holdings[id]) return ALL_STATS
+  const known = knownLights(run, id) as LightKey[]
+  return ['price', ...known.flatMap((k) => ASK_STATS[k])] as StatId[]
+}
+
+export const companyStatus = (run: RunState, id: CompanyId): 'own' | 'met' | 'unmet' => (run.holdings[id] ? 'own' : run.pitched.includes(id) ? 'met' : 'unmet')
+
+/** Full study sheet for one company: lights, every statistic with a chart and an explanation, news, and trading. */
+export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: MarketRun; id: CompanyId; onClose: () => void; onTrade: (mode: TradeMode) => void }) {
+  const { t } = useTranslation('dealboard')
+  const money = useInr()
+  const ref = useRef<HTMLDivElement>(null)
+  const [sel, setSel] = useState<LightKey | null>(null)
+  useEffect(() => ref.current?.focus(), [])
+  const co = COMPANY[id]
+  const status = companyStatus(run, id)
+  const q = knownQuarter(run)
+  const hist = m.history[id]
+  const visible = new Set(visibleStats(run, id))
+  const h = run.holdings[id]
+  const value = h ? holdingValueAt(run, m, id, q) : 0
+  const gain = h ? value - h.cost : 0
+  const feed = run.feed.filter((f) => f.company === id)
+  const tradeable = !!h && ['news', 'land', 'manage'].includes(run.phase) && !hist[q].failed
+  const known = knownLights(run, id) as LightKey[]
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label={t(`companies.${id}.name`)} onKeyDown={(e) => e.key === 'Escape' && onClose()} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div ref={ref} tabIndex={-1} className="paper db-sheet db-in max-h-[94vh] w-full max-w-[520px] overflow-y-auto p-4 outline-none">
+        <div className="-mx-4 -mt-4 mb-3 flex items-baseline justify-between gap-2 border-b-[3px] border-ink px-4 py-2" style={{ background: SECTOR_COLOUR[co.sector] }}>
+          <h2 className="font-sign lang-fit m-0 truncate text-[20px] text-jasmine" style={{ textShadow: '1.5px 1.5px 0 #2B1A17' }}>{t(`companies.${id}.name`)}</h2>
+          <span className="shrink-0 text-[11px] font-extrabold uppercase tracking-wider text-jasmine">{t(`sectors.${co.sector}`)}</span>
+        </div>
+
+        <p className="m-0 text-[15px] font-semibold italic">“{t(`companies.${id}.slogan`)}”</p>
+        <p className="m-0 mt-1 text-[13px]"><span className="font-extrabold">{t('dossier.claims')}:</span> {t(`claims.${id}`)}</p>
+        <p className="m-0 mt-1 text-[13px] opacity-75"><span className="font-extrabold">{t(`companies.${id}.founder`).split(',')[0]}:</span> “{t(`companies.${id}.line`)}”</p>
+
+        {h && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border-2 border-ink bg-[#F6E6BE] px-3 py-2 text-[14px]">
+            <span className="font-extrabold">{t('dossier.own', { v: money(value) })}</span>
+            <span className="font-extrabold" style={{ color: gain >= 0 ? '#2f6f4a' : '#C8442F' }}>{gain >= 0 ? '▲ ' : '▼ '}{money(Math.abs(gain))}</span>
+            {tradeable && (
+              <span className="flex gap-2">
+                <button type="button" className="ink-btn cream" style={{ minHeight: 44 }} onClick={() => onTrade('buyMore')}>{t('portfolio.buyMore')}</button>
+                <button type="button" className="ink-btn" style={{ minHeight: 44 }} onClick={() => onTrade('sell')}>{t('portfolio.sell')}</button>
+              </span>
+            )}
+          </div>
+        )}
+
+        {status === 'unmet' && <p className="m-0 mt-3 rounded-lg border-2 border-dashed border-ink/40 px-3 py-2 text-[14px]">{t('dossier.unmet')}</p>}
+        {status === 'met' && <p className="m-0 mt-3 text-[13px] opacity-75">{t('dossier.passed')}</p>}
+
+        {status !== 'unmet' && (
+          <>
+            <div className="mt-3"><LightsPanel hist={hist} q={q} lights={lightsAt(m, id, q)} visible={status === 'own' ? 'all' : known} selected={sel} onSelect={setSel} /></div>
+            <div className="mt-3 space-y-3">
+              {STAT_GROUPS.map((g) => (
+                <section key={g.id}>
+                  <div className="db-eyebrow mb-1 text-[#8a5a2b]">{t(`stats.groups.${g.id}`)}</div>
+                  <div className="grid grid-cols-1 gap-1.5 min-[460px]:grid-cols-2">
+                    {g.stats.map((s) => (visible.has(s) ? <StatRow key={s} id={s} hist={hist} q={q} money={money} /> : <StatLocked key={s} />))}
+                  </div>
+                </section>
+              ))}
+            </div>
+            <p className="m-0 mt-3 text-[11px] leading-snug opacity-65"><span className="font-extrabold">{t('dossier.legend')}:</span> {t('stats.tagLegend')}</p>
+          </>
+        )}
+
+        <section className="mt-3">
+          <div className="db-eyebrow mb-1 text-[#8a5a2b]">{t('dossier.news')}</div>
+          {feed.length === 0 ? <p className="m-0 text-[13px] opacity-65">{t('dossier.noNews')}</p> : (
+            <ul className="m-0 list-none space-y-1.5 p-0">
+              {feed.slice(-4).map((f) => (
+                <li key={`${f.q}-${f.key}`} className="rounded-lg border-2 border-ink bg-white/60 px-2.5 py-1.5 text-[13px] leading-snug">
+                  <span className="mr-1.5 rounded border-2 px-1 text-[10px] font-extrabold uppercase" style={{ color: f.type === 'rumour' ? '#C9506F' : '#3F7A3A', borderColor: f.type === 'rumour' ? '#C9506F' : '#3F7A3A' }}>{f.type === 'rumour' ? t('cards.unverified') : t('news.verified')}</span>
+                  <span className="opacity-60">{t('quarterShort', { n: f.q })}</span> {t(`cards.${f.key}.head`)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <div className="mt-4 flex justify-end"><button type="button" className="ink-btn pink" onClick={onClose}>{t('dossier.close')}</button></div>
+      </div>
+    </div>
+  )
+}

@@ -35,27 +35,30 @@ export function LightChip({ k, state, active, onTap }: { k: LightKey; state: Lig
     >
       <span className="flex max-w-full items-center gap-1">
         <Glyph state={state} />
-        <span className="font-sign lang-fit truncate text-[11px] leading-none min-[400px]:text-[12px]">{t(`lights.${k}.name`)}</span>
+        <span className="lang-fit text-[12px] font-extrabold leading-none">{t(`lights.${k}.name`)}</span>
       </span>
       <span className="text-[10px] font-extrabold uppercase leading-none tracking-wide opacity-90">{label}</span>
     </button>
   )
 }
 
-/** Six-quarter mini chart for one light: thick bars, green above zero and red below. */
-export function MiniChart({ values, mode }: { values: number[]; mode: 'signed' | 'level' }) {
+/** Six-quarter mini chart: six fixed slots (newest on the right), thick bars, green above zero and red below. */
+export function MiniChart({ values, mode, height = 52 }: { values: number[]; mode: 'signed' | 'level'; height?: number }) {
+  const SLOTS = 6
   const max = Math.max(1e-6, ...values.map((v) => Math.abs(v)))
-  const W = 168, H = 52, gap = 8
-  const bw = (W - gap * (values.length - 1)) / values.length
-  const mid = mode === 'signed' ? H / 2 : H - 4
+  const W = 168, H = height, gap = 8
+  const bw = (W - gap * (SLOTS - 1)) / SLOTS
+  const mid = mode === 'signed' ? H / 2 : H - 3
+  const offset = SLOTS - values.length
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} role="img" aria-label={values.map((v) => v.toFixed(1)).join(', ')}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={values.map((v) => v.toFixed(1)).join(', ')} style={{ display: 'block', maxHeight: H * 1.4 }}>
+      {Array.from({ length: SLOTS }, (_, i) => <rect key={'g' + i} x={i * (bw + gap)} y={H - 3} width={bw} height={3} rx="1.5" fill="#2B1A17" opacity=".12" />)}
       {mode === 'signed' && <line x1="0" x2={W} y1={mid} y2={mid} stroke="#2B1A17" strokeWidth="1.5" strokeDasharray="3 3" opacity=".5" />}
       {values.map((v, i) => {
-        const h = Math.max(2, (Math.abs(v) / max) * (mode === 'signed' ? H / 2 - 4 : H - 8))
+        const h = Math.max(2.5, (Math.abs(v) / max) * (mode === 'signed' ? H / 2 - 3 : H - 8))
         const up = v >= 0
         const y = mode === 'signed' ? (up ? mid - h : mid) : mid - h
-        return <rect key={i} x={i * (bw + gap)} y={y} width={bw} height={h} rx="2" fill={mode === 'level' ? '#8A6D3B' : up ? '#3F7A3A' : '#C8442F'} stroke="#2B1A17" strokeWidth="1.6" />
+        return <rect key={i} x={(i + offset) * (bw + gap)} y={y} width={bw} height={h} rx="2" fill={mode === 'level' ? '#8A6D3B' : up ? '#3F7A3A' : '#C8442F'} stroke="#2B1A17" strokeWidth="1.6" />
       })}
     </svg>
   )

@@ -15,7 +15,7 @@ export const HOUSE = 10000
 /**
  * news       banner for the coming quarter, waiting for the roll
  * land       token is on its tile; the tile does its thing
- * manage     optional buys, sells, loan repayment; then end the quarter
+ * manage     (legacy) optional buys and sells before ending the quarter; the app no longer stops here
  * emergency  family emergency: raise the cash, then pay
  * lesson     a lesson card from the quarter that just ended
  * yearEnd    review after turns 4, 8 and 12
@@ -29,6 +29,26 @@ export interface Holding {
   cost: number
   /** quarter of the first purchase */
   since: number
+}
+
+/** What happened on the tile last quarter, shown at the top of the next briefing. */
+export interface Recap {
+  tile: TileKind
+  cardKey: string | null
+  cardType: 'news' | 'rumour' | null
+  cardCompany: CompanyId | null
+  rent: { id: CompanyId; amount: number }[]
+  /** the company whose property tile the token landed on */
+  ownTile: CompanyId | null
+  bank: 'clue' | 'loan' | 'skip' | null
+  clue: { companyId: CompanyId; light: LightKey } | null
+}
+
+export interface FeedItem {
+  q: number
+  key: string
+  type: 'news' | 'rumour'
+  company: CompanyId | null
 }
 
 export interface EmergencySale {
@@ -58,8 +78,16 @@ export interface RunState {
   /** lights revealed by the Banker's clue */
   clues: Partial<Record<CompanyId, LightKey[]>>
   log: Decision[]
+  /** the player has seen the introduction to this game's companies */
+  briefed: boolean
+  /** auction tiles claimed by the companies bought there (tile index to company) */
+  owners: Record<number, CompanyId>
+  recap: Recap | null
+  feed: FeedItem[]
+  lastBank: 'clue' | 'loan' | 'skip' | null
+  lastClue: { companyId: CompanyId; light: LightKey } | null
 
-  // this turn
+  // this quarter
   turnStartInvested: number
   soldThisTurn: number
   soldRed: boolean
@@ -104,6 +132,12 @@ export const newRun = (seed: string): RunState => ({
   asked: {},
   clues: {},
   log: [],
+  briefed: false,
+  owners: {},
+  recap: null,
+  feed: [],
+  lastBank: null,
+  lastClue: null,
   turnStartInvested: 0,
   soldThisTurn: 0,
   soldRed: false,
@@ -136,6 +170,9 @@ export function marketFor(seed: string): MarketRun {
 /** Latest quarter whose results the player can see: during a turn it is the previous quarter. */
 export const knownQuarter = (run: RunState): number =>
   run.phase === 'land' || run.phase === 'manage' || run.phase === 'emergency' ? run.turn - 1 : run.turn
+
+/** The quarter a decision belongs to: the briefing before the roll already decides the coming quarter. */
+export const decisionQ = (run: RunState): number => (run.phase === 'news' ? run.turn + 1 : run.turn)
 
 export const tileAt = (run: RunState, m: MarketRun): TileKind => BOARD[m.positions[run.turn]]
 

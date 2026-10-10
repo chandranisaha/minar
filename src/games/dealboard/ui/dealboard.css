@@ -136,3 +136,14 @@ html[data-lite="true"] .db-token { transition: none; }
 .db-tile svg { width: clamp(18px, 36%, 46px); height: auto; margin-bottom: 2px; }
 /* on wide screens the board is sized by the window height so the whole table fits */
 @media (min-width: 1024px) { .db-board { max-width: min(100%, calc(100vh - 150px)); justify-self: center; } }
+
+/* a company you own claims its tile: sector band, mark, name and a gain badge */
+button.db-owned { cursor: pointer; justify-content: center; gap: 2px; font: inherit; }
+button.db-owned:hover, button.db-owned:focus-visible { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--brass), 3px 3px 0 3px var(--color-ink); z-index: 2; }
+.db-tile .badge { font-family: var(--font-sign); font-size: clamp(8px, 2.2vw, 11px); line-height: 1; }
+
+/* calm entrance for sheets and dialogs (the board itself keeps the hub's stepped feel) */
+@keyframes db-in { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+.db-in { animation: db-in .18s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .db-in { animation: none; } }
+html[data-lite="true"] .db-in { animation: none; }

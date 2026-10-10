@@ -1,0 +1,130 @@
+{
+  "meet": {
+    "eyebrow": "Before the first roll",
+    "title": "Meet today's companies",
+    "intro": "Four made-up companies will pitch to you during this game. Each one tells a story. Your job is to find out which stories hold up.",
+    "headline": "What they say",
+    "tipsTitle": "How this works",
+    "tips": [
+      "A headline is chosen to impress. Cash, customers and debt show what is really going on.",
+      "At each pitch you can ask two questions. Every answer shows real numbers with a chart and what they mean.",
+      "A company you buy claims a tile on the board. Hover it to see how it is doing, click it to study or trade."
+    ],
+    "start": "Start playing"
+  },
+  "claims": {
+    "dailyBasket": "18,000 customers, and 88 in every 100 stay.",
+    "payEasy": "4,00,000 users and growing 25% every quarter!",
+    "solarGrid": "Revenue jumps 25% in the sunny season.",
+    "medLink": "Five new clinics this year. Revenue up 12% a quarter.",
+    "steelWorks": "Fifty years of steel, now just ₹40 a share.",
+    "quickRide": "Record users every month: 2,50,000 and climbing."
+  },
+  "strip": {
+    "title": "Companies in this game",
+    "unmet": "Not met yet",
+    "met": "Pitched",
+    "own": "You own",
+    "hint": "Tap a company to study it."
+  },
+  "tileOwned": "{{name}}: your property. Study it or trade.",
+  "boardHint": "Companies you buy claim a tile. Hover it for stats, click to study or trade.",
+  "briefing": {
+    "first": "How a quarter works: read the news, roll the die, and decide only when a tile asks you to. Click a company on the board to study it any time.",
+    "loan": "You owe {{x}} on your loan.",
+    "empty": "You own no companies yet. Land on an Auction tile to hear a pitch."
+  },
+  "recap": {
+    "title": "Last quarter",
+    "results": "Your companies",
+    "held": "Your holding {{delta}}",
+    "tile": {
+      "start": "You passed Start. Know where you stand: net worth {{nw}}.",
+      "own": "You landed on your property, {{name}}. Nothing to decide: see how it is doing.",
+      "empty": "An empty Auction: nobody new was pitching.",
+      "invested": "You invested {{amt}} in {{name}}. It claimed this tile.",
+      "passed": "You passed on {{name}}.",
+      "rentNone": "Rent Day, but you do not own anything yet.",
+      "rent": "Rent Day: each company you own paid out its profit share.",
+      "tax": "Tax: you have paid {{fees}} in fees so far. Every buy and sell costs 1%.",
+      "parking": "Free Parking: idle cash has lost {{lost}} to rising prices so far.",
+      "chest": "Community Chest: a quiet quarter for your family. A cushion of cash makes bad news easier.",
+      "loan": "At the Bank you took a ₹20,000 loan. It costs ₹600 every quarter.",
+      "clue": "At the Bank, the Banker told you: {{name}}, {{light}} is {{state}}.",
+      "skip": "You skipped the Banker."
+    },
+    "card": { "news": "News", "rumour": "Rumour", "unverified": "Unverified" }
+  },
+  "why": {
+    "title": "Why",
+    "market": { "fell": "The whole market fell {{x}}% this quarter. Even healthy companies drop when everyone sells.", "rose": "The whole market rose {{x}}%. A rising tide lifts most prices." },
+    "sector": { "up": "{{sector}} companies rallied on good news.", "down": "{{sector}} companies fell on bad news." },
+    "event": {
+      "raised": "It raised money from new investors because its cash was running low.",
+      "downRound": "It sold new shares at a much lower price (a down-round). That is usually a sign of trouble, and it shrinks every owner's slice.",
+      "failed": "It ran out of cash and shut down. Its shares are now worth nothing.",
+      "restated": "It cut its user numbers: the headline users were not real customers.",
+      "layoffNews": "It laid off staff, an early sign that business is slowing."
+    },
+    "profitUp": "Profit rose from ₹{{a}} lakh to ₹{{b}} lakh.",
+    "profitDown": "Profit fell from ₹{{a}} lakh to ₹{{b}} lakh.",
+    "lossGrew": "The loss grew from ₹{{a}} lakh to ₹{{b}} lakh.",
+    "lossShrank": "The loss shrank from ₹{{a}} lakh to ₹{{b}} lakh.",
+    "excitement": "The price rose even though the numbers got worse. That is excitement, not earnings, and excitement fades.",
+    "customersLeaving": "More customers left ({{b}}) than joined ({{a}}).",
+    "runwayShort": "At this pace its cash lasts only about {{n}} more months.",
+    "ceoSold": "The CEO sold shares this quarter.",
+    "steady": "Nothing big changed. Small price moves are normal noise."
+  },
+  "stats": {
+    "tags": { "L": "Early warning", "G": "Looks back", "V": "Easy to inflate" },
+    "tagLegend": "Early warning numbers move before the results do. Looks-back numbers report what already happened. Easy-to-inflate numbers look good and tell you little.",
+    "groups": { "price": "Price", "money": "Money", "customers": "Customers", "people": "People" },
+    "locked": "Not asked yet. Ask the founder at a pitch to see this.",
+    "noProfit": "no profit yet",
+    "profitable": "Profitable",
+    "lakh": "₹{{v}} lakh",
+    "lakhQ": "₹{{v}} lakh a quarter",
+    "months": "{{n}} months",
+    "years": "{{n}} years",
+    "price": { "name": "Share price", "explain": "What one share costs now. Prices move for market reasons as well as company reasons." },
+    "valuation": { "name": "Years of profit in the price", "explain": "How many years of today's profit the whole price equals. Low can mean a bargain or a shrinking business." },
+    "revenue": { "name": "Revenue", "explain": "Money the company takes in. It shows speed, not whether the company can survive." },
+    "profit": { "name": "Profit or loss", "explain": "What is left after every cost. Above the line is profit, below it is a loss." },
+    "runway": { "name": "Cash runway", "explain": "How many months the company can pay its bills before the cash runs out." },
+    "debt": { "name": "Debt", "explain": "What it owes. Interest cover (profit divided by interest) of 3 or more is comfortable; near 1 is dangerous.", "cover": "{{debt}}, interest cover {{x}} times" },
+    "customers": { "name": "Paying customers", "explain": "Paying customers against everyone who signed up. A big gap means the headline number is inflated.", "value": "{{paying}} pay out of {{users}} signed up ({{pct}}%)" },
+    "retention": { "name": "Customers who stay", "explain": "Out of 100 customers, how many are still there next quarter. High means growth is cheaper and steadier." },
+    "net": { "name": "Net new customers", "explain": "New customers minus lost customers. Growth is both." },
+    "people": { "name": "Employees", "explain": "Headcount. Layoffs are an early warning, long before profit drops.", "value": "{{n}} staff", "layoffs": "{{n}} staff, {{l}} laid off" },
+    "ceo": { "name": "CEO share trades", "explain": "Did the CEO sell or buy shares? Insiders know the company best.", "none": "No trades", "sold": "Sold shares {{n}} of the last 3 quarters", "bought": "Bought shares" }
+  },
+  "dossier": {
+    "meet": "Meet the company",
+    "unmet": "You have not met this company yet. It will pitch when you land on a free Auction tile.",
+    "passed": "You passed on this company. You can only see the numbers you asked for.",
+    "own": "You own {{v}}",
+    "news": "In the news",
+    "noNews": "No news about this company yet.",
+    "close": "Close",
+    "claims": "What they say",
+    "learned": "What the numbers say",
+    "askHint": "Ask a question at a pitch to unlock these numbers.",
+    "legend": "How to read the tags"
+  },
+  "hover": {
+    "click": "Click to study or trade",
+    "tap": "Tap to study or trade"
+  },
+  "pitch2": {
+    "dodged": "They dodged the question. A founder who will not answer with a number is telling you something.",
+    "answer": "{{name}} says:",
+    "ask": "Ask the founder. Choose wisely: you get two questions.",
+    "revealTitle": "What the numbers show",
+    "meaning": "What this tells you",
+    "claim": "What they say"
+  },
+  "land": {
+    "waiting": "Landing on {{tile}}..."
+  }
+}
