@@ -477,7 +477,7 @@ export function IslandMap() {
         </div>
       </div>
 
-      {touch && <Joystick />}
+      <Joystick />
       {spot && (
         <div className="fixed inset-x-0 z-50 flex justify-center px-3" style={{ top: 64 }}>
           <div className="w-full max-w-[420px]"><MomentsSheet focusId={spot} onClose={() => setSpot(null)} /></div>

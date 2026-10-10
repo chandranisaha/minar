@@ -11,7 +11,7 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   const page = await ctx.newPage()
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()) })
-  await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' })
+  await page.goto('http://localhost:5173/?dev=1', { waitUntil: 'networkidle' })
   await page.waitForTimeout(600)
   page.url().endsWith('/story') ? ok(`${tag}: first visit -> /story`) : fail(`${tag}: no story redirect`)
   await page.getByRole('button', { name: /^Start/ }).click()
@@ -19,6 +19,7 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   await page.getByText('College student').first().click()
   await page.getByRole('button', { name: /^Next/ }).click()
   await page.getByRole('button', { name: /^Next/ }).click()
+  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: /^Next/ }).click() // places, flags, stay happy
   await page.getByRole('button', { name: /Let's go/ }).click()
   await page.waitForTimeout(1200)
   page.url().endsWith('/') ? ok(`${tag}: story end -> island`) : fail(`${tag}: story did not finish`)
@@ -44,7 +45,7 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   await page.evaluate(() => document.querySelector("button[aria-label^='Understand']").click())
   await page.waitForTimeout(6500)
   ;(await page.getByRole('dialog').count()) ? ok(`${tag}: token walked, card opened`) : fail(`${tag}: no card`)
-  await page.getByRole('button', { name: /^Enter/ }).click()
+  await page.getByRole('button', { name: /^(Enter|Play|Continue|Replay)/ }).click()
   await page.waitForTimeout(800)
   page.url().includes('/play/invest') ? ok(`${tag}: Enter -> pillar screen`) : fail(`${tag}: enter failed`)
   // the pillar screen is the game host: entry panel -> placeholder game -> result -> back to the island
