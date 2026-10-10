@@ -1,5 +1,5 @@
 import { useEffect, useId, useState, type ReactNode } from 'react'
-import { Toon, type Mood, type ToonLook } from '../../../art/Toon'
+import { Toon, type Mood, type ToonLook } from '../../shared/Toon'
 import { JARS, type JarId, type Jars } from '../engine/types'
 import { useFestival } from '../state/store'
 import { JAR_COLOR } from './looks'

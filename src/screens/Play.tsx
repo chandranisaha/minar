@@ -11,7 +11,7 @@ const FestivalCountdown = lazy(() => import('../games/festival/FestivalCountdown
 
 /** Pillar 1. `?demo` starts Demo mode (seed DEMO); `?cohort=CODE` tags the result for the NGO view. */
 function PlanGame() {
-  const iris = useIris()
+  const nav = useNavigate()
   const [params] = useSearchParams()
   const complete = useGame((s) => s.completePillar)
   return (
@@ -23,7 +23,7 @@ function PlanGame() {
           saveResult(r)
           if (r.minaretLit) complete('plan')
         }}
-        onExit={() => iris.go('/')}
+        onExit={() => nav('/')}
       />
     </Suspense>
   )

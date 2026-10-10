@@ -1,4 +1,4 @@
-import { LOOKS, type ToonLook } from '../../../art/Toon'
+import { LOOKS, type ToonLook } from '../../shared/Toon'
 import type { FriendId, JarId, ShopId } from '../engine/types'
 
 export const AMMI: ToonLook = { ...LOOKS.nani, hair: '#2B1A17', top: '#2F6F73', scarf: '#E5457A', glasses: 'none' }

@@ -1,4 +1,4 @@
-import { Toon } from '../../../art/Toon'
+import { Toon } from '../../shared/Toon'
 import { useLite } from '../../../store/game'
 import type { Scene } from '../engine/scene'
 import type { FestivalId } from '../engine/types'
