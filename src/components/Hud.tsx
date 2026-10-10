@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LANGS, inr, type Lang } from '../content/data'
 import { useGame, useLite } from '../store/game'
+import { useHappyView } from '../features/happy/hooks'
+import { FaceGlyph } from '../ui/wire/icons'
+import { MomentsSheet } from '../ui/wire/MomentsSheet'
 
 export function Coin({ size = 24 }: { size?: number }) {
   return (
@@ -113,10 +116,33 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
   )
 }
 
+/** Happy Index chip (face + number, never colour alone); opens the life-moments sheet. */
+export function HappyChip() {
+  const { t } = useTranslation()
+  const view = useHappyView()
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" className="ink-btn cream flex h-11 items-center gap-1 px-2" aria-label={`${t('happy.title')}: ${view.valueRounded}`} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <FaceGlyph band={view.band} size={24} />
+        <span className="text-[13px] font-bold tabular-nums">{view.valueRounded}</span>
+      </button>
+      {open && (
+        <div className="fixed inset-x-0 z-50 flex justify-center px-3" style={{ top: 64 }}>
+          <div className="w-full max-w-[420px]"><MomentsSheet onClose={() => setOpen(false)} /></div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function TopHud({ replay = true }: { replay?: boolean }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-2 p-2.5" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
-      <GoalBar className="pointer-events-auto" />
+      <div className="pointer-events-auto flex items-center gap-1.5">
+        <GoalBar />
+        <HappyChip />
+      </div>
       <div className="pointer-events-auto flex items-center gap-2">
         <PersonaChip />
         <GearMenu replay={replay} />

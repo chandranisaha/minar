@@ -13,6 +13,11 @@ const ALL_TIPS: CoachTip[] = [
   { id: 'hub', titleKey: 'coach.hub.title', bodyKey: 'coach.hub.body' },
 ]
 
+/** the next tip to show: one at a time, in order, only the first-time ones not yet seen; none once the player has dismissed all */
+export function pickCoachTip(seen: Record<string, boolean>, tips: CoachTip[] = ALL_TIPS): CoachTip | null {
+  return tips.find((tip) => !seen[tip.id]) ?? null
+}
+
 export function useCoachTips() {
   const seen = useGame((s) => s.coachTipsSeen)
   const markCoachTipSeen = useGame((s) => s.markCoachTipSeen)

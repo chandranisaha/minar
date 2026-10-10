@@ -143,3 +143,10 @@ Summary, settings and dashboard are added by later prompts and will append their
 `onboarding.*` (welcome, problem, persona, festival, avatar, skills, win, happy, controls, skip, next, back).
 `hub.*` (title, lookAfterYourself, teaches, time, minutes, bestQuality, cta.{start, continue, replay, brighten, back}, plan.*, save.*, invest.*, safe.*).
 `coach.*` (header, dismissAll, goal.*, happy.*, progress.*, hub.*).
+
+## Prompt B2 additions
+- Story is 7 beats (cover not counted): island, persona + festival chips, flowers, letter, four places, flags, stay happy. Replaying the story keeps the chosen person (persona buttons disabled once `storySeen`).
+- HUD: Happy chip (face + number) beside the goal pill; tapping opens the life-moments sheet.
+- Island card shows "About N min · state" and best result; button label comes from `hub.cta.*` (start / continue / replay / brighten).
+- Flags: bright = gold glow, dim / flicker = muted, locked gate = grey (CSS filters only).
+- Two life-moment spots (`spots` in island.json: chai, restAtHome, approximate positions) open the moments sheet; a one-time coach card shows on the island (`pickCoachTip`).

@@ -6,6 +6,8 @@ export interface IslandNode { id: NodeId; kind: 'start' | 'hub' | 'pillar' | 'go
 export interface IslandPath { id: string; from: string; to: string; pts: number[][] }
 
 export const WORLD = raw.world
+/** life-moment spots on the island (percent of the world); tapping one opens that moment */
+export const SPOTS = raw.spots as { id: string; x: number; y: number }[]
 export const NODES = raw.nodes as IslandNode[]
 export const nodeById = (id: NodeId) => NODES.find((n) => n.id === id)!
 const WP: { id: string; x: number; y: number }[] = [...raw.nodes.map((n) => ({ id: n.id, x: n.x, y: n.y })), ...raw.waypoints]

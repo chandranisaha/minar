@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { PillarId } from '../content/data'
 import { useGame } from '../store/game'
+import { buildHubView } from '../features/hub/view'
+import { MomentsSheet } from '../ui/wire/MomentsSheet'
 import { ArtSlot, useManifest } from '../art/ArtSlot'
 import raw from '../content/island.json'
 import { Gate, IslandArt, Kiosk } from './IslandArt'
 import { Joystick } from './Joystick'
 import { joy, useTouchUi } from './input'
-import { NODES, WORLD, nodeById, px, type IslandNode, type NodeId } from './data'
+import { NODES, SPOTS, WORLD, nodeById, px, type IslandNode, type NodeId } from './data'
 import { canStand, grid, COLS, ROWS, T, pathTo, setGateOpen, gateEntry } from './walk'
 
 type Dir = 'down' | 'up' | 'left' | 'right'
@@ -46,6 +48,16 @@ const FLAG_SIDE: Record<string, number> = { plan: -1, invest: -1, save: 1, safe:
 
 let lastPos: number[] | null = null // survives entering a pillar and coming back
 
+/** flag look per state: gold glow when bright, muted when dim or flickering, grey while the gate is locked */
+function flagFilter(state?: string): string {
+  const base = 'drop-shadow(0 0 2px #fff) drop-shadow(0 4px 3px rgba(58,42,36,.4))'
+  if (state === 'bright') return `${base} drop-shadow(0 0 8px #F2B84B)`
+  if (state === 'dim') return `${base} saturate(.7) brightness(.92)`
+  if (state === 'flicker') return `${base} saturate(.45) brightness(.8)`
+  if (state === 'locked') return `${base} grayscale(.8)`
+  return base
+}
+
 export function IslandMap() {
   const { t } = useTranslation()
   const nav = useNavigate()
@@ -72,6 +84,9 @@ export function IslandMap() {
   const [near, setNear] = useState<NodeId | null>(null)
   const [hover, setHover] = useState<NodeId | null>(null)
   const [card, setCard] = useState<NodeId | null>(null)
+  const [spot, setSpot] = useState<string | null>(null)
+  const pillarsState = useGame((s) => s.pillars)
+  const hub = useMemo(() => buildHubView(useGame.getState()), [pillarsState])
   const [firstTime, setFirstTime] = useState(true)
   const [vpTick, setVpTick] = useState(0)
 
@@ -399,6 +414,9 @@ export function IslandMap() {
         })()}
 
         {/* places: marker flag + hit area. Positions come from island.json; swapping art never breaks them. */}
+        {SPOTS.map((sp) => { const [x, y] = px([sp.x, sp.y]); return (
+          <button key={sp.id} type="button" aria-label={`${t('island.spot')}: ${t(`moments.${sp.id}.name`)}`} onClick={() => setSpot(sp.id)} className="ink-chip grid place-items-center" style={{ position: 'absolute', left: x, top: y, width: 64, height: 64, transform: `translate(-50%,-50%) scale(${inv})`, zIndex: 3600, cursor: 'pointer', fontSize: 28 }}>{sp.id === 'chai' ? '☕' : '🛏'}</button>
+        ) })}
         {NODES.map((n) => {
           const [x, y] = px([n.x, n.y])
           const isPillar = n.kind === 'pillar'
@@ -407,7 +425,7 @@ export function IslandMap() {
           return (
             <div key={n.id}>
               {(isPillar || n.kind === 'goal') && (
-                <div style={{ position: 'absolute', left: x + (FLAG_SIDE[n.id] ?? 1) * 215 - 82, top: y + 60 - 250, width: 165, height: 250, pointerEvents: 'none', zIndex: 3500, filter: 'drop-shadow(0 0 2px #fff) drop-shadow(0 4px 3px rgba(58,42,36,.4))' }}>
+                <div style={{ position: 'absolute', left: x + (FLAG_SIDE[n.id] ?? 1) * 215 - 82, top: y + 60 - 250, width: 165, height: 250, pointerEvents: 'none', zIndex: 3500, filter: flagFilter(n.kind === 'goal' ? (allDone ? 'bright' : 'locked') : hub.pillars.find((p) => p.id === n.id)?.state) }}>
                   {n.id === 'plan' && firstTime && completed.length === 0 && <div className="idle ring" style={{ position: 'absolute', left: -14, right: -14, bottom: -8, height: 40, borderRadius: '50%', border: '3px solid #D9573F' }} />}
                   <img src={`/art/${n.kind === 'goal' ? (allDone ? 'flag-done' : 'flag-locked') : isDone ? 'flag-done' : 'flag-open'}.webp`} alt="" draggable={false} className="idle flagwave" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transformOrigin: '50% 100%' }} />
                 </div>
@@ -460,6 +478,11 @@ export function IslandMap() {
       </div>
 
       {touch && <Joystick />}
+      {spot && (
+        <div className="fixed inset-x-0 z-50 flex justify-center px-3" style={{ top: 64 }}>
+          <div className="w-full max-w-[420px]"><MomentsSheet focusId={spot} onClose={() => setSpot(null)} /></div>
+        </div>
+      )}
       {!touch && (
         <div className="absolute right-2 z-30 flex flex-col gap-1.5" style={{ bottom: 12 }}>
           <button type="button" className="ink-chip grid h-10 w-10 place-items-center text-[20px]" aria-label="+" onClick={() => zoomBy(1.25)}>+</button>
@@ -481,10 +504,11 @@ export function IslandMap() {
                 <div className="text-[12px] font-bold uppercase tracking-[.2em] text-coral">{t('play.chapter', { n: nodeById(card).n })}</div>
                 <div className="font-display lang-fit text-[22px] leading-tight">{t(nodeById(card).labelKey)}</div>
                 <p className="m-0 mt-1 text-[14px] leading-snug">{t(nodeById(card).hookKey!)}</p>
+                {(() => { const h = hub.pillars.find((p) => p.id === card); return h && <p className="m-0 mt-1 text-[13px] font-semibold opacity-80">{t('island.cardMeta', { minutes: h.estimatedMinutes, state: t(`state.${h.state}`) })}{h.attempts > 0 ? ` · ${t('island.cardBest', { percent: Math.round(h.bestQuality * 100) })}` : ''}</p> })()}
               </>
             )}
             <div className="mt-3 flex gap-2">
-              {card !== 'gate' && <button type="button" className="ink-btn" autoFocus onClick={() => nav(`/play/${card}`)}>{t('hud.enter')} ▸</button>}
+              {card !== 'gate' && <button type="button" className="ink-btn" autoFocus onClick={() => nav(`/play/${card}`)}>{t(hub.pillars.find((p) => p.id === card)?.ctaKey ?? 'hud.enter')} ▸</button>}
               {card === 'gate' && allDone && <button type="button" className="ink-btn" autoFocus onClick={() => { setCelebrated(true); nav('/dashboard') }}>{t('celebrate.enter')}</button>}
               <button type="button" className="ink-btn cream" onClick={() => { S.current.dismissed = S.current.near; setCard(null) }}>{t('buttons.back')}</button>
             </div>

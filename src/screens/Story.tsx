@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { animate, motion, useMotionValue } from 'framer-motion'
-import { PERSONAS, inr, type PersonaId } from '../content/data'
+import { FESTIVALS, PERSONAS, PILLARS, inr, type PersonaId } from '../content/data'
+import { HappyMeter } from '../ui/wire/HappyMeter'
 import { useGame } from '../store/game'
 import { GearMenu, GoalBar } from '../components/Hud'
 import { TitleCard } from '../components/TitleCard'
@@ -11,7 +12,7 @@ import { IslandArt } from '../island/IslandArt'
 import { WORLD, nodeById, px } from '../island/data'
 import { stepped } from '../lib/stepped'
 
-const LAST = 3
+const LAST = 6
 const bgSky = 'linear-gradient(#92C9D3, #F8EBCB 70%)'
 
 function useSize(ref: React.RefObject<HTMLElement | null>) {
@@ -67,6 +68,9 @@ function B2Persona() {
   const gender = useGame((s) => s.gender)
   const setGender = useGame((s) => s.setGender)
   const ids = Object.keys(PERSONAS) as PersonaId[]
+  const seen = useGame((s) => s.storySeen) // replaying must not reset progress: the person is fixed once chosen
+  const festival = useGame((s) => s.festival)
+  const setFestival = useGame((s) => s.setFestival)
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
       <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
@@ -87,7 +91,8 @@ function B2Persona() {
                 type="button"
                 role="radio"
                 aria-checked={sel}
-                onClick={() => setPersona(id)}
+                disabled={seen && !!persona}
+                onClick={() => { if (!seen) setPersona(id) }}
                 className="paper flex w-full items-center gap-3 p-2.5 text-left"
                 style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FBF3DF' : '#FBF0D2', borderColor: sel ? '#D9573F' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s' }}
               >
@@ -101,6 +106,14 @@ function B2Persona() {
               </button>
             )
           })}
+        </div>
+        <div className="paper p-2.5" role="radiogroup" aria-label={t('story.b2.festival')}>
+          <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[.16em] opacity-70">{t('story.b2.festival')}</div>
+          <div className="flex flex-wrap gap-1.5">
+            {FESTIVALS.map((f) => (
+              <button key={f} type="button" role="radio" aria-checked={festival === f} onClick={() => setFestival(f)} className="h-10 rounded-full px-3 text-[14px] font-bold" style={{ background: festival === f ? '#3A2A24' : 'transparent', color: festival === f ? '#FBF0D2' : '#3A2A24', border: '1.5px solid #3A2A24', cursor: 'pointer' }}>{t(`festivals.${f}`)}</button>
+            ))}
+          </div>
         </div>
         <p className="m-0 text-center text-[11px] font-semibold opacity-70">{t('hud.illustrative')}</p>
       </div>
@@ -183,6 +196,56 @@ function B4Letter() {
   )
 }
 
+/** Beat 5: the four places and the skill each teaches. */
+function B5Places() {
+  const { t } = useTranslation()
+  return (
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
+      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
+        <TitleCard title={t('story.places.title')}>{t('story.places.caption')}</TitleCard>
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+          {PILLARS.map((p) => (
+            <li key={p.id} className="paper flex items-center gap-3 p-2.5">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border-[1.5px] border-ink text-[14px] font-bold">{p.n}</span>
+              <div className="min-w-0"><div className="font-display text-[17px] leading-tight">{t(`pillars.${p.id}.name`)}</div><div className="text-[13px] leading-snug opacity-85">{t(`pillars.${p.id}.hook`)}</div></div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+/** Beat 6: finish a place, its flag turns gold, the goal bar fills. */
+function B6Win() {
+  const { t } = useTranslation()
+  return (
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
+      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-24">
+        <div className="paper rise flex items-end justify-center gap-6 p-3" aria-hidden>
+          <img src="/art/flag-open.webp" alt="" draggable={false} className="h-24 object-contain" />
+          <span className="pb-8 text-[26px]">→</span>
+          <img src="/art/flag-done.webp" alt="" draggable={false} className="h-24 object-contain" />
+        </div>
+        <TitleCard title={t('story.win.title')}>{t('story.win.caption')}</TitleCard>
+      </div>
+    </div>
+  )
+}
+
+/** Beat 7: stay happy, and how to move on the island. */
+function B7Happy() {
+  const { t } = useTranslation()
+  return (
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
+      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-24">
+        <div className="paper rise p-3"><HappyMeter /></div>
+        <TitleCard title={t('story.happy.title')}>{t('story.happy.caption')}</TitleCard>
+      </div>
+    </div>
+  )
+}
+
 function Cover({ onStart, w, h }: { onStart: () => void; w: number; h: number }) {
   const { t } = useTranslation()
   return (
@@ -242,6 +305,9 @@ export default function Story() {
         {step === 1 && <B2Persona />}
         {step === 2 && <B3Flowers />}
         {step === 3 && <B4Letter />}
+        {step === 4 && <B5Places />}
+        {step === 5 && <B6Win />}
+        {step === 6 && <B7Happy />}
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-2 p-2.5" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
@@ -256,7 +322,7 @@ export default function Story() {
         <div className="absolute inset-x-0 bottom-0 z-40 flex items-center justify-between gap-2 p-3" style={{ paddingBottom: 'max(14px, env(safe-area-inset-bottom))' }}>
           <button type="button" className="ink-btn cream" onClick={back} disabled={step === 0} aria-label={t('buttons.back')}>◂</button>
           <div className="flex items-center gap-2" role="img" aria-label={t('story.step', { n: step + 1 })}>
-            {[0, 1, 2, 3].map((i) => <span key={i} style={{ width: i === step ? 22 : 8, height: 8, borderRadius: 4, background: i <= step ? '#3A2A24' : 'rgba(58,42,36,.25)', transition: 'width .25s' }} />)}
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ width: i === step ? 22 : 8, height: 8, borderRadius: 4, background: i <= step ? '#3A2A24' : 'rgba(58,42,36,.25)', transition: 'width .25s' }} />)}
           </div>
           <button type="button" className="ink-btn" onClick={next} disabled={!canNext}>{step === LAST ? t('buttons.go') : t('buttons.next')} ▸</button>
         </div>
