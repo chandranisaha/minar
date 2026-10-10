@@ -185,8 +185,8 @@ export function Overworld() {
       else S.intro = 0
       const fx = S.intro > 0 ? W / 2 : S.x
       const fy = S.intro > 0 ? 500 : S.y
-      const M = 300
-      const tx = vwW >= W + 2 * M ? (W - vwW) / 2 : Math.max(-M, Math.min(W - vwW + M, fx - vwW / 2))
+      // narrow screens clamp to the world; wide screens centre it (margins are filled by extended backdrop art)
+      const tx = vwW >= W ? (W - vwW) / 2 : Math.max(0, Math.min(W - vwW, fx - vwW / 2))
       const ty = vhW >= H ? (H - vhW) / 2 : Math.max(0, Math.min(H - vhW, fy - vhW * (S.intro > 0 ? 0.5 : 0.58)))
       const lerp = Math.min(1, dt * (lite ? 9 : 5.5))
       S.camX += (tx - S.camX) * lerp

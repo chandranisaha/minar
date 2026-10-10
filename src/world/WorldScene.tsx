@@ -1,4 +1,5 @@
 import { memo, type CSSProperties, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { PILLARS, type PillarId } from '../content/data'
 import { CharminarSvg } from '../art/Charminar'
 import { SHOPS } from '../art/Shops'
@@ -24,12 +25,14 @@ export interface SceneProps {
 /** where the four finial lamps sit inside the painted Charminar (fractions of the trimmed image), by pillar order */
 const LAMP_FRAC = [{ x: 0.223, y: 0.019 }, { x: 0.8, y: 0.019 }, { x: 0.31, y: 0.147 }, { x: 0.708, y: 0.147 }]
 /** shopkeeper placement over painted stalls: centre x and counter-top y, as fractions of the stall image */
-const KEEPER: Record<PillarId, { cx: number; counter: number; mood: 'happy' | 'worried' | 'sly' | 'cycle' }> = {
-  plan: { cx: 0.47, counter: 0.7, mood: 'happy' },
-  save: { cx: 0.5, counter: 0.7, mood: 'cycle' },
-  invest: { cx: 0.56, counter: 0.7, mood: 'happy' },
-  safe: { cx: 0.5, counter: 0.7, mood: 'sly' },
+const KEEPER: Record<PillarId, { cx: number; counter: number; mood: 'happy' | 'worried' | 'sly' | 'cycle'; s: number }> = {
+  plan: { cx: 0.47, counter: 0.7, mood: 'happy', s: 1 },
+  save: { cx: 0.5, counter: 0.7, mood: 'cycle', s: 1 },
+  invest: { cx: 0.56, counter: 0.7, mood: 'happy', s: 1 },
+  safe: { cx: 0.43, counter: 0.57, mood: 'sly', s: 0.72 },
 }
+/** blank starburst sign on the painted kiosk: we letter OFFER! on it so it stays translatable */
+const OFFER_POS = { x: 0.664, y: 0.1 }
 const KEEPER_LOOK: Record<PillarId, string> = { plan: 'bangle', save: 'chai', invest: 'pearl', safe: 'upi' }
 
 function Lamp({ lit, x, y }: { lit: boolean; x: number; y: number }) {
@@ -64,9 +67,13 @@ const PIGEONS = [
 
 export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlow, children, showOverhead = true }: SceneProps) {
   const art = useManifest()
+  const { t } = useTranslation()
   return (
     <div style={{ position: 'relative', width: W, height: H }}>
-      <WorldBackdrop />
+      <WorldBackdrop skyline={!!art['bg-skyline']} />
+      {art['deco-rangoli'] && (
+        <img src="/art/deco-rangoli.webp" alt="" draggable={false} style={{ position: 'absolute', left: 190, top: 770, width: 620, height: 374, zIndex: 3, pointerEvents: 'none', WebkitMaskImage: 'radial-gradient(ellipse at center, #000 52%, transparent 71%)', maskImage: 'radial-gradient(ellipse at center, #000 52%, transparent 71%)', opacity: 0.95 }} />
+      )}
 
       {/* door rings on the ground */}
       {PILLARS.map((p) => {
@@ -123,7 +130,7 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
         const sw = 270
         const sh = Math.round((sw * a.h) / a.w)
         const k = KEEPER[p.id]
-        const tw = 92, th = 138, visible = 104
+        const tw = Math.round(92 * k.s), th = Math.round(138 * k.s), visible = Math.round(104 * k.s)
         return (
           <Obj key={p.id} x={L.x + L.w / 2 - sw / 2} y={L.base + 8 - sh} w={sw} h={sh} z={L.base}>
             <img src={`/art/shop-${p.id}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
@@ -132,6 +139,11 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
                 <Toon look={LOOKS[KEEPER_LOOK[p.id]]} mood={k.mood} excited={react[p.id]} wave={p.id === 'plan' && !react[p.id]} shifty={p.id === 'safe'} width={tw} height={th} />
               </div>
             </div>
+            {p.id === 'safe' && (
+              <div className="font-sign anim-blink" style={{ position: 'absolute', left: OFFER_POS.x * sw, top: OFFER_POS.y * sh, transform: 'translate(-50%,-50%) rotate(-5deg)', fontSize: 17, color: '#D8503A', textShadow: '1px 1px 0 #2B1A17, -1px -1px 0 #2B1A17, 1px -1px 0 #2B1A17, -1px 1px 0 #2B1A17', whiteSpace: 'nowrap' }}>
+                {t('world.offer')}
+              </div>
+            )}
             {done[p.id] && <Seal />}
           </Obj>
         )

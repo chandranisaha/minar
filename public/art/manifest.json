@@ -13,5 +13,20 @@
   "w": 640,
   "h": 586,
   "src": "Vibrant Indian Bangle Market Stall.png"
+ },
+ "shop-safe": {
+  "w": 640,
+  "h": 574,
+  "src": "Colourful Indian Phone Recharge Kiosk.png"
+ },
+ "deco-rangoli": {
+  "w": 900,
+  "h": 543,
+  "src": "Hand-Painted Rangoli Plaza Tile.png"
+ },
+ "bg-skyline": {
+  "w": 1600,
+  "h": 515,
+  "src": "Watercolour Sunset Cityscape Cutout.png"
  }
 }

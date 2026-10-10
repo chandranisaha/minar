@@ -107,7 +107,7 @@ function WallSegment({ x, y, w = 92, h = 250, wall, shade, shutter, flip }: { x:
 
 /* ------------------------------------------------------------------ the static world backdrop */
 
-export const WorldBackdrop = memo(function WorldBackdrop() {
+export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false }: { skyline?: boolean }) {
   const id = useId().replace(/:/g, '')
   const lite = useLite()
   return (
@@ -157,17 +157,23 @@ export const WorldBackdrop = memo(function WorldBackdrop() {
       <rect x="-420" width="1840" height="600" fill={`url(#${id}-sky)`} />
       <circle cx="500" cy="360" r="260" fill={`url(#${id}-sun)`} />
       <circle cx="500" cy="360" r="86" fill="#FFF1B0" opacity=".85" />
-      <Cloud x={70} y={90} s={1.2} />
-      <Cloud x={690} y={60} s={1.5} />
-      <Cloud x={380} y={150} s={0.9} />
-      <Cloud x={850} y={210} s={0.8} />
+      {skyline ? (
+        <image href="/art/bg-skyline.webp" x="-200" y="150" width="1400" height="451" preserveAspectRatio="none" />
+      ) : (
+        <>
+          <Cloud x={70} y={90} s={1.2} />
+          <Cloud x={690} y={60} s={1.5} />
+          <Cloud x={380} y={150} s={0.9} />
+          <Cloud x={850} y={210} s={0.8} />
+        </>
+      )}
 
-      {/* far skyline: domes, minarets, hills */}
-      <g opacity=".85">
+      {/* far skyline: domes, minarets, hills (procedural fallback) */}
+      <g opacity=".85" display={skyline ? 'none' : undefined}>
         <path d="M0 440 Q90 400 180 430 Q260 410 330 440 V560 H0Z" fill="#9CC9C6" />
         <path d="M660 440 Q760 395 850 430 Q930 410 1000 436 V560 H660Z" fill="#9CC9C6" />
       </g>
-      <g fill="#7FB0AE" stroke={INK} strokeWidth="2" strokeOpacity=".5">
+      <g fill="#7FB0AE" stroke={INK} strokeWidth="2" strokeOpacity=".5" display={skyline ? 'none' : undefined}>
         <path d="M60 520 V450 Q60 420 90 420 Q120 420 120 450 V520Z" />
         <rect x="84" y="380" width="12" height="44" />
         <circle cx="90" cy="374" r="7" />

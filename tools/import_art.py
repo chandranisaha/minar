@@ -16,6 +16,8 @@ RULES = [  # (keywords any-of, slot, max width)
     (['chai', 'irani', 'cafe', 'café'], 'shop-save', 640),
     (['pearl'], 'shop-invest', 640),
     (['recharge', 'kiosk', 'upi', 'phone shop', 'mobile'], 'shop-safe', 640),
+    (['rangoli', 'plaza tile'], 'deco-rangoli', 900),
+    (['cityscape', 'skyline', 'sunset'], 'bg-skyline', 1600),
     (['flower', 'jasmine'], 'story-flowers', 1100),
     (['receipt', 'fee'], 'receipt', 800),
     (['nani', 'grandmother', 'grandma'], 'nani', 600),
