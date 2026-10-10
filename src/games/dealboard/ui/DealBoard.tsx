@@ -33,6 +33,8 @@ export interface DealBoardProps {
 
 /** Deal Board: learn to invest by deciding, one company a quarter, with feedback on every decision. */
 export default function DealBoard({ seed, onExit, onComplete }: DealBoardProps) {
+  // the game always opens on the start screen: any earlier run is dropped before the first render
+  useState(() => useDealBoard.getState().quit())
   const run = useDealBoard((s) => s.run)
   const start = useDealBoard((s) => s.start)
   const { t } = useTranslation('dealboard')
