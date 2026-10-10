@@ -122,6 +122,7 @@ export function Report({ cohortCode, onComplete, onExit }: { cohortCode: string;
       <Say who="shobha"><span className="text-[14px]">{t('report.lessons')}</span></Say>
       {r.lessons.map((l, i) => <LessonCard key={l.id} line={l} tilt={i % 2 ? 0.6 : -0.6} />)}
 
+      <p className="m-0 text-center text-[12px] font-bold opacity-80">{t('report.code', { code })}</p>
       <div className="flex flex-wrap justify-center gap-2">
         <button type="button" className="ink-btn cream" onClick={restart}>↺ {t('report.replay')}</button>
         <button type="button" className="ink-btn pink" onClick={onExit}>{t('report.done')} ▶</button>

@@ -21,11 +21,14 @@
   "start": {
     "eyebrow": "Plan & Budget",
     "tagline": "Be the treasurer. ₹50,000 on paper. What will really arrive?",
-    "code": "Your code",
-    "codeNote": "No name needed. The code just saves your game on this phone.",
     "go": "Start",
     "resume": "Continue my game",
-    "again": "Start a new game"
+    "again": "Start a new game",
+    "how": {
+      "1": "You are the treasurer of a colony festival with ₹50,000 to plan.",
+      "2": "Pick what to buy, and when to pay for it.",
+      "3": "Then see if the money lasts, in ten possible festivals."
+    }
   },
   "brief": {
     "l1": "Welcome, treasurer! The colony festival needs ₹50,000.",
@@ -696,6 +699,7 @@
     "notLit": "Not lit yet. Play again with a new plan.",
     "replay": "Play again",
     "done": "Back to Charminar",
-    "cardTitle": "Lesson"
+    "cardTitle": "Lesson",
+    "code": "Game code: {{code}}. It has no name in it. Tell your teacher if they ask."
   }
 }

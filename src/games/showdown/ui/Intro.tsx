@@ -8,7 +8,6 @@ import { useSd } from './useSd'
 
 export function Start() {
   const { t } = useSd()
-  const code = useShowdown((s) => s.code)
   const log = useShowdown((s) => s.log)
   const decide = useShowdown((s) => s.decide)
   const restart = useShowdown((s) => s.restart)
@@ -17,10 +16,10 @@ export function Start() {
       <TitleCard eyebrow={t('start.eyebrow')} title={t('title')}>
         <p className="m-0">{t('start.tagline')}</p>
       </TitleCard>
-      <section className="paper p-3 text-center">
-        <div className="text-[12px] font-extrabold opacity-80">{t('start.code')}</div>
-        <div className="font-display text-[34px] tracking-[.2em]" aria-label={t('start.code')}>{code}</div>
-        <p className="m-0 text-[12px] font-bold opacity-80">{t('start.codeNote')}</p>
+      <section className="paper p-3">
+        <ol className="m-0 flex list-none flex-col gap-1 p-0 text-[14px] font-bold leading-snug">
+          {[1, 2, 3].map((n) => <li key={n}><span className="font-extrabold">{n}.</span> {t(`start.how.${n}`)}</li>)}
+        </ol>
       </section>
       <div className="flex flex-wrap justify-center gap-2">
         <button type="button" className="ink-btn pink" onClick={() => decide({ k: 'seen', screen: 'start' })}>{log.length ? t('start.resume') : t('start.go')} ▶</button>
