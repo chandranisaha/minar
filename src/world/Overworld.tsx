@@ -5,6 +5,7 @@ import { PILLARS, type PillarId } from '../content/data'
 import { useGame, useLite } from '../store/game'
 import { useIris } from '../components/Iris'
 import { WorldScene } from './WorldScene'
+import { joy, useTouchUi } from './input'
 import { COLS, DOOR_RADIUS, H, ROWS, SHOP_LAYOUT, START, T, W, canStand, cellOf, grid, nearestWalkable, walkable } from './layout'
 
 type Dir = 'down' | 'up' | 'left' | 'right'
@@ -35,6 +36,7 @@ const pathTo = (sx: number, sy: number, tx: number, ty: number): { x: number; y:
 export function Overworld() {
   const { t } = useTranslation()
   const iris = useIris()
+  const touchUi = useTouchUi()
   const lite = useLite()
   const completed = useGame((s) => s.completedPillars)
   const celebrated = useGame((s) => s.celebrated)
@@ -120,12 +122,14 @@ export function Overworld() {
       if (k.has('ArrowRight') || k.has('d')) dx += 1
       if (k.has('ArrowUp') || k.has('w')) dy -= 1
       if (k.has('ArrowDown') || k.has('s')) dy += 1
+      let analog = 1
+      if (!dx && !dy && joy.active) { dx = joy.x; dy = joy.y; analog = Math.min(1, Math.hypot(dx, dy)) }
       let moving = false
       if ((dx || dy) && !S.entering) {
         S.path = []
         S.pending = null
         const len = Math.hypot(dx, dy)
-        const mx = (dx / len) * SPEED * dt, my = (dy / len) * SPEED * dt
+        const mx = (dx / len) * SPEED * analog * dt, my = (dy / len) * SPEED * analog * dt
         if (canStand(S.x + mx, S.y)) S.x += mx
         if (canStand(S.x, S.y + my)) S.y += my
         moving = true
@@ -290,7 +294,7 @@ export function Overworld() {
                   onClick={(e) => { e.stopPropagation(); goToShop(p.id) }}
                   onPointerEnter={() => setHover(p.id)}
                   onPointerLeave={() => setHover((h) => (h === p.id ? null : h))}
-                  onPointerDown={(e) => { e.stopPropagation(); setHover(p.id) }}
+                  onPointerDown={(e) => { e.stopPropagation(); setHover(p.id); if (e.pointerType === 'touch') window.setTimeout(() => setHover((h) => (h === p.id ? null : h)), 2200) }}
                   onFocus={() => setHover(p.id)}
                   onBlur={() => setHover((h) => (h === p.id ? null : h))}
                   style={{ position: 'absolute', left: L.x, top: L.y, width: L.w, height: L.h, zIndex: 3000, background: 'transparent', border: 0, borderRadius: 18, cursor: 'pointer' }}
@@ -327,7 +331,7 @@ export function Overworld() {
 
       {/* keyboard / touch "Enter" prompt when standing at a doorway */}
       {near && !pending && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-24 z-30 flex justify-center">
+        <div className="pointer-events-none absolute inset-x-0 z-30 flex justify-center" style={{ bottom: touchUi ? 188 : 96 }}>
           <button type="button" className="ink-btn pink pointer-events-auto anim-pop" onClick={() => enter(near)}>
             ▶ {t('hud.enter')}: {t(`pillars.${near}.name`)}
           </button>

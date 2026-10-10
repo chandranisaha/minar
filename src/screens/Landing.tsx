@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Overworld } from '../world/Overworld'
 import { BottomHud, TopHud } from '../components/Hud'
 import { Celebration } from '../components/Celebration'
+import { Joystick } from '../components/Joystick'
 import { useGame } from '../store/game'
 
 export default function Landing() {
@@ -31,11 +32,12 @@ export default function Landing() {
       {hint && done < 4 && (
         <div className="pointer-events-none absolute inset-x-0 z-30 flex justify-center px-3" style={{ top: 76 }}>
           <div className="ink-chip font-sign lang-fit anim-pop px-3 py-1.5 text-center text-[13px]">
-            <span className="sm:hidden">{t('hud.walkHint')}</span>
-            <span className="hidden sm:inline">{t('hud.keysHint')}</span>
+            <span className="[@media(pointer:coarse)]:inline hidden max-[699px]:inline">{t('hud.walkHint')}</span>
+            <span className="[@media(pointer:coarse)]:hidden min-[700px]:inline max-[699px]:hidden">{t('hud.keysHint')}</span>
           </div>
         </div>
       )}
+      <Joystick />
       <BottomHud />
       {done >= 4 && !celebrated && <Celebration />}
     </div>

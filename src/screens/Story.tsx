@@ -10,6 +10,7 @@ import { CharminarArt } from '../components/CharminarArt'
 import { Backdrop, Stage } from './story/Stage'
 import { B1Dawn, B2Persona, B3Flowers, B4Goal, B5Bazaar } from './story/Beats'
 import { stepped } from '../lib/stepped'
+import { useShortLandscape } from '../world/input'
 
 const LAST = 4
 
@@ -56,6 +57,7 @@ export default function Story() {
   const [ready5, setReady5] = useState(false)
   const onReady = useCallback(() => setReady5(true), [])
   const swipe = useRef<{ x: number; y: number } | null>(null)
+  const sideways = useShortLandscape()
 
   const finish = useCallback(() => {
     if (!useGame.getState().persona) setPersona('college')
@@ -134,6 +136,15 @@ export default function Story() {
           <button type="button" className="ink-btn pink" onClick={next} disabled={!canNext} style={{ opacity: canNext ? 1 : 0.45 }}>
             {step === LAST ? t('buttons.go') : t('buttons.next')} ▶
           </button>
+        </div>
+      )}
+      {sideways && (
+        <div className="absolute inset-0 z-50 grid place-items-center p-6" style={{ background: 'rgba(30,42,68,.94)' }} role="alert">
+          <div className="paper max-w-sm p-4 text-center">
+            <div className="text-[40px]" aria-hidden>⟳📱</div>
+            <p className="font-sign lang-fit m-0 text-[18px]">{t('story.rotate')}</p>
+            <button type="button" className="ink-btn mt-3" onClick={finish}>{t('buttons.skip')} »</button>
+          </div>
         </div>
       )}
       {step === 3 && <div className="sr-only" aria-live="polite">{t('story.b4.caption')}</div>}

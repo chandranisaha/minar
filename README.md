@@ -26,6 +26,8 @@ npm run preview
 Routes: `/` hub, `/story` opening story (auto on first visit, replay from the HUD), `/play/:pillar` placeholder shell
 (has a "Mark as complete" dev button), `/dashboard` stub, `/kit` art-kit review page.
 
+**Controls:** desktop = arrow keys / WASD or click-to-walk; phone/tablet = on-screen analog joystick (Among Us style) or tap-to-walk.
+
 ## Deploy
 
 Static site, no backend. `npm run build`, then upload `dist/` to Vercel / Netlify / GitHub Pages.
@@ -33,7 +35,7 @@ Add an SPA fallback so deep links work (Netlify: `/* /index.html 200` in `public
 
 ## Art pipeline (drop in painted art, no code changes)
 
-Put PNGs in `../graphics/` (or pass a folder) and run:
+Put source PNGs in `graphics/` (committed in the repo; or pass another folder) and run:
 
 ```bash
 npm run art        # python tools/import_art.py
@@ -49,6 +51,10 @@ The tool matches by **filename keyword**, trims transparent borders, converts to
 | `chai` / `irani` / `cafe` | `shop-save` | pillar 2 stall |
 | `pearl` | `shop-invest` | pillar 3 stall |
 | `recharge` / `kiosk` / `upi` | `shop-safe` | pillar 4 kiosk |
+
+| `rangoli` | `deco-rangoli` | plaza floor medallion |
+| `cityscape` / `skyline` | `bg-skyline` | watercolour skyline behind the buildings |
+| `alleyway` frames (`mediterranean`, `old-town`) | `bld-a-*`, `bld-b-*` | street-wall building clusters (split into left/right automatically) |
 
 Anything missing falls back to the procedural SVG in `src/art/` (`<ArtSlot/>` pattern), so the game always runs.
 Shopkeepers are separate animated SVG characters layered on the counters, so they can squash-and-stretch on hover.

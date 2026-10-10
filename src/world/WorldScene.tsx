@@ -60,6 +60,16 @@ function Seal() {
   )
 }
 
+/** painted street-wall clusters along both lane edges; two building styles (a, b) alternate */
+const SIDE_BUILDINGS: { art: string; side: 'left' | 'right'; base: number; h: number }[] = [
+  { art: 'bld-b-left', side: 'left', base: 760, h: 440 },
+  { art: 'bld-a-left', side: 'left', base: 1050, h: 430 },
+  { art: 'bld-b-left', side: 'left', base: 1340, h: 430 },
+  { art: 'bld-a-right', side: 'right', base: 760, h: 440 },
+  { art: 'bld-b-right', side: 'right', base: 1050, h: 430 },
+  { art: 'bld-a-right', side: 'right', base: 1340, h: 430 },
+]
+
 const PIGEONS = [
   { x: 405, y: 800, f: false, d: 0 }, { x: 470, y: 838, f: true, d: 1.1 }, { x: 600, y: 812, f: false, d: 2.2 },
   { x: 250, y: 930, f: true, d: 0.7 }, { x: 740, y: 972, f: false, d: 1.7 },
@@ -68,9 +78,20 @@ const PIGEONS = [
 export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlow, children, showOverhead = true }: SceneProps) {
   const art = useManifest()
   const { t } = useTranslation()
+  const hasBuildings = SIDE_BUILDINGS.every((b) => !!art[b.art])
   return (
     <div style={{ position: 'relative', width: W, height: H }}>
-      <WorldBackdrop skyline={!!art['bg-skyline']} />
+      <WorldBackdrop skyline={!!art['bg-skyline']} buildings={hasBuildings} />
+      {hasBuildings && SIDE_BUILDINGS.map((b, i) => {
+        const a = art[b.art]
+        const bh = b.h
+        const bw = Math.round((bh * a.w) / a.h)
+        return (
+          <Obj key={i} x={b.side === 'left' ? 82 - bw : 918} y={b.base - bh} w={bw} h={bh} z={b.base - 400}>
+            <img src={`/art/${b.art}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
+          </Obj>
+        )
+      })}
       {art['deco-rangoli'] && (
         <img src="/art/deco-rangoli.webp" alt="" draggable={false} style={{ position: 'absolute', left: 190, top: 770, width: 620, height: 374, zIndex: 3, pointerEvents: 'none', WebkitMaskImage: 'radial-gradient(ellipse at center, #000 52%, transparent 71%)', maskImage: 'radial-gradient(ellipse at center, #000 52%, transparent 71%)', opacity: 0.95 }} />
       )}
@@ -85,9 +106,9 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
               className={lit ? 'anim-pulse' : undefined}
               style={{
                 width: '100%', height: '100%', borderRadius: '50%',
-                border: `5px solid ${done[p.id] ? '#D9A520' : lit ? '#FFF3D6' : '#2B1A17'}`,
-                background: done[p.id] ? 'rgba(217,165,32,.45)' : lit ? 'rgba(255,225,120,.75)' : 'rgba(255,243,214,.28)',
-                boxShadow: lit || done[p.id] ? '0 0 26px 10px rgba(255,210,90,.75)' : 'inset 0 0 0 3px rgba(242,140,40,.55)',
+                border: `4px solid ${done[p.id] ? '#D9A520' : lit ? '#FFF3D6' : 'rgba(43,26,23,.5)'}`,
+                background: done[p.id] ? 'rgba(217,165,32,.45)' : lit ? 'rgba(255,225,120,.75)' : 'radial-gradient(ellipse, rgba(255,230,150,.5), rgba(255,243,214,.12))',
+                boxShadow: lit || done[p.id] ? '0 0 26px 10px rgba(255,210,90,.75)' : '0 0 14px 2px rgba(255,200,90,.45)',
                 opacity: lit || done[p.id] ? 1 : 0.8,
               }}
             />

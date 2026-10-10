@@ -28,5 +28,30 @@
   "w": 1600,
   "h": 515,
   "src": "Watercolour Sunset Cityscape Cutout.png"
+ },
+ "bld-a-left": {
+  "w": 526,
+  "h": 901,
+  "src": "Mediterranean Alleyway Facades with Open Centre-2.png"
+ },
+ "bld-a-right": {
+  "w": 494,
+  "h": 899,
+  "src": "Mediterranean Alleyway Facades with Open Centre-2.png"
+ },
+ "bld-b-left": {
+  "w": 536,
+  "h": 1002,
+  "src": "Sunlit Old-Town Alleyway Fa\u00e7ades-1.png"
+ },
+ "bld-b-right": {
+  "w": 553,
+  "h": 998,
+  "src": "Sunlit Old-Town Alleyway Fa\u00e7ades-1.png"
+ },
+ "deco-tree": {
+  "w": 700,
+  "h": 368,
+  "src": "Indian Street Market Props-1.png"
  }
 }

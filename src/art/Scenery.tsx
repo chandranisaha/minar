@@ -107,7 +107,7 @@ function WallSegment({ x, y, w = 92, h = 250, wall, shade, shutter, flip }: { x:
 
 /* ------------------------------------------------------------------ the static world backdrop */
 
-export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false }: { skyline?: boolean }) {
+export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buildings = false }: { skyline?: boolean; buildings?: boolean }) {
   const id = useId().replace(/:/g, '')
   const lite = useLite()
   return (
@@ -228,12 +228,16 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false }: { 
 
       {/* left & right street walls */}
       <g>
+        {!buildings && (
+          <>
         <WallSegment x={-22} y={590} wall="#F2A56B" shade="#D9743F" shutter={C.sage} />
         <WallSegment x={-22} y={840} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} h={250} />
         <WallSegment x={-22} y={1090} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} h={220} />
         <WallSegment x={930} y={590} wall="#F0907A" shade="#C65A47" shutter={C.sage} flip />
         <WallSegment x={930} y={840} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} flip />
         <WallSegment x={930} y={1090} wall="#A7D1A1" shade="#6BA46A" shutter={C.coral} flip h={220} />
+          </>
+        )}
         <WallSegment x={-114} y={590} wall="#F0907A" shade="#C65A47" shutter={C.teal} />
         <WallSegment x={-114} y={840} wall="#F7D18A" shade="#D6A04A" shutter={C.sage} />
         <WallSegment x={-114} y={1090} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} h={220} />

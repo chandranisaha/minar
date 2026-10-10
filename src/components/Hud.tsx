@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LANGS, PERSONAS, inr, type Lang } from '../content/data'
 import { useGame, useLite } from '../store/game'
+import { useTouchUi } from '../world/input'
 import { stepped } from '../lib/stepped'
 
 export function Coin({ size = 28 }: { size?: number }) {
@@ -140,6 +141,31 @@ export function TopHud({ showGoal = true }: { showGoal?: boolean }) {
 }
 
 export function BottomHud({ replay = true }: { replay?: boolean }) {
+  const touch = useTouchUi()
+  const { t } = useTranslation()
+  const lite = useLite()
+  const setLite = useGame((x) => x.setLite)
+  const nav = useNavigate()
+  if (touch) {
+    // phone / tablet: the left thumb zone belongs to the joystick; controls stack on the right
+    return (
+      <div className="pointer-events-none absolute bottom-0 right-0 z-40 flex flex-col items-end gap-2 p-2" style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom))', paddingRight: 'max(8px, env(safe-area-inset-right))' }}>
+        <div className="pointer-events-auto flex gap-2">
+          <button type="button" className="ink-chip grid h-12 w-12 place-items-center text-[20px]" aria-pressed={lite} aria-label={t('hud.lite')} title={t('hud.lite')} onClick={() => setLite(!lite)}>
+            {lite ? '☀' : '✦'}
+          </button>
+          {replay && (
+            <button type="button" className="ink-chip grid h-12 w-12 place-items-center text-[20px]" aria-label={t('hud.replay')} title={t('hud.replay')} onClick={() => nav('/story?replay=1')}>
+              ↺
+            </button>
+          )}
+        </div>
+        <div className="pointer-events-auto">
+          <LangSwitch />
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex flex-wrap items-end justify-between gap-2 p-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
       <div className="pointer-events-auto">

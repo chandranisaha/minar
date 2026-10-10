@@ -1,13 +1,14 @@
 """
 Import hand-made / generated art into the game.
 
-  python tools/import_art.py [source_dir]      (default: ../graphics)
+  python tools/import_art.py [source_dir]      (default: ./graphics in the repo)
 
 Scans PNG/WebP files, matches them to ArtSlot names by filename keyword, trims transparent
 borders, resizes, and writes public/art/<slot>.webp + public/art/manifest.json (natural sizes).
 Re-run any time you add or replace a file. Unmatched files are listed so you can rename them.
 """
 import json, os, sys
+import numpy as np
 from PIL import Image
 
 RULES = [  # (keywords any-of, slot, max width)
@@ -24,11 +25,13 @@ RULES = [  # (keywords any-of, slot, max width)
     (['tree'], 'deco-tree', 700),
     (['cart'], 'deco-cart', 700),
 ]
+# two-sided alley frames: split at the widest empty gap into <slot>-left / <slot>-right
+SPLIT = [(['mediterranean', 'open centre'], 'bld-a', 0.12), (['old-town', 'sunlit'], 'bld-b', 0.0)]  # (keywords, slot, crop-bottom fraction)
 SKIP = ['character asset sheet', 'character game asset']
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(here)
-src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(root), 'graphics')
+src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(root, 'graphics')
 out = os.path.join(root, 'public', 'art')
 os.makedirs(out, exist_ok=True)
 mf_path = os.path.join(out, 'manifest.json')
@@ -40,6 +43,36 @@ for fn in sorted(os.listdir(src)):
         continue
     low = fn.lower()
     if any(s in low for s in SKIP):
+        continue
+    sp = next(((n, c) for keys, n, c in SPLIT if any(k in low for k in keys)), None)
+    if sp:
+        name, crop_b = sp
+        im = Image.open(os.path.join(src, fn)).convert('RGBA')
+        if crop_b:
+            im = im.crop((0, 0, im.width, int(im.height * (1 - crop_b))))
+        a = np.array(im.getchannel('A')) > 12
+        cols = a.sum(axis=0)
+        lo, hi = int(im.width * 0.3), int(im.width * 0.7)
+        best, run0, bs, be = 0, None, lo, lo
+        for x in range(lo, hi):
+            if cols[x] == 0:
+                run0 = x if run0 is None else run0
+                if x - run0 + 1 > best:
+                    best, bs, be = x - run0 + 1, run0, x
+            else:
+                run0 = None
+        cut = (bs + be) // 2 if best else im.width // 2
+        for side, box in (('left', (0, 0, cut, im.height)), ('right', (cut, 0, im.width, im.height))):
+            part = im.crop(box)
+            bb = part.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox()
+            if bb:
+                part = part.crop(bb)
+            if part.width > 760:
+                part = part.resize((760, round(part.height * 760 / part.width)), Image.LANCZOS)
+            slot_name = f'{name}-{side}'
+            part.save(os.path.join(out, slot_name + '.webp'), 'WEBP', quality=88, method=6)
+            manifest[slot_name] = {'w': part.width, 'h': part.height, 'src': fn}
+            done.append((fn, slot_name, part.size))
         continue
     slot = next(((s, w) for keys, s, w in RULES if any(k in low for k in keys)), None)
     if not slot:
