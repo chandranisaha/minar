@@ -1,0 +1,17 @@
+{
+ "charminar": {
+  "w": 1000,
+  "h": 1014,
+  "src": "Charminar-Inspired Gateway Illustration.png"
+ },
+ "shop-invest": {
+  "w": 640,
+  "h": 589,
+  "src": "Ornate Pearl Merchant Bazaar Stall.png"
+ },
+ "shop-plan": {
+  "w": 640,
+  "h": 586,
+  "src": "Vibrant Indian Bangle Market Stall.png"
+ }
+}

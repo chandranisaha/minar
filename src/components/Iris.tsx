@@ -3,8 +3,13 @@ import { animate, motion, useMotionTemplate, useMotionValue } from 'framer-motio
 import { useNavigate } from 'react-router-dom'
 import { stepped } from '../lib/stepped'
 
-type IrisCtx = { go: (to: string, origin?: { x: number; y: number }) => void; busy: boolean }
-const Ctx = createContext<IrisCtx>({ go: () => {}, busy: false })
+type IrisCtx = {
+  go: (to: string, origin?: { x: number; y: number }) => void
+  /** run any scene change under an iris wipe (used between story beats) */
+  run: (cb: () => void, origin?: { x: number; y: number }, dur?: number) => void
+  busy: boolean
+}
+const Ctx = createContext<IrisCtx>({ go: () => {}, run: () => {}, busy: false })
 export const useIris = () => useContext(Ctx)
 
 /** Classic 1930s iris-wipe: the picture closes to a circle, we change scene, then it opens again. */
@@ -17,8 +22,8 @@ export function IrisProvider({ children }: { children: ReactNode }) {
   const lock = useRef(false)
   const bg = useMotionTemplate`radial-gradient(circle at ${cx}px ${cy}px, transparent ${r}px, #2B1A17 ${r}px)`
 
-  const go = useCallback(
-    (to: string, origin?: { x: number; y: number }) => {
+  const run = useCallback(
+    (cb: () => void, origin?: { x: number; y: number }, dur = 0.55) => {
       if (lock.current) return
       lock.current = true
       const W = window.innerWidth, H = window.innerHeight
@@ -27,19 +32,20 @@ export function IrisProvider({ children }: { children: ReactNode }) {
       cy.set(origin?.y ?? H / 2)
       r.set(max)
       setBusy(true)
-      animate(r, 0, { duration: 0.55, ease: stepped(12) }).then(() => {
-        navigate(to)
+      animate(r, 0, { duration: dur, ease: stepped(12) }).then(() => {
+        cb()
         window.setTimeout(() => {
-          animate(r, max, { duration: 0.55, ease: stepped(12) }).then(() => {
+          animate(r, max, { duration: dur, ease: stepped(12) }).then(() => {
             setBusy(false)
             lock.current = false
           })
         }, 120)
       })
     },
-    [cx, cy, r, navigate],
+    [cx, cy, r],
   )
-  const value = useMemo(() => ({ go, busy }), [go, busy])
+  const go = useCallback((to: string, origin?: { x: number; y: number }) => run(() => navigate(to), origin), [run, navigate])
+  const value = useMemo(() => ({ go, run, busy }), [go, run, busy])
 
   return (
     <Ctx.Provider value={value}>

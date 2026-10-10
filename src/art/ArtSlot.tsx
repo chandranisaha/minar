@@ -1,5 +1,22 @@
 import { useEffect, useState, type ReactNode } from 'react'
 
+export type Manifest = Record<string, { w: number; h: number; src?: string }>
+let manifestP: Promise<Manifest> | null = null
+const loadManifest = () =>
+  (manifestP ??= fetch('/art/manifest.json')
+    .then((r) => (r.ok ? r.json() : {}))
+    .catch(() => ({})) as Promise<Manifest>)
+/** natural sizes of imported art (written by tools/import_art.py); {} until loaded or when no art exists */
+export function useManifest(): Manifest {
+  const [m, setM] = useState<Manifest>({})
+  useEffect(() => {
+    let dead = false
+    void loadManifest().then((x) => { if (!dead && x && typeof x === 'object') setM(x) })
+    return () => { dead = true }
+  }, [])
+  return m
+}
+
 const cache = new Map<string, string | null>()
 const probe = (src: string) =>
   new Promise<boolean>((res) => {

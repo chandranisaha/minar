@@ -34,8 +34,8 @@
 }
 
 :root { color-scheme: light; --ink: #2b1a17; --lang-scale: 1; }
-html[lang="hi"] { --lang-scale: .9; }
-html[lang="te"] { --lang-scale: .86; }
+html[lang="hi"] { --lang-scale: .95; }
+html[lang="te"] { --lang-scale: .92; }
 html, body, #root { height: 100%; margin: 0; background: #2b1a17; }
 body {
   font-family: var(--font-body); font-weight: 500; color: var(--ink);

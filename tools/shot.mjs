@@ -22,6 +22,9 @@ for (const [w, h, tag] of sizes) {
     if (a.focus) await page.focus(a.focus)
     if (a.eval) await page.evaluate(a.eval)
     if (a.wait) await page.waitForTimeout(a.wait)
+    if (a.shot) await page.screenshot({ path: `${OUT}/${a.shot}-${tag}.png` })
+    if (a.text) await page.getByText(a.text, { exact: false }).first().click()
+    if (a.btn) await page.getByRole('button', { name: new RegExp(a.btn) }).first().click()
   }
   await page.screenshot({ path: `${OUT}/${name}-${tag}.png` })
   await ctx.close()
