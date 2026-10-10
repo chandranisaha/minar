@@ -570,14 +570,14 @@
     "L5": {
       "what": "Your plan held in {{k}} of 10 possible festivals. It first broke on {{when}}: {{bill}}.",
       "all": "Your plan held in all 10 possible festivals.",
-      "idea": "One late payment can break a plan that looked fine. A cushion is sized by risks you can name.",
-      "rule": "Name the risks, then size the cushion.",
+      "idea": "One late payment can break a plan that looked fine. Spare money should be sized by risks you can name.",
+      "rule": "Name the risks, then size your spare money.",
       "more": {
         "what": "Your plan was replayed in ten different festivals. The ones that broke show where the plan was thin.",
-        "idea": "A late sponsor, a smaller crowd or a bigger repair bill can break a plan that looked fine. A cushion sized for risks you can name is a stress test passed in advance.",
+        "idea": "A late sponsor, a smaller crowd or a bigger repair bill can break a plan that looked fine. Spare money sized for risks you can name is a stress test passed in advance.",
         "example": "A stall plan fails in 4 of 10 imagined cases, all on the same date. Moving one payment off that date fixes it.",
-        "real": "Planners ask \"what if the money is late?\" before it happens. They keep a cushion for the risks they can name.",
-        "ask": "What could go wrong on my tightest date? How big a cushion would cover it?"
+        "real": "Planners ask \"what if the money is late?\" before it happens. They keep spare money for the risks they can name.",
+        "ask": "What could go wrong on my tightest date? How much spare money would cover it?"
       }
     },
     "L7": {
@@ -641,7 +641,7 @@
       "ok": "Move or soften what falls on that date",
       "w1": "Hope that date goes better",
       "w2": "Cut the cheapest cost",
-      "f1": "Naming the date shows where to put the cushion. Hope is not a cushion.",
+      "f1": "Naming the date shows where to keep spare money. Hope is not spare money.",
       "f2": "The problem is the date, not the smallest bill."
     },
     "T7": {
