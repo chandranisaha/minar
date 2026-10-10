@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { LangSwitch } from '../components/Hud'
+import { ShareProgress } from '../ngo/ShareProgress'
 import { NAME_MAX, adoptLiveIfNeeded, deleteSlot, getActive, listSlots, loadSlot, renameSlot, saveSlot, startNewGame, type SlotMeta } from './slots'
 
 const ENTERED = 'mm-entered'
@@ -55,6 +57,7 @@ function SlotCard({ slot, onPlay, onChanged }: { slot: SlotMeta; onPlay: () => v
   const [renaming, setRenaming] = useState(false)
   const [name, setName] = useState(slot.name)
   const [confirm, setConfirm] = useState(false)
+  const [sharing, setSharing] = useState(false)
   const date = new Date(slot.updatedAt).toLocaleString(i18n.language, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
   const commit = () => { const s = store(); if (s) renameSlot(s, slot.id, name); setRenaming(false); onChanged() }
   return (
@@ -86,9 +89,11 @@ function SlotCard({ slot, onPlay, onChanged }: { slot: SlotMeta; onPlay: () => v
           ) : (
             <button type="button" className="ink-btn cream" onClick={() => { setName(slot.name); setRenaming(true) }}>{t('home.rename')}</button>
           )}
+          <button type="button" className="ink-btn cream" onClick={() => setSharing((x) => !x)}>{t('home.share')}</button>
           <button type="button" className="ink-btn cream" onClick={() => setConfirm(true)}>{t('home.delete')}</button>
         </div>
       )}
+      {sharing && <ShareProgress slot={slot} onClose={() => setSharing(false)} />}
     </li>
   )
 }
@@ -96,6 +101,7 @@ function SlotCard({ slot, onPlay, onChanged }: { slot: SlotMeta; onPlay: () => v
 /** The home screen: new game or load a saved one (any number, each with its own name). Built over the game, not into it. */
 export default function Home() {
   const { t } = useTranslation()
+  const nav = useNavigate()
   const [tick, setTick] = useState(0)
   const [view, setView] = useState<'menu' | 'load' | 'new'>('menu')
   useMemo(() => { const s = store(); if (s) adoptLiveIfNeeded(s, t('home.firstName')) }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -125,6 +131,7 @@ export default function Home() {
               {t('home.load')}{slots.length > 0 ? ` (${slots.length})` : ''}
             </button>
             {slots.length === 0 && <p className="m-0 text-center text-[13px] opacity-70">{t('home.noSaves')}</p>}
+            <button type="button" className="mt-2 self-center text-[14px] font-bold underline" style={{ background: 'none', border: 0, cursor: 'pointer', minHeight: 44, color: 'inherit' }} onClick={() => nav('/ngo')}>{t('home.facilitator')}</button>
           </div>
         )}
 

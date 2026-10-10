@@ -458,6 +458,16 @@
     "places": "{{n}} of 4 places",
     "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
     "deleteYes": "Yes, delete",
-    "title": "Money Mohalla"
+    "title": "Money Mohalla",
+    "share": "Share progress",
+    "shareTitle": "Share my progress",
+    "shareBody": "Send this code to your teacher or NGO facilitator so they can see how the class is doing.",
+    "shareWhat": "It shares your progress, skills, Happy score and language. It never shares your name, your alias or anything you typed.",
+    "shareCopy": "Copy code",
+    "shareCopied": "Copied",
+    "shareSend": "Send",
+    "shareDownload": "Save as file",
+    "shareClose": "Close",
+    "facilitator": "For teachers and NGOs"
   }
 }
