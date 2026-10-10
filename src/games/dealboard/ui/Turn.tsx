@@ -155,17 +155,15 @@ function LastQuarter({ run, m, onOpen }: { run: RunState; m: MarketRun; onOpen: 
   const ids = Object.keys(run.holdings) as CompanyId[]
   return (
     <section className="space-y-2">
-      <div className="db-eyebrow text-[#8a5a2b]">{t('desk.last')}</div>
       <MarketLine banner={m.banners[q - 1]} />
       {rivalAlerts(m, q).map((rid) => <AlertStrip key={rid}>{t('alert.rival', { name: t(`companies.${rid}.name`) })}</AlertStrip>)}
-      {entries.map((e) => <ReviewCard key={e.id} entry={e} defaultOpen={e.verdict !== 'good' || run.log.length <= 1} />)}
+      {entries.map((e) => <ReviewCard key={e.id} entry={e} defaultOpen={false} />)}
       {ids.map((id) => {
         const { move, reasons } = explainQuarter(m, id, q)
         const h = run.holdings[id]!
         const delta = h.units * (m.history[id][q].price - m.history[id][q - 1].price)
-        const notable = Math.abs(move) >= 0.05 || reasons.some((r) => r.key.startsWith('event.'))
         return (
-          <details key={id} className="group rounded-lg border-2 border-ink bg-white/60" open={notable}>
+          <details key={id} className="group rounded-lg border-2 border-ink bg-white/60" open={false}>
             <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-2.5 py-1.5 [&::-webkit-details-marker]:hidden">
               <Mark id={id} size={24} />
               <span className="min-w-0 flex-1 truncate text-[14px] font-extrabold">{t(`companies.${id}.name`)}</span>
@@ -197,7 +195,7 @@ function Bonus({ run, dispatch }: { run: RunState; dispatch: Dispatch }) {
   const right = picked === 0
   return (
     <section className="rounded-lg border-2 border-ink bg-white/60 px-3 py-2.5">
-      <div className="db-eyebrow text-[#8a5a2b]">{t('bonus.title')} · {t('bonus.sub')}</div>
+      <div className="db-eyebrow text-[#8a5a2b]">{t('bonus.title')}</div>
       <p className="m-0 mt-1 text-[15px] font-extrabold leading-snug">{t(`bonus.q.${n}.q`)}</p>
       <div className="mt-2 grid gap-1.5">
         {order.map((o) => {
@@ -228,7 +226,7 @@ function Desk({ run, m, dispatch, onOpen, onTrade, onPass }: { run: RunState; m:
   const reviewId = reviewFor(run, m)
   if (stage === 'results') {
     return (
-      <Sheet eyebrow={t('desk.eyebrow')} title={t('desk.resultsTitle', { n: run.turn - 1 })} tone="#E8B04A" actions={<button type="button" className="ink-btn pink" onClick={() => { setStage('pitch') }}>{t('desk.next')} ▸</button>}>
+      <Sheet title={t('desk.resultsTitle', { n: run.turn - 1 })} tone="#E8B04A" actions={<button type="button" className="ink-btn pink" onClick={() => { setStage('pitch') }}>{t('desk.next')} ▸</button>}>
         <div className="space-y-3">
           <LastQuarter run={run} m={m} onOpen={onOpen} />
           <Bonus run={run} dispatch={dispatch} />
