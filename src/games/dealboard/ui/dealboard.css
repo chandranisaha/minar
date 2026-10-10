@@ -75,7 +75,7 @@
 }
 .db-wordmark {
   font-family: var(--font-display);
-  font-size: clamp(20px, 6.4vw, 34px);
+  font-size: clamp(15px, 8.5cqw, 34px);
   line-height: .95;
   letter-spacing: .02em;
   color: var(--cream);
@@ -203,3 +203,16 @@ html[lang="te"] .db-root .font-display, html[lang="te"] .db-root .font-sign { fo
 @keyframes db-hop { 0% { transform: translateY(0) scale(1, 1) } 40% { transform: translateY(-34%) scale(.94, 1.06) } 80% { transform: translateY(0) scale(1.08, .92) } 100% { transform: translateY(0) scale(1, 1) } }
 html[data-lite="true"] .db-hop { animation: none; }
 @media (prefers-reduced-motion: reduce) { .db-hop { animation: none; } }
+
+/* the board never grows taller than the screen: it shrinks to fit the height and centres in its column */
+.db-boardwrap { width: min(100%, max(300px, calc(100dvh - 150px))); margin-inline: auto; }
+
+/* a phone held sideways: board and panel sit side by side instead of stacking */
+@media (min-width: 640px) and (max-height: 520px) {
+  .db-layout { display: grid; max-width: 1060px; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); align-items: start; gap: 12px; }
+  .db-layout > header { grid-column: 1 / -1; }
+  .db-boardwrap { width: min(100%, max(300px, calc(100dvh - 90px))); }
+  .db-panel { position: sticky; top: 8px; max-height: calc(100dvh - 90px); overflow-y: auto; }
+}
+.db-boardwrap { container-type: inline-size; }
+@container (max-width: 380px) { .db-centre { gap: 3px; } .db-judge { transform: scale(.85); } }
