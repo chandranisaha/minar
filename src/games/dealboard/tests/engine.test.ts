@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 import { simulateMarket } from '../engine/simulate'
 import { COMPANY, COMPANY_IDS, pickCompanies } from '../engine/companies'
-import { BOARD, rollPath } from '../engine/board'
-import { buildBanners, buildDeck, emergencyTurn } from '../engine/events'
+import { RING, RING_SIZE, TURNS, lotTile, quarterTile } from '../engine/board'
+import { buildBanners, emergencyTurn } from '../engine/events'
 import { hashSeed, mulberry32, normal } from '../engine/rng'
 import type { CompanyId, MarketRun } from '../engine/types'
 
@@ -42,25 +42,12 @@ describe('run setup', () => {
     }
   })
 
-  test('board ring has the spec tile counts', () => {
-    const count = (k: string) => BOARD.filter((t) => t === k).length
-    expect(BOARD.length).toBe(16)
-    expect([count('start'), count('auction'), count('chance'), count('bank'), count('rent'), count('tax'), count('parking'), count('chest')]).toEqual([1, 4, 4, 2, 2, 1, 1, 1])
-  })
-
-  test('dice are d6 and positions follow the rolls', () => {
-    const { rolls, positions } = rollPath('dice')
-    expect(rolls).toHaveLength(12)
-    rolls.forEach((r, i) => {
-      expect(r).toBeGreaterThanOrEqual(1)
-      expect(r).toBeLessThanOrEqual(6)
-      expect(positions[i + 1]).toBe((positions[i] + r) % 16)
-    })
-  })
-
-  test('chance deck alternates verified news and rumours', () => {
-    const deck = buildDeck('deck', ['dailyBasket', 'payEasy', 'quickRide', 'medLink'])
-    for (let i = 0; i + 1 < 8; i += 2) expect(deck[i].type).not.toBe(deck[i + 1].type)
+  test('the ring has four company corners and twelve quarters in order', () => {
+    expect(RING_SIZE).toBe(16)
+    expect(RING.filter((s) => s.kind === 'lot').map((s) => (s.kind === 'lot' ? s.index : -1))).toEqual([0, 1, 2, 3])
+    expect(RING.filter((s) => s.kind === 'quarter').map((s) => (s.kind === 'quarter' ? s.q : -1))).toEqual(Array.from({ length: TURNS }, (_, i) => i + 1))
+    for (let i = 0; i < 4; i++) expect(RING[lotTile(i)]).toEqual({ kind: 'lot', index: i })
+    for (let q = 1; q <= TURNS; q++) expect(RING[quarterTile(q)]).toEqual({ kind: 'quarter', q })
   })
 
   test('market fall lands in Q8-Q10 and starts at -12%', () => {
@@ -72,13 +59,13 @@ describe('run setup', () => {
     }
   })
 
-  test('family emergency fires once by turn 10', () => {
-    for (const m of RUNS) {
-      const t = emergencyTurn(m.seed, m.positions)
-      const firstChest = m.positions.findIndex((p, i) => i > 0 && BOARD[p] === 'chest')
-      if (firstChest > 0 && firstChest <= 10) expect(t).toBe(firstChest)
-      else expect(t >= 8 && t <= 10).toBe(true)
+  test('the family emergency lands between quarters 8 and 10', () => {
+    for (const s of SEEDS) {
+      const t = emergencyTurn(s)
+      expect(t).toBeGreaterThanOrEqual(8)
+      expect(t).toBeLessThanOrEqual(10)
     }
+    expect(new Set(SEEDS.map(emergencyTurn)).size).toBeGreaterThan(1)
   })
 
   test('starting valuations match the spec', () => {
@@ -155,6 +142,12 @@ describe('story arcs (spec "Story arc of each company")', () => {
     }
     expect(median(RUNS.map((m) => hist(m, 'quickRide')[5].price))).toBeGreaterThan(150)
     expect(positive('quickRide')).toBeLessThan(0.25)
+  })
+
+  test('layoffs are reported as an event the first quarter they happen', () => {
+    const h = hist(RUNS[0], 'steelWorks')
+    expect(h[1].events).toContain('layoffNews')
+    expect(h[2].events).not.toContain('layoffNews')
   })
 
   test('every company has 13 snapshots (start + 12 quarters)', () => {

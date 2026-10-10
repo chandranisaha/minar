@@ -2,18 +2,17 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { inr } from '../../../content/data'
 import { useGame } from '../../../store/game'
-import type { Banner, Card, TileKind } from '../engine/types'
-import { TILE_TONE, TileIcon } from './icons'
+import type { Banner } from '../engine/types'
 
 export const useInr = () => {
   const lang = useGame((s) => s.language)
   return (n: number) => inr(n, lang)
 }
 
-/** Cream sheet under the board: one decision at a time. */
+/** Cream sheet beside or under the board: one decision area at a time. */
 export function Sheet({ eyebrow, title, icon, tone, children, actions }: { eyebrow?: ReactNode; title: ReactNode; icon?: ReactNode; tone?: string; children?: ReactNode; actions?: ReactNode }) {
   return (
-    <section className="paper db-sheet db-in relative overflow-hidden p-4" aria-live="polite">
+    <section className="paper db-sheet db-in relative overflow-hidden p-4">
       {tone && <div className="absolute inset-x-0 top-0 h-2 border-b-2 border-ink" style={{ background: tone }} />}
       <div className="mt-1 flex items-center gap-3">
         {icon && <div className="shrink-0">{icon}</div>}
@@ -28,35 +27,16 @@ export function Sheet({ eyebrow, title, icon, tone, children, actions }: { eyebr
   )
 }
 
-export const TileHead = ({ kind }: { kind: TileKind }) => <TileIcon kind={kind} size={34} />
-export const toneOf = (kind: TileKind) => TILE_TONE[kind]
-
-export function NewsBanner({ banner }: { banner: Banner }) {
+/** One line about what the whole market did, shown only when it was notable (a fall, a recovery, a sector rally). */
+export function MarketLine({ banner }: { banner: Banner }) {
   const { t } = useTranslation('dealboard')
+  if (banner.key === 'quiet') return null
   const text = banner.key === 'sectorRally' ? t('news.sectorRally', { sector: t(`sectors.${banner.sector}`) }) : t(`news.${banner.key}`)
+  const down = banner.marketShock < 0
   return (
-    <div className="flex items-start gap-2 rounded-lg border-2 border-ink bg-[#F6E6BE] px-3 py-2">
-      <span className="db-stamp shrink-0 text-[#2f6f4a]" style={{ transform: 'none' }}>{t('news.verified')}</span>
-      <span className="text-[15px] font-semibold leading-snug">{text}</span>
-    </div>
-  )
-}
-
-/** A Chance card: verified news, or a rumour stamped "unverified". */
-export function ChanceCard({ card }: { card: Card }) {
-  const { t } = useTranslation('dealboard')
-  const rumour = card.type === 'rumour'
-  return (
-    <div className="relative overflow-hidden rounded-xl border-[3px] border-ink bg-jasmine" style={{ boxShadow: '3px 4px 0 #2B1A17' }}>
-      <div className="flex items-center justify-between border-b-[3px] border-ink px-3 py-1.5" style={{ background: rumour ? '#C9506F' : '#3F7A3A', color: '#FFF3D6' }}>
-        <span className="font-sign lang-fit text-[14px] tracking-[.18em] uppercase">{rumour ? t('cards.rumour') : t('cards.news')}</span>
-        <span className="font-sign text-[18px]">{rumour ? '?' : '✓'}</span>
-      </div>
-      <div className={`px-3 pt-3 ${rumour ? 'pb-9' : 'pb-3'}`}>
-        <div className="text-[16px] font-extrabold leading-snug">{t(`cards.${card.key}.head`)}</div>
-        <div className="mt-1 text-[14px] opacity-75">{t(`cards.${card.key}.detail`)}</div>
-      </div>
-      {rumour && <span className="db-stamp absolute bottom-2 right-3 text-[#C9506F]">{t('cards.unverified')}</span>}
+    <div className="flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2" style={{ background: down ? '#F5D9CF' : '#E4EDCF' }}>
+      <span className="font-sign text-[16px] leading-none" style={{ color: down ? '#C8442F' : '#2f6f4a' }} aria-hidden>{down ? '▼' : '▲'}</span>
+      <span className="text-[14px] font-semibold leading-snug"><span className="font-extrabold">{t('desk.market')}: </span>{text}</span>
     </div>
   )
 }

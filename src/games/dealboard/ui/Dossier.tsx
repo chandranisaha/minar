@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
-import { knownLights, knownQuarter, lightsAt, holdingValueAt, type RunState } from '../engine/state'
+import { knownQuarter, lightsAt, holdingValueAt, type RunState } from '../engine/state'
 import type { CompanyId, LightKey, MarketRun } from '../engine/types'
 import { LightsPanel } from './Lights'
 import { useInr } from './Panels'
@@ -12,7 +12,7 @@ import type { TradeMode } from './TradeDialog'
 /** Which statistics the player can see for a company right now. */
 export function visibleStats(run: RunState, id: CompanyId): StatId[] {
   if (run.holdings[id]) return ALL_STATS
-  const known = knownLights(run, id) as LightKey[]
+  const known = (run.unlocked[id] ?? []) as LightKey[]
   return ['price', ...known.flatMap((k) => ASK_STATS[k])] as StatId[]
 }
 
@@ -33,9 +33,10 @@ export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: Ma
   const h = run.holdings[id]
   const value = h ? holdingValueAt(run, m, id, q) : 0
   const gain = h ? value - h.cost : 0
-  const feed = run.feed.filter((f) => f.company === id)
-  const tradeable = !!h && ['news', 'land', 'manage'].includes(run.phase) && !hist[q].failed
-  const known = knownLights(run, id) as LightKey[]
+  // real company events so far (raising money, a down-round, layoffs, a shutdown), not invented headlines
+  const events = status === 'unmet' ? [] : hist.slice(1, q + 1).flatMap((x) => x.events.map((e) => ({ q: x.q, e })))
+  const tradeable = !!h && run.phase === 'desk' && !hist[q].failed
+  const known = (run.unlocked[id] ?? []) as LightKey[]
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label={t(`companies.${id}.name`)} onKeyDown={(e) => e.key === 'Escape' && onClose()} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div ref={ref} tabIndex={-1} className="paper db-sheet db-in max-h-[94vh] w-full max-w-[520px] overflow-y-auto p-4 outline-none">
@@ -83,12 +84,11 @@ export function Dossier({ run, m, id, onClose, onTrade }: { run: RunState; m: Ma
 
         <section className="mt-3">
           <div className="db-eyebrow mb-1 text-[#8a5a2b]">{t('dossier.news')}</div>
-          {feed.length === 0 ? <p className="m-0 text-[13px] opacity-65">{t('dossier.noNews')}</p> : (
+          {events.length === 0 ? <p className="m-0 text-[13px] opacity-65">{t('dossier.noNews')}</p> : (
             <ul className="m-0 list-none space-y-1.5 p-0">
-              {feed.slice(-4).map((f) => (
-                <li key={`${f.q}-${f.key}`} className="rounded-lg border-2 border-ink bg-white/60 px-2.5 py-1.5 text-[13px] leading-snug">
-                  <span className="mr-1.5 rounded border-2 px-1 text-[10px] font-extrabold uppercase" style={{ color: f.type === 'rumour' ? '#C9506F' : '#3F7A3A', borderColor: f.type === 'rumour' ? '#C9506F' : '#3F7A3A' }}>{f.type === 'rumour' ? t('cards.unverified') : t('news.verified')}</span>
-                  <span className="opacity-60">{t('quarterShort', { n: f.q })}</span> {t(`cards.${f.key}.head`)}
+              {events.slice(-4).map((x) => (
+                <li key={`${x.q}-${x.e}`} className="rounded-lg border-2 border-ink bg-white/60 px-2.5 py-1.5 text-[13px] leading-snug">
+                  <span className="opacity-60">{t('quarterShort', { n: x.q })}</span> {t(`companies.${id}.name`)} {t(`quarterResults.ev.${x.e}`)}
                 </li>
               ))}
             </ul>

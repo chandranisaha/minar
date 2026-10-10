@@ -97,25 +97,6 @@ export interface QuarterStats {
   events: CompanyEvent[]
 }
 
-export type TileKind = 'start' | 'auction' | 'chance' | 'bank' | 'rent' | 'tax' | 'parking' | 'chest'
-
-export type CardEffect =
-  | { kind: 'sector'; sector: SectorId; shock: number }
-  | { kind: 'newGrowth'; company: CompanyId; delta: number }
-  | { kind: 'layoff'; company: CompanyId; rate: number }
-  | { kind: 'priceBump'; company: CompanyId; bump: number }
-  | { kind: 'sentimentBump'; company: CompanyId; bump: number }
-  | { kind: 'revenueBump'; company: CompanyId; bump: number }
-  | { kind: 'none' }
-
-export interface Card {
-  /** content key in en.json (dealboard.cards.<key>) */
-  key: string
-  type: 'news' | 'rumour'
-  company?: CompanyId
-  effect: CardEffect
-}
-
 export interface Banner {
   key: string
   marketShock: number
@@ -127,18 +108,11 @@ export interface Banner {
 export interface MarketRun {
   seed: string
   picked: CompanyId[]
-  /** order in which Auction tiles pitch the picked companies */
+  /** order in which companies pitch (quarter 1 pitches the first, and so on, skipping ones you own) */
   pitchOrder: CompanyId[]
-  /** index t-1 = roll of turn t */
-  rolls: number[]
-  /** index t = tile index after turn t (index 0 = Start) */
-  positions: number[]
-  tiles: TileKind[]
-  /** index t-1: banner for quarter t */
+  /** index t-1: what the whole market did in quarter t */
   banners: Banner[]
-  /** index t-1: card drawn on a Chance tile in turn t, else null */
-  chance: (Card | null)[]
-  /** turn the family emergency fires (landed on Chest, or forced once in turns 8-10) */
+  /** turn the family emergency fires (between 8 and 10) */
   emergencyTurn: number
   /** quarter of the broad market fall */
   fallQ: number
@@ -167,6 +141,17 @@ export interface Decision {
   held?: number
   /** INVEST: a rumour card named this company this quarter */
   rumour?: boolean
+  /** lights the player had seen at the decision (founder questions) */
+  known?: LightKey[]
+  /** INVEST: largest sector share (0-1) and cash left after the purchase */
+  share?: number
+  cashAfter?: number
+  /** companies owned after this purchase */
+  positions?: number
+  /** share of net worth this purchase made up */
+  size?: number
+  /** SELL made while paying the family emergency */
+  forced?: boolean
 }
 
 export interface Lesson {

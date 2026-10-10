@@ -1,38 +1,30 @@
 import type { CompanyId, Decision, LightKey, MarketRun } from './types'
-import { BOARD, TURNS, YEAR_ENDS } from './board'
+import { TURNS, YEAR_ENDS } from './board'
 import { TUNING } from './companies'
 import { EMERGENCY_COST } from './events'
 import { redFlags } from './lights'
 import { collectEarned, collectLessons, houseCard, type LessonRef, type QuarterEvents } from './lessons'
 import {
-  CASH_DRAG, LOAN_AMOUNT, MIN_BID, TRADE_FEE, decisionQ, investedAt, knownLights, knownQuarter, lightsAt, marketFor,
-  netWorthAt, pitchFor, priceAt, sectorShares, tileAt, type EmergencySale, type RunState,
+  CASH_DRAG, MIN_BID, reviewFor, TRADE_FEE, decisionQ, investedAt, knownLights, knownQuarter, lightsAt, marketFor,
+  netWorthAt, pitchFor, priceAt, sectorShares, type EmergencySale, type RunState,
 } from './state'
 
 export * from './state'
 
 export type Action =
   | { type: 'brief' }
-  | { type: 'roll' }
   | { type: 'ask'; companyId: CompanyId; light: LightKey }
   | { type: 'bid'; companyId: CompanyId; amount: number; reason: string }
   | { type: 'pass'; companyId: CompanyId }
   | { type: 'buyMore'; companyId: CompanyId; amount: number; reason: string }
   | { type: 'sell'; companyId: CompanyId; fraction: number; reason: string }
-  | { type: 'clue'; companyId: CompanyId; light: LightKey }
-  | { type: 'loan' }
   | { type: 'repay' }
-  | { type: 'resolve' }
-  | { type: 'endTurn' }
+  | { type: 'hold'; companyId: CompanyId }
   | { type: 'payEmergency' }
   | { type: 'continue' }
   | { type: 'rewind' }
 
 export const REASONS = ['strongGrowth', 'trustFounder', 'priceLow', 'scaredLoss', 'friendTold', 'looksHyped', 'dataSays', 'other'] as const
-
-/** Phases where the player can buy and sell: in the briefing, after landing, and (selling only) in an emergency. */
-const TRADING = ['news', 'land', 'manage'] as const
-const canTrade = (run: RunState) => (TRADING as readonly string[]).includes(run.phase) && !(run.phase === 'news' && run.turn >= TURNS)
 
 const strip = (r: RunState): Omit<RunState, 'checkpoints'> => {
   const { checkpoints: _c, ...rest } = r
@@ -52,23 +44,29 @@ const decision = (run: RunState, type: Decision['type'], companyId: CompanyId, e
   ...extra,
 })
 
-function buy(run: RunState, m: MarketRun, id: CompanyId, amount: number, reason: string, flips: number): RunState {
-  const price = priceAt(m, id, knownQuarter(run))
-  if (price <= 0 || amount < MIN_BID || amount > run.cash || !canBuy(run) || !canTrade(run)) return run
+function buy(run: RunState, m: MarketRun, id: CompanyId, amount: number, reason: string): RunState {
+  const q = knownQuarter(run)
+  const price = priceAt(m, id, q)
+  if (price <= 0 || amount < MIN_BID || amount > run.cash || !canBuy(run) || run.phase !== 'desk') return run
   const fee = Math.round(amount * TRADE_FEE)
   const prev = run.holdings[id]
-  const card = run.phase === 'land' ? m.chance[run.turn - 1] : null
+  const holdings = {
+    ...run.holdings,
+    [id]: { units: (prev?.units ?? 0) + (amount - fee) / price, cost: (prev?.cost ?? 0) + amount, since: prev?.since ?? decisionQ(run) },
+  }
+  const after = { ...run, holdings, cash: run.cash - amount }
+  const shares = Object.values(sectorShares(after, m, q)) as number[]
+  const nw = netWorthAt(run, m, q)
+  const known = knownLights(run, id)
   return {
-    ...run,
-    cash: run.cash - amount,
+    ...after,
     feesPaid: run.feesPaid + fee,
     trades: run.trades + 1,
-    holdings: {
-      ...run.holdings,
-      [id]: { units: (prev?.units ?? 0) + (amount - fee) / price, cost: (prev?.cost ?? 0) + amount, since: prev?.since ?? decisionQ(run) },
-    },
     pitched: run.pitched.includes(id) ? run.pitched : [...run.pitched, id],
-    log: [...run.log, decision(run, 'INVEST', id, { amount, reason, price, flips, rumour: card?.type === 'rumour' && card.company === id })],
+    log: [...run.log, decision(run, 'INVEST', id, {
+      amount, reason, price, flips: Math.min(2, known.length), known,
+      share: shares.length ? Math.max(...shares) : 0, positions: Object.keys(holdings).length, cashAfter: after.cash, size: nw > 0 ? amount / nw : 0,
+    })],
   }
 }
 
@@ -84,12 +82,9 @@ function sell(run: RunState, m: MarketRun, id: CompanyId, fraction: number, reas
   const costPart = h.cost * f
   const gain = costPart > 0 ? (gross - fee) / costPart - 1 : 0
   const holdings = { ...run.holdings }
-  const owners = { ...run.owners }
-  if (f >= 0.999) {
-    delete holdings[id]
-    // the property tile goes back to the Auction pool
-    for (const [tile, owner] of Object.entries(owners)) if (owner === id) delete owners[Number(tile)]
-  } else holdings[id] = { ...h, units: h.units - unitsSold, cost: h.cost - costPart }
+  if (f >= 0.999) delete holdings[id]
+  else holdings[id] = { ...h, units: h.units - unitsSold, cost: h.cost - costPart }
+  const forced = run.phase === 'emergency'
   const sale: EmergencySale = { companyId: id, atLoss: gain < 0, inDip: m.banners[decisionQ(run) - 1].marketShock < 0 }
   return {
     ...run,
@@ -97,18 +92,27 @@ function sell(run: RunState, m: MarketRun, id: CompanyId, fraction: number, reas
     feesPaid: run.feesPaid + fee,
     trades: run.trades + 1,
     holdings,
-    owners,
     soldThisTurn: run.soldThisTurn + gross,
     soldRed: run.soldRed || redFlags(lightsAt(m, id, q)) > 0,
-    emergencySales: run.phase === 'emergency' ? [...run.emergencySales, sale] : run.emergencySales,
-    log: [...run.log, decision(run, 'SELL', id, { amount: Math.round(gross), reason, price, gain, held: decisionQ(run) - h.since })],
+    emergencySales: forced ? [...run.emergencySales, sale] : run.emergencySales,
+    log: [...run.log, decision(run, 'SELL', id, { amount: Math.round(gross), reason, price, gain, held: decisionQ(run) - h.since, forced })],
   }
 }
 
-/** Quarter ends: loan interest, idle-cash drag, trackers, recap for the briefing, then lessons. */
+/** Opens the next quarter's desk, remembering how it began so the player can replay it. */
+function advance(r: RunState, m: MarketRun): RunState {
+  if (r.turn >= TURNS) return { ...r, phase: 'done' }
+  const turn = r.turn + 1
+  const next: RunState = { ...r, turn, phase: 'desk', lesson: null, asked: {}, soldThisTurn: 0, soldRed: false, emergencySales: [] }
+  next.turnStartInvested = investedAt(next, m, turn - 1)
+  next.checkpoints = { ...r.checkpoints, [turn]: strip(next) }
+  return next
+}
+
+/** Quarter ends: loan interest, idle-cash drag, trackers, then lessons or straight on to the next desk. */
 function closeQuarter(run: RunState, m: MarketRun, emergency: QuarterEvents['emergency']): RunState {
   const t = run.turn
-  const r: RunState = { ...run, flagged: [...run.flagged], queue: [...run.queue], shown: { ...run.shown }, seen: [...run.seen], feed: [...run.feed] }
+  const r: RunState = { ...run, flagged: [...run.flagged], queue: [...run.queue], shown: { ...run.shown }, seen: [...run.seen] }
 
   if (r.loan > 0) {
     const interest = Math.round(r.loan * TUNING.loanRate)
@@ -134,33 +138,14 @@ function closeQuarter(run: RunState, m: MarketRun, emergency: QuarterEvents['eme
   r.cashStreakMax = Math.max(r.cashStreakMax, r.cashStreak)
   const shares = Object.values(sectorShares(r, m, t)) as number[]
   r.spread = [...r.spread, { top: shares.length ? Math.max(...shares) : 0, holdings: Object.keys(r.holdings).length }]
+  r.series = [...r.series, { q: t, cash: r.cash, invested: investedAt(r, m, t), loan: r.loan }]
 
-  // panic sell: 70% or more of invested money in one market-wide fall quarter, nothing sold had a red light
+  // panic sell: 70% or more of invested money in one market-wide fall quarter, nothing sold had a red check
   const jail = m.banners[t - 1].marketShock < 0 && r.turnStartInvested > 0 && r.soldThisTurn >= 0.7 * r.turnStartInvested && !r.soldRed
   if (jail) {
     r.jails += 1
     r.jailedTurn = t + 1
   }
-
-  // what happened on the tile, for the next briefing
-  const tile = tileAt(run, m)
-  const card = m.chance[t - 1]
-  if (card) r.feed.push({ q: t, key: card.key, type: card.type, company: card.company ?? null })
-  r.recap = {
-    tile,
-    cardKey: card?.key ?? null,
-    cardType: card?.type ?? null,
-    cardCompany: card?.company ?? null,
-    rent: tile === 'rent' ? (Object.keys(r.holdings) as CompanyId[]).map((id) => {
-      const s = m.history[id][t]
-      return { id, amount: (r.holdings[id]!.units / s.shares) * s.profit * 1e5 }
-    }) : [],
-    ownTile: tile === 'auction' ? r.owners[m.positions[t]] ?? null : null,
-    bank: r.lastBank,
-    clue: r.lastClue,
-  }
-  r.lastBank = null
-  r.lastClue = null
 
   const fresh = [...collectLessons(r, m, { jail, emergency }), ...collectEarned(r, m)]
   for (const ref of fresh) {
@@ -168,7 +153,7 @@ function closeQuarter(run: RunState, m: MarketRun, emergency: QuarterEvents['eme
     r.queue.push(ref)
   }
   const next = r.queue.shift() ?? null
-  r.after = YEAR_ENDS.includes(t) ? 'yearEnd' : 'news'
+  r.after = YEAR_ENDS.includes(t) ? 'yearEnd' : 'desk'
   if (r.after === 'yearEnd' && !r.seen.includes(11)) r.seen.push(11)
   if (next) {
     r.lesson = next
@@ -176,93 +161,73 @@ function closeQuarter(run: RunState, m: MarketRun, emergency: QuarterEvents['eme
     if (!r.seen.includes(next.id)) r.seen.push(next.id)
     if (next.id >= 100) r.positives = [...r.positives, Math.ceil(t / 4)]
     r.phase = 'lesson'
-  } else {
-    r.lesson = null
-    r.phase = r.after
+    return r
   }
-
-  // the next quarter starts fresh: panic-sell tracking begins from today's values
-  r.soldThisTurn = 0
-  r.soldRed = false
-  r.emergencySales = []
-  r.turnStartInvested = investedAt(r, m, t)
-  return r
+  if (r.after === 'yearEnd') return { ...r, phase: 'yearEnd' }
+  return advance(r, m)
 }
 
-/** The player is done with this quarter's tile: handle a family emergency first, else close the quarter. */
+/** The player is done with this quarter's decision: handle a family emergency first, else close the quarter. */
 function finish(run: RunState, m: MarketRun): RunState {
   if (run.turn === m.emergencyTurn && !run.emergencyDone) return { ...run, phase: 'emergency' }
   return closeQuarter(run, m, null)
 }
 
-const onOwnedTile = (run: RunState, m: MarketRun) => !!run.owners[m.positions[run.turn]]
-
 /** Pure turn reducer. Illegal actions for the current phase return the state unchanged. */
 export function act(run: RunState, a: Action): RunState {
   const m = marketFor(run.seed)
   switch (a.type) {
-    case 'brief':
-      return run.briefed ? run : { ...run, briefed: true }
-
-    case 'roll': {
-      if (run.phase !== 'news' || run.turn >= TURNS) return run
-      const t = run.turn + 1
-      return { ...run, turn: t, phase: 'land', checkpoints: { ...run.checkpoints, [t]: strip(run) } }
+    case 'brief': {
+      if (run.briefed) return run
+      const start = { ...run, briefed: true }
+      return { ...start, checkpoints: { ...run.checkpoints, [run.turn]: strip(start) } }
     }
 
     case 'ask': {
-      if (run.phase !== 'land' || tileAt(run, m) !== 'auction' || onOwnedTile(run, m) || pitchFor(run, m) !== a.companyId) return run
+      if (run.phase !== 'desk' || pitchFor(run, m) !== a.companyId) return run
       const asked = run.asked[a.companyId] ?? []
       if (asked.length >= 2 || asked.includes(a.light)) return run
-      return { ...run, asked: { ...run.asked, [a.companyId]: [...asked, a.light] } }
+      const seen = run.unlocked[a.companyId] ?? []
+      return {
+        ...run,
+        asked: { ...run.asked, [a.companyId]: [...asked, a.light] },
+        unlocked: { ...run.unlocked, [a.companyId]: seen.includes(a.light) ? seen : [...seen, a.light] },
+      }
     }
 
     case 'bid': {
-      if (run.phase !== 'land' || tileAt(run, m) !== 'auction' || onOwnedTile(run, m) || pitchFor(run, m) !== a.companyId) return run
-      const next = buy(run, m, a.companyId, a.amount, a.reason, Math.min(2, knownLights(run, a.companyId).length))
-      if (next === run) return run
-      // the company claims this Auction tile as its property
-      return finish({ ...next, owners: { ...next.owners, [m.positions[run.turn]]: a.companyId } }, m)
+      if (run.phase !== 'desk' || pitchFor(run, m) !== a.companyId) return run
+      const next = buy(run, m, a.companyId, a.amount, a.reason)
+      return next === run ? run : finish(next, m)
     }
 
     case 'pass': {
-      if (run.phase !== 'land' || onOwnedTile(run, m)) return run
+      if (run.phase !== 'desk' || pitchFor(run, m) !== a.companyId) return run
+      const known = knownLights(run, a.companyId)
       return finish({
         ...run,
         pitched: run.pitched.includes(a.companyId) ? run.pitched : [...run.pitched, a.companyId],
-        log: [...run.log, decision(run, 'REJECT', a.companyId, { price: priceAt(m, a.companyId, knownQuarter(run)), flips: Math.min(2, knownLights(run, a.companyId).length) })],
+        log: [...run.log, decision(run, 'REJECT', a.companyId, { price: priceAt(m, a.companyId, knownQuarter(run)), flips: Math.min(2, known.length), known })],
       }, m)
     }
 
-    case 'clue': {
-      if (run.phase !== 'land' || tileAt(run, m) !== 'bank') return run
-      const have = run.clues[a.companyId] ?? []
-      if (have.includes(a.light)) return run
-      return finish({ ...run, lastBank: 'clue', lastClue: { companyId: a.companyId, light: a.light }, clues: { ...run.clues, [a.companyId]: [...have, a.light] } }, m)
+    case 'hold': {
+      // the quarterly check-in when you own everything: keep holding is a decision too, and it is graded
+      if (run.phase !== 'desk' || reviewFor(run, m) !== a.companyId) return run
+      return finish({ ...run, log: [...run.log, decision(run, 'HOLD', a.companyId, { price: priceAt(m, a.companyId, knownQuarter(run)), known: ['cash', 'customers', 'debt', 'ceo'] })] }, m)
     }
 
-    case 'loan':
-      if (run.phase !== 'land' || tileAt(run, m) !== 'bank' || run.loan > 0) return run
-      return finish({ ...run, lastBank: 'loan', cash: run.cash + LOAN_AMOUNT, loan: LOAN_AMOUNT }, m)
-
     case 'repay':
-      if (!canTrade(run) || run.loan <= 0 || run.cash < run.loan) return run
+      if (run.phase !== 'desk' || run.loan <= 0 || run.cash < run.loan) return run
       return { ...run, cash: run.cash - run.loan, loan: 0 }
 
     case 'buyMore':
       if (!run.holdings[a.companyId]) return run
-      return buy(run, m, a.companyId, a.amount, a.reason, 2)
+      return buy(run, m, a.companyId, a.amount, a.reason)
 
     case 'sell':
-      if (!canTrade(run) && run.phase !== 'emergency') return run
+      if (run.phase !== 'desk' && run.phase !== 'emergency') return run
       return sell(run, m, a.companyId, a.fraction, a.reason)
-
-    case 'resolve':
-      if (run.phase !== 'land') return run
-      return finish(tileAt(run, m) === 'bank' ? { ...run, lastBank: 'skip' } : run, m)
-
-    case 'endTurn':
-      return run.phase === 'manage' ? finish(run, m) : run
 
     case 'payEmergency': {
       if (run.phase !== 'emergency') return run
@@ -285,9 +250,9 @@ export function act(run: RunState, a: Action): RunState {
     }
 
     case 'continue': {
-      if (run.phase === 'lesson') return { ...run, lesson: null, phase: run.after }
+      if (run.phase === 'lesson') return run.after === 'yearEnd' ? { ...run, lesson: null, phase: 'yearEnd' } : advance({ ...run, lesson: null }, m)
       if (run.phase !== 'yearEnd') return run
-      return { ...run, phase: run.turn >= TURNS ? 'done' : 'news' }
+      return advance(run, m)
     }
 
     case 'rewind': {
@@ -303,11 +268,4 @@ export function act(run: RunState, a: Action): RunState {
 /** Year-end review: shows the houses (compounding) card. */
 export function yearEndCard(run: RunState, m: MarketRun): LessonRef {
   return houseCard(run, m)
-}
-
-/** Tiles where the player makes a real decision; every other tile resolves itself on arrival. */
-export function needsDecision(run: RunState, m: MarketRun): boolean {
-  const tile = BOARD[m.positions[run.turn]]
-  if (tile === 'bank') return true
-  return tile === 'auction' && !run.owners[m.positions[run.turn]] && pitchFor(run, m) !== null
 }

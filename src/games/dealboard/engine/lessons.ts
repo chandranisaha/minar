@@ -51,8 +51,8 @@ export function collectLessons(r: RunState, m: MarketRun, ev: QuarterEvents): Le
     if (L.customers === 'R') add({ id: 2, params: { companyId: id, n: num(s.users), m: num(s.customers), a: num(s.newCust), b: num(s.lostCust) } }, `2:${id}`)
     if (L.ceo === 'R') add({ id: 3, params: { companyId: id, quarters: `${m.history[id].slice(Math.max(1, q - 2), q + 1).filter((h) => h.ceoTrade === 'SELL').length} of the last 3` } }, `3:${id}`)
     if (L.debt === 'R') add({ id: 4, variant: 'b', params: { companyId: id, debtShare: Math.round((s.debt / Math.max(1, s.revenue * 4)) * 100) } }, `4:${id}`)
-    const card = m.chance[t - 1]
-    if (card?.type === 'rumour' && card.company === id) add({ id: 5, params: { companyId: id } }, `5:${id}`)
+    // hype and tips are not evidence: fires when the stated reason was a feeling or something heard
+    if (d.reason === 'friendTold' || d.reason === 'looksHyped') add({ id: 5, params: { companyId: id, reasonKey: d.reason } }, `5:${id}`)
   }
 
   // held (not only bought) with a red CEO light
@@ -94,19 +94,23 @@ export function collectLessons(r: RunState, m: MarketRun, ev: QuarterEvents): Le
   return out
 }
 
-/** Positive reinforcement (spec "Positive lessons"): good reads that paid off, at most one per year. */
+/**
+ * Positive reinforcement: good reads that have since paid off, at most one per year. A decision made in quarter t-1
+ * is judged once quarter t has happened, so the card never shows results the player has not lived through yet.
+ */
 export function collectEarned(r: RunState, m: MarketRun): LessonRef[] {
   const t = r.turn
-  if (r.positives.includes(Math.ceil(t / 4)) || t > 10) return []
+  if (t < 2 || r.positives.includes(Math.ceil(t / 4))) return []
   const out: LessonRef[] = []
-  for (const d of r.log.filter((x) => x.q === t)) {
+  for (const d of r.log.filter((x) => x.q === t - 1)) {
     const h = m.history[d.companyId]
-    const later = h[Math.min(12, t + 2)].price
-    if (d.type === 'SELL' && d.price && h[t - 1].price > 0 && later <= h[t - 1].price * 0.9) {
+    const before = h[d.q - 1].price
+    const later = h[t].price
+    if (d.type === 'SELL' && d.price && later <= d.price * 0.9) {
       out.push({ id: EARNED_SOLD, params: { companyId: d.companyId, r_p: Math.round(d.price), y: Math.round((1 - later / d.price) * 100) } })
     }
-    if (d.type === 'REJECT' && !COMPANY[d.companyId].sound && later <= h[t - 1].price * 0.85) {
-      out.push({ id: EARNED_PASSED, params: { companyId: d.companyId, y: Math.round((1 - later / h[t - 1].price) * 100) } })
+    if (d.type === 'REJECT' && !COMPANY[d.companyId].sound && before > 0 && later <= before * 0.85) {
+      out.push({ id: EARNED_PASSED, params: { companyId: d.companyId, y: Math.round((1 - later / before) * 100) } })
     }
   }
   return out.slice(0, 1)

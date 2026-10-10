@@ -3,7 +3,6 @@ import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { holdingValueAt, knownQuarter, lightsAt, type RunState } from '../engine/state'
 import type { CompanyId, MarketRun } from '../engine/types'
 import { LightChip } from './Lights'
-import { companyStatus } from './Dossier'
 import { useInr } from './Panels'
 import { TitleCard } from '../../../components/TitleCard'
 
@@ -24,57 +23,40 @@ export function gainPct(run: RunState, m: MarketRun, id: CompanyId): number | nu
   return holdingValueAt(run, m, id, knownQuarter(run)) / h.cost - 1
 }
 
-/** The four companies in this game: not met, pitched, or owned. Tap one to study it. */
-export function CompanyStrip({ run, m, onOpen }: { run: RunState; m: MarketRun; onOpen: (id: CompanyId) => void }) {
-  const { t } = useTranslation('dealboard')
-  return (
-    <nav aria-label={t('strip.title')} className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-      {m.picked.map((id) => {
-        const status = companyStatus(run, id)
-        const g = gainPct(run, m, id)
-        return (
-          <button key={id} type="button" onClick={() => onOpen(id)} className="flex min-h-12 items-center gap-2 rounded-lg border-[2.5px] border-ink px-2 py-1 text-left" style={{ background: status === 'own' ? '#FFF3D6' : '#E6D8B6', opacity: status === 'unmet' ? 0.8 : 1, boxShadow: status === 'own' ? '2px 2px 0 #2B1A17' : 'none' }}>
-            {status === 'unmet' ? <span className="font-sign grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full border-[2.5px] border-dashed border-ink/50 text-[13px] opacity-70" aria-hidden>?</span> : <Mark id={id} />}
-            <span className="min-w-0 leading-tight">
-              <span className="block truncate text-[13px] font-extrabold">{t(`companies.${id}.name`)}</span>
-              <span className="block truncate text-[11px] font-bold opacity-70" style={{ color: g !== null ? (g >= 0 ? '#2f6f4a' : '#C8442F') : undefined }}>
-                {status === 'own' && g !== null ? `${g >= 0 ? '▲' : '▼'} ${Math.abs(g * 100).toFixed(1)}%` : status === 'met' ? t('strip.met') : t('strip.unmet')}
-              </span>
-            </span>
-          </button>
-        )
-      })}
-    </nav>
-  )
-}
-
-/** Compact stats card shown when hovering a company on the board. */
+/** Compact card shown when hovering a company corner on the board. */
 export function HoverCard({ run, m, id, touch }: { run: RunState; m: MarketRun; id: CompanyId; touch: boolean }) {
   const { t } = useTranslation('dealboard')
   const money = useInr()
-  const q = knownQuarter(run)
+  const q = Math.max(0, knownQuarter(run))
   const s = m.history[id][q]
   const h = run.holdings[id]
+  const met = run.pitched.includes(id)
   const L = lightsAt(m, id, q)
   const value = h ? holdingValueAt(run, m, id, q) : 0
   const gain = h ? value - h.cost : 0
   const runway = s.failed ? '—' : s.profit >= 0 ? t('stats.profitable') : t('stats.months', { n: Math.round(s.runwayMonths ?? 0) })
   return (
     <div className="pointer-events-none w-[236px] rounded-xl border-[3px] border-ink bg-jasmine p-2.5 text-[12px] leading-snug" style={{ boxShadow: '3px 4px 0 #2B1A17' }} role="tooltip">
-      <div className="flex items-center gap-1.5"><Mark id={id} size={22} /><span className="font-sign lang-fit truncate text-[14px]">{t(`companies.${id}.name`)}</span><span className="ml-auto font-extrabold">{money(s.failed ? 0 : s.price)}</span></div>
-      {h && <div className="mt-1.5 flex justify-between font-extrabold"><span>{t('dossier.own', { v: money(value) })}</span><span style={{ color: gain >= 0 ? '#2f6f4a' : '#C8442F' }}>{gain >= 0 ? '▲ ' : '▼ '}{money(Math.abs(gain))}</span></div>}
-      <div className="mt-1.5 grid grid-cols-2 gap-1">{(['cash', 'customers', 'debt', 'ceo'] as const).map((k) => <LightChip key={k} k={k} state={L[k]} />)}</div>
-      <dl className="m-0 mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5">
-        <dt className="opacity-60">{t('stats.runway.name')}</dt><dd className="m-0 text-right font-extrabold">{runway}</dd>
-        <dt className="opacity-60">{t('stats.retention.name')}</dt><dd className="m-0 text-right font-extrabold">{Math.round(s.retention * 100)}%</dd>
-        <dt className="opacity-60">{t('stats.profit.name')}</dt><dd className="m-0 text-right font-extrabold">{s.profit >= 0 ? '▲ ' : '▼ '}{t('stats.lakh', { v: Math.abs(s.profit).toFixed(1) })}</dd>
-      </dl>
+      <div className="flex items-center gap-1.5"><Mark id={id} size={22} /><span className="font-sign lang-fit truncate text-[14px]">{t(`companies.${id}.name`)}</span>{(h || met) && <span className="ml-auto font-extrabold">{money(s.failed ? 0 : s.price)}</span>}</div>
+      {h ? (
+        <>
+          <div className="mt-1.5 flex justify-between font-extrabold"><span>{t('dossier.own', { v: money(value) })}</span><span style={{ color: gain >= 0 ? '#2f6f4a' : '#C8442F' }}>{gain >= 0 ? '▲ ' : '▼ '}{money(Math.abs(gain))}</span></div>
+          <div className="mt-1.5 grid grid-cols-2 gap-1">{(['cash', 'customers', 'debt', 'ceo'] as const).map((k) => <LightChip key={k} k={k} state={L[k]} />)}</div>
+          <dl className="m-0 mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5">
+            <dt className="opacity-60">{t('stats.runway.name')}</dt><dd className="m-0 text-right font-extrabold">{runway}</dd>
+            <dt className="opacity-60">{t('stats.retention.name')}</dt><dd className="m-0 text-right font-extrabold">{Math.round(s.retention * 100)}%</dd>
+            <dt className="opacity-60">{t('stats.profit.name')}</dt><dd className="m-0 text-right font-extrabold">{s.profit >= 0 ? '▲ ' : '▼ '}{t('stats.lakh', { v: Math.abs(s.profit).toFixed(1) })}</dd>
+          </dl>
+        </>
+      ) : (
+        <p className="m-0 mt-1.5">{met ? t('dossier.passed') : t('dossier.unmet')}</p>
+      )}
       <div className="mt-1.5 text-center text-[11px] font-bold opacity-65">{touch ? t('hover.tap') : t('hover.click')}</div>
     </div>
   )
 }
 
-/** Introduction before the first roll: who the four companies are and what they claim. */
+/** Introduction before the first quarter: who the four companies are and what they claim. */
 export function Meet({ m, onStart }: { m: MarketRun; onStart: () => void }) {
   const { t } = useTranslation('dealboard')
   const tips = t('meet.tips', { returnObjects: true }) as string[]

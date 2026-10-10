@@ -1,0 +1,90 @@
+{
+  "title": "Deal Board",
+  "eyebrow": "The Pearl Exchange",
+  "tagline": "Back made-up companies. Read their signals. Learn when to hold and when to walk away.",
+  "intro": [
+    "You have ₹1,00,000 of play money and 12 quarters. A quarter is three months.",
+    "Every quarter, one company pitches to you. Ask questions to see its real numbers, then invest or pass.",
+    "The game scores your judgement, not your profit. Every decision gets feedback on what went well and what to improve."
+  ],
+  "start": "Start a new game",
+  "language": "Language",
+  "guardrail": "Simulation with made-up numbers. Real life is different.",
+  "quarter": "Quarter {{n}} of 12",
+  "quarterShort": "Q{{n}}",
+  "cash": "Cash",
+  "invested": "Invested",
+  "netWorth": "Net worth",
+  "back": "Charminar",
+  "perShare": "{{price}} a share",
+  "dragNote": "Prices rose a little. Idle cash lost {{x}}.",
+  "news": {
+    "slowdown": "A broad slowdown hits every sector.",
+    "shaky": "Markets stay shaky after the slowdown.",
+    "optimism": "Optimism returns across markets.",
+    "sectorRally": "{{sector}} companies rally on strong demand."
+  },
+  "sectors": {
+    "food": "Food and retail",
+    "fintech": "Fintech",
+    "energy": "Energy",
+    "health": "Healthcare",
+    "industrial": "Industrial",
+    "mobility": "Mobility"
+  },
+  "auction": {
+    "pitching": "Now pitching"
+  },
+  "companies": {
+    "dailyBasket": {
+      "name": "Daily Basket",
+      "slogan": "Groceries at your door, every morning.",
+      "founder": "Meera Rao, a calm ex-supermarket manager",
+      "line": "We grow slowly, because customers stay."
+    },
+    "payEasy": {
+      "name": "PayEasy",
+      "slogan": "The payments app everyone is downloading.",
+      "founder": "Kabir Sethi, a very confident app founder",
+      "line": "We are growing 25% a quarter. Profit comes later."
+    },
+    "solarGrid": {
+      "name": "SolarGrid",
+      "slogan": "Clean power for every rooftop.",
+      "founder": "Anil Varma, a patient engineer",
+      "line": "Summers are our big season; winters are quiet."
+    },
+    "medLink": {
+      "name": "MedLink Clinics",
+      "slogan": "Clinics in every neighbourhood.",
+      "founder": "Dr. Farah Siddiqui, an ambitious clinic builder",
+      "line": "We are opening five new clinics this year."
+    },
+    "steelWorks": {
+      "name": "SteelWorks",
+      "slogan": "Fifty years of steel. Now at a bargain.",
+      "founder": "R. Krishnan, a third-generation owner",
+      "line": "Our price is low because the market underestimates us."
+    },
+    "quickRide": {
+      "name": "QuickRide",
+      "slogan": "Record users, every single month.",
+      "founder": "Zoya Malik, a smooth showman",
+      "line": "Our ride numbers speak for themselves."
+    }
+  },
+  "yearEnd": {
+    "title": "Year {{n}} review",
+    "body": "Net worth {{nw}}. Cash {{cash}}, invested {{inv}}.",
+    "drag": "Rising prices took {{lost}} from idle cash so far.",
+    "fees": "Fees paid so far: {{fees}}.",
+    "continue": "Into year {{n}}",
+    "finish": "See the result"
+  },
+  "done": {
+    "title": "Twelve quarters, done",
+    "body": "You finished with a net worth of {{nw}}.",
+    "again": "Play again"
+  },
+  "closing": "Real markets are harder than this game. This teaches how to ask good questions, not what to buy."
+}

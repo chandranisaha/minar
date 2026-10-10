@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest'
-import en from '../content/en.json'
+import en from '../content/core.json'
+import enJudgement from '../content/judgement.json'
+import teJudgement from '../content/te/judgement.json'
 import enPlay from '../content/play.json'
 import enLearn from '../content/learn.json'
 import enLessons from '../content/lessons.json'
@@ -18,8 +20,8 @@ function flatten(v: Json, path = '', out: Record<string, string> = {}): Record<s
   return out
 }
 
-const EN = flatten({ ...en, ...enPlay, ...enLearn, ...enLessons } as Json)
-const TE = flatten({ ...teCore, ...tePlay, ...teLearn, ...teLessons } as Json)
+const EN = flatten({ ...en, ...enPlay, ...enLearn, ...enJudgement, ...enLessons } as Json)
+const TE = flatten({ ...teCore, ...tePlay, ...teLearn, ...teJudgement, ...teLessons } as Json)
 const holes = (s: string) => [...s.matchAll(/\{\{\s*([\w.]+)\s*\}\}/g)].map((m) => m[1]).sort()
 
 // strings that exist only in English (retired screens, unused keys) are allowed to be missing

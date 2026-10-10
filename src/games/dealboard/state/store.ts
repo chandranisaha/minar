@@ -32,7 +32,7 @@ export const useDealBoard = create<DealBoardStore>()(
     }),
     {
       name: 'deal-board-v1',
-      version: 3,
+      version: 4,
       // runs saved by earlier builds are dropped rather than crashing the page
       migrate: () => ({ run: null }),
       merge: (saved, current) => {

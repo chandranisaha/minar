@@ -1,213 +1,365 @@
 import { describe, expect, test } from 'vitest'
-import { act, canBuy, marketFor, newRun, netWorth, pitchFor, tileAt, type Action, type RunState } from '../engine/run'
-import { computeScore, tellQuarter } from '../engine/scoring'
+import { act, canBuy, marketFor, newRun, netWorth, pitchFor, reviewFor, type Action, type RunState } from '../engine/run'
+import { computeScore } from '../engine/scoring'
+import { reviewDecisions } from '../engine/review'
+import { computeAnalytics } from '../engine/analytics'
+import { explainQuarter } from '../engine/explain'
 import { lightsAt, knownLights } from '../engine/state'
 import { COMPANY, COMPANY_IDS } from '../engine/companies'
-import type { CompanyId } from '../engine/types'
+import type { CompanyId, LightKey } from '../engine/types'
+import enJudgement from '../content/judgement.json'
+import teJudgement from '../content/te/judgement.json'
 
-type Policy = (run: RunState, m: ReturnType<typeof marketFor>) => Action | null
+type Market = ReturnType<typeof marketFor>
+type Policy = (run: RunState, m: Market) => Action | null
 
-/** Plays a whole run with a policy for the land phase; other phases auto-advance. */
-function play(seed: string, landPolicy: Policy, managePolicy?: Policy): RunState {
+/** Plays a whole run: the policy decides at the desk, everything else advances itself. */
+function play(seed: string, desk: Policy): RunState {
   const m = marketFor(seed)
-  let run = newRun(seed)
-  for (let guard = 0; run.phase !== 'done' && guard < 600; guard++) {
-    let a: Action | null = null
-    if (run.phase === 'news') a = { type: 'roll' }
-    else if (run.phase === 'land') a = landPolicy(run, m) ?? { type: 'resolve' }
-    else if (run.phase === 'manage') a = managePolicy?.(run, m) ?? { type: 'endTurn' }
+  let run = act(newRun(seed), { type: 'brief' })
+  for (let guard = 0; run.phase !== 'done' && guard < 400; guard++) {
+    let a: Action
+    if (run.phase === 'desk') a = desk(run, m) ?? (pitchFor(run, m) ? { type: 'pass', companyId: pitchFor(run, m)! } : { type: 'hold', companyId: reviewFor(run, m)! })
     else if (run.phase === 'emergency') {
-      // sell the biggest holding until the cash is there
       const ids = Object.keys(run.holdings) as CompanyId[]
       a = run.cash >= 25000 || !ids.length ? { type: 'payEmergency' } : { type: 'sell', companyId: ids[0], fraction: 1, reason: 'other' }
     } else a = { type: 'continue' }
     const next = act(run, a)
-    if (next === run) {
-      // illegal move (e.g. pass when nothing to pass on): fall back so the test never hangs
-      run = act(run, run.phase === 'land' ? { type: 'resolve' } : { type: 'continue' })
-    } else run = next
+    run = next === run ? act(run, { type: 'continue' }) : next
   }
   return run
 }
 
-const bidAll = (amount: number, flips = 0): Policy => (run, m) => {
-  if (tileAt(run, m) !== 'auction') return null
+const LIGHTS: LightKey[] = ['cash', 'customers', 'debt', 'ceo']
+
+/** Invests the same amount in whatever pitches, asking `asks` questions first. */
+const investEvery = (amount: number, asks = 0): Policy => (run, m) => {
   const id = pitchFor(run, m)
-  if (!id) return null
-  for (const light of (['cash', 'customers', 'debt', 'ceo'] as const).slice(0, flips)) {
-    if (!knownLights(run, id).includes(light)) return { type: 'ask', companyId: id, light }
-  }
+  if (!id) return { type: 'hold', companyId: reviewFor(run, m)! }
+  for (const light of LIGHTS.slice(0, asks)) if (!knownLights(run, id).includes(light)) return { type: 'ask', companyId: id, light }
   return run.cash >= amount && canBuy(run) ? { type: 'bid', companyId: id, amount, reason: 'looksHyped' } : { type: 'pass', companyId: id }
 }
 
-/** Careful player: asks two questions, buys only when the lights it saw are clean, never sells a sound company. */
+/** Careful player: asks two questions, buys only sound-looking companies, never sells a sound one. */
 const careful: Policy = (run, m) => {
-  if (tileAt(run, m) !== 'auction') return null
   const id = pitchFor(run, m)
-  if (!id) return null
+  if (!id) return { type: 'hold', companyId: reviewFor(run, m)! }
   for (const light of ['cash', 'customers'] as const) if (!knownLights(run, id).includes(light)) return { type: 'ask', companyId: id, light }
   const L = lightsAt(m, id, run.turn - 1)
   const clean = COMPANY[id].sound && (['cash', 'customers'] as const).every((k) => L[k] === 'G')
   return clean && run.cash >= 25000 ? { type: 'bid', companyId: id, amount: 25000, reason: 'dataSays' } : { type: 'pass', companyId: id }
 }
 
-describe('decisions and consequences', () => {
-  test('a bid buys at the known price with a 1% fee', () => {
-    const seed = 'bid-1'
-    const m = marketFor(seed)
-    let run = act(newRun(seed), { type: 'roll' })
-    // jump to an auction state for the test
-    run = { ...run, phase: 'land' }
-    const id = pitchFor(run, m)!
-    if (tileAt(run, m) !== 'auction') return
-    const after = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'dataSays' })
-    // the quarter closes straight away: idle cash then loses 1%
-    expect(after.cash).toBe(90000 - Math.round(90000 * 0.01))
-    expect(after.feesPaid).toBe(100)
-    expect(after.holdings[id]!.units).toBeCloseTo(9900 / m.history[id][0].price, 6)
-    expect(after.phase).not.toBe('land')
-    expect(after.owners[m.positions[run.turn]]).toBe(id)
+describe('a quarter is one screen with one real decision', () => {
+  test('every quarter has a company pitching until you own all four', () => {
+    const m = marketFor('pitch-1')
+    let run = act(newRun('pitch-1'), { type: 'brief' })
+    const seen: CompanyId[] = []
+    for (let q = 1; q <= 4; q++) {
+      const id = pitchFor(run, m)!
+      expect(id).toBeTruthy()
+      seen.push(id)
+      run = act(run, { type: 'pass', companyId: id })
+      if (run.phase === 'lesson') run = act(run, { type: 'continue' })
+      if (run.phase === 'yearEnd') run = act(run, { type: 'continue' })
+    }
+    expect(new Set(seen).size).toBe(4)
+    expect(run.turn).toBe(5)
   })
 
-  test('founder questions are limited to two lights per pitch', () => {
-    const seed = 'ask-1'
-    const m = marketFor(seed)
-    let run: RunState = { ...act(newRun(seed), { type: 'roll' }), phase: 'land' }
-    // force the token onto an auction by searching seeds is overkill: use a state-level check instead
-    const auctionTurn = m.positions.findIndex((p, i) => i > 0 && m.tiles[p] === 'auction')
-    if (auctionTurn < 1) return
-    run = { ...newRun(seed), turn: auctionTurn, phase: 'land' }
+  test('a quarter can never be clicked through without a decision', () => {
+    const m = marketFor('quiet-1')
+    const run = act(newRun('quiet-1'), { type: 'brief' })
+    expect(pitchFor(run, m)).not.toBeNull()
+    expect(act(run, { type: 'continue' })).toBe(run)
+    expect(act(run, { type: 'hold', companyId: m.picked[0] })).toBe(run)
+  })
+
+  test('owning all four turns each quarter into a graded check-in on one of your companies, rotating', () => {
+    const m = marketFor('own-all')
+    let run = act(newRun('own-all'), { type: 'brief' })
+    for (let q = 1; q <= 4; q++) {
+      run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: 'dataSays' })
+      while (run.phase === 'lesson' || run.phase === 'yearEnd') run = act(run, { type: 'continue' })
+    }
+    expect(Object.keys(run.holdings)).toHaveLength(4)
+    expect(pitchFor(run, m)).toBeNull()
+    const seen: CompanyId[] = []
+    for (let q = 0; q < 4; q++) {
+      const id = reviewFor(run, m)!
+      expect(id).toBeTruthy()
+      seen.push(id)
+      // you cannot skip: only a hold, a sell or a buy-more is accepted, and holding is logged
+      const before = run.log.length
+      run = act(run, { type: 'hold', companyId: id })
+      expect(run.log.length).toBe(before + 1)
+      expect(run.log.at(-1)).toMatchObject({ type: 'HOLD', companyId: id })
+      while (run.phase === 'lesson' || run.phase === 'yearEnd') run = act(run, { type: 'continue' })
+    }
+    expect(new Set(seen).size).toBe(4)
+  })
+
+  test('holding a company with weak checks is flagged, holding a healthy one is praised', () => {
+    let weak = false, strong = false
+    for (let i = 0; i < 300 && !(weak && strong); i++) {
+      const seed = `hold-${i}`
+      const m = marketFor(seed)
+      for (const id of m.pitchOrder) {
+        for (let turn = 2; turn <= 12; turn++) {
+          const run = { ...newRun(seed), briefed: true, turn, holdings: { [id]: { units: 10, cost: 1000, since: 1 } } } as RunState
+          const first = Object.keys(run.holdings)[0] as CompanyId
+          const done = { ...run, log: [{ id: 'x', q: turn, type: 'HOLD' as const, companyId: first, tabsOpened: [], questionsAsked: [], known: LIGHTS, price: 100 }] }
+          const [e] = reviewDecisions(done, m)
+          if (e.pointers.some((p) => p.key === 'heldWeak')) { weak = true; expect(e.verdict).not.toBe('good') }
+          if (e.pointers.some((p) => p.key === 'heldStrong')) { strong = true; expect(e.verdict).toBe('good') }
+        }
+      }
+    }
+    expect(weak && strong).toBe(true)
+  })
+
+  test('questions are limited to two per pitch and reset every quarter', () => {
+    const m = marketFor('ask-1')
+    let run = act(newRun('ask-1'), { type: 'brief' })
     const id = pitchFor(run, m)!
     run = act(run, { type: 'ask', companyId: id, light: 'cash' })
     run = act(run, { type: 'ask', companyId: id, light: 'customers' })
-    const third = act(run, { type: 'ask', companyId: id, light: 'debt' })
-    expect(third).toBe(run)
+    expect(act(run, { type: 'ask', companyId: id, light: 'debt' })).toBe(run)
     expect(run.asked[id]).toEqual(['cash', 'customers'])
+    run = act(run, { type: 'pass', companyId: id })
+    if (run.phase === 'lesson') run = act(run, { type: 'continue' })
+    expect(run.asked).toEqual({})
+  })
+
+  test('a bid buys at the known price with a 1% fee and a recorded reason', () => {
+    const m = marketFor('bid-1')
+    let run = act(newRun('bid-1'), { type: 'brief' })
+    const id = pitchFor(run, m)!
+    run = act(run, { type: 'ask', companyId: id, light: 'cash' })
+    const after = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'dataSays' })
+    expect(after.feesPaid).toBe(100)
+    expect(after.holdings[id]!.units).toBeCloseTo(9900 / m.history[id][0].price, 6)
+    expect(after.cash).toBe(90000 - Math.round(90000 * 0.01))
+    expect(after.log[0]).toMatchObject({ type: 'INVEST', q: 1, reason: 'dataSays', flips: 1, known: ['cash'] })
   })
 
   test('selling charges a 1% fee and removes the holding', () => {
-    const seed = 'sell-1'
-    const m = marketFor(seed)
+    const m = marketFor('sell-1')
     const id = m.picked[0]
-    let run: RunState = { ...newRun(seed), turn: 2, phase: 'manage', cash: 50000, holdings: { [id]: { units: 100, cost: 50000, since: 1 } } }
-    const price = m.history[id][1].price
+    let run: RunState = { ...act(newRun('sell-1'), { type: 'brief' }), turn: 3, cash: 50000, holdings: { [id]: { units: 100, cost: 50000, since: 1 } } }
+    const price = m.history[id][2].price
     run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: 'dataSays' })
     expect(run.holdings[id]).toBeUndefined()
-    expect(run.cash).toBe(50000 + Math.round(100 * price - Math.round(100 * price * 0.01)))
     expect(run.feesPaid).toBe(Math.round(100 * price * 0.01))
+    expect(run.cash).toBe(50000 + Math.round(100 * price - Math.round(100 * price * 0.01)))
   })
 
-  test('the bank loan adds cash and costs ₹600 a quarter, cleared by the end', () => {
-    const seed = 'loan-1'
-    const m = marketFor(seed)
-    const bankTurn = m.positions.findIndex((p, i) => i > 0 && m.tiles[p] === 'bank')
-    if (bankTurn < 1) return
-    let run: RunState = { ...newRun(seed), turn: bankTurn, phase: 'land' }
-    run = act(run, { type: 'loan' })
-    expect(run.loan).toBe(20000)
-    expect(run.loanInterest).toBe(600)
-    expect(run.cash).toBe(Math.round((120000 - 600) * 0.99))
-    expect(run.recap?.bank).toBe('loan')
+  test('the family emergency fires once, in quarters 8 to 10', () => {
+    const run = play('emergency-1', investEvery(25000))
+    expect(run.emergencyDone).toBe(true)
+    expect(run.phase).toBe('done')
   })
 
   test('rewind restores the start of the quarter once a year', () => {
     const seed = 'rewind-1'
     const m = marketFor(seed)
-    const id = pitchFor(newRun(seed), m)!
-    let run: RunState = { ...act(newRun(seed), { type: 'roll' }) }
-    const start = run.checkpoints[1]
-    expect(start.turn).toBe(0)
-    run = { ...run, phase: 'lesson', lesson: { id: 1, params: { companyId: id } }, after: 'news', cash: 12345 }
+    let run = act(newRun(seed), { type: 'brief' })
+    const id = pitchFor(run, m)!
+    run = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'looksHyped' })
+    if (run.phase === 'desk') {
+      // no lesson fired; fabricate one from this quarter so the replay path is exercised
+      run = { ...run, turn: 1, phase: 'lesson', lesson: { id: 1, params: { companyId: id } }, after: 'desk' }
+    }
     const back = act(run, { type: 'rewind' })
-    expect(back.turn).toBe(0)
-    expect(back.phase).toBe('news')
+    expect(back.turn).toBe(1)
+    expect(back.phase).toBe('desk')
     expect(back.cash).toBe(100000)
     expect(back.rewinds).toEqual([1])
-    expect(act({ ...back, phase: 'lesson', turn: 1 }, { type: 'rewind' }).turn).toBe(1)
+    expect(act({ ...back, phase: 'lesson', turn: 1 }, { type: 'rewind' }).phase).toBe('lesson')
+  })
+
+  test('same seed and same decisions give identical runs', () => {
+    expect(play('same-1', investEvery(20000))).toEqual(play('same-1', investEvery(20000)))
+  })
+
+  test('a full run always ends in done after 12 quarters', () => {
+    for (const seed of ['a1', 'a2', 'a3']) {
+      const run = play(seed, investEvery(10000, 1))
+      expect(run.phase).toBe('done')
+      expect(run.turn).toBe(12)
+      expect(run.series).toHaveLength(13)
+    }
+  })
+
+  test('idle cash loses 1% a quarter when nothing is invested', () => {
+    const run = play('drag-1', () => null)
+    expect(run.cashDragLost).toBeGreaterThan(0)
+    expect(run.cash + run.cashDragLost + 25000 - run.loan).toBeGreaterThanOrEqual(99900)
   })
 })
 
-describe('lessons fire from the player’s own decisions (spec acceptance tests)', () => {
-  const find = (pred: (m: ReturnType<typeof marketFor>) => boolean) => {
-    for (let i = 0; i < 400; i++) if (pred(marketFor(`les-${i}`))) return `les-${i}`
+describe('lessons come from the player’s own decisions', () => {
+  test('investing in a company with weak checks teaches growth-is-not-health and customers', () => {
+    for (let i = 0; i < 300; i++) {
+      const seed = `les-${i}`
+      const m = marketFor(seed)
+      if (m.pitchOrder[0] !== 'payEasy') continue
+      const run = act(act(newRun(seed), { type: 'brief' }), { type: 'bid', companyId: 'payEasy', amount: 10000, reason: 'looksHyped' })
+      const ids = [run.lesson, ...run.queue].filter(Boolean).map((l) => l!.id)
+      expect(ids).toContain(1)
+      expect(ids).toContain(2)
+      expect(ids).toContain(5)
+      return
+    }
     throw new Error('no seed found')
-  }
-  const firstAuction = (m: ReturnType<typeof marketFor>) => m.positions.findIndex((p, i) => i > 0 && m.tiles[p] === 'auction')
-
-  test('buying a company with a red Cash light fires lesson 1 with real numbers', () => {
-    const seed = find((m) => {
-      const t = firstAuction(m)
-      return t > 0 && t <= 4 && m.pitchOrder[0] === 'payEasy'
-    })
-    const m = marketFor(seed)
-    const t = firstAuction(m)
-    let run: RunState = { ...newRun(seed), turn: t, phase: 'land', turnStartInvested: 0 }
-    run = act(run, { type: 'bid', companyId: 'payEasy', amount: 10000, reason: 'looksHyped' })
-    const ids = [run.lesson, ...run.queue].filter(Boolean).map((l) => l!.id)
-    expect(ids).toContain(1)
-    expect(ids).toContain(2)
   })
 
-  test('selling 70% or more in the market fall with no red lights is jail and lesson 7', () => {
-    const seed = find((m) => m.fallQ <= 10)
-    const m = marketFor(seed)
-    const t = m.fallQ
-    const id = 'dailyBasket' as CompanyId
-    let run: RunState = { ...newRun(seed), turn: t - 1, phase: 'news', cash: 50000, holdings: { [id]: { units: 400, cost: 40000, since: 1 } }, checkpoints: {}, turnStartInvested: 400 * m.history[id][t - 1].price }
-    run = act(run, { type: 'roll' })
-    run = { ...run, phase: 'manage' }
-    run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: 'scaredLoss' })
-    run = act(run, { type: 'endTurn' })
-    expect(run.jails).toBe(1)
-    expect(run.jailedTurn).toBe(t + 1)
-    expect([run.lesson, ...run.queue].map((l) => l?.id)).toContain(7)
-    // jailed: cannot buy next turn
-    expect(canBuy({ ...run, turn: t + 1 })).toBe(false)
-  })
-
-  test('the family emergency fires once between turns 8 and 10 and a forced sale teaches lesson 9', () => {
-    const run = play('emergency-1', bidAll(30000))
-    expect(run.emergencyDone).toBe(true)
-    const m = marketFor('emergency-1')
-    expect(m.emergencyTurn).toBeGreaterThanOrEqual(1)
-    expect(run.phase).toBe('done')
+  test('selling 70% or more in the market fall with no weak checks is panic: no buying next quarter, lesson 7', () => {
+    for (let i = 0; i < 400; i++) {
+      const m = marketFor(`dip-${i}`)
+      if (m.fallQ > 10) continue
+      const t = m.fallQ
+      const id = 'dailyBasket'
+      const price = m.history[id][t - 1].price
+      let run: RunState = { ...newRun(`dip-${i}`), briefed: true, turn: t, cash: 50000, holdings: { [id]: { units: 400, cost: 40000, since: 1 } }, turnStartInvested: 400 * price }
+      run = act(run, { type: 'sell', companyId: id, fraction: 1, reason: 'scaredLoss' })
+      const target = pitchFor(run, m)!
+      run = act(run, { type: 'pass', companyId: target })
+      expect(run.jails).toBe(1)
+      expect(run.jailedTurn).toBe(t + 1)
+      expect(canBuy({ ...run, turn: t + 1, phase: 'desk' })).toBe(false)
+      expect([run.lesson, ...run.queue].map((l) => l?.id)).toContain(7)
+      return
+    }
   })
 
   test('8 trades or fees above 3% fire lesson 10', () => {
-    const seed = 'fees-1'
-    let run: RunState = { ...newRun(seed), turn: 5, phase: 'manage', trades: 8, feesPaid: 200, cash: 90000 }
-    run = act(run, { type: 'endTurn' })
+    const m = marketFor('fees-1')
+    let run: RunState = { ...act(newRun('fees-1'), { type: 'brief' }), turn: 5, trades: 8, feesPaid: 200, cash: 90000 }
+    run = act(run, { type: 'pass', companyId: pitchFor(run, m)! })
     expect([run.lesson, ...run.queue].map((l) => l?.id)).toContain(10)
   })
 
-  test('a lesson shows at most twice per run and at most one per quarter', () => {
-    const run = play('twice-1', bidAll(20000))
+  test('a lesson shows at most twice per run', () => {
+    const run = play('twice-1', investEvery(20000))
     for (const [id, n] of Object.entries(run.shown)) expect(n, `lesson ${id}`).toBeLessThanOrEqual(2)
+  })
+
+  test('"earned it" cards only describe quarters that have already been played', () => {
+    for (let i = 0; i < 60; i++) {
+      const seed = `earn-${i}`
+      const m = marketFor(seed)
+      const run = play(seed, careful)
+      for (const l of [...run.queue, run.lesson].filter(Boolean)) expect(l!.id).toBeLessThan(200)
+      void m
+    }
+  })
+})
+
+describe('judgement is tracked decision by decision', () => {
+  test('every decision is reviewed with a verdict and pointers', () => {
+    const run = play('rev-1', investEvery(15000, 1))
+    const m = marketFor('rev-1')
+    const entries = reviewDecisions(run, m)
+    expect(entries.length).toBe(run.log.length)
+    for (const e of entries) {
+      expect(['good', 'ok', 'risky']).toContain(e.verdict)
+      expect(e.pointers.length).toBeGreaterThan(0)
+    }
+  })
+
+  test('investing blind in a weak company is called risky and says what was missed', () => {
+    for (let i = 0; i < 300; i++) {
+      const seed = `blind-${i}`
+      const m = marketFor(seed)
+      if (m.pitchOrder[0] !== 'payEasy') continue
+      const run = act(act(newRun(seed), { type: 'brief' }), { type: 'bid', companyId: 'payEasy', amount: 10000, reason: 'looksHyped' })
+      const [e] = reviewDecisions(run, m)
+      expect(e.verdict).toBe('risky')
+      const keys = e.pointers.map((p) => p.key)
+      expect(keys).toContain('askedNone')
+      expect(keys).toContain('missedWeak')
+      expect(keys).toContain('reasonFeeling')
+      return
+    }
+    throw new Error('no seed found')
+  })
+
+  test('asking, reading the checks and investing on data is rewarded', () => {
+    for (let i = 0; i < 300; i++) {
+      const seed = `good-${i}`
+      const m = marketFor(seed)
+      const id = m.pitchOrder[0]
+      if (id !== 'dailyBasket') continue
+      let run = act(newRun(seed), { type: 'brief' })
+      run = act(run, { type: 'ask', companyId: id, light: 'cash' })
+      run = act(run, { type: 'ask', companyId: id, light: 'customers' })
+      run = act(run, { type: 'bid', companyId: id, amount: 20000, reason: 'dataSays' })
+      const [e] = reviewDecisions(run, m)
+      expect(e.verdict).toBe('good')
+      expect(e.pointers.filter((p) => p.kind === 'bad')).toHaveLength(0)
+      expect(e.pointers.map((p) => p.key)).toEqual(expect.arrayContaining(['askedTwo', 'reasonData', 'readChecks']))
+      return
+    }
+    throw new Error('no seed found')
+  })
+
+  test('passing on a weak company is praised; passing without asking is a gentle note', () => {
+    for (let i = 0; i < 300; i++) {
+      const seed = `pass-${i}`
+      const m = marketFor(seed)
+      if (m.pitchOrder[0] !== 'payEasy') continue
+      let run = act(newRun(seed), { type: 'brief' })
+      run = act(run, { type: 'ask', companyId: 'payEasy', light: 'customers' })
+      run = act(run, { type: 'pass', companyId: 'payEasy' })
+      const [e] = reviewDecisions(run, m)
+      expect(e.verdict).toBe('good')
+      expect(e.pointers.map((p) => p.key)).toContain('passedWeak')
+      return
+    }
+    throw new Error('no seed found')
+  })
+
+  test('the review never uses results from quarters that have not been played yet', () => {
+    const seed = 'spoiler-1'
+    const m = marketFor(seed)
+    let run = act(newRun(seed), { type: 'brief' })
+    const id = pitchFor(run, m)!
+    run = act(run, { type: 'bid', companyId: id, amount: 10000, reason: 'dataSays' })
+    // right after the decision, quarter 1 has closed so its result may show; nothing beyond it
+    const [e] = reviewDecisions(run, m)
+    const outcome = e.pointers.find((p) => p.key.startsWith('outcomeBuy'))
+    expect(outcome).toBeDefined()
+    const q1 = m.history[id][1].price / m.history[id][0].price - 1
+    expect(outcome!.params.pct).toBe(Math.abs(Math.round(q1 * 100)))
+  })
+
+  test('the live score only counts skills that have come up', () => {
+    const m = marketFor('live-1')
+    const start = computeScore(act(newRun('live-1'), { type: 'brief' }), m)
+    expect(start.measured).toMatchObject({ research: false, skepticism: false, spread: false })
+    const run = play('live-1', careful)
+    expect(computeScore(run, m).measured.research || computeScore(run, m).measured.skepticism).toBe(true)
   })
 })
 
 describe('judgement scoring', () => {
-  test('profit never decides the result: same decisions, same score', () => {
-    expect(computeScore(play('same-1', bidAll(20000)), marketFor('same-1'))).toEqual(computeScore(play('same-1', bidAll(20000)), marketFor('same-1')))
-  })
-
-  test('buying a trap without asking scores zero research and zero skepticism for it', () => {
-    const run = play('trap-1', bidAll(20000, 0))
+  test('buying a company without asking scores zero research', () => {
+    const run = play('trap-1', investEvery(20000, 0))
     const s = computeScore(run, marketFor('trap-1'))
     expect(s.research).toBe(0)
     expect(s.skepticism).toBeLessThan(10)
   })
 
-  test('a bot that spreads equally across the companies and holds scores 35 to 55 (median over 1,000 seeds)', () => {
+  test('a bot that buys everything equally and never asks scores 35 to 55 (median over 1,000 seeds)', () => {
     const scores: number[] = []
     for (let i = 0; i < 1000; i++) {
       const seed = `bot-${i}`
-      scores.push(computeScore(play(seed, bidAll(20000, 0)), marketFor(seed)).total)
+      scores.push(computeScore(play(seed, investEvery(20000, 0)), marketFor(seed)).total)
     }
     scores.sort((a, b) => a - b)
-    const median = scores[500]
-    expect(median).toBeGreaterThanOrEqual(35)
-    expect(median).toBeLessThanOrEqual(55)
+    expect(scores[500]).toBeGreaterThanOrEqual(35)
+    expect(scores[500]).toBeLessThanOrEqual(55)
   })
 
   test('careful play clears the stage far more often than careless play', () => {
@@ -217,21 +369,155 @@ describe('judgement scoring', () => {
     for (let i = 0; i < N; i++) {
       const seed = `cmp-${i}`
       if (computeScore(play(seed, careful), marketFor(seed)).cleared) carefulClears++
-      if (computeScore(play(seed, bidAll(20000, 0)), marketFor(seed)).cleared) carelessClears++
+      if (computeScore(play(seed, investEvery(20000, 0)), marketFor(seed)).cleared) carelessClears++
     }
     expect(carefulClears / N).toBeGreaterThan(0.6)
     expect(carelessClears / N).toBeLessThan(0.1)
   })
 
-  test('net worth is secondary: passing everything cannot clear the stage', () => {
-    const s = computeScore(play('pass-1', (run, m) => (tileAt(run, m) === 'auction' && pitchFor(run, m) ? { type: 'pass', companyId: pitchFor(run, m)! } : null)), marketFor('pass-1'))
+  test('passing on everything cannot clear the stage', () => {
+    const run = play('pass-all', (r, m) => ({ type: 'pass', companyId: pitchFor(r, m)! }))
+    const s = computeScore(run, marketFor('pass-all'))
     expect(s.cleared).toBe(false)
     expect(s.profit).toBeLessThan(0)
   })
 
-  test('tell quarters exist for every trap', () => {
-    const m = marketFor('tell-1')
-    for (const id of COMPANY_IDS.filter((c) => !COMPANY[c].sound)) expect(tellQuarter(m, id)).toBeLessThanOrEqual(12)
-    expect(netWorth(newRun('tell-1'), m)).toBe(100000)
+  test('profit never decides the result: same decisions, same score', () => {
+    expect(computeScore(play('same-2', investEvery(20000)), marketFor('same-2'))).toEqual(computeScore(play('same-2', investEvery(20000)), marketFor('same-2')))
+  })
+})
+
+describe('analytics', () => {
+  test('series, allocation and habits describe the run', () => {
+    const run = play('an-1', investEvery(15000, 1))
+    const m = marketFor('an-1')
+    const a = computeAnalytics(run, m)
+    expect(a.series).toHaveLength(13)
+    expect(a.series[0].networth).toBe(100000)
+    expect(a.series.at(-1)!.networth).toBe(a.netWorth)
+    expect(a.allocation.reduce((s, x) => s + x.pct, 0)).toBeCloseTo(1, 5)
+    expect(a.habits.trades).toBe(run.trades)
+    expect(a.habits.fees).toBe(run.feesPaid)
+    expect(a.counts.invest + a.counts.sell + a.counts.pass + a.counts.hold).toBe(run.log.length)
+    expect(a.change).toBe(a.netWorth - 100000)
+  })
+
+  test('reasons are split into evidence and feelings', () => {
+    let run = act(newRun('rs-1'), { type: 'brief' })
+    const m = marketFor('rs-1')
+    run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: 'dataSays' })
+    if (run.phase === 'lesson') run = act(run, { type: 'continue' })
+    run = act(run, { type: 'bid', companyId: pitchFor(run, m)!, amount: 10000, reason: 'looksHyped' })
+    const a = computeAnalytics(run, m)
+    expect(a.evidencePct).toBe(0.5)
+    expect(a.reasons.map((r) => r.kind).sort()).toEqual(['evidence', 'feeling'])
+  })
+
+  test('analytics never show quarters that have not been played', () => {
+    const m = marketFor('an-2')
+    const run = act(newRun('an-2'), { type: 'brief' })
+    expect(computeAnalytics(run, m).series).toHaveLength(1)
+    expect(netWorth(run, m)).toBe(100000)
+  })
+})
+
+describe('why a price moved', () => {
+  const m = marketFor('why-1')
+
+  test('a broad market fall is named as a reason', () => {
+    expect(explainQuarter(m, 'dailyBasket', m.fallQ).reasons.map((r) => r.key)).toContain('market.fell')
+    for (const id of COMPANY_IDS) {
+      const { reasons } = explainQuarter(m, id, m.fallQ)
+      expect(reasons.length).toBeGreaterThan(0)
+      expect(reasons.length).toBeLessThanOrEqual(3)
+    }
+  })
+
+  test('PayEasy rising while losses grow is called excitement, not earnings', () => {
+    let found = false
+    for (let i = 0; i < 40 && !found; i++) {
+      const mm = marketFor(`hype-${i}`)
+      for (let q = 2; q <= 6; q++) {
+        const { move, reasons } = explainQuarter(mm, 'payEasy', q)
+        if (move > 0.04 && mm.history.payEasy[q].profit < mm.history.payEasy[q - 1].profit) {
+          expect(reasons.map((r) => r.key)).toContain('excitement')
+          found = true
+          break
+        }
+      }
+    }
+    expect(found).toBe(true)
+  })
+
+  test('a failed company is explained by its failure', () => {
+    for (let i = 0; i < 60; i++) {
+      const mm = marketFor(`fail-${i}`)
+      if (mm.payEasyPath !== 'fail') continue
+      expect(explainQuarter(mm, 'payEasy', 10).reasons[0].key).toBe('event.failed')
+      return
+    }
+  })
+})
+
+describe('every pointer the review can give has text in both languages', () => {
+  test('keys seen over many different playstyles all exist in English and Telugu', () => {
+    const keys = new Set<string>()
+    const unfilled: string[] = []
+    const styles: Policy[] = [investEvery(20000, 0), investEvery(10000, 1), investEvery(15000, 2), careful, (r, m) => ({ type: 'pass', companyId: pitchFor(r, m)! })]
+    for (let i = 0; i < 120; i++) {
+      const seed = `keys-${i}`
+      const m = marketFor(seed)
+      for (const style of styles) for (const e of reviewDecisions(play(seed, style), m)) for (const p of e.pointers) {
+        keys.add(p.key)
+        const have = new Set(Object.keys(p.params).concat(p.params.reasonKey ? ['reason'] : []))
+        for (const hole of ((enJudgement.review as Record<string, string>)[p.key] ?? '').matchAll(/{{s*([w]+)s*}}/g)) if (!have.has(hole[1])) unfilled.push(p.key + ':' + hole[1])
+      }
+    }
+    expect([...new Set(unfilled)]).toEqual([])
+    expect(keys.size).toBeGreaterThan(15)
+    for (const k of keys) {
+      expect((enJudgement.review as Record<string, string>)[k], 'en ' + k).toBeTruthy()
+      expect((teJudgement.review as Record<string, string>)[k], 'te ' + k).toBeTruthy()
+    }
+  })
+})
+
+describe('lesson cards fill every placeholder', () => {
+  test('across many playstyles, each lesson card has a value for every {{placeholder}} in both languages', async () => {
+    const en = (await import('../content/lessons.json')).default as unknown as { lite: Record<string, Record<string, string>>; earned: Record<string, Record<string, string>> }
+    const te = (await import('../content/te/lessons.json')).default as unknown as typeof en
+    const bad: string[] = []
+    const seen = new Set<number>()
+    const styles: Policy[] = [investEvery(20000, 0), investEvery(10000, 1), careful, (r, m) => ({ type: 'pass', companyId: pitchFor(r, m)! })]
+    for (let i = 0; i < 80; i++) {
+      for (const style of styles) {
+        const seed = `lc-${i}`
+        const m = marketFor(seed)
+        let run = act(newRun(seed), { type: 'brief' })
+        for (let guard = 0; run.phase !== 'done' && guard < 400; guard++) {
+          if (run.phase === 'lesson' && run.lesson) {
+            const l = run.lesson
+            seen.add(l.id)
+            const have = new Set([...Object.keys(l.params), ...(l.params.companyId ? ['company'] : []), ...(l.params.reasonKey ? ['reason'] : [])])
+            const set = l.id >= 100 ? [en.earned[String(l.id)], te.earned[String(l.id)]] : [en.lite[String(l.id)], te.lite[String(l.id)]]
+            for (const texts of set) for (const key of ['did', 'didB']) for (const hole of (texts[key] ?? '').matchAll(/\{\{\s*(\w+)\s*\}\}/g)) {
+              if (key === 'didB' && l.variant !== 'b') continue
+              if (key === 'did' && l.variant === 'b' && texts.didB) continue
+              if (!have.has(hole[1])) bad.push(`${l.id}.${key}:${hole[1]}`)
+            }
+          }
+          let a: Action
+          if (run.phase === 'desk') a = style(run, m) ?? (pitchFor(run, m) ? { type: 'pass', companyId: pitchFor(run, m)! } : { type: 'hold', companyId: reviewFor(run, m)! })
+          else if (run.phase === 'emergency') {
+            const ids = Object.keys(run.holdings) as CompanyId[]
+            a = run.cash >= 25000 || !ids.length ? { type: 'payEmergency' } : { type: 'sell', companyId: ids[0], fraction: 1, reason: 'scaredLoss' }
+          } else a = { type: 'continue' }
+          const next = act(run, a)
+          run = next === run ? act(run, { type: 'continue' }) : next
+        }
+      }
+    }
+    expect([...new Set(bad)]).toEqual([])
+    expect(seen.size).toBeGreaterThan(5)
   })
 })

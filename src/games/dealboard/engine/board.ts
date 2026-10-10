@@ -1,26 +1,25 @@
-import type { TileKind } from './types'
-import { int, streamFor } from './rng'
-
-/** The 16-tile ring, clockwise from Start (spec "The board"). */
-export const BOARD: TileKind[] = [
-  'start', 'auction', 'chance', 'auction', 'bank',
-  'rent', 'chance', 'auction',
-  'chest', 'chance', 'tax', 'bank', 'auction',
-  'rent', 'parking', 'chance',
-]
-
 export const TURNS = 12
 export const YEAR_ENDS = [4, 8, 12]
 
-/** Seeded d6 rolls and the resulting token positions. positions[0] is Start. */
-export function rollPath(seed: string): { rolls: number[]; positions: number[] } {
-  const rng = streamFor(seed, 'dice')
-  const rolls: number[] = []
-  const positions = [0]
-  for (let t = 1; t <= TURNS; t++) {
-    const r = int(rng, 1, 6)
-    rolls.push(r)
-    positions.push((positions[t - 1] + r) % BOARD.length)
-  }
-  return { rolls, positions }
+/**
+ * The ring has 16 slots: the four companies of this game sit on the corners and the twelve quarters
+ * fill the stretches between them. The token moves one quarter at a time; the company that is
+ * pitching this quarter glows on its corner.
+ */
+export type Slot = { kind: 'lot'; index: number } | { kind: 'quarter'; q: number }
+
+export const RING: Slot[] = Array.from({ length: 16 }, (_, i) =>
+  i % 4 === 0 ? { kind: 'lot', index: i / 4 } : { kind: 'quarter', q: i - Math.floor(i / 4) },
+)
+
+export const RING_SIZE = RING.length
+
+/** Ring slot of a company's corner (index = position in the run's picked order). */
+export const lotTile = (index: number): number => index * 4
+
+/** Ring slot of a quarter (1 to 12). Before the first quarter the token waits on the first company's corner. */
+export const quarterTile = (q: number): number => {
+  if (q < 1) return 0
+  const n = Math.min(TURNS, q)
+  return n + Math.floor((n - 1) / 3)
 }

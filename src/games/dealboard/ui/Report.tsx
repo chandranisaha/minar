@@ -2,6 +2,10 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PASS_MARK, type Score } from '../engine/scoring'
 import type { RunState } from '../engine/state'
+import { marketFor } from '../engine/state'
+import { reviewDecisions } from '../engine/review'
+import { AnalyticsView } from './Analytics'
+import { ReviewCard } from './Review'
 import { useInr } from './Panels'
 
 const SKILLS = ['research', 'skepticism', 'spread', 'calm', 'habits'] as const
@@ -39,6 +43,8 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
     onComplete(score)
   }, [onComplete, score])
 
+  const m = marketFor(run.seed)
+  const entries = reviewDecisions(run, m)
   const toolkit = run.seen.filter((id) => id < 100).map((id) => ({ id, term: t(`lite.${id}.term`), title: t(`lite.${id}.title`) }))
   const ahead = score.profit > 0 && score.total < 75
   const behind = score.profit < 0 && score.total >= PASS_MARK
@@ -94,6 +100,21 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
         {ahead && <div className="mt-1 font-bold">{t('report.luck')}</div>}
         {behind && <div className="mt-1 font-bold">{t('report.unlucky')}</div>}
       </div>
+
+      <details className="mt-3 rounded-lg border-2 border-ink bg-white/50" open>
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 [&::-webkit-details-marker]:hidden">
+          <span><span className="font-sign lang-fit block text-[15px]">{t('report2.decisions')} ({entries.length})</span><span className="block text-[12px] opacity-70">{t('report2.decisionsBody')}</span></span>
+          <span aria-hidden>▾</span>
+        </summary>
+        <div className="flex flex-col gap-2 px-3 pb-3">{entries.map((e) => <ReviewCard key={e.id} entry={e} />)}</div>
+      </details>
+      <details className="mt-2 rounded-lg border-2 border-ink bg-white/50">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 [&::-webkit-details-marker]:hidden">
+          <span className="font-sign lang-fit text-[15px]">{t('report2.analytics')}</span>
+          <span aria-hidden>▾</span>
+        </summary>
+        <div className="px-3 pb-3"><AnalyticsView run={run} m={m} /></div>
+      </details>
 
       <div className="db-eyebrow mt-3 text-[#8a5a2b]">{t('report.toolkit')}</div>
       <p className="m-0 text-[12px] opacity-70">{t('report.toolkitBody')}</p>

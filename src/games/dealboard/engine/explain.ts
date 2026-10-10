@@ -19,7 +19,6 @@ export function explainQuarter(m: MarketRun, id: CompanyId, q: number): { move: 
   const co = COMPANY[id]
   const move = prev.price > 0 ? now.price / prev.price - 1 : 0
   const banner = m.banners[q - 1]
-  const card = m.chance[q - 1]
   const out: Reason[] = []
   const add = (key: string, params: Reason['params'] = {}) => out.push({ key, params })
 
@@ -30,7 +29,7 @@ export function explainQuarter(m: MarketRun, id: CompanyId, q: number): { move: 
   }
   if (banner.marketShock <= -0.05) add('market.fell', { x: Math.round(Math.abs(banner.marketShock) * 100) })
   else if (banner.marketShock >= 0.05) add('market.rose', { x: Math.round(banner.marketShock * 100) })
-  const sectorShock = (banner.sector === co.sector ? banner.sectorShock ?? 0 : 0) + (card?.effect.kind === 'sector' && card.effect.sector === co.sector ? card.effect.shock : 0)
+  const sectorShock = banner.sector === co.sector ? banner.sectorShock ?? 0 : 0
   if (sectorShock !== 0) add(sectorShock > 0 ? 'sector.up' : 'sector.down', { sector: co.sector })
   if (!now.failed && move > 0.04 && now.profit < prev.profit) add('excitement')
   if (now.ceoTrade === 'SELL' && !now.failed) add('ceoSold')

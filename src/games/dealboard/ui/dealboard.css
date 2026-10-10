@@ -147,3 +147,25 @@ button.db-owned:hover, button.db-owned:focus-visible { transform: translateY(-2p
 .db-in { animation: db-in .18s ease-out both; }
 @media (prefers-reduced-motion: reduce) { .db-in { animation: none; } }
 html[data-lite="true"] .db-in { animation: none; }
+
+/* quarter tiles: a quiet timeline; the company corners are the buttons */
+.db-q { justify-content: center; background: #EAD9B0; opacity: .75; box-shadow: none; }
+.db-q .label { font-size: clamp(9px, 2.4vw, 12px); }
+.db-q .mark { font-size: 12px; font-weight: 900; line-height: 1; color: #6B5A4A; }
+.db-q.past { opacity: 1; background: #F3E6C2; }
+.db-q.past .mark { color: #2f6f4a; }
+.db-q[aria-current="true"] { opacity: 1; background: var(--cream); box-shadow: 0 0 0 3px var(--brass), 3px 3px 0 3px var(--color-ink); z-index: 1; }
+button.db-lot { cursor: pointer; justify-content: center; gap: 2px; font: inherit; }
+button.db-lot:hover, button.db-lot:focus-visible { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--brass), 3px 3px 0 3px var(--color-ink); z-index: 2; }
+button.db-lot:not(.owned) { background: #F1E4C0; }
+button.db-lot.glow { box-shadow: 0 0 0 3px #E5457A, 3px 3px 0 3px var(--color-ink); }
+
+/* Judgement button in the middle of the board */
+.db-judge {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px;
+  background: var(--cream); color: var(--color-ink); cursor: pointer;
+  border: 3px solid var(--color-ink); border-radius: 12px 9px 13px 8px / 9px 13px 8px 12px; box-shadow: 3px 3px 0 var(--color-ink);
+}
+.db-judge:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--color-ink); }
+.db-judge:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--color-ink); }
+.db-judge:focus-visible { outline: 4px solid var(--color-pink); outline-offset: 3px; }

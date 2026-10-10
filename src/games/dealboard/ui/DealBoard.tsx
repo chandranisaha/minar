@@ -1,26 +1,25 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TitleCard } from '../../../components/TitleCard'
 import { useGame, useLite } from '../../../store/game'
-import { BOARD, TURNS } from '../engine/board'
-import { houses, invested, marketFor, needsDecision, netWorth, type RunState } from '../engine/run'
-import { computeScore, type Score } from '../engine/scoring'
+import { RING_SIZE, TURNS, quarterTile } from '../engine/board'
+import { houses, invested, marketFor, netWorth, pitchFor, type RunState } from '../engine/run'
+import { computeScore, liveScore, type Score } from '../engine/scoring'
+import { knownQuarter, priceAt } from '../engine/state'
 import type { CompanyId, MarketRun } from '../engine/types'
 import { useDealBoard } from '../state/store'
 import { Board } from './Board'
-import { CompanyStrip, Meet } from './Companies'
+import { Meet } from './Companies'
 import { Dossier } from './Dossier'
-import { TradeDialog, type TradeMode } from './TradeDialog'
-import { knownQuarter, priceAt } from '../engine/state'
-import { Die } from './Dice'
-import { Report } from './Report'
+import { JudgementDialog } from './Judgement'
 import { Sheet, Stat, useInr } from './Panels'
+import { Report } from './Report'
+import { TradeDialog, type TradeMode } from './TradeDialog'
 import { TurnPanel } from './Turn'
 import './dealboard.css'
 
 const NOOP = () => {}
 const STEP_MS = 170
-const ROLL_MS = 650
 
 export interface DealBoardProps {
   /** fixed seed (a class can share one); otherwise each new game picks its own */
@@ -30,7 +29,7 @@ export interface DealBoardProps {
   onComplete?: (score: Score) => void
 }
 
-/** Deal Board Lite: the investing stage of the bazaar, played as a dice-and-board game. */
+/** Deal Board: learn to invest by deciding, one company a quarter, with feedback on every decision. */
 export default function DealBoard({ seed, onExit, onComplete }: DealBoardProps) {
   const run = useDealBoard((s) => s.run)
   const start = useDealBoard((s) => s.start)
@@ -103,18 +102,18 @@ function Intro({ onStart, onExit }: { onStart: () => void; onExit: () => void })
   )
 }
 
-/** Walks the token one tile at a time from where it was to where the seed says it lands. */
+/** Walks the token one slot at a time along the ring to the current quarter. */
 function useTokenWalk(target: number, lite: boolean) {
   const [shown, setShown] = useState(target)
-  const dist = (target - shown + BOARD.length) % BOARD.length
+  const dist = (target - shown + RING_SIZE) % RING_SIZE
   useEffect(() => {
     if (lite || dist === 0) return
-    // a long jump (a replay sending the token back) snaps; a die roll is at most 6 tiles
-    const snap = dist > 6
-    const id = window.setTimeout(() => setShown(snap ? target : (shown + 1) % BOARD.length), snap ? 0 : STEP_MS)
+    // a long jump (a replay sending the token back) snaps; moving on a quarter is at most a few slots
+    const snap = dist > 4
+    const id = window.setTimeout(() => setShown(snap ? target : (shown + 1) % RING_SIZE), snap ? 0 : STEP_MS)
     return () => window.clearTimeout(id)
   }, [shown, target, lite, dist])
-  return lite || dist > 6 ? target : shown
+  return lite || dist > 4 ? target : shown
 }
 
 function Header({ run, m, onExit }: { run: RunState; m: MarketRun; onExit: () => void }) {
@@ -166,52 +165,19 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
   const quit = useDealBoard((s) => s.quit)
   const lite = useLite()
   const m = marketFor(run.seed)
-  const target = m.positions[run.turn]
-  const shown = useTokenWalk(target, lite)
-  const arrived = shown === target
-  const [rolling, setRolling] = useState(false)
-  const [face, setFace] = useState(1)
+  const shown = useTokenWalk(quarterTile(run.turn), lite)
   const [study, setStudy] = useState<CompanyId | null>(null)
   const [trade, setTrade] = useState<{ mode: TradeMode; id: CompanyId } | null>(null)
-  const timer = useRef(0)
-  useEffect(() => () => window.clearTimeout(timer.current), [])
-  // cosmetic tumbling faces while the die rolls
-  useEffect(() => {
-    if (!rolling) return
-    const id = window.setInterval(() => setFace((f) => (f % 6) + 1), 110)
-    return () => window.clearInterval(id)
-  }, [rolling])
-
-  // tiles that need no decision resolve themselves a moment after the token lands: what happened is told in the next briefing
-  const quiet = run.phase === 'land' && arrived && !needsDecision(run, m)
-  useEffect(() => {
-    if (!quiet) return
-    const id = window.setTimeout(() => dispatch({ type: 'resolve' }), lite ? 250 : 900)
-    return () => window.clearTimeout(id)
-  }, [quiet, run.turn, lite, dispatch])
-
-  // saves from before the one-decision-per-quarter flow can sit in the retired 'manage' phase: close that quarter so the panel is never blank
-  const stale = run.phase === 'manage'
-  useEffect(() => {
-    if (stale) dispatch({ type: 'endTurn' })
-  }, [stale, dispatch])
-
-  const roll = () => {
-    if (lite) return dispatch({ type: 'roll' })
-    setRolling(true)
-    timer.current = window.setTimeout(() => {
-      setRolling(false)
-      dispatch({ type: 'roll' })
-    }, ROLL_MS)
-  }
+  const [judge, setJudge] = useState(false)
 
   if (!run.briefed) return <Meet m={m} onStart={() => dispatch({ type: 'brief' })} />
 
-  const nextQ = run.phase === 'news' ? run.turn + 1 : run.turn
-  const lastRoll = run.turn > 0 ? m.rolls[run.turn - 1] : 1
-  const dieFace = rolling ? face : lastRoll
-  const score = run.phase === 'done' ? computeScore(run, m) : null
+  const score = computeScore(run, m)
+  const live = liveScore(score)
+  const final = run.phase === 'done' ? score : null
   const q = knownQuarter(run)
+  const played = run.phase === 'desk' || run.phase === 'emergency' ? run.turn - 1 : run.turn
+  const pitching = run.phase === 'desk' ? pitchFor(run, m) : null
 
   const confirmTrade = ({ amount, fraction, reason }: { amount: number; fraction: number; reason: string }) => {
     if (!trade) return
@@ -223,34 +189,38 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
   }
 
   return (
-    // phones: header, companies, board, sheet stacked; wide screens: board beside the sheet
+    // phones: header, board, sheet stacked; wide screens: board beside the sheet
     <div className="mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-5">
       <Header run={run} m={m} onExit={onExit} />
       <div className="flex flex-col gap-2">
-        <CompanyStrip run={run} m={m} onOpen={setStudy} />
-        <Board run={run} m={m} tokenAt={shown} current={run.phase === 'land' && arrived ? target : null} onOpen={setStudy}>
-          <div className="db-eyebrow text-[#E8B04A]">{t('quarter', { n: Math.min(TURNS, Math.max(1, nextQ)) })}</div>
+        <Board run={run} m={m} tokenAt={shown} pitching={pitching} onOpen={setStudy}>
+          <div className="db-eyebrow text-[#E8B04A]">{t('quarter', { n: Math.min(TURNS, run.turn) })}</div>
           <div className="db-wordmark">{t('title')}</div>
           <div className="db-rule" />
           <div className="flex flex-wrap justify-center gap-1" aria-hidden>
-            {Array.from({ length: TURNS }, (_, i) => <span key={i} className={`db-pip ${i < run.turn ? 'on' : ''}`} />)}
+            {Array.from({ length: TURNS }, (_, i) => <span key={i} className={`db-pip ${i < played ? 'on' : ''}`} />)}
           </div>
-          <Die value={dieFace} rolling={rolling} size={48} label={t('rolled', { n: lastRoll })} />
+          <button type="button" className="db-judge" onClick={() => setJudge(true)} aria-label={t('judgement.title')}>
+            <span aria-hidden>⚖</span>
+            <span className="font-sign lang-fit text-[12px]">{t('desk.judgementBtn')}</span>
+            <span className="font-sign text-[15px]">{live.value ?? '—'}</span>
+          </button>
         </Board>
         <p className="m-0 text-center text-[12px] text-jasmine/80">{t('boardHint')}</p>
       </div>
       <div className="lg:sticky lg:top-3 lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto lg:pr-1">
-        {run.phase === 'done' && score ? (
-          <Report run={run} score={score} onComplete={onComplete ?? NOOP} onAgain={() => quit()} onExit={onExit} />
+        {run.phase === 'done' && final ? (
+          <Report run={run} score={final} onComplete={onComplete ?? NOOP} onAgain={() => quit()} onExit={onExit} />
         ) : run.phase === 'yearEnd' ? (
           <YearEnd run={run} m={m} />
         ) : (
-          <TurnPanel run={run} m={m} arrived={arrived} rolling={rolling} dispatch={dispatch} onRoll={roll} onRewind={() => dispatch({ type: 'rewind' })} onOpen={setStudy} onTrade={(mode, id) => setTrade({ mode, id })} />
+          <TurnPanel run={run} m={m} dispatch={dispatch} onRewind={() => dispatch({ type: 'rewind' })} onOpen={setStudy} onTrade={(mode, id) => setTrade({ mode, id })} />
         )}
       </div>
-      {study && !trade && <Dossier run={run} m={m} id={study} onClose={() => setStudy(null)} onTrade={(mode) => setTrade({ mode, id: study })} />}
+      {judge && !trade && <JudgementDialog run={run} m={m} onClose={() => setJudge(false)} />}
+      {study && !trade && !judge && <Dossier run={run} m={m} id={study} onClose={() => setStudy(null)} onTrade={(mode) => setTrade({ mode, id: study })} />}
       {trade && (
-        <TradeDialog mode={trade.mode} companyId={trade.id} price={priceAt(m, trade.id, q)} cash={run.cash} holding={run.holdings[trade.id]} blocked={trade.mode !== 'sell' && run.jailedTurn === (run.phase === 'news' ? run.turn + 1 : run.turn)} onCancel={() => setTrade(null)} onConfirm={confirmTrade} />
+        <TradeDialog mode={trade.mode} companyId={trade.id} price={priceAt(m, trade.id, q)} cash={run.cash} holding={run.holdings[trade.id]} blocked={trade.mode !== 'sell' && run.jailedTurn === run.turn} onCancel={() => setTrade(null)} onConfirm={confirmTrade} />
       )}
     </div>
   )

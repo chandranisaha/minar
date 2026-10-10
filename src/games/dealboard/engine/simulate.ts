@@ -1,19 +1,13 @@
-import type { Banner, Card, Company, CompanyId, MarketRun, QuarterStats } from './types'
+import type { Banner, Company, CompanyId, MarketRun, QuarterStats } from './types'
 import { COMPANIES, TUNING, pickCompanies, startProfit } from './companies'
-import { BOARD, TURNS, rollPath } from './board'
-import { buildBanners, drawChance, emergencyTurn } from './events'
+import { TURNS } from './board'
+import { buildBanners, emergencyTurn } from './events'
 import { normal, streamFor, type Rng } from './rng'
 
 /** Everything outside the company that moves it this quarter. */
 export interface QuarterCtx {
   marketShock: number
   sectorShock: number
-  /** cumulative change to newGrowth from verified news */
-  newGrowthDelta: number
-  extraLayoff: number
-  priceBump: number
-  sentimentBump: number
-  revenueBump: number
   payEasyPath: 'downRound' | 'fail'
 }
 
@@ -94,7 +88,7 @@ export function simulateQuarter(hist: QuarterStats[], co: Company, ctx: QuarterC
   const collapseQ = collapseQuarter(co, ctx.payEasyPath)
   const season = p.season ? p.season[(q - 1) % p.season.length] : 0
 
-  const revenue = prev.revenue * (1 + p.g + season + ctx.sectorShock + ctx.revenueBump + eRev)
+  const revenue = prev.revenue * (1 + p.g + season + ctx.sectorShock + eRev)
   const margin = prev.margin + p.dm + eMargin
   const interest = prev.debt * TUNING.interestRate
   const profit = revenue * margin - interest
@@ -125,15 +119,14 @@ export function simulateQuarter(hist: QuarterStats[], co: Company, ctx: QuarterC
   const rule = p.layoff
   let rate = 0
   if (q >= rule.from && (!rule.weakSeasonOnly || season < 0)) rate = Math.min(rule.cap, rule.base + rule.step * (q - rule.from))
-  rate += ctx.extraLayoff
-  if (ctx.extraLayoff > 0) events.push('layoffNews')
   const layoffs = round(prev.employees * rate)
+  if (layoffs > 0 && prev.layoffs === 0) events.push('layoffNews')
   const hires = layoffs > 0 ? 0 : round(prev.employees * Math.max(0, revenue / prev.revenue - 1) * 0.5)
   const employees = prev.employees - layoffs + hires
 
   // customers: paying customers, plus reported users that can drift away from them
   const lostCust = round(prev.customers * p.churn * (1 + eLost))
-  const newCust = round(p.newBase * Math.pow(1 + p.newGrowth + ctx.newGrowthDelta, q) * (1 + eNew))
+  const newCust = round(p.newBase * Math.pow(1 + p.newGrowth, q) * (1 + eNew))
   const customers = Math.max(0, prev.customers + newCust - lostCust)
   const retention = prev.customers > 0 ? 1 - lostCust / prev.customers : 0
   let users = Math.max(customers, prev.users * (1 + p.userGrowth + eUsers))
@@ -152,8 +145,6 @@ export function simulateQuarter(hist: QuarterStats[], co: Company, ctx: QuarterC
     TUNING.sectorWeight * ctx.sectorShock +
     (storyActive ? p.sentiment : 0) +
     (p.collapse && q > collapseQ ? TUNING.postCollapseSentiment : 0) +
-    ctx.priceBump +
-    ctx.sentimentBump +
     ePrice
   if (co.archetype === 'smoke' && TUNING.smokeSpike.quarters.includes(q)) {
     logReturn += TUNING.smokeSpike.bump
@@ -206,55 +197,25 @@ export function simulateQuarter(hist: QuarterStats[], co: Company, ctx: QuarterC
   }
 }
 
-function ctxFor(co: Company, banner: Banner, card: Card | null, carry: { newGrowthDelta: number }, path: QuarterCtx['payEasyPath']): QuarterCtx {
-  const ctx: QuarterCtx = {
+function ctxFor(co: Company, banner: Banner, path: QuarterCtx['payEasyPath']): QuarterCtx {
+  return {
     marketShock: banner.marketShock,
     sectorShock: banner.sector === co.sector ? (banner.sectorShock ?? 0) : 0,
-    newGrowthDelta: carry.newGrowthDelta,
-    extraLayoff: 0,
-    priceBump: 0,
-    sentimentBump: 0,
-    revenueBump: 0,
     payEasyPath: path,
   }
-  const e = card?.effect
-  if (!e) return ctx
-  if (e.kind === 'sector' && e.sector === co.sector) ctx.sectorShock += e.shock
-  if (e.kind === 'newGrowth' && e.company === co.id) ctx.newGrowthDelta = carry.newGrowthDelta += e.delta
-  if (e.kind === 'layoff' && e.company === co.id) ctx.extraLayoff = e.rate
-  if (e.kind === 'priceBump' && e.company === co.id) ctx.priceBump = e.bump
-  if (e.kind === 'sentimentBump' && e.company === co.id) ctx.sentimentBump = e.bump
-  if (e.kind === 'revenueBump' && e.company === co.id) ctx.revenueBump = e.bump
-  return ctx
 }
 
-/** The whole seeded market: dice, tiles, news, chance draws and all six companies for 12 quarters. */
+/** The whole seeded market: the market cycle and all six companies for 12 quarters. */
 export function simulateMarket(seed: string): MarketRun {
   const picked = pickCompanies(seed)
-  const { rolls, positions } = rollPath(seed)
   const { banners, fallQ } = buildBanners(seed, picked)
-  const chance = drawChance(seed, picked, positions)
   const payEasyPath = streamFor(seed, 'payEasyPath')() < 0.5 ? 'downRound' : 'fail'
   const history = {} as Record<CompanyId, QuarterStats[]>
   for (const co of COMPANIES) {
     const rng = streamFor(seed, co.id)
     const hist = [startStats(co)]
-    const carry = { newGrowthDelta: 0 }
-    for (let q = 1; q <= TURNS; q++) hist.push(simulateQuarter(hist, co, ctxFor(co, banners[q - 1], chance[q - 1], carry, payEasyPath), rng))
+    for (let q = 1; q <= TURNS; q++) hist.push(simulateQuarter(hist, co, ctxFor(co, banners[q - 1], payEasyPath), rng))
     history[co.id] = hist
   }
-  return {
-    seed,
-    picked,
-    pitchOrder: picked,
-    rolls,
-    positions,
-    tiles: BOARD,
-    banners,
-    chance,
-    emergencyTurn: emergencyTurn(seed, positions),
-    fallQ,
-    payEasyPath,
-    history,
-  }
+  return { seed, picked, pitchOrder: picked, banners, emergencyTurn: emergencyTurn(seed), fallQ, payEasyPath, history }
 }

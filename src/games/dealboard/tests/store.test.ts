@@ -13,7 +13,7 @@ describe('saved game compatibility', () => {
   })
 
   test('current runs are accepted, including after a JSON round trip and some play', () => {
-    const run = act(newRun('keep'), { type: 'roll' })
+    const run = act(newRun('keep'), { type: 'brief' })
     expect(usableRun(run)).toBe(true)
     expect(usableRun(JSON.parse(JSON.stringify(run)))).toBe(true)
   })

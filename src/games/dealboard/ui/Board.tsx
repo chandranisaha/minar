@@ -1,14 +1,14 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTouchUi } from '../../../world/input'
-import { BOARD } from '../engine/board'
+import { RING, TURNS } from '../engine/board'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import type { RunState } from '../engine/state'
 import type { CompanyId, MarketRun } from '../engine/types'
 import { HoverCard, Mark, gainPct } from './Companies'
-import { Pawn, TILE_TONE, TileIcon } from './icons'
+import { Pawn } from './icons'
 
-/** Grid cell (row, col) of each ring tile on the 5 x 5 board, clockwise from Start at the top-left. */
+/** Grid cell (row, col) of each ring slot on the 5 x 5 board, clockwise from the top-left corner. */
 export function cellOf(i: number): [number, number] {
   if (i <= 4) return [0, i]
   if (i <= 7) return [i - 4, 4]
@@ -27,55 +27,64 @@ function hoverStyle(r: number, c: number): CSSProperties {
   return style
 }
 
-export function Board({ run, m, tokenAt, current, onOpen, children }: { run: RunState; m: MarketRun; tokenAt: number; current: number | null; onOpen: (id: CompanyId) => void; children: ReactNode }) {
+/**
+ * The ring: the four companies of this game sit on the corners, the twelve quarters fill the stretches between,
+ * and the token walks forward one quarter at a time. The company pitching this quarter glows.
+ */
+export function Board({ run, m, tokenAt, pitching, onOpen, children }: { run: RunState; m: MarketRun; tokenAt: number; pitching: CompanyId | null; onOpen: (id: CompanyId) => void; children: ReactNode }) {
   const { t } = useTranslation('dealboard')
   const touch = useTouchUi()
   const [hover, setHover] = useState<number | null>(null)
   const [tr, tc] = cellOf(tokenAt)
+  const done = run.phase === 'done'
   return (
     <div className="db-board w-full" role="group" aria-label={t('title')}>
-      {BOARD.map((kind, i) => {
+      {RING.map((slot, i) => {
         const [r, c] = cellOf(i)
-        const owner = run.owners[i]
         const place = { gridRow: r + 1, gridColumn: c + 1 }
-        if (owner) {
-          const g = gainPct(run, m, owner)
+        if (slot.kind === 'quarter') {
+          const past = done || slot.q < run.turn || (slot.q === run.turn && run.phase !== 'desk')
+          const now = slot.q === run.turn && !done
           return (
-            <button
-              key={i}
-              type="button"
-              className="db-tile db-owned"
-              style={place}
-              aria-label={t('tileOwned', { name: t(`companies.${owner}.name`) })}
-              aria-current={current === i}
-              onMouseEnter={() => setHover(i)}
-              onMouseLeave={() => setHover(null)}
-              onFocus={() => setHover(i)}
-              onBlur={() => setHover(null)}
-              onClick={() => { setHover(null); onOpen(owner) }}
-            >
-              <span className="band" style={{ background: SECTOR_COLOUR[COMPANY[owner].sector] }} />
-              <Mark id={owner} size={22} />
-              <span className="label lang-fit">{t(`companies.${owner}.name`)}</span>
-              {g !== null && <span className="badge" style={{ color: g >= 0 ? '#2f6f4a' : '#C8442F' }}>{g >= 0 ? '▲' : '▼'}{Math.abs(g * 100).toFixed(0)}%</span>}
-            </button>
+            <div key={i} className={`db-tile db-q ${past ? 'past' : ''}`} style={place} aria-label={t('quarter', { n: slot.q })} aria-current={now}>
+              <span className="label lang-fit">{t('quarterShort', { n: slot.q })}</span>
+              <span className="mark" aria-hidden>{past ? '✓' : '·'}</span>
+            </div>
           )
         }
-        const name = t(`tiles.${kind}.name`)
-        const short = t(`tiles.${kind}.short`, { defaultValue: name })
+        const id = m.picked[slot.index]
+        const own = !!run.holdings[id]
+        const met = run.pitched.includes(id)
+        const g = gainPct(run, m, id)
+        const glow = pitching === id
         return (
-          <div key={i} className="db-tile" style={place} aria-label={name} aria-current={current === i}>
-            <span className="band" style={{ background: TILE_TONE[kind] }} />
-            <TileIcon kind={kind} size={22} />
-            <span className="label lang-fit">{short}</span>
-          </div>
+          <button
+            key={i}
+            type="button"
+            className={`db-tile db-lot ${own ? 'owned' : ''} ${glow ? 'glow' : ''}`}
+            style={place}
+            aria-label={t('tileLot', { name: t(`companies.${id}.name`), state: own ? t('lotState.own') : met ? t('lotState.met') : t('lotState.unmet') })}
+            onMouseEnter={() => setHover(i)}
+            onMouseLeave={() => setHover(null)}
+            onFocus={() => setHover(i)}
+            onBlur={() => setHover(null)}
+            onClick={() => { setHover(null); onOpen(id) }}
+          >
+            <span className="band" style={{ background: SECTOR_COLOUR[COMPANY[id].sector] }} />
+            {met || own ? <Mark id={id} size={22} /> : <span className="font-sign grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border-[2.5px] border-dashed border-ink/50 text-[12px] opacity-70" aria-hidden>?</span>}
+            <span className="label lang-fit">{t(`companies.${id}.name`)}</span>
+            {own && g !== null ? <span className="badge" style={{ color: g >= 0 ? '#2f6f4a' : '#C8442F' }}>{g >= 0 ? '▲' : '▼'}{Math.abs(g * 100).toFixed(0)}%</span> : glow ? <span className="badge" style={{ color: '#B8473A' }}>{t('lotState.pitching')}</span> : null}
+          </button>
         )
       })}
       <div className="db-centre">{children}</div>
       <div className="db-token" style={{ left: `calc(8px + (100% - 16px) * ${(tc + 0.5) / 5})`, top: `calc(8px + (100% - 16px) * ${(tr + 0.5) / 5})` }}>
         <Pawn />
       </div>
-      {hover !== null && run.owners[hover] && !touch && <div style={hoverStyle(...cellOf(hover))}><HoverCard run={run} m={m} id={run.owners[hover]!} touch={false} /></div>}
+      {hover !== null && RING[hover].kind === 'lot' && !touch && (
+        <div style={hoverStyle(...cellOf(hover))}><HoverCard run={run} m={m} id={m.picked[(RING[hover] as { index: number }).index]} touch={false} /></div>
+      )}
+      <span className="sr-only">{t('quarter', { n: Math.min(TURNS, run.turn) })}</span>
     </div>
   )
 }

@@ -1,5 +1,4 @@
-import type { CompanyId, Decision, LightKey, Lights, MarketRun, SectorId, TileKind } from './types'
-import { BOARD } from './board'
+import type { CompanyId, Decision, LightKey, Lights, MarketRun, SectorId } from './types'
 import { COMPANY } from './companies'
 import { computeLights } from './lights'
 import { simulateMarket } from './simulate'
@@ -9,19 +8,16 @@ export const START_CASH = 100000
 export const TRADE_FEE = 0.01
 export const CASH_DRAG = 0.01
 export const MIN_BID = 5000
-export const LOAN_AMOUNT = 20000
 export const HOUSE = 10000
 
 /**
- * news       banner for the coming quarter, waiting for the roll
- * land       token is on its tile; the tile does its thing
- * manage     (legacy) optional buys and sells before ending the quarter; the app no longer stops here
+ * desk       the quarter's one screen: last quarter's results, a company pitching, trading
  * emergency  family emergency: raise the cash, then pay
  * lesson     a lesson card from the quarter that just ended
- * yearEnd    review after turns 4, 8 and 12
+ * yearEnd    review after quarters 4, 8 and 12
  * done       run finished
  */
-export type Phase = 'news' | 'land' | 'manage' | 'emergency' | 'lesson' | 'yearEnd' | 'done'
+export type Phase = 'desk' | 'emergency' | 'lesson' | 'yearEnd' | 'done'
 
 export interface Holding {
   units: number
@@ -31,61 +27,45 @@ export interface Holding {
   since: number
 }
 
-/** What happened on the tile last quarter, shown at the top of the next briefing. */
-export interface Recap {
-  tile: TileKind
-  cardKey: string | null
-  cardType: 'news' | 'rumour' | null
-  cardCompany: CompanyId | null
-  rent: { id: CompanyId; amount: number }[]
-  /** the company whose property tile the token landed on */
-  ownTile: CompanyId | null
-  bank: 'clue' | 'loan' | 'skip' | null
-  clue: { companyId: CompanyId; light: LightKey } | null
-}
-
-export interface FeedItem {
-  q: number
-  key: string
-  type: 'news' | 'rumour'
-  company: CompanyId | null
-}
-
 export interface EmergencySale {
   companyId: CompanyId
   atLoss: boolean
   inDip: boolean
 }
 
+/** One point on the net worth chart. q = 0 is the start. */
+export interface SeriesPoint {
+  q: number
+  cash: number
+  invested: number
+  loan: number
+}
+
 export interface RunState {
   seed: string
-  /** turns played so far (0 before the first roll) */
+  /** the quarter being played (1 to 12); after a quarter closes it stays until the next desk opens */
   turn: number
   phase: Phase
   cash: number
+  /** money owed after a family emergency the player could not cover */
   loan: number
   loanInterest: number
   holdings: Partial<Record<CompanyId, Holding>>
   feesPaid: number
   trades: number
   cashDragLost: number
-  /** idle-cash loss at the last quarter tick (shown with the next news) */
+  /** idle-cash loss at the last quarter tick */
   lastDrag: number
-  /** companies that have pitched at an Auction, in order */
+  /** companies that have pitched, in order */
   pitched: CompanyId[]
-  /** lights asked of a founder at a pitch (max 2 per company) */
+  /** questions asked at this quarter's pitch (max 2 per pitch; cleared each quarter) */
   asked: Partial<Record<CompanyId, LightKey[]>>
-  /** lights revealed by the Banker's clue */
-  clues: Partial<Record<CompanyId, LightKey[]>>
+  /** every health check ever unlocked per company, so earlier answers stay visible in its study sheet */
+  unlocked: Partial<Record<CompanyId, LightKey[]>>
   log: Decision[]
   /** the player has seen the introduction to this game's companies */
   briefed: boolean
-  /** auction tiles claimed by the companies bought there (tile index to company) */
-  owners: Record<number, CompanyId>
-  recap: Recap | null
-  feed: FeedItem[]
-  lastBank: 'clue' | 'loan' | 'skip' | null
-  lastClue: { companyId: CompanyId; light: LightKey } | null
+  series: SeriesPoint[]
 
   // this quarter
   turnStartInvested: number
@@ -105,7 +85,7 @@ export interface RunState {
   // lessons
   queue: LessonRef[]
   lesson: LessonRef | null
-  after: 'news' | 'yearEnd'
+  after: 'desk' | 'yearEnd'
   shown: Record<number, number>
   seen: number[]
   flagged: string[]
@@ -118,8 +98,8 @@ export interface RunState {
 
 export const newRun = (seed: string): RunState => ({
   seed,
-  turn: 0,
-  phase: 'news',
+  turn: 1,
+  phase: 'desk',
   cash: START_CASH,
   loan: 0,
   loanInterest: 0,
@@ -130,14 +110,10 @@ export const newRun = (seed: string): RunState => ({
   lastDrag: 0,
   pitched: [],
   asked: {},
-  clues: {},
+  unlocked: {},
   log: [],
   briefed: false,
-  owners: {},
-  recap: null,
-  feed: [],
-  lastBank: null,
-  lastClue: null,
+  series: [{ q: 0, cash: START_CASH, invested: 0, loan: 0 }],
   turnStartInvested: 0,
   soldThisTurn: 0,
   soldRed: false,
@@ -151,7 +127,7 @@ export const newRun = (seed: string): RunState => ({
   spread: [],
   queue: [],
   lesson: null,
-  after: 'news',
+  after: 'desk',
   shown: {},
   seen: [],
   flagged: [],
@@ -167,14 +143,11 @@ export function marketFor(seed: string): MarketRun {
   return cached
 }
 
-/** Latest quarter whose results the player can see: during a turn it is the previous quarter. */
-export const knownQuarter = (run: RunState): number =>
-  run.phase === 'land' || run.phase === 'manage' || run.phase === 'emergency' ? run.turn - 1 : run.turn
+/** Latest quarter whose results the player can see: while deciding it is the previous quarter. */
+export const knownQuarter = (run: RunState): number => (run.phase === 'desk' || run.phase === 'emergency' ? run.turn - 1 : run.turn)
 
-/** The quarter a decision belongs to: the briefing before the roll already decides the coming quarter. */
-export const decisionQ = (run: RunState): number => (run.phase === 'news' ? run.turn + 1 : run.turn)
-
-export const tileAt = (run: RunState, m: MarketRun): TileKind => BOARD[m.positions[run.turn]]
+/** Decisions belong to the quarter being played. */
+export const decisionQ = (run: RunState): number => run.turn
 
 export const priceAt = (m: MarketRun, id: CompanyId, q: number): number => m.history[id][q].price
 
@@ -191,18 +164,34 @@ export const invested = (run: RunState, m: MarketRun): number => investedAt(run,
 export const netWorthAt = (run: RunState, m: MarketRun, q: number): number => run.cash + investedAt(run, m, q) - run.loan
 export const netWorth = (run: RunState, m: MarketRun): number => netWorthAt(run, m, knownQuarter(run))
 
-/** Company pitching at the current Auction: the next one in the seeded order, else one passed on before. */
+/**
+ * The company pitching this quarter: the pitch order rotates one company a quarter and skips companies you
+ * already own, so there is always something real to decide until you own all four.
+ */
 export function pitchFor(run: RunState, m: MarketRun): CompanyId | null {
-  const fresh = m.pitchOrder.find((id) => !run.pitched.includes(id))
-  if (fresh) return fresh
-  return m.pitchOrder.find((id) => !run.holdings[id]) ?? null
+  const order = m.pitchOrder
+  for (let k = 0; k < order.length; k++) {
+    const id = order[(run.turn - 1 + k) % order.length]
+    if (!run.holdings[id]) return id
+  }
+  return null
+}
+
+/**
+ * When you own all four companies nothing pitches, so each quarter you check in on one of them (they rotate).
+ * Returns null while a company is still pitching.
+ */
+export function reviewFor(run: RunState, m: MarketRun): CompanyId | null {
+  if (pitchFor(run, m) !== null) return null
+  const held = m.pitchOrder.filter((id) => run.holdings[id])
+  return held.length ? held[(run.turn - 1) % held.length] : null
 }
 
 export const lightsAt = (m: MarketRun, id: CompanyId, q: number): Lights => computeLights(m.history[id], COMPANY[id], q)
 
-/** Lights the player has seen for a company: founder answers plus banker clues. */
+/** Health checks the player has seen for a company this quarter (founder answers). */
 export function knownLights(run: RunState, id: CompanyId): LightKey[] {
-  return [...new Set([...(run.asked[id] ?? []), ...(run.clues[id] ?? [])])]
+  return run.asked[id] ?? []
 }
 
 /** Share of invested money per sector (0 when nothing is invested). */

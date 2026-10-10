@@ -109,3 +109,30 @@ with hover stats, and stop starting and ending a quarter every two seconds."
 - Company names, CEO and the short sector names stay in Latin script (fictional brand names); everything else is Telugu.
 - **Needs a native-speaker review** before real use, especially the finance terms (చక్రవడ్డీ, ద్రవ్యత, వైవిధ్యీకరణ, రన్‌వే) and the
   long "Learn more" explanations.
+
+## Deal Board v3: learning-first redesign (after player feedback)
+Feedback: news and rumours feel unnecessary; track every decision in the judgement report with expandable right/wrong pointers and
+analytics; "lights" is unclear; quarters look dumb when you can click through them without investing.
+- **No random news, rumours, dice or filler tiles.** They were drawn from a seeded deck and did not come from anything in the simulation.
+  What remains is real: a market line only when the whole market did something notable, and company events that actually happened
+  (raised money, down-round, restated users, layoffs, shut down). Lesson 5 (hype and tips) now fires when the player's own reason for
+  a purchase was "friend told me" or "looks hyped".
+- **A quarter is one screen with one real decision.** Each quarter one company pitches (the order rotates and skips companies you own).
+  You ask up to two questions (reset every quarter, so you see fresh numbers each time) then invest or pass. When you own all four, the
+  quarter becomes a check-in on one of your companies (rotating): keep holding, buy more or sell. Keep holding is a logged, graded
+  decision, so there is no "Next quarter" button to click through. Passing everything is allowed but costs idle-cash value and scores
+  zero research, and the stage cannot be cleared that way.
+- **"Lights" became the Health check**: Cash cushion, Customers, Debt, Insider trades, each Strong / Caution / Weak (or No answer).
+  Icon and word always accompany the colour.
+- **Judgement is tracked at every step.** `engine/review.ts` grades each decision using only what was knowable then plus quarters
+  already played, never the future. It gives a verdict (Good call, Mixed, Risky) and expandable pointers: what went well, what to improve,
+  good to know. The last decision's feedback leads the next quarter, the Judgement button on the board opens every decision, the five
+  skills (a skill counts only once it has come up) and the analytics. The live score averages measured skills; the final report keeps
+  the full five-skill total and now lists every decision and the analytics.
+- **Analytics** (`engine/analytics.ts`): net worth by quarter, where the money is, per-company gain and quarters held, sector split,
+  fees, idle-cash loss, questions per purchase, share of cash sitting idle, decision counts, and a split of the player's reasons into
+  evidence, feeling and judgement call.
+- Honest hindsight: an "Earned it" card about a decision appears only after the following quarter has been played.
+- The ring is now four company corners plus twelve quarter tiles; the token walks one quarter at a time and the pitching company glows.
+- Tests added or changed: placeholder coverage for review pointers and lesson cards in both languages, check-in rotation, review
+  verdicts, no-spoiler outcome, analytics totals, scoring bounds (equal-buy bot median 35-55; careful play clears most runs).

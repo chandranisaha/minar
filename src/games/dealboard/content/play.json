@@ -1,13 +1,50 @@
 {
   "lights": {
-    "title": "Health lights",
-    "tapHint": "Tap a light to see what it means.",
-    "grey": "Not asked yet",
-    "state": { "G": "Healthy", "A": "Watch", "R": "Warning", "X": "No answer" },
-    "cash": { "name": "Cash", "ask": "How long can you run on cash?", "explain": "Cash runway: how many months the company can pay its bills before the cash runs out.", "G": "Profitable, or 12 months or more of cash.", "A": "Runway of 6 to 12 months.", "R": "Runway under 6 months.", "deflect": "“We are focused on growth.”" },
-    "customers": { "name": "Customers", "ask": "How many pay, and how many stay?", "explain": "Net customers and retention: are more paying customers arriving than leaving, and how many stay?", "G": "More customers arriving than leaving, and 75% or more stay.", "A": "Customers about steady, 60 to 75% stay.", "R": "Losing more customers than it wins, or few sign-ups pay.", "deflect": "“People love us.”" },
-    "debt": { "name": "Debt", "ask": "How much do you owe?", "explain": "Debt and interest cover: can profit pay the interest, and is debt growing faster than profit?", "G": "No debt, or profit pays the interest 3 times or more.", "A": "Profit pays the interest 1.5 to 3 times.", "R": "Interest is hard to cover, or debt is growing while margin falls.", "deflect": "“We are investing in growth.”" },
-    "ceo": { "name": "CEO", "ask": "Are you selling shares?", "explain": "Insider trades: has the CEO been selling shares lately?", "G": "No share sales in the last 3 quarters.", "A": "One sale in the last 3 quarters.", "R": "Sales in 2 or more of the last 3 quarters.", "deflect": "“That is private.”" },
+    "title": "Health check",
+    "tapHint": "Tap a check to see what it means.",
+    "grey": "Not checked yet",
+    "state": {
+      "G": "Strong",
+      "A": "Caution",
+      "R": "Weak",
+      "X": "No answer"
+    },
+    "cash": {
+      "name": "Cash cushion",
+      "ask": "How long can you run on cash?",
+      "explain": "How many months the company can pay its bills before its cash runs out.",
+      "G": "Profitable, or 12 months or more of cash.",
+      "A": "Runway of 6 to 12 months.",
+      "R": "Runway under 6 months.",
+      "deflect": "“We are focused on growth.”"
+    },
+    "customers": {
+      "name": "Customers",
+      "ask": "How many pay, and how many stay?",
+      "explain": "Are more paying customers arriving than leaving, and do most of them stay?",
+      "G": "More customers arriving than leaving, and 75% or more stay.",
+      "A": "Customers about steady, 60 to 75% stay.",
+      "R": "Losing more customers than it wins, or few sign-ups pay.",
+      "deflect": "“People love us.”"
+    },
+    "debt": {
+      "name": "Debt",
+      "ask": "How much do you owe?",
+      "explain": "Can its profit comfortably pay the interest on what it owes?",
+      "G": "No debt, or profit pays the interest 3 times or more.",
+      "A": "Profit pays the interest 1.5 to 3 times.",
+      "R": "Interest is hard to cover, or debt is growing while margin falls.",
+      "deflect": "“We are investing in growth.”"
+    },
+    "ceo": {
+      "name": "Insider trades",
+      "ask": "Are you selling shares?",
+      "explain": "Have the people running the company been selling their own shares lately?",
+      "G": "No share sales in the last 3 quarters.",
+      "A": "One sale in the last 3 quarters.",
+      "R": "Sales in 2 or more of the last 3 quarters.",
+      "deflect": "“That is private.”"
+    },
     "detail": {
       "cashProfit": "Profitable this quarter.",
       "cashRunway": "Runway: about {{n}} months.",
@@ -21,7 +58,7 @@
   },
   "pitch": {
     "askTitle": "Ask the founder",
-    "askLeft": "{{n}} of 2 questions left",
+    "askLeft": "{{n}} of 2 questions left.",
     "askNone": "You have used your 2 questions.",
     "decide": "Your decision",
     "bid": "Invest",
@@ -35,7 +72,6 @@
     "buyMore": "Buy more of {{name}}",
     "sell": "Sell {{name}}",
     "amount": "Amount",
-    "min": "Minimum {{min}}",
     "fee": "Fee (1%)",
     "youPay": "You pay",
     "youGet": "You get",
@@ -52,7 +88,8 @@
     "confirm": "Confirm",
     "cancel": "Cancel",
     "notEnough": "Not enough cash for the minimum.",
-    "jailed": "You sat out this turn after selling in a panic. You cannot buy until next turn."
+    "jailed": "You sat out this turn after selling in a panic. You cannot buy until next turn.",
+    "min": "Minimum {{min}}"
   },
   "reasons": {
     "strongGrowth": "Strong growth",
@@ -65,8 +102,6 @@
     "other": "Other"
   },
   "portfolio": {
-    "title": "Your properties",
-    "empty": "You do not own anything yet. Land on an Auction tile to hear a pitch.",
     "value": "Worth {{v}}",
     "paidIn": "Paid in {{c}}",
     "gain": "Gain {{g}}",
@@ -75,19 +110,9 @@
     "hotel": "Hotel",
     "noHouses": "No houses yet",
     "buyMore": "Buy more",
-    "sell": "Sell",
-    "lights": "Lights",
-    "noSell": "This company has failed. Its shares are worth nothing.",
-    "concentration": "Concentration warning: {{pct}}% of your invested money is in {{sector}}.",
-    "colourNote": "Colour sets: owning a lot in one sector is a risk marker."
+    "sell": "Sell"
   },
   "quarterResults": {
-    "title": "Quarter {{n}} results",
-    "price": "Price",
-    "profit": "Company profit",
-    "yours": "Your holding",
-    "lakh": "₹{{v}} lakh",
-    "none": "Nothing to report. You do not own any companies yet.",
     "ev": {
       "raised": "raised new money from investors",
       "downRound": "sold new shares at a lower price (a down-round)",
@@ -96,27 +121,6 @@
       "layoffNews": "laid off staff",
       "rumourSpike": "price jumped on a wave of excitement"
     }
-  },
-  "rent": {
-    "row": "{{name}}: rent this quarter {{v}}",
-    "profit": "profit",
-    "lossWord": "loss",
-    "note": "Rent is the company's profit share this quarter. Results are not guaranteed."
-  },
-  "bank": {
-    "intro": "The Banker has two things to offer today.",
-    "clue": "One clue",
-    "clueBody": "Pick a company and a light. The Banker tells you the real answer, free.",
-    "loan": "Take a ₹20,000 loan",
-    "loanBody": "Costs ₹600 interest every quarter. You can repay any time and must clear it by quarter 12. Borrowing makes gains and losses bigger.",
-    "loanHave": "You already have a loan of {{x}}.",
-    "skip": "No thanks",
-    "pickCompany": "Which company?",
-    "pickLight": "Which light?",
-    "revealed": "The Banker says: {{name}} — {{light}} is {{state}}.",
-    "repay": "Repay the loan ({{x}})",
-    "repayShort": "Not enough cash to repay yet.",
-    "owe": "Loan: {{x}}"
   },
   "emergency": {
     "eyebrow": "Family emergency",
@@ -127,7 +131,9 @@
     "ready": "You have enough. Pay now.",
     "pay": "Pay ₹25,000",
     "payShort": "Pay what I can",
-    "payShortNote": "You cannot cover all of it. The rest becomes a loan."
+    "payShortNote": "You cannot cover all of it. The rest becomes a loan.",
+    "owed": "You owe {{x}} after the family emergency.",
+    "repay": "Repay {{x}}"
   },
   "lesson": {
     "eyebrow": "Lesson",
@@ -162,11 +168,26 @@
     "notCleared": "Not cleared yet. Replay and try new questions.",
     "skillsTitle": "Five skills",
     "skills": {
-      "research": { "name": "Research", "body": "Did you ask before you invested?" },
-      "skepticism": { "name": "Skepticism", "body": "Did you spot the risky companies in time?" },
-      "spread": { "name": "Spread", "body": "Was your money spread across different sectors?" },
-      "calm": { "name": "Calm and patience", "body": "Did you stay steady in a falling market?" },
-      "habits": { "name": "Money habits", "body": "Fees, a cushion for emergencies, idle cash." }
+      "research": {
+        "name": "Research",
+        "body": "Did you ask before you invested?"
+      },
+      "skepticism": {
+        "name": "Skepticism",
+        "body": "Did you spot the risky companies in time?"
+      },
+      "spread": {
+        "name": "Spread",
+        "body": "Was your money spread across different sectors?"
+      },
+      "calm": {
+        "name": "Calm and patience",
+        "body": "Did you stay steady in a falling market?"
+      },
+      "habits": {
+        "name": "Money habits",
+        "body": "Fees, a cushion for emergencies, idle cash."
+      }
     },
     "netWorth": "Net worth at the end",
     "profit": "Profit or loss",
@@ -174,14 +195,19 @@
     "luck": "You finished ahead, but part of that was luck. Here is what to repeat and what not to.",
     "unlucky": "You finished behind, but much of your method was sound. Luck decides some quarters.",
     "trapsTitle": "The risky companies you met",
-    "trap": { "avoided": "Passed on it", "soldEarly": "Sold in time", "soldLate": "Sold a little late", "held": "Held through trouble" },
+    "trap": {
+      "avoided": "Passed on it",
+      "soldEarly": "Sold in time",
+      "soldLate": "Sold a little late",
+      "held": "Held through trouble"
+    },
     "toolkit": "Your toolkit",
     "toolkitBody": "Real-life terms you met through your own decisions.",
     "toolkitNone": "Play a few quarters to earn terms for your toolkit.",
     "lessonsSeen": "Lessons you saw",
     "again": "Play again",
     "back": "Back to the Charminar",
-    "flipsLine": "You asked about {{n}} lights per purchase on average.",
+    "flipsLine": "You ran {{n}} health checks per purchase on average.",
     "feesLine": "Fees paid: {{f}}.",
     "concLine": "Most money in one sector at once: {{p}}%.",
     "closing": "Real markets are harder than this game. This teaches how to ask good questions, not what to buy."

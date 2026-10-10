@@ -12,6 +12,7 @@ export function useFill() {
     const p: Record<string, string | number> = { ...params }
     if (params.companyId) p.company = t(`companies.${params.companyId}.name`)
     if (params.sector) p.sector = t(`sectors.${params.sector}`)
+    if (params.reasonKey) p.reason = t(`reasons.${params.reasonKey}`)
     for (const [k, v] of Object.entries(params)) if (k.startsWith('r_')) p[k] = money(Number(v))
     return p
   }

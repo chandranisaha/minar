@@ -14,6 +14,8 @@ export interface Score {
   /** judgement score out of 100: never profit */
   total: number
   cleared: boolean
+  /** which skills have had a chance to show yet (the live score only counts what has come up) */
+  measured: Record<'research' | 'skepticism' | 'spread' | 'calm' | 'habits', boolean>
   netWorth: number
   profit: number
   counters: { investDecisions: number; flipsPerBuy: number; trapsMet: number; trapsAvoided: number; prematureSells: number; feesPaid: number; concentrationPeak: number; jails: number }
@@ -83,6 +85,7 @@ export function computeScore(run: RunState, m: MarketRun): Score {
     habits,
     total,
     cleared: total >= PASS_MARK,
+    measured: { research: invests.length > 0, skepticism: traps.length > 0, spread: investedQs.length > 0, calm: invests.length + sells.length > 0, habits: invests.length + sells.length > 0 },
     netWorth,
     profit: netWorth - START_CASH,
     traps,
@@ -101,3 +104,14 @@ export function computeScore(run: RunState, m: MarketRun): Score {
 
 /** Stars for the hub: 1 = cleared, 2 = strong, 3 = excellent. */
 export const starsFor = (score: number): 0 | 1 | 2 | 3 => (score >= 88 ? 3 : score >= 75 ? 2 : score >= PASS_MARK ? 1 : 0)
+
+/**
+ * Live score for the Judgement button: the average of the skills that have come up so far, out of 100.
+ * The final report uses the full five-skill total; this is only a progress read.
+ */
+export function liveScore(score: Score): { value: number | null; skills: number } {
+  const keys = ['research', 'skepticism', 'spread', 'calm', 'habits'] as const
+  const on = keys.filter((k) => score.measured[k])
+  if (!on.length) return { value: null, skills: 0 }
+  return { value: Math.round((on.reduce((a, k) => a + score[k], 0) / (20 * on.length)) * 100), skills: on.length }
+}
