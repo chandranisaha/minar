@@ -1,4 +1,5 @@
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { PILLARS, SKILLS, type PillarId } from '../content/data'
 import { SHOPS } from '../art/Shops'
@@ -6,6 +7,29 @@ import { BottomHud, TopHud } from '../components/Hud'
 import { TitleCard } from '../components/TitleCard'
 import { useIris } from '../components/Iris'
 import { useGame } from '../store/game'
+import { saveResult } from '../lib/gameResult'
+
+const FestivalCountdown = lazy(() => import('../games/festival/FestivalCountdown'))
+
+/** Pillar 1. `?demo` starts Demo mode (seed DEMO); `?cohort=CODE` tags the result for the NGO view. */
+function PlanGame() {
+  const iris = useIris()
+  const [params] = useSearchParams()
+  const complete = useGame((s) => s.completePillar)
+  return (
+    <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
+      <FestivalCountdown
+        seed={params.has('demo') ? 'DEMO' : undefined}
+        cohortCode={params.get('cohort') ?? 'local'}
+        onComplete={(r) => {
+          saveResult(r)
+          if (r.minaretLit) complete('plan')
+        }}
+        onExit={() => iris.go('/')}
+      />
+    </Suspense>
+  )
+}
 
 /** Shared shell the four mini-games plug into: goal bar, title card, back button, rewind stub, recap card. */
 function RecapCard() {
@@ -33,6 +57,7 @@ export default function Play() {
   const complete = useGame((s) => s.completePillar)
   const p = PILLARS.find((x) => x.id === pillar)
   if (!p) return <Navigate to="/" replace />
+  if (p.id === 'plan') return <PlanGame />
   const id: PillarId = p.id
   const done = completed.includes(id)
   const Shop = SHOPS[id]
