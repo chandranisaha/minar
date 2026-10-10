@@ -1,4 +1,5 @@
 import type { CompanyId, Decision, LightKey, MarketRun } from './types'
+import { BONUS_CASH, bonusFor } from './bonus'
 import { TURNS, YEAR_ENDS } from './board'
 import { TUNING } from './companies'
 import { EMERGENCY_COST } from './events'
@@ -23,6 +24,7 @@ export type Action =
   | { type: 'hold'; companyId: CompanyId }
   | { type: 'payEmergency' }
   | { type: 'continue' }
+  | { type: 'bonus'; choice: number }
   | { type: 'rewind' }
 
 const why = (r: ReasonOption | null | undefined) => (r ? { reason: r.id, reasonKey: r.key, reasonKind: r.kind, reasonParams: r.params } : {})
@@ -256,12 +258,18 @@ export function act(run: RunState, a: Action): RunState {
       return advance(run, m)
     }
 
+    case 'bonus': {
+      if (!bonusFor(run)) return run
+      const right = a.choice === 0
+      return { ...run, cash: run.cash + (right ? BONUS_CASH : 0), bonus: { ...(run.bonus ?? {}), [run.turn]: right } }
+    }
+
     case 'rewind': {
       const year = Math.ceil(run.turn / 4)
       const snap = run.checkpoints[run.turn]
       if (run.phase !== 'lesson' || !snap || run.rewinds.includes(year)) return run
       const restored = { ...snap, checkpoints: Object.fromEntries(Object.entries(run.checkpoints).filter(([k]) => Number(k) <= run.turn)) } as RunState
-      return { ...restored, shown: run.shown, seen: run.seen, positives: run.positives, flagged: run.flagged, rewinds: [...run.rewinds, year] }
+      return { ...restored, shown: run.shown, seen: run.seen, bonus: run.bonus, positives: run.positives, flagged: run.flagged, rewinds: [...run.rewinds, year] }
     }
   }
 }

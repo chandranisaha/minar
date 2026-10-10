@@ -88,8 +88,8 @@
 
 .db-token {
   position: absolute;
-  width: 9%;
-  aspect-ratio: .8;
+  width: 11%;
+  aspect-ratio: .5;
   transform: translate(-50%, -78%);
   transition: left .14s steps(3), top .14s steps(3);
   pointer-events: none;
@@ -179,7 +179,7 @@ button.db-lot.glow { box-shadow: 0 0 0 3px #E5457A, 3px 3px 0 3px var(--color-in
 
 /* company tiles: keep mark, name and gain from piling into the colour band on small screens */
 .db-lot { justify-content: center; padding: 20% 2px 3px; gap: 2px; }
-.db-lot .label { font-size: clamp(8px, 2.3vw, 12px); line-height: 1.1; word-break: break-word; }
+.db-lot .label { font-size: clamp(7px, 2vw, 11px); line-height: 1.1; word-break: normal; overflow-wrap: normal; }
 .db-lot .badge { font-size: clamp(8px, 2.2vw, 11px); line-height: 1; white-space: nowrap; }
 @media (max-width: 520px) { .db-lot .lotmark { display: none; } }
 
@@ -190,3 +190,10 @@ button.db-lot.glow { box-shadow: 0 0 0 3px #E5457A, 3px 3px 0 3px var(--color-in
 .db-flash.green { animation: db-flash-green .7s steps(2, jump-none) 3; }
 html[data-lite="true"] .db-flash { animation: none; }
 @media (prefers-reduced-motion: reduce) { .db-flash { animation: none; } }
+
+/* pin the game's own type, whatever the surrounding theme does */
+.db-root { font-family: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif; }
+.db-root .font-display { font-family: "Chango", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif; }
+.db-root .font-sign { font-family: "Bowlby One", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif; }
+html[lang="hi"] .db-root .font-display, html[lang="hi"] .db-root .font-sign { font-family: "Rozha One", "Noto Sans Devanagari", sans-serif; font-weight: 400; }
+html[lang="te"] .db-root .font-display, html[lang="te"] .db-root .font-sign { font-family: "Noto Sans Telugu", sans-serif; font-weight: 900; }

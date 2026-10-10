@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { EMERGENCY_COST } from '../engine/events'
@@ -13,6 +14,7 @@ import { LessonCard } from './LessonCard'
 import { LightChip, MiniChart, lightFacts } from './Lights'
 import { AlertStrip, MarketLine, Sheet, useInr } from './Panels'
 import { rivalAlerts } from '../engine/rivals'
+import { BONUS_CASH, bonusFor } from '../engine/bonus'
 import { ReviewCard } from './Review'
 import { ASK_STATS, StatRow } from './Stats'
 import type { TradeMode } from './TradeDialog'
@@ -185,16 +187,59 @@ function LastQuarter({ run, m, onOpen }: { run: RunState; m: MarketRun; onOpen: 
   )
 }
 
-/** The quarter's one screen: last quarter's feedback, then this quarter's real decision. */
+/** A bonus question about last quarter's lessons: a correct answer earns a little cash. */
+function Bonus({ run, dispatch }: { run: RunState; dispatch: Dispatch }) {
+  const { t } = useTranslation('dealboard')
+  const money = useInr()
+  const [picked, setPicked] = useState<number | null>(null)
+  const [frozen] = useState(() => bonusFor(run))
+  if (!frozen) return null
+  const { n, order } = frozen
+  const right = picked === 0
+  return (
+    <section className="rounded-lg border-2 border-ink bg-white/60 px-3 py-2.5">
+      <div className="db-eyebrow text-[#8a5a2b]">{t('bonus.title')} · {t('bonus.sub', { x: BONUS_CASH.toLocaleString('en-IN') })}</div>
+      <p className="m-0 mt-1 text-[15px] font-extrabold leading-snug">{t(`bonus.q.${n}.q`)}</p>
+      <div className="mt-2 grid gap-1.5">
+        {order.map((o) => {
+          const on = picked === o
+          return (
+            <button key={o} type="button" disabled={picked !== null} onClick={() => { setPicked(o); dispatch({ type: 'bonus', choice: o }) }} className="min-h-11 rounded-lg border-2 border-ink px-2.5 py-1.5 text-left text-[14px] font-bold leading-snug" style={{ background: picked === null ? '#FFF3D6' : o === 0 ? '#DCEBC8' : on ? '#F5D9CF' : '#FFF3D6', opacity: picked !== null && !on && o !== 0 ? 0.6 : 1 }}>
+              {t(`bonus.q.${n}.a${o}`)}
+            </button>
+          )
+        })}
+      </div>
+      {picked !== null && (
+        <p className="m-0 mt-2 text-[13px] leading-snug">
+          <span className="font-extrabold" style={{ color: right ? '#2f6f4a' : '#C8442F' }}>{right ? t('bonus.right', { x: money(BONUS_CASH).replace('₹', '') }) : t('bonus.wrong')}</span>{' '}
+          {t(`bonus.q.${n}.why`)}
+        </p>
+      )}
+    </section>
+  )
+}
+
+/** Each quarter has two calm screens: how the last quarter went (plus a bonus question), then this quarter's pitch. */
 function Desk({ run, m, dispatch, onOpen, onTrade, onPass }: { run: RunState; m: MarketRun; dispatch: Dispatch } & TurnHandlers) {
   const { t } = useTranslation('dealboard')
   const money = useInr()
+  const [stage, setStage] = useState<'results' | 'pitch'>(run.turn > 1 ? 'results' : 'pitch')
   const id = pitchFor(run, m)
   const reviewId = reviewFor(run, m)
+  if (stage === 'results') {
+    return (
+      <Sheet eyebrow={t('desk.eyebrow')} title={t('desk.resultsTitle', { n: run.turn - 1 })} tone="#E8B04A" actions={<button type="button" className="ink-btn pink" onClick={() => { setStage('pitch') }}>{t('desk.next')} ▸</button>}>
+        <div className="space-y-3">
+          <LastQuarter run={run} m={m} onOpen={onOpen} />
+          <Bonus run={run} dispatch={dispatch} />
+        </div>
+      </Sheet>
+    )
+  }
   return (
     <Sheet eyebrow={t('desk.eyebrow')} title={t('desk.title', { n: run.turn })} tone="#E8B04A">
       <div className="space-y-4">
-        {run.turn > 1 && <LastQuarter run={run} m={m} onOpen={onOpen} />}
         {run.loan > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] font-bold text-[#C8442F]">
             <span>{t('emergency.owed', { x: money(run.loan) })}</span>
@@ -245,7 +290,7 @@ function Emergency({ run, m, dispatch, onTrade }: { run: RunState; m: MarketRun;
 
 /** The decision area: the desk, the emergency, or a lesson. */
 export function TurnPanel({ run, m, dispatch, onRewind, onOpen, onTrade, onPass }: { run: RunState; m: MarketRun; dispatch: Dispatch; onRewind: () => void } & TurnHandlers) {
-  if (run.phase === 'desk') return <Desk run={run} m={m} dispatch={dispatch} onOpen={onOpen} onTrade={onTrade} onPass={onPass} />
+  if (run.phase === 'desk') return <Desk key={run.turn} run={run} m={m} dispatch={dispatch} onOpen={onOpen} onTrade={onTrade} onPass={onPass} />
   if (run.phase === 'emergency') return <Emergency run={run} m={m} dispatch={dispatch} onTrade={onTrade} />
   if (run.phase === 'lesson' && run.lesson) return <LessonCard run={run} onContinue={() => dispatch({ type: 'continue' })} onReplay={onRewind} />
   return null

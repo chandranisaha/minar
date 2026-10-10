@@ -75,6 +75,8 @@ export interface RunState {
 
   // run-long tracking for scoring and lessons
   emergencyDone: boolean
+  /** bonus questions answered: quarter -> was it right */
+  bonus?: Record<number, boolean>
   emergencyForcedSale: boolean
   jails: number
   jailedTurn: number
@@ -119,6 +121,7 @@ export const newRun = (seed: string): RunState => ({
   soldRed: false,
   emergencySales: [],
   emergencyDone: false,
+  bonus: {},
   emergencyForcedSale: false,
   jails: 0,
   jailedTurn: -1,
