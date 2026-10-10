@@ -3,12 +3,17 @@ import type { PillarId } from '../content/data'
 
 export type NodeId = 'dock' | 'plaza' | PillarId | 'gate'
 export interface IslandNode { id: NodeId; kind: 'start' | 'hub' | 'pillar' | 'goal'; n?: number; x: number; y: number; art: { x: number; y: number }; labelKey: string; hookKey?: string }
-export interface IslandPath { id: string; from: NodeId; to: NodeId; pts: number[][] }
+export interface IslandPath { id: string; from: string; to: string; pts: number[][] }
 
 export const WORLD = raw.world
 export const NODES = raw.nodes as IslandNode[]
-export const PATHS = raw.paths as IslandPath[]
 export const nodeById = (id: NodeId) => NODES.find((n) => n.id === id)!
+const WP: { id: string; x: number; y: number }[] = [...raw.nodes.map((n) => ({ id: n.id, x: n.x, y: n.y })), ...raw.waypoints]
+/** the walk network drawn as paths (fallback art only) */
+export const PATHS: IslandPath[] = (raw.edges as string[][]).map(([a, b]) => {
+  const A = WP.find((w) => w.id === a)!, B = WP.find((w) => w.id === b)!
+  return { id: `${a}-${b}`, from: a, to: b, pts: [[A.x, A.y], [B.x, B.y]] }
+})
 
 /** % of the world -> world px */
 export const px = (p: number[]) => [(p[0] / 100) * WORLD.w, (p[1] / 100) * WORLD.h]
@@ -27,18 +32,6 @@ export function smoothD(pts: number[][], closed = false): string {
     d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`
   }
   return closed ? d + 'Z' : d
-}
-
-export interface Segment { path: IslandPath; reverse: boolean }
-/** route between any two nodes; everything meets at the plaza */
-export function route(a: NodeId, b: NodeId): Segment[] {
-  if (a === b) return []
-  const link = (id: NodeId) => PATHS.find((q) => (q.from === id && q.to === 'plaza') || (q.to === id && q.from === 'plaza'))!
-  const toPlaza = (id: NodeId): Segment[] => { const p = link(id); return [{ path: p, reverse: p.from !== id }] }
-  const fromPlaza = (id: NodeId): Segment[] => { const p = link(id); return [{ path: p, reverse: p.from === id }] }
-  if (a === 'plaza') return fromPlaza(b)
-  if (b === 'plaza') return toPlaza(a)
-  return [...toPlaza(a), ...fromPlaza(b)]
 }
 
 export const PALETTE = {

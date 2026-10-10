@@ -8,5 +8,20 @@
   "w": 800,
   "h": 736,
   "src": "Vintage Watercolour Receipt with Ribbon.png"
+ },
+ "island-bg": {
+  "w": 1344,
+  "h": 1142,
+  "src": "C:\\Users\\maith\\Downloads\\meg26_van\\codebase\\megathon26-sushi-aur-ek\\new_graphics\\Waterfall Bazaar Island Diorama.png"
+ },
+ "island-terrain": {
+  "w": 1342,
+  "h": 1139,
+  "src": "C:\\Users\\maith\\Downloads\\meg26_van\\codebase\\megathon26-sushi-aur-ek\\new_graphics\\Floating Island Fantasy Game Map.png"
+ },
+ "monument": {
+  "w": 1185,
+  "h": 1184,
+  "src": "C:\\Users\\maith\\Downloads\\meg26_van\\codebase\\megathon26-sushi-aur-ek\\new_graphics\\Ornate Sandstone Mosque Pavilion.png"
  }
 }

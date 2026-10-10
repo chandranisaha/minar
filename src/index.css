@@ -99,3 +99,9 @@ button:focus-visible { outline: 3px solid var(--color-coral); outline-offset: 3p
 html[data-lite="true"] .grain { display: none !important; }
 html[data-lite="true"] .idle, html[data-lite="true"] .petal { animation: none !important; }
 @media (prefers-reduced-motion: reduce) { .idle, .petal, .fade-in, .rise { animation: none !important; } }
+
+@keyframes hero-bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+@keyframes hero-breathe { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.012,.988) } }
+.hero-walk { animation: hero-bob .28s steps(3) infinite; transform-origin: 50% 100%; }
+.hero-idle { animation: hero-breathe 1.6s steps(4) infinite; transform-origin: 50% 100%; }
+html[data-lite="true"] .hero-idle { animation: none; }

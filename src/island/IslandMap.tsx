@@ -1,17 +1,25 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { PillarId } from '../content/data'
 import { useGame } from '../store/game'
-import { ArtSlot } from '../art/ArtSlot'
+import { ArtSlot, useManifest } from '../art/ArtSlot'
 import { IslandArt } from './IslandArt'
-import { NODES, WORLD, nodeById, px, route, smoothD, type IslandNode, type NodeId } from './data'
+import { Joystick } from './Joystick'
+import { joy, useTouchUi } from './input'
+import { NODES, WORLD, nodeById, px, type IslandNode, type NodeId } from './data'
+import { canStand, grid, COLS, ROWS, T, pathTo } from './walk'
 
 type Dir = 'down' | 'up' | 'left' | 'right'
-const TOKEN_H = 150
-let lastNode: NodeId = 'dock' // survives navigating into a pillar and back
+const SPEED = 560 // world px / second
+const HERO_H = 175
+const HERO_W = 140
+const DOOR_R = 120 // stepping this close to a place offers to go in
+const WATER = '#41B9E4' // matches the painted water at the island edge
 
-/** A flag on a pole: white while incomplete, antique gold with a tick once the pillar is done. */
+let lastPos: number[] | null = null // survives entering a pillar and coming back
+
+/** A flag on a pole: white while incomplete, antique gold with a tick once the place is done. */
 function Marker({ done, pulse, locked }: { done: boolean; pulse?: boolean; locked?: boolean }) {
   return (
     <svg width="90" height="150" viewBox="0 0 90 150" style={{ overflow: 'visible', display: 'block' }} aria-hidden>
@@ -27,8 +35,6 @@ function Marker({ done, pulse, locked }: { done: boolean; pulse?: boolean; locke
   )
 }
 
-interface View { s: number; x: number; y: number }
-
 export function IslandMap() {
   const { t } = useTranslation()
   const nav = useNavigate()
@@ -36,180 +42,251 @@ export function IslandMap() {
   const celebrated = useGame((s) => s.celebrated)
   const setCelebrated = useGame((s) => s.setCelebrated)
   const allDone = completed.length >= 4
+  const touch = useTouchUi()
+  const art = useManifest()
+  const debug = useMemo(() => new URLSearchParams(window.location.search).has('debug'), [])
 
   const box = useRef<HTMLDivElement>(null)
-  const measure = useRef<SVGSVGElement>(null)
-  const [vp, setVp] = useState({ w: 390, h: 844 })
-  const [view, setView] = useState<View>({ s: 0.4, x: 0, y: 0 })
-  const fit = useRef(0.4)
-  const [at, setAt] = useState<NodeId>(lastNode)
-  const [pos, setPos] = useState(() => px([nodeById(lastNode).x, nodeById(lastNode).y]))
-  const [dir, setDir] = useState<Dir>('down')
-  const [frame, setFrame] = useState(0)
-  const [walking, setWalking] = useState(false)
-  const [card, setCard] = useState<NodeId | null>(null)
+  const worldEl = useRef<HTMLDivElement>(null)
+  const heroEl = useRef<HTMLDivElement>(null)
+  const heroImg = useRef<HTMLImageElement>(null)
+  const heroBob = useRef<HTMLDivElement>(null)
+  const startPt = lastPos ?? px([nodeById('dock').x, nodeById('dock').y])
+
+  const [zoom, setZoom] = useState(1)
+  const [near, setNear] = useState<NodeId | null>(null)
   const [hover, setHover] = useState<NodeId | null>(null)
+  const [card, setCard] = useState<NodeId | null>(null)
   const [firstTime, setFirstTime] = useState(true)
-  const walkTimer = useRef<number | null>(null)
-  const drag = useRef<{ id: number; x: number; y: number; moved: boolean }[]>([])
-  const pinch = useRef<{ d: number; s: number } | null>(null)
-  const dragged = useRef(false)
+  const [vpTick, setVpTick] = useState(0)
 
-  /* ---------------------------------------------------------------- camera */
-  const clamp = useCallback((v: View, w = vp.w, h = vp.h): View => {
-    const cw = WORLD.w * v.s, ch = WORLD.h * v.s
-    const x = cw <= w ? (w - cw) / 2 : Math.min(0, Math.max(w - cw, v.x))
-    const y = ch <= h ? (h - ch) / 2 : Math.min(0, Math.max(h - ch, v.y))
-    return { s: v.s, x, y }
-  }, [vp.w, vp.h])
+  const S = useRef({
+    x: startPt[0], y: startPt[1], path: [] as { x: number; y: number }[], dir: 'down' as Dir, t: 0,
+    camX: 0, camY: 0, keys: new Set<string>(), pending: null as NodeId | null, near: null as NodeId | null,
+    fit: 0.4, zoom: 1, scale: 0, vw: 390, vh: 844, maxZoom: 2, ptrs: new Map<number, { x: number; y: number }>(), pinch: 0, down: false, lastRepath: 0, dismissed: null as NodeId | null, cardOpen: false, ready: false,
+  })
+  S.current.cardOpen = card !== null
 
+  /* ---------------------------------------------------------------- viewport / scale */
   useEffect(() => {
     const el = box.current!
-    const run = () => {
+    const measure = () => {
       const w = el.clientWidth, h = el.clientHeight
-      setVp({ w, h })
-      // desktop: fit the whole island. phone: fit by height, drag sideways.
-      const f = w < 700 ? h / WORLD.h : Math.min(w / WORLD.w, h / WORLD.h)
-      fit.current = f
-      setView((v) => {
-        const s = v.s < f * 0.999 || Math.abs(v.s - f) < 1e-6 || v.s === 0.4 ? f : v.s
-        const tok = px([nodeById(lastNode).x, nodeById(lastNode).y])
-        const centred = clamp({ s, x: w / 2 - tok[0] * s, y: h / 2 - tok[1] * s }, w, h)
-        return w < 700 ? centred : clamp({ s, x: 0, y: 0 }, w, h)
-      })
+      const s = S.current
+      // desktop: the whole island fits. phone: fit by height and follow the hero sideways.
+      s.fit = w < 700 ? h / WORLD.h : Math.min(w / WORLD.w, h / WORLD.h)
+      s.vw = w; s.vh = h
+      setVpTick((n) => n + 1) // re-render so label scale and zoom cap update
     }
-    run()
-    const ro = new ResizeObserver(run)
+    measure()
+    const ro = new ResizeObserver(measure)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [clamp])
+  }, [])
+  useEffect(() => { S.current.zoom = zoom }, [zoom])
+  // zoom is capped by how sharp the painting is: source px per world px, times the screen's pixel ratio
+  const srcW = art['island-bg']?.w
+  useEffect(() => {
+    const dpr = window.devicePixelRatio || 1
+    const crisp = srcW ? ((srcW / WORLD.w) * dpr) / (S.current.fit || 0.4) : 2
+    S.current.maxZoom = Math.max(1, Math.min(3, crisp))
+    setZoom((z) => Math.min(z, S.current.maxZoom))
+  }, [srcW, vpTick])
 
-  const zoomAt = (cx: number, cy: number, factor: number) =>
-    setView((v) => {
-      const s = Math.min(1.8, Math.max(fit.current, v.s * factor))
-      const k = s / v.s
-      return clamp({ s, x: cx - (cx - v.x) * k, y: cy - (cy - v.y) * k })
-    })
+  /* ---------------------------------------------------------------- walking */
+  const walkTo = useCallback((tx: number, ty: number, pend: NodeId | null) => {
+    const s = S.current
+    s.path = pathTo(s.x, s.y, tx, ty)
+    s.pending = pend
+    setCard(null)
+    setFirstTime(false)
+  }, [])
 
-  const onWheel = (e: React.WheelEvent) => {
+  const openCard = useCallback((id: NodeId) => { S.current.dismissed = null; setCard(id) }, [])
+
+  const goToPlace = useCallback((n: IslandNode) => {
+    const [dx, dy] = px([n.x, n.y])
+    const s = S.current
+    if (n.kind === 'pillar' || n.kind === 'goal') {
+      if (Math.hypot(s.x - dx, s.y - dy) < DOOR_R * 0.7) openCard(n.id)
+      else walkTo(dx, dy, n.id)
+    } else walkTo(dx, dy, null)
+  }, [openCard, walkTo])
+
+  /* ---------------------------------------------------------------- main loop */
+  useEffect(() => {
+    let raf = 0
+    let last = performance.now()
+    const s = S.current
+    const loop = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000)
+      last = now
+      let dx = 0, dy = 0
+      const k = s.keys
+      if (k.has('ArrowLeft') || k.has('a')) dx -= 1
+      if (k.has('ArrowRight') || k.has('d')) dx += 1
+      if (k.has('ArrowUp') || k.has('w')) dy -= 1
+      if (k.has('ArrowDown') || k.has('s')) dy += 1
+      let analog = 1
+      if (!dx && !dy && joy.active) { dx = joy.x; dy = joy.y; analog = Math.min(1, Math.hypot(dx, dy)) }
+      let moving = false
+      if ((dx || dy) && !s.cardOpen) {
+        s.path = []; s.pending = null
+        const len = Math.hypot(dx, dy)
+        const mx = (dx / len) * SPEED * analog * dt, my = (dy / len) * SPEED * analog * dt
+        if (canStand(s.x + mx, s.y)) s.x += mx
+        if (canStand(s.x, s.y + my)) s.y += my
+        moving = true
+        s.dir = Math.abs(dx) > Math.abs(dy) * 0.9 ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up'
+      } else if (s.path.length && !s.cardOpen) {
+        const tg = s.path[0]
+        const vx = tg.x - s.x, vy = tg.y - s.y
+        const dist = Math.hypot(vx, vy), step = SPEED * dt
+        if (dist <= step) { s.x = tg.x; s.y = tg.y; s.path.shift() } else { s.x += (vx / dist) * step; s.y += (vy / dist) * step }
+        if (dist > 0.5) s.dir = Math.abs(vx) > Math.abs(vy) * 0.9 ? (vx > 0 ? 'right' : 'left') : vy > 0 ? 'down' : 'up'
+        moving = true
+        if (!s.path.length && s.pending) { const id = s.pending; s.pending = null; setCard(id); s.dismissed = null }
+      }
+      if (moving) s.t += dt
+
+      // stepping up to a place offers to go in (once per approach)
+      let n: NodeId | null = null
+      for (const q of NODES) {
+        if (q.kind !== 'pillar' && q.kind !== 'goal') continue
+        const [qx, qy] = px([q.x, q.y])
+        if (Math.hypot(s.x - qx, s.y - qy) < DOOR_R) n = q.id
+      }
+      if (n !== s.near) {
+        s.near = n; setNear(n)
+        if (!n) s.dismissed = null
+        else if (moving && !s.pending && s.dismissed !== n) { setCard(n); s.dismissed = null }
+      }
+      lastPos = [s.x, s.y]
+
+      // hero
+      const frame = moving ? Math.floor(s.t * 6) % 2 : 0
+      if (heroEl.current) { heroEl.current.style.transform = `translate3d(${s.x - HERO_W / 2}px, ${s.y - HERO_H}px, 0)`; heroEl.current.style.zIndex = String(Math.floor(s.y)) }
+      if (heroImg.current) { const src = `/art/chibi/${s.dir}_${frame}.png`; if (!heroImg.current.src.endsWith(src)) heroImg.current.src = src }
+      if (heroBob.current) heroBob.current.className = moving ? 'hero-walk' : 'hero-idle'
+
+      // camera: centred when the island fits, otherwise it follows the hero
+      const target = s.fit * s.zoom
+      if (!s.scale) s.scale = target
+      s.scale += (target - s.scale) * Math.min(1, dt * 8)
+      const sc = s.scale
+      const cw = WORLD.w * sc, ch = WORLD.h * sc
+      const wantX = cw <= s.vw ? (s.vw - cw) / 2 : Math.min(0, Math.max(s.vw - cw, s.vw / 2 - s.x * sc))
+      const wantY = ch <= s.vh ? (s.vh - ch) / 2 : Math.min(0, Math.max(s.vh - ch, s.vh * 0.55 - s.y * sc))
+      if (!s.ready) { s.camX = wantX; s.camY = wantY; s.ready = true }
+      const lerp = Math.min(1, dt * 6)
+      s.camX += (wantX - s.camX) * lerp
+      s.camY += (wantY - s.camY) * lerp
+      if (worldEl.current) worldEl.current.style.transform = `translate3d(${s.camX}px, ${s.camY}px, 0) scale(${sc})`
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  /* ---------------------------------------------------------------- keyboard */
+  useEffect(() => {
+    const norm = (e: KeyboardEvent) => (e.key.length === 1 ? e.key.toLowerCase() : e.key)
+    const dn = (e: KeyboardEvent) => {
+      const key = norm(e)
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's'].includes(key)) {
+        if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return
+        if (S.current.cardOpen) return
+        e.preventDefault()
+        S.current.keys.add(key)
+        setFirstTime(false)
+      } else if (key === 'Enter' && S.current.near && !(document.activeElement instanceof HTMLButtonElement)) {
+        openCard(S.current.near)
+      } else if (key === '+' || key === '=') { setZoom((z) => Math.min(S.current.maxZoom, z * 1.15)) }
+      else if (key === '-') { setZoom((z) => Math.max(1, z / 1.15)) }
+      else if (key === 'Escape') { S.current.dismissed = S.current.near; setCard(null) }
+    }
+    const up = (e: KeyboardEvent) => S.current.keys.delete(norm(e))
+    window.addEventListener('keydown', dn)
+    window.addEventListener('keyup', up)
+    return () => { window.removeEventListener('keydown', dn); window.removeEventListener('keyup', up) }
+  }, [openCard])
+
+  /* ---------------------------------------------------------------- tap / drag to walk */
+  const toWorld = (e: React.PointerEvent) => {
     const r = box.current!.getBoundingClientRect()
-    zoomAt(e.clientX - r.left, e.clientY - r.top, e.deltaY < 0 ? 1.12 : 1 / 1.12)
+    const sc = S.current.scale || S.current.fit * S.current.zoom
+    return { x: (e.clientX - r.left - S.current.camX) / sc, y: (e.clientY - r.top - S.current.camY) / sc }
   }
   const onDown = (e: React.PointerEvent) => {
-    if (!drag.current.length) dragged.current = false
-    drag.current.push({ id: e.pointerId, x: e.clientX, y: e.clientY, moved: false })
-    if (drag.current.length === 2) {
-      const [a, b] = drag.current
-      pinch.current = { d: Math.hypot(a.x - b.x, a.y - b.y), s: view.s }
-    }
-  }
-  const onMove = (e: React.PointerEvent) => {
-    const p = drag.current.find((d) => d.id === e.pointerId)
-    if (!p) return
-    const dx = e.clientX - p.x, dy = e.clientY - p.y
-    if (!p.moved && Math.hypot(dx, dy) < 6) return
-    p.moved = true
-    dragged.current = true
-    if (drag.current.length === 2 && pinch.current) {
-      p.x = e.clientX; p.y = e.clientY
-      const [a, b] = drag.current
-      const d = Math.hypot(a.x - b.x, a.y - b.y)
-      const r = box.current!.getBoundingClientRect()
-      const target = pinch.current.s * (d / pinch.current.d)
-      zoomAt((a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top, target / view.s)
+    if ((e.target as HTMLElement).closest('button, [role=application], [role=dialog]')) return
+    const q = S.current
+    q.ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (q.ptrs.size === 2) {
+      // second finger: pinch to zoom, stop any walk the first finger started
+      const [a, b] = [...q.ptrs.values()]
+      q.pinch = Math.hypot(a.x - b.x, a.y - b.y)
+      q.down = false; q.path = []
       return
     }
-    p.x = e.clientX; p.y = e.clientY
-    setView((v) => clamp({ ...v, x: v.x + dx, y: v.y + dy }))
+    const p = toWorld(e)
+    q.down = true
+    walkTo(p.x, p.y, null)
+  }
+  const onMove = (e: React.PointerEvent) => {
+    const q = S.current
+    if (q.ptrs.has(e.pointerId)) q.ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (q.ptrs.size >= 2) {
+      const [a, b] = [...q.ptrs.values()]
+      const d = Math.hypot(a.x - b.x, a.y - b.y)
+      if (q.pinch > 0) setZoom((z) => Math.min(q.maxZoom, Math.max(1, z * (d / q.pinch))))
+      q.pinch = d
+      return
+    }
+    if (!q.down) return
+    const now = performance.now()
+    if (now - q.lastRepath < 140) return
+    q.lastRepath = now
+    const p = toWorld(e)
+    walkTo(p.x, p.y, null)
   }
   const onUp = (e: React.PointerEvent) => {
-    drag.current = drag.current.filter((d) => d.id !== e.pointerId)
-    if (drag.current.length < 2) pinch.current = null
+    const q = S.current
+    q.ptrs.delete(e.pointerId)
+    if (q.ptrs.size < 2) q.pinch = 0
+    q.down = false
   }
-
-  /* ---------------------------------------------------------------- walking token (stepped ~8fps) */
-  const walkTo = useCallback(
-    (target: NodeId, after?: () => void) => {
-      if (walkTimer.current) window.clearInterval(walkTimer.current)
-      setCard(null)
-      const legs = route(at, target)
-      if (!legs.length) { after?.(); return }
-      const svg = measure.current!
-      const pts: { x: number; y: number }[] = []
-      for (const leg of legs) {
-        const el = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-        el.setAttribute('d', smoothD(leg.path.pts))
-        svg.appendChild(el)
-        const len = el.getTotalLength()
-        const n = Math.max(8, Math.round(len / 12))
-        for (let i = 0; i <= n; i++) {
-          const p = el.getPointAtLength((leg.reverse ? 1 - i / n : i / n) * len)
-          pts.push({ x: p.x, y: p.y })
-        }
-        svg.removeChild(el)
-      }
-      const dur = Math.min(1.5, Math.max(0.7, pts.length / 160)) // seconds, whole route
-      const ticks = Math.max(4, Math.round(dur * 8))
-      let k = 0
-      setWalking(true)
-      walkTimer.current = window.setInterval(() => {
-        k++
-        const idx = Math.min(pts.length - 1, Math.round((k / ticks) * (pts.length - 1)))
-        const p = pts[idx], q = pts[Math.max(0, idx - 3)]
-        const vx = p.x - q.x, vy = p.y - q.y
-        if (Math.hypot(vx, vy) > 2) setDir(Math.abs(vx) > Math.abs(vy) * 0.8 ? (vx > 0 ? 'right' : 'left') : vy > 0 ? 'down' : 'up')
-        setPos([p.x, p.y])
-        setFrame((f) => 1 - f)
-        // on phones the camera follows the token
-        setView((v) => (vp.w < 700 ? clamp({ ...v, x: vp.w / 2 - p.x * v.s, y: vp.h / 2 - p.y * v.s }) : v))
-        if (k >= ticks) {
-          window.clearInterval(walkTimer.current!)
-          walkTimer.current = null
-          setWalking(false)
-          setFrame(0)
-          setAt(target)
-          lastNode = target
-          after?.()
-        }
-      }, 125)
-    },
-    [at, clamp, vp.h, vp.w],
-  )
-  useEffect(() => () => { if (walkTimer.current) window.clearInterval(walkTimer.current) }, [])
-
-  const activate = useCallback(
-    (n: IslandNode) => {
-      if (dragged.current) return
-      setFirstTime(false)
-      if (n.kind === 'pillar' || n.kind === 'goal') walkTo(n.id, () => setCard(n.id))
-      else walkTo(n.id)
-    },
-    [walkTo],
-  )
+  const zoomBy = (k: number) => setZoom((z) => Math.min(S.current.maxZoom, Math.max(1, z * k)))
+  const onWheel = (e: React.WheelEvent) => zoomBy(e.deltaY < 0 ? 1.1 : 1 / 1.1)
 
   /* ---------------------------------------------------------------- render */
-  const doneIds = completed as NodeId[]
-  const toScreen = (x: number, y: number) => ({ left: x, top: y })
   const labelFor = (n: IslandNode) => t(n.labelKey)
-  const active = hover ?? null
+  const active = hover ?? near
+  const monument = art.monument
+  const inv = 1 / (S.current.fit * zoom || 1)
+  void vpTick
 
   return (
     <div
       ref={box}
       className="absolute inset-0 touch-none overflow-hidden"
-      style={{ background: '#8FCBD8', cursor: 'grab' }}
-      onWheel={onWheel}
+      style={{ background: WATER, cursor: 'pointer' }}
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
+      onPointerLeave={onUp}
+      onWheel={onWheel}
       onScroll={(e) => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0 }}
     >
-      <svg ref={measure} width="0" height="0" style={{ position: 'absolute' }} aria-hidden />
-      <div style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.s})`, willChange: 'transform' }}>
-        <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={doneIds} allDone={allDone} />} />
+      <div ref={worldEl} style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', willChange: 'transform' }}>
+        <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={completed as NodeId[]} allDone={allDone} />} />
 
-        {/* hotspots layer: independent of the art, positioned from island.json */}
+        {/* the Charminar stands on the plaza; the hero walks behind / in front of it by y */}
+        {monument && (
+          <img src="/art/monument.webp" alt="" draggable={false} style={{ position: 'absolute', left: 925, top: 520, width: 650, height: (650 * monument.h) / monument.w, zIndex: 1180, pointerEvents: 'none' }} />
+        )}
+
+        {/* places: marker flag + hit area. Positions come from island.json; swapping art never breaks them. */}
         {NODES.map((n) => {
           const [x, y] = px([n.x, n.y])
           const isPillar = n.kind === 'pillar'
@@ -219,58 +296,66 @@ export function IslandMap() {
           return (
             <div key={n.id}>
               {(isPillar || n.kind === 'goal') && (
-                <div style={{ position: 'absolute', left: x + 36, top: y - 142, pointerEvents: 'none', zIndex: Math.round(y) }}>
+                <div style={{ position: 'absolute', left: x + 30, top: y - 215, pointerEvents: 'none', zIndex: Math.round(y) + 5, transform: 'scale(1.5)', transformOrigin: '0 100%' }}>
                   <Marker done={n.kind === 'goal' ? allDone : isDone} locked={locked} pulse={n.id === 'plan' && firstTime && completed.length === 0} />
                 </div>
               )}
               <button
                 type="button"
                 aria-label={isPillar ? `${labelFor(n)}. ${t(n.hookKey!)}` : labelFor(n)}
-                onClick={() => activate(n)}
+                onClick={() => goToPlace(n)}
                 onPointerEnter={() => setHover(n.id)}
                 onPointerLeave={() => setHover((h) => (h === n.id ? null : h))}
                 onFocus={() => setHover(n.id)}
                 onBlur={() => setHover((h) => (h === n.id ? null : h))}
-                style={{ ...toScreen(x - 70, y - 70), position: 'absolute', width: 140, height: 140, borderRadius: '50%', background: 'transparent', border: 0, cursor: 'pointer', zIndex: 3000, outline: 'none' }}
+                style={{ position: 'absolute', left: x - 80, top: y - 80, width: 160, height: 160, borderRadius: '50%', background: 'transparent', border: 0, cursor: 'pointer', zIndex: 3000, outline: 'none' }}
                 className="island-hit"
               >
                 <span className="island-ring" style={{ opacity: showLabel ? 1 : 0 }} />
               </button>
               {showLabel && (
-                <div className="island-label" style={{ left: x, top: y - 168, transform: `translate(-50%,-100%) scale(${1 / view.s})`, zIndex: 4000 }}>
-                  {labelFor(n)}
-                </div>
+                <div className="island-label" style={{ left: x, top: y - 175, transform: `translate(-50%,-100%) scale(${inv})`, zIndex: 4000 }}>{labelFor(n)}</div>
               )}
             </div>
           )
         })}
 
-        {/* player token */}
-        <div style={{ position: 'absolute', left: pos[0] - TOKEN_H * 0.4, top: pos[1] - TOKEN_H + 8, width: TOKEN_H * 0.8, height: TOKEN_H, pointerEvents: 'none', zIndex: Math.round(pos[1]) + 100 }}>
-          <div style={{ position: 'absolute', left: '18%', right: '18%', bottom: -2, height: 14, borderRadius: '50%', background: 'rgba(58,42,36,.28)' }} />
-          <img src={`/art/chibi/${dir}_${walking ? frame : 0}.png`} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', display: 'block' }} />
+        {/* the hero */}
+        <div ref={heroEl} style={{ position: 'absolute', left: 0, top: 0, width: HERO_W, height: HERO_H, pointerEvents: 'none', willChange: 'transform' }}>
+          <div style={{ position: 'absolute', left: '20%', right: '20%', bottom: -2, height: 14, borderRadius: '50%', background: 'rgba(58,42,36,.3)' }} />
+          <div ref={heroBob} className="hero-idle" style={{ width: '100%', height: '100%' }}>
+            <img ref={heroImg} src="/art/chibi/down_0.png" alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', display: 'block' }} />
+          </div>
         </div>
 
-        {/* quiet petals once the goal is reached */}
+        {debug && (
+          <svg width={WORLD.w} height={WORLD.h} style={{ position: 'absolute', inset: 0, zIndex: 9000, pointerEvents: 'none' }}>
+            {grid.map((row, r) => row.map((v, c) => (v === 0 ? <rect key={`${r}-${c}`} x={c * T} y={r * T} width={T} height={T} fill="#ff2200" opacity=".38" /> : null)))}
+            {Array.from({ length: 21 }, (_, i) => (<g key={i}><line x1={(i * 5 / 100) * WORLD.w} x2={(i * 5 / 100) * WORLD.w} y1="0" y2={WORLD.h} stroke="#fff" strokeWidth={i % 2 ? 1 : 3} opacity=".7" /><line y1={(i * 5 / 100) * WORLD.h} y2={(i * 5 / 100) * WORLD.h} x1="0" x2={WORLD.w} stroke="#fff" strokeWidth={i % 2 ? 1 : 3} opacity=".7" />{i % 2 === 0 && <text x={(i * 5 / 100) * WORLD.w + 6} y="30" fontSize="30" fill="#c00">{i * 5}</text>}{i % 2 === 0 && <text x="6" y={(i * 5 / 100) * WORLD.h - 6} fontSize="30" fill="#c00">{i * 5}</text>}</g>))}
+            {NODES.map((n) => { const [x, y] = px([n.x, n.y]); return <circle key={n.id} cx={x} cy={y} r={DOOR_R} fill="none" stroke="#ff00aa" strokeWidth="4" /> })}
+            <text x="20" y="40" fontSize="30" fill="#000">{COLS}x{ROWS}</text>
+          </svg>
+        )}
+
         {allDone && (
           <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5000 }}>
-            {Array.from({ length: 9 }, (_, i) => (
-              <span key={i} className="petal" style={{ left: `${30 + i * 5}%`, animationDelay: `${i * 0.9}s` }} />
-            ))}
+            {Array.from({ length: 9 }, (_, i) => <span key={i} className="petal" style={{ left: `${30 + i * 5}%`, animationDelay: `${i * 0.9}s` }} />)}
           </div>
         )}
       </div>
 
-      {/* zoom buttons for mouse users */}
-      <div className="absolute right-2 z-30 hidden flex-col gap-1.5 sm:flex" style={{ bottom: 12 }}>
-        <button type="button" className="ink-chip grid h-10 w-10 place-items-center text-[20px]" aria-label="+" onClick={() => zoomAt(vp.w / 2, vp.h / 2, 1.25)}>+</button>
-        <button type="button" className="ink-chip grid h-10 w-10 place-items-center text-[20px]" aria-label="−" onClick={() => zoomAt(vp.w / 2, vp.h / 2, 1 / 1.25)}>−</button>
-      </div>
+      {touch && <Joystick />}
+      {!touch && (
+        <div className="absolute right-2 z-30 flex flex-col gap-1.5" style={{ bottom: 12 }}>
+          <button type="button" className="ink-chip grid h-10 w-10 place-items-center text-[20px]" aria-label="+" onClick={() => zoomBy(1.25)}>+</button>
+          <button type="button" className="ink-chip grid h-10 w-10 place-items-center text-[20px]" aria-label="−" onClick={() => zoomBy(1 / 1.25)}>−</button>
+        </div>
+      )}
 
-      {/* paper card for the chosen place */}
-      {card && !walking && (
+      {/* paper card for the place you stepped up to */}
+      {card && (
         <div className="absolute inset-x-0 z-40 flex justify-center px-3" style={{ bottom: 'max(16px, env(safe-area-inset-bottom))' }}>
-          <div className="paper w-full max-w-[420px] p-4 text-left" role="dialog" aria-label={labelFor(nodeById(card))}>
+          <div className="paper rise w-full max-w-[420px] p-4 text-left" role="dialog" aria-label={labelFor(nodeById(card))}>
             {card === 'gate' ? (
               <>
                 <div className="font-display lang-fit text-[22px] leading-tight">{allDone ? t('celebrate.title') : t('island.gate')}</div>
@@ -284,20 +369,13 @@ export function IslandMap() {
               </>
             )}
             <div className="mt-3 flex gap-2">
-              {card !== 'gate' && (
-                <button type="button" className="ink-btn" autoFocus onClick={() => nav(`/play/${card}`)}>
-                  {t('hud.enter')} ▸
-                </button>
-              )}
-              {card === 'gate' && allDone && !celebrated && (
-                <button type="button" className="ink-btn" autoFocus onClick={() => setCelebrated(true)}>{t('celebrate.again')}</button>
-              )}
-              <button type="button" className="ink-btn cream" onClick={() => setCard(null)}>{t('buttons.back')}</button>
+              {card !== 'gate' && <button type="button" className="ink-btn" autoFocus onClick={() => nav(`/play/${card}`)}>{t('hud.enter')} ▸</button>}
+              {card === 'gate' && allDone && !celebrated && <button type="button" className="ink-btn" autoFocus onClick={() => { setCelebrated(true); setCard(null) }}>{t('celebrate.again')}</button>}
+              <button type="button" className="ink-btn cream" onClick={() => { S.current.dismissed = S.current.near; setCard(null) }}>{t('buttons.back')}</button>
             </div>
           </div>
         </div>
       )}
-      <span className="sr-only" aria-live="polite">{walking ? '' : labelFor(nodeById(at))}</span>
     </div>
   )
 }

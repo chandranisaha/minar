@@ -13,7 +13,9 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 RULES = [  # (keywords any-of, slot, max width)
-    (['island background', 'island-bg', 'floating island'], 'island-bg', 2400),
+    (['island background', 'island-bg', 'diorama'], 'island-bg', 2400),
+    (['game map', 'island terrain'], 'island-terrain', 2400),
+    (['mosque pavilion', 'monument'], 'monument', 1400),
     (['golden hour'], 'scene-charminar', 1500),
     (['charminar'], 'charminar', 1000),
     (['bangle'], 'shop-plan', 640),
@@ -81,7 +83,8 @@ SKIP = ['character asset sheet', 'character game asset']
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.dirname(here)
-src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(root, 'graphics')
+srcs = sys.argv[1:] or [os.path.join(root, 'graphics'), os.path.join(root, 'new_graphics')]
+src = ''  # file entries below are absolute paths
 out = os.path.join(root, 'public', 'art')
 os.makedirs(out, exist_ok=True)
 mf_path = os.path.join(out, 'manifest.json')
@@ -89,13 +92,14 @@ manifest = json.load(open(mf_path)) if os.path.exists(mf_path) else {}
 
 done, unmatched = [], []
 files = []
-for dp, _, fns in os.walk(src):
-    for f in fns:
-        files.append(os.path.relpath(os.path.join(dp, f), src))
-for fn in sorted(files):
+for d in srcs:
+    for dp, _, fns in os.walk(d):
+        for f in fns:
+            files.append(os.path.join(dp, f))
+for fn in sorted(files, key=lambda q: os.path.basename(q)):
     if not fn.lower().endswith(('.png', '.webp', '.jpg', '.jpeg')):
         continue
-    low = fn.lower()
+    low = os.path.basename(fn).lower()
     if os.environ.get('ART_ONLY') and os.environ['ART_ONLY'].lower() not in low:
         continue
     if 'caf' in low and 'character' in low:

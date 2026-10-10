@@ -24,9 +24,25 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   page.url().endsWith('/') ? ok(`${tag}: story end -> island`) : fail(`${tag}: story did not finish`)
   const st = await page.evaluate(() => JSON.parse(localStorage.getItem('money-mohalla-v1')).state)
   st.storySeen && st.persona === 'college' && st.goalAmount === 30000 ? ok(`${tag}: persona + goal saved`) : fail(`${tag}: state`)
-  // tap a pillar: token walks, card appears, Enter goes in
+  // free movement: arrow keys move the hero (and collision stops it at the water)
+  const hero = () => page.evaluate(() => document.querySelector('img[src*="/art/chibi/"]').parentElement.parentElement.style.transform)
+  const h0 = await hero()
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(500); await page.keyboard.up('ArrowRight')
+  const h1 = await hero()
+  h0 !== h1 ? ok(`${tag}: arrow keys walk freely`) : fail(`${tag}: keys did not move the hero`)
+  await page.keyboard.down('ArrowDown'); await page.waitForTimeout(2500); await page.keyboard.up('ArrowDown')
+  const h2 = await hero(); await page.keyboard.down('ArrowDown'); await page.waitForTimeout(600); await page.keyboard.up('ArrowDown')
+  ;(await hero()) === h2 ? ok(`${tag}: collision stops the hero at the island edge`) : fail(`${tag}: walked off the island`)
+  if (w < 600) {
+    const box = await page.locator('[role=application]').boundingBox()
+    const cx = box.x + box.width / 2, cy = box.y + box.height / 2
+    const a = await hero()
+    await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx - 40, cy - 10, { steps: 4 }); await page.waitForTimeout(700); await page.mouse.up()
+    ;(await hero()) !== a ? ok(`${tag}: joystick moves the hero`) : fail(`${tag}: joystick`)
+  }
+  // tap a pillar: hero walks (A*), card appears, Enter goes in
   await page.evaluate(() => document.querySelector("button[aria-label^='Understand']").click())
-  await page.waitForTimeout(2600)
+  await page.waitForTimeout(6500)
   ;(await page.getByRole('dialog').count()) ? ok(`${tag}: token walked, card opened`) : fail(`${tag}: no card`)
   await page.getByRole('button', { name: /^Enter/ }).click()
   await page.waitForTimeout(800)
@@ -38,7 +54,7 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   st2.completedPillars.includes('invest') && st2.savedAmount > st2.startAmount ? ok(`${tag}: pillar complete, goal pill advanced`) : fail(`${tag}: completion`)
   // locked gate message, then all four -> gate opens
   await page.evaluate(() => document.querySelector("button[aria-label='College gate']").click())
-  await page.waitForTimeout(2600)
+  await page.waitForTimeout(7000)
   ;(await page.getByText(/opens when all four/).count()) ? ok(`${tag}: gate locked until all four`) : fail(`${tag}: gate lock message`)
   // gear menu: language + lite
   await page.getByRole('button', { name: 'Settings' }).click()
