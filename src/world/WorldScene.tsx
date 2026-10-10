@@ -29,7 +29,7 @@ const KEEPER: Record<PillarId, { cx: number; counter: number; mood: 'happy' | 'w
   plan: { cx: 0.47, counter: 0.7, mood: 'happy', s: 1 },
   save: { cx: 0.575, counter: 0.77, mood: 'cycle', s: 0.8 },
   invest: { cx: 0.56, counter: 0.7, mood: 'happy', s: 1 },
-  safe: { cx: 0.43, counter: 0.57, mood: 'sly', s: 0.72 },
+  safe: { cx: 0.43, counter: 0.67, mood: 'sly', s: 0.72 },
 }
 /** blank starburst sign on the painted kiosk: we letter OFFER! on it so it stays translatable */
 const OFFER_POS = { x: 0.664, y: 0.1 }
@@ -45,6 +45,7 @@ interface ArtKeeperCfg { idle: string; hover: string; ref: string; width: number
 const ART_KEEPER: Partial<Record<PillarId, ArtKeeperCfg>> = {
   plan: { idle: 'char-seller-arrange', hover: 'char-seller-hold', ref: 'char-seller-hold', width: 0.34, drop: 20 },
   invest: { idle: 'char-pearl-idle', hover: 'char-pearl-show', ref: 'char-pearl-idle', width: 0.3, drop: 40 },
+  safe: { idle: 'char-hacker-idle', hover: 'char-hacker-point', ref: 'char-hacker-idle', width: 0.3, drop: 20 },
   save: { idle: 'char-cafe-worried', hover: 'char-cafe-relieved', ref: 'char-cafe-worried', width: 0.3, anchor: 0.79 },
 }
 

@@ -188,5 +188,15 @@
   "w": 162,
   "h": 230,
   "src": "Elderly Pearl Merchant Character Sheet.png"
+ },
+ "char-hacker-idle": {
+  "w": 152,
+  "h": 178,
+  "src": "Hooded Phone Hacker Sticker Sheet.png"
+ },
+ "char-hacker-point": {
+  "w": 222,
+  "h": 180,
+  "src": "Hooded Phone Hacker Sticker Sheet.png"
  }
 }
