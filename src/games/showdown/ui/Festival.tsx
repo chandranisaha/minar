@@ -133,6 +133,9 @@ export function Futures() {
   const { plan, log } = useView()
   const runs = futuresRun(plan, choicesOf(log))
   const k = runs.filter((r) => r.result.survived).length
+  const ranks = plan.ranks ?? []
+  const metAll = (r: (typeof runs)[number]['result']) => ranks.every((g) => r.goals.includes(g))
+  const g = runs.filter((r) => r.result.survived && metAll(r.result)).length
   const fb = firstBreak(runs)
   return (
     <div className="flex flex-col gap-3">
@@ -144,13 +147,19 @@ export function Futures() {
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
           {runs.map(({ id, result }) => {
             const f = future(id)
+            const goalsOk = metAll(result)
             return (
-              <li key={id} className="rounded-lg border-2 border-ink px-2 py-1.5" style={{ background: result.survived ? '#E6F2DF' : '#FBE0D8' }}>
+              <li key={id} className="rounded-lg border-2 border-ink px-2 py-1.5" style={{ background: !result.survived ? '#FBE0D8' : goalsOk ? '#E6F2DF' : '#FFF1C4' }}>
                 <div className="flex items-center justify-between gap-2 text-[14px] font-extrabold">
                   <span>{id}{id === 'F2' ? ` · ${t('futures.played')}` : ''}</span>
-                  <span>{result.survived ? '✓ ' + t('futures.held') : '✕ ' + t('futures.broke', { when: when(result.shortfalls[0]?.[0] ?? 'FD') })}</span>
+                  <span>{result.survived ? '✓ ' + t('futures.money') : '✕ ' + t('futures.moneyShort', { when: when(result.shortfalls[0]?.[0] ?? 'FD') })}</span>
                 </div>
                 <div className="text-[11px] font-bold opacity-80">{t('futures.row', { sponsor: money(f.sponsor), at: t(`futures.at.${f.sponsorAt}`), crowd: f.crowd.toFixed(2), elec: f.elec, donation: f.donation ? '' : t('futures.noDonation') })}</div>
+                {ranks.length > 0 && (
+                  <ul className="m-0 mt-1 flex list-none flex-wrap gap-1 p-0 text-[11px] font-extrabold">
+                    {ranks.map((gid) => <li key={gid} className="rounded-md border-2 border-ink px-1.5" style={{ background: result.goals.includes(gid) ? '#CDE8C4' : '#F7C9C0' }}>{result.goals.includes(gid) ? '✓' : '✕'} {t(`goals.${gid}.name`)}</li>)}
+                  </ul>
+                )}
               </li>
             )
           })}
@@ -158,6 +167,8 @@ export function Futures() {
       </section>
       <section className="paper p-3 text-center" style={{ background: k >= 7 ? '#FFE08A' : undefined }}>
         <p className="font-display m-0 text-[20px] leading-tight">{t('futures.count', { k })}</p>
+        <p className="font-display m-0 mt-1 text-[18px] leading-tight">{t('futures.goalsCount', { g })}</p>
+        {g < k && <p className="m-0 mt-1 text-[13px] font-extrabold">{t('futures.goalsWarn')}</p>}
         <p className="m-0 mt-1 text-[14px] font-extrabold">{fb ? t('futures.first', { when: when(fb.point), bill: label(fb.bill) }) : t('futures.none')}</p>
         <p className="m-0 mt-2 text-[12px] font-bold opacity-80">{t('futures.autopilot')}</p>
       </section>

@@ -67,8 +67,8 @@ export function Brief() {
         </ol>
         <span className="sr-only">{POINTS.map(when).join(', ')}</span>
       </section>
-      <button type="button" className="ink-chip min-h-12 px-3 text-left text-[14px] font-extrabold" aria-expanded={open} onClick={() => setOpen(!open)}>
-        ❓ {t('brief.what')}
+      <button type="button" className="ink-chip min-h-12 !rounded-2xl px-3 text-left text-[14px] font-extrabold" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <span aria-hidden className="mr-2 inline-grid h-7 w-7 place-items-center rounded-full border-[3px] border-ink bg-mustard font-display text-[16px] align-middle">?</span>{t('brief.what')}
       </button>
       {open && <p className="paper anim-unfurl m-0 p-3 text-[14px] font-bold leading-snug">{t('brief.whatText')}</p>}
       <button type="button" className="ink-btn pink self-center" onClick={() => decide({ k: 'seen', screen: 'brief' })}>{t('brief.go')} ▶</button>

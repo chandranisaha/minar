@@ -6,6 +6,7 @@ import { POINTS, type Point } from '../engine/types'
 import { useShowdown, usePlayed, useView } from '../state/store'
 import { Say } from './kit'
 import { MomentLesson } from './Moment'
+import { MoneyFlow } from './MoneyFlow'
 import { useLabel } from './labels'
 import { useSd } from './useSd'
 
@@ -104,17 +105,11 @@ export function DateScreen({ point }: { point: Point }) {
       {point === 'FD' && <Say who="shobha"><span className="text-[14px]">{t('date.cast.shobha')}</span></Say>}
       {point === 'W1' && <Say who="ayesha"><span className="text-[14px]">{t('date.cast.ayesha')}</span></Say>}
 
-      <section className="paper p-3">
-        <h2 className="font-sign lang-fit m-0 text-[14px]">▲ {t('date.in')}</h2>
-        <ul className="m-0 mt-1 flex list-none flex-col gap-0.5 p-0 text-[14px] font-bold">
-          {ins.length ? ins.map((l) => <li key={l.key} className="flex justify-between gap-2"><span>{t(`date.ins.${l.key}`, { crowd: l.crowd })}</span><span style={{ color: '#2B4A1E' }}>{money(l.amount)}</span></li>) : <li className="opacity-80">{t('date.nothingIn')}</li>}
-        </ul>
-        <h2 className="font-sign lang-fit mb-0 mt-3 text-[14px]">▼ {t('date.out')}</h2>
-        <ul className="m-0 mt-1 flex list-none flex-col gap-0.5 p-0 text-[14px] font-bold">
-          {line.pay.length ? line.pay.map(([k, a]) => <li key={k} className="flex justify-between gap-2"><span>{outLabel(k)}</span><span style={{ color: '#7A2A22' }}>{money(a)}</span></li>) : <li className="opacity-80">{t('date.nothingOut')}</li>}
-        </ul>
-        <div className="mt-2 flex justify-between border-t-2 border-dashed border-ink pt-2 text-[17px] font-extrabold"><span>{t('date.balance')}</span><span>{money(line.cash)}</span></div>
-      </section>
+      <MoneyFlow
+        ins={ins.map((l) => ({ label: t(`date.ins.${l.key}`, { crowd: l.crowd }), amount: l.amount }))}
+        outs={line.pay.map(([k, a]) => ({ label: outLabel(k), amount: a }))}
+        end={line.cash}
+      />
 
       <p className="m-0 text-[14px] font-extrabold">
         {point === 'W1' && t('date.cards.W1')}

@@ -13,7 +13,7 @@ export function GuardrailFooter() {
 }
 
 export function Portrait({ who, size = 64 }: { who: CastId; size?: number }) {
-  return <img src={`${import.meta.env.BASE_URL}art/${CAST[who]}.webp`} alt="" aria-hidden width={size} height={size * 1.6} className="shrink-0 object-contain" style={{ height: size * 1.6 }} />
+  return <img src={`${import.meta.env.BASE_URL}art/${CAST[who]}.webp`} alt="" aria-hidden width={size} height={size * 1.6} className="shrink-0 object-contain" style={{ height: size * 1.6, clipPath: who === 'shobha' ? 'inset(0 9% 0 0)' : undefined }} />
 }
 
 /** A cast member says one or two short lines (never which option to pick). */
@@ -22,7 +22,8 @@ export function Say({ who, children }: { who: CastId; children: ReactNode }) {
   return (
     <div className="flex items-end gap-2">
       <Portrait who={who} />
-      <div className="ink-chip mb-3 flex-1 px-3 py-2">
+      <div className="ink-chip relative mb-3 flex-1 !rounded-2xl px-3.5 py-2.5">
+        <span aria-hidden className="absolute -left-[9px] bottom-5 h-4 w-4 rotate-45 border-b-[3px] border-l-[3px] border-ink" style={{ background: '#FFF8E6' }} />
         <div className="font-sign lang-fit text-[12px] text-pink">{t(`cast.${who}`)}</div>
         <div className="text-[15px] font-extrabold leading-snug">{children}</div>
       </div>

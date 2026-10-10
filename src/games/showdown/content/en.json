@@ -460,7 +460,7 @@
     "held": "Held",
     "broke": "Broke on {{when}}",
     "played": "your festival",
-    "count": "Your plan held in {{k}} of 10 possible festivals.",
+    "count": "Your money lasted in {{k}} of 10 festivals.",
     "first": "It first broke on {{when}}: {{bill}}.",
     "none": "It never broke.",
     "row": "Sponsor {{sponsor}} {{at}} · crowd ×{{crowd}} · repair ×{{elec}}{{donation}}",
@@ -471,7 +471,12 @@
       "FD": "on Festival Day"
     },
     "autopilot": "In every festival the same rules decide: extend the biggest bills, then cancel what serves your lowest goals.",
-    "go": "Next: three questions"
+    "go": "Next: three questions",
+    "money": "Money held",
+    "moneyShort": "Money ran out: {{when}}",
+    "goalsMet": "Goals met: {{k}} of {{n}}",
+    "goalsCount": "You met all your goals in {{g}} of 10.",
+    "goalsWarn": "Money lasting is not enough. A festival that skips what people came for is not a success."
   },
   "concepts": {
     "C1": "Cash flow",
@@ -701,5 +706,9 @@
     "done": "Back to Charminar",
     "cardTitle": "Lesson",
     "code": "Game code: {{code}}. It has no name in it. Tell your teacher if they ask."
+  },
+  "flow": {
+    "start": "In the festival fund before",
+    "end": "In the festival fund now"
   }
 }
