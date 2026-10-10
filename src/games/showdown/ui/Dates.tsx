@@ -5,9 +5,8 @@ import { choicesOf } from '../engine/log'
 import { POINTS, type Point } from '../engine/types'
 import { useShowdown, usePlayed, useView } from '../state/store'
 import { Say } from './kit'
+import { useLabel } from './labels'
 import { useSd } from './useSd'
-
-const OUT_KEY: Record<string, string> = { permits: 'permits', electrical: 'electrical', 'rush plates': 'rush', stage: 'stage', 'sunny cash': 'sunnycash', 'speakers (bill)': 'speakers' }
 
 /** The Shortfall sheet: bills are more than the cash. Extend (not Daam Fix, not on Festival Day) or Cancel, item by item. */
 function Shortfall() {
@@ -60,6 +59,7 @@ function Shortfall() {
 /** S8: one money date. Money in, money out, balance, the event, and the player's choices. */
 export function DateScreen({ point }: { point: Point }) {
   const { t, money, when } = useSd()
+  const label = useLabel()
   const decide = useShowdown((s) => s.decide)
   const { log, plan } = useView()
   const played = usePlayed()
@@ -69,10 +69,10 @@ export function DateScreen({ point }: { point: Point }) {
   const line = played.ledger[point]!
   const ins = arrivals(point, 'F2', played)
   const n = POINTS.indexOf(point) + 2 // Today is the first of the five money dates
-  const outLabel = (k: string) => (OUT_KEY[k] ? t(`date.outs.${OUT_KEY[k]}`) : k === 'hall' ? t('items.hall.name') : t(`items.${k}.name`) + (k === 'plates' ? ` × ${plan.contracts.find((c) => c.id === 'plates')?.qty ?? ''}` : ''))
+  const plates = plan.contracts.find((c) => c.id === 'plates')?.qty ?? 0
+  const outLabel = (k: string) => label(k, plates)
   const owed = played.unpaid.filter(([pt]) => pt === point).reduce((a, [, x]) => a + x, 0)
   const rush = point === 'FD' ? line.pay.find(([k]) => k === 'rush plates') : undefined
-  const plates = plan.contracts.find((c) => c.id === 'plates')?.qty ?? 0
 
   const decided = point === 'W2' ? !!choices.e2 : point === 'W3' ? !!choices.e4 : true
   const cashBeforeChoice = line.cash + (point === 'W2' && choices.e2 === 'stage' ? RULES.stageCost : 0) + (point === 'W3' && choices.e4 && choices.e4 !== 'refuse' ? RULES.sunnyAdvance : 0)

@@ -8,12 +8,9 @@ export function futuresRun(plan: Plan, choices: Choices = {}): { id: string; res
 }
 export const survival = (plan: Plan, choices: Choices = {}): number => futuresRun(plan, choices).filter((x) => x.result.survived).length
 
-/** The first date and bill that broke a plan that did not survive (for the debrief line). */
-export function firstBreak(result: RunResult): { point: string; bill: string } | null {
-  const first = result.shortfalls[0]
-  if (!first) return null
-  const [point] = first
-  const paid = result.ledger[point]?.pay ?? []
-  const biggest = [...paid].sort((a, b) => b[1] - a[1])[0]
-  return { point, bill: biggest ? biggest[0] : '' }
+/** Across the futures that broke, the earliest date and the biggest bill due then (for the debrief: "it first broke on Week 3: the hall"). */
+export function firstBreak(runs: { id: string; result: RunResult }[]): RunResult['firstBreak'] {
+  const order = ['W1', 'W2', 'W3', 'FD']
+  const breaks = runs.map((r) => r.result.firstBreak).filter((b): b is NonNullable<RunResult['firstBreak']> => !!b)
+  return breaks.sort((a, b) => order.indexOf(a.point) - order.indexOf(b.point))[0] ?? null
 }

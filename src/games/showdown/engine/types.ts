@@ -54,6 +54,11 @@ export interface RunResult {
   extensionFees: number
   /** exact amounts the score needs (the rounded fields above are what a screen shows) */
   avoidable: { extensionFees: number; rushPlates: number; lostPaid: number; unpaidFee: number; unrecorded: number }
+  /** how many people the signed sound reaches (with Sunny's speakers if he was paid against a bill), and whether good lights are live */
+  cap: number
+  lightsOk: boolean
+  /** the first date that was short, how much, and the biggest bill due that day */
+  firstBreak: { point: Point; gap: number; bill: string } | null
   survived: boolean
   pending?: Pending
 }

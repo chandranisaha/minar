@@ -336,5 +336,74 @@
     "risk": "Goal at risk: {{goal}} (rank {{rank}})",
     "owe": "Leave {{money}} unpaid",
     "owedNote": "On Festival Day an unpaid bill is recorded as owed, with a 10% fee."
+  },
+  "festival": {
+    "title": "Festival Day!",
+    "goalsTitle": "Your goals",
+    "met": "Goal met",
+    "missed": "Goal missed",
+    "layers": {
+      "hall": "The hall is ready.",
+      "lightsOn": "The lights are glowing.",
+      "lightsOff": "No good lights. The ground is dim.",
+      "soundOn": "Sound reaches {{cap}} people.",
+      "soundOff": "No sound.",
+      "stage": "You built a bigger stage.",
+      "foodOn": "{{plates}} plates are ready.",
+      "foodOff": "No food stall.",
+      "kidsOn": "The kids' corner is open.",
+      "kidsOff": "No kids' corner.",
+      "bannerOn": "Posters brought the crowd.",
+      "bannerOff": "No posters. Word of mouth only.",
+      "safetyOn": "The safety pack is ready.",
+      "safetyOff": "No safety pack.",
+      "crowd": "{{crowd}} visitors came."
+    },
+    "why": {
+      "G1none": "There was no kids' corner in the plan.",
+      "G1cancelled": "The kids' corner was cancelled.",
+      "G2none": "There was no food order.",
+      "G2cancelled": "The plates were cancelled.",
+      "G3light": "There were no good lights.",
+      "G3sound": "There was no sound.",
+      "G3cap": "The sound reaches {{cap}} people. {{crowd}} came.",
+      "G5crowd": "Only {{crowd}} came. The goal needed 420.",
+      "G5safety": "There was no safety pack.",
+      "ok": "All set."
+    },
+    "notice": {
+      "title": "Colony notice board",
+      "sub": "Every bill and every payment, as the colony reads it.",
+      "received": "Money received",
+      "paid": "Money paid",
+      "left": "Left in the kitty",
+      "start": "Cash at the start",
+      "unrecorded": "UNRECORDED",
+      "unrecordedLine": "Cash to Sunny: {{given}} paid, {{back}} came back, {{lost}} has no bill and no record.",
+      "extended": "Extended to Festival Day, +5%: {{item}}",
+      "cancelled": "Cancelled in {{when}}: {{item}}. The {{paid}} already paid was lost.",
+      "owed": "Still owed: {{money}}. A 10% fee counts against the books.",
+      "shobha": "The colony reads this notice. Every bill is on it."
+    },
+    "go": "Test the plan in ten futures"
+  },
+  "futures": {
+    "title": "Ten possible festivals",
+    "sub": "Your plan, replayed. The sponsor, the crowd and the surprise bills change each time.",
+    "held": "Held",
+    "broke": "Broke on {{when}}",
+    "played": "your festival",
+    "count": "Your plan held in {{k}} of 10 possible festivals.",
+    "first": "It first broke on {{when}}: {{bill}}.",
+    "none": "It never broke.",
+    "row": "Sponsor {{sponsor}} {{at}} · crowd ×{{crowd}} · repair ×{{elec}}{{donation}}",
+    "noDonation": " · no donation",
+    "at": {
+      "W2": "in Week 2",
+      "W3": "in Week 3",
+      "FD": "on Festival Day"
+    },
+    "autopilot": "In every festival the same rules decide: extend the biggest bills, then cancel what serves your lowest goals.",
+    "go": "Next: three questions"
   }
 }
