@@ -1,6 +1,12 @@
 # How to check Festival Showdown after each step
 
-Run these from the repo folder. Nothing here costs any credits.
+Run these from the project folder (the one that contains `package.json`), not the folder above it:
+
+```bash
+cd /Users/shriyakansal/Desktop/IIIT/megathon/megathon_2k26/megathon26-sushi-aur-ek
+```
+
+Nothing here costs any credits.
 
 ## 1. The automatic checks (about 10 seconds)
 
