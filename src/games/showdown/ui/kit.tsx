@@ -1,5 +1,4 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { Toon, type Mood } from '../../shared/Toon'
 import type { CashLines } from '../engine/lines'
 import { POINTS } from '../engine/types'
 import { MONEY_VARS, type LessonLine } from '../engine/lessons'
@@ -13,20 +12,16 @@ export function GuardrailFooter() {
   return <p className="m-0 px-3 py-2 text-center text-[12px] font-extrabold" style={{ color: '#7A2A22' }} role="note">ⓘ {t('guardrail')}</p>
 }
 
-export function Portrait({ who, size = 64, mood = 'happy' }: { who: CastId; size?: number; mood?: Mood }) {
-  return (
-    <svg width={size} height={size * 1.5} viewBox="0 0 100 150" aria-hidden className="shrink-0" style={{ overflow: 'visible' }}>
-      <Toon look={CAST[who]} mood={mood} width={100} height={150} />
-    </svg>
-  )
+export function Portrait({ who, size = 64 }: { who: CastId; size?: number }) {
+  return <img src={`${import.meta.env.BASE_URL}art/${CAST[who]}.webp`} alt="" aria-hidden width={size} height={size * 1.6} className="shrink-0 object-contain" style={{ height: size * 1.6 }} />
 }
 
 /** A cast member says one or two short lines (never which option to pick). */
-export function Say({ who, children, mood }: { who: CastId; children: ReactNode; mood?: Mood }) {
+export function Say({ who, children }: { who: CastId; children: ReactNode }) {
   const { t } = useSd()
   return (
     <div className="flex items-end gap-2">
-      <Portrait who={who} mood={mood} />
+      <Portrait who={who} />
       <div className="ink-chip mb-3 flex-1 px-3 py-2">
         <div className="font-sign lang-fit text-[12px] text-pink">{t(`cast.${who}`)}</div>
         <div className="text-[15px] font-extrabold leading-snug">{children}</div>

@@ -125,13 +125,24 @@ export function Goals() {
 }
 
 /** S4: Prediction P1, revealed at the debrief. */
+const LAST_YEAR: [string, number][] = [['hall', 11000], ['sound', 8000], ['lights', 5500], ['plates', 7400], ['kids', 3000], ['posters', 4000]]
+
 export function PredictP1() {
-  const { t } = useSd()
+  const { t, money } = useSd()
   const decide = useShowdown((s) => s.decide)
   const [v, setV] = useState<string | null>(null)
   return (
     <div className="flex flex-col gap-3">
       <div className="font-sign lang-fit text-center text-[13px] text-pink">{t('p1.label')}</div>
+      <section className="paper p-3" aria-label={t('p1.intro')}>
+        <div className="text-[12px] font-extrabold opacity-80">{t('p1.intro')}</div>
+        <ul className="m-0 mt-1 list-none p-0">
+          {LAST_YEAR.map(([id, amt]) => (
+            <li key={id} className="flex justify-between border-b-2 border-dashed border-ink/30 py-1 text-[14px] font-bold"><span>{t(`p1.rows.${id}`)}</span><span>{money(amt)}</span></li>
+          ))}
+        </ul>
+        <div className="mt-1 flex justify-between font-display text-[18px]"><span>{t('p1.total')}</span><span>{money(38900)}</span></div>
+      </section>
       <div className="paper p-3">
         <Ask q={t('p1.q')} opts={PREDICTIONS.P1.options.map((o) => [o, t(`p1.opts.${o}`)])} value={v} onPick={setV} go={t('p1.go')} note={t('p1.note')} onLock={() => v && decide({ k: 'predict', id: 'P1', answer: v })} />
       </div>

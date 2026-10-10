@@ -81,7 +81,7 @@
   },
   "p1": {
     "label": "Quick guess",
-    "q": "This year, the same shopping list will cost…",
+    "q": "Buying these same six things again this year, the bill will be…",
     "opts": {
       "same": "About the same",
       "5": "About 5% more",
@@ -89,7 +89,17 @@
       "25": "About 25% more"
     },
     "note": "Your answer is revealed at the end. A wrong guess costs nothing.",
-    "go": "Lock in my guess"
+    "go": "Lock in my guess",
+    "intro": "Last year's festival bill",
+    "rows": {
+      "hall": "Hall",
+      "sound": "Sound",
+      "lights": "Lights",
+      "plates": "Plates",
+      "kids": "Kids' corner",
+      "posters": "Posters"
+    },
+    "total": "Total last year"
   },
   "market": {
     "title": "The market",
@@ -506,8 +516,8 @@
     }
   },
   "transfer": {
-    "title": "Three questions",
-    "sub": "Situations the game did not show.",
+    "title": "Try it in real life",
+    "sub": "Three everyday situations. Use what you just learned.",
     "n": "Question {{n}} of 3",
     "check": "Check my answer",
     "unsureOpt": "Not sure",
