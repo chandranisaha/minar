@@ -42,7 +42,7 @@ Use your browser's phone view (width 360 to 390) for the real test.
 | `...?preset=A&at=locked` | Plan A. At Week 3 the **Shortfall sheet** opens: due 10,500, in hand 6,870, short 3,630. Cancel Reliable sound. Ends at 10,434 |
 | `...?preset=B&at=festival` | Festival Day scene with all layers, all three goals met, public notice |
 | `...?preset=A&at=festival` | Scene with no sound. "Lights and sound: Goal missed. There was no sound." |
-| `...?preset=B&at=futures` | Ten futures: holds in 9 of 10 (fails F5) |
+| `...?preset=B&at=futures` | Press "Light the diyas": ten diyas light one by one. Money holds in 9 of 10 (F5 goes out). Tap any diya to read its story |
 | `...?preset=A&at=transfer` | Three transfer questions (stress test first), then the report: 45, Careful Planner, minaret not lit |
 | `...?preset=B&at=report` | Report: 98, Master Treasurer, four stars, six "Got it", minaret lit |
 

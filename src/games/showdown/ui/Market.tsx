@@ -218,7 +218,7 @@ export function Market() {
         <p className="m-0 mt-1 text-[12px] font-bold opacity-80">{t('market.actionsNote')}</p>
       </div>
 
-      {toast && <p className="ink-chip anim-pop m-0 px-3 py-2 text-[14px] font-extrabold" style={{ background: '#FFE08A' }} role="status" onClick={() => setToast(null)}>{toast}</p>}
+      {toast && <p className="ink-chip anim-squash m-0 px-3 py-2 text-[14px] font-extrabold" style={{ background: '#FFE08A' }} role="status" onClick={() => setToast(null)}>{toast}</p>}
 
       <section className="paper p-3">
         <h2 className="font-sign lang-fit m-0 text-[15px]">{t('market.list')}</h2>

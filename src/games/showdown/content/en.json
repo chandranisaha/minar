@@ -456,7 +456,7 @@
   },
   "futures": {
     "title": "Ten possible festivals",
-    "sub": "Your plan, replayed. The sponsor, the crowd and the surprise bills change each time.",
+    "sub": "Same plan, ten different luck. Light each diya to see how your plan does when the sponsor, the crowd and the repairs change.",
     "held": "Held",
     "broke": "Broke on {{when}}",
     "played": "your festival",
@@ -476,7 +476,24 @@
     "moneyShort": "Money ran out: {{when}}",
     "goalsMet": "Goals met: {{k}} of {{n}}",
     "goalsCount": "You met all your goals in {{g}} of 10.",
-    "goalsWarn": "Money lasting is not enough. A festival that skips what people came for is not a success."
+    "goalsWarn": "Money lasting is not enough. A festival that skips what people came for is not a success.",
+    "light": "Light the diyas",
+    "lighting": "Lighting…",
+    "lit": "Done. Your money lasted in {{k}} of 10. You met all goals in {{g}} of 10.",
+    "keyLit": "Lit: money held, goals met",
+    "keyDim": "Dim: money held, a goal missed",
+    "keyOut": "Out: money ran out",
+    "sponsorChip": "Sponsor {{sponsor}} {{at}}",
+    "repair": "Repairs ×{{n}}",
+    "donation": "Rao uncle gives",
+    "noDonationChip": "No donation",
+    "crowd": {
+      "big": "Big crowd",
+      "normal": "Normal crowd",
+      "small": "Small crowd"
+    },
+    "lightFirst": "Light the diyas first to see how this one went.",
+    "weak": "Show me the weak spot ({{id}})"
   },
   "concepts": {
     "C1": "Cash flow",

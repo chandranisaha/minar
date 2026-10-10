@@ -30,7 +30,7 @@ export function MoneyFlow({ ins, outs, end }: { ins: Flow[]; outs: Flow[]; end: 
       {ins.length > 0 && (
         <ul className="m-0 mt-3 flex list-none flex-col gap-2 p-0">
           {rows.filter((r) => r.sign > 0).map((r) => (
-            <li key={r.label} className="anim-pop rounded-xl border-[3px] border-ink px-3 py-2" style={{ background: '#CDE8C4' }}>
+            <li key={r.label} className="anim-squash rounded-xl border-[3px] border-ink px-3 py-2" style={{ background: '#CDE8C4' }}>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[15px] font-extrabold leading-tight"><span aria-hidden>💰 </span>{r.label}</span>
                 <span className="font-display text-[24px] leading-none" style={{ color: '#2B4A1E' }}>+{money(r.amount)}</span>

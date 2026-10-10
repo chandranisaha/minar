@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { RULES, future, item } from '../engine/content'
 import { arrivals } from '../engine/dates'
 import { choicesOf } from '../engine/log'
@@ -126,54 +127,112 @@ export function Festival() {
 }
 
 /** S10: the same plan replayed in ten possible festivals, with the simple shortfall rules deciding each time. */
+type DiyaState = 'unlit' | 'lit' | 'dim' | 'out'
+
+/** One clay diya. Lit = money held and goals met; dim = money held, goals missed; out = money ran out (smoke). */
+function Diya({ state, label, selected, onClick }: { state: DiyaState; label: string; selected: boolean; onClick: () => void }) {
+  const flame = state === 'lit' ? '#F28C28' : state === 'dim' ? '#E8B04A' : null
+  return (
+    <button type="button" onClick={onClick} aria-label={label} aria-pressed={selected} className="grid min-h-16 place-items-center rounded-xl border-[3px] border-ink p-1" style={{ background: selected ? '#FFE08A' : '#FFF8E6', boxShadow: selected ? '2px 3px 0 #2B1A17' : undefined }}>
+      <svg viewBox="0 0 60 64" width="52" height="56" aria-hidden>
+        {state === 'lit' && <circle cx="30" cy="26" r="22" fill="#FFD36B" opacity=".45" />}
+        {flame && (
+          <g className="flame">
+            <path d={state === 'lit' ? 'M30 6 C38 16 40 24 30 34 C20 24 22 16 30 6 Z' : 'M30 18 C35 24 36 29 30 34 C24 29 25 24 30 18 Z'} fill={flame} stroke="#2B1A17" strokeWidth="2" />
+            {state === 'lit' && <path d="M30 18 C34 23 34 28 30 32 C26 28 26 23 30 18 Z" fill="#FFF1C4" />}
+          </g>
+        )}
+        {state === 'out' && <path d="M30 34 C24 28 36 24 28 16 M33 30 C40 24 30 18 36 10" fill="none" stroke="#7A7A7A" strokeWidth="3" strokeLinecap="round" opacity=".7" />}
+        <path d="M6 38 C6 54 20 60 30 60 C40 60 54 54 54 38 Z" fill={state === 'out' ? '#8A7B6B' : '#C8693A'} stroke="#2B1A17" strokeWidth="3" strokeLinejoin="round" />
+        <ellipse cx="30" cy="38" rx="24" ry="5" fill={state === 'out' ? '#6B5E52' : '#8E4521'} stroke="#2B1A17" strokeWidth="3" />
+        {state === 'unlit' && <path d="M30 34 L30 30" stroke="#2B1A17" strokeWidth="3" strokeLinecap="round" />}
+      </svg>
+    </button>
+  )
+}
+
+/** S10: ten possible festivals as ten diyas. Light them one by one; tap any to read its story. */
 export function Futures() {
   const { t, money, when } = useSd()
   const label = useLabel()
   const decide = useShowdown((s) => s.decide)
   const { plan, log } = useView()
   const runs = futuresRun(plan, choicesOf(log))
-  const k = runs.filter((r) => r.result.survived).length
   const ranks = plan.ranks ?? []
   const metAll = (r: (typeof runs)[number]['result']) => ranks.every((g) => r.goals.includes(g))
+  const stateOf = (r: (typeof runs)[number]['result']): DiyaState => (!r.survived ? 'out' : metAll(r) ? 'lit' : 'dim')
+  const k = runs.filter((r) => r.result.survived).length
   const g = runs.filter((r) => r.result.survived && metAll(r.result)).length
   const fb = firstBreak(runs)
+  const [shown, setShown] = useState(0)
+  const [pick, setPick] = useState<string>('F2')
+  const done = shown >= runs.length
+  useEffect(() => {
+    if (shown === 0 || shown >= runs.length) return
+    const id = window.setTimeout(() => setShown(shown + 1), 320)
+    return () => window.clearTimeout(id)
+  }, [shown, runs.length])
+  const sel = runs.find((r) => r.id === pick)!
+  const sf = future(pick)
+  const crowdWord = sf.crowd >= 1.1 ? 'big' : sf.crowd <= 0.9 ? 'small' : 'normal'
+  const weak = runs.find((r) => !r.result.survived) ?? runs.find((r) => !metAll(r.result))
   return (
     <div className="flex flex-col gap-3">
       <div className="paper p-3">
         <h1 className="font-display lang-fit m-0 text-[22px] leading-tight">{t('futures.title')}</h1>
         <p className="m-0 mt-1 text-[13px] font-bold leading-snug">{t('futures.sub')}</p>
       </div>
+
       <section className="paper p-3">
-        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-          {runs.map(({ id, result }) => {
-            const f = future(id)
-            const goalsOk = metAll(result)
-            return (
-              <li key={id} className="rounded-lg border-2 border-ink px-2 py-1.5" style={{ background: !result.survived ? '#FBE0D8' : goalsOk ? '#E6F2DF' : '#FFF1C4' }}>
-                <div className="flex items-center justify-between gap-2 text-[14px] font-extrabold">
-                  <span>{id}{id === 'F2' ? ` · ${t('futures.played')}` : ''}</span>
-                  <span>{result.survived ? '✓ ' + t('futures.money') : '✕ ' + t('futures.moneyShort', { when: when(result.shortfalls[0]?.[0] ?? 'FD') })}</span>
-                </div>
-                <div className="text-[11px] font-bold opacity-80">{t('futures.row', { sponsor: money(f.sponsor), at: t(`futures.at.${f.sponsorAt}`), crowd: f.crowd.toFixed(2), elec: f.elec, donation: f.donation ? '' : t('futures.noDonation') })}</div>
-                {ranks.length > 0 && (
-                  <ul className="m-0 mt-1 flex list-none flex-wrap gap-1 p-0 text-[11px] font-extrabold">
-                    {ranks.map((gid) => <li key={gid} className="rounded-md border-2 border-ink px-1.5" style={{ background: result.goals.includes(gid) ? '#CDE8C4' : '#F7C9C0' }}>{result.goals.includes(gid) ? '✓' : '✕'} {t(`goals.${gid}.name`)}</li>)}
-                  </ul>
-                )}
-              </li>
-            )
-          })}
+        <ul className="m-0 grid list-none grid-cols-5 gap-1.5 p-0">
+          {runs.map(({ id, result }, i) => (
+            <li key={id} className="text-center">
+              <Diya state={i < shown ? stateOf(result) : 'unlit'} label={`${id}${id === 'F2' ? ' · ' + t('futures.played') : ''}`} selected={pick === id} onClick={() => setPick(id)} />
+              <div className="text-[11px] font-extrabold">{id === 'F2' ? '★ ' : ''}{id}</div>
+            </li>
+          ))}
         </ul>
+        {shown === 0 && <button type="button" className="ink-btn pink mx-auto mt-3 block" onClick={() => setShown(1)}>🪔 {t('futures.light')}</button>}
+        {shown > 0 && <p className="m-0 mt-2 text-center text-[12px] font-extrabold" role="status">{done ? t('futures.lit', { k, g }) : t('futures.lighting')}</p>}
+        <p className="m-0 mt-1 flex flex-wrap justify-center gap-x-3 text-[11px] font-bold opacity-90">
+          <span><span style={{ color: '#F28C28' }}>●</span> {t('futures.keyLit')}</span>
+          <span><span style={{ color: '#E8B04A' }}>●</span> {t('futures.keyDim')}</span>
+          <span><span style={{ color: '#7A7A7A' }}>●</span> {t('futures.keyOut')}</span>
+        </p>
       </section>
-      <section className="paper p-3 text-center" style={{ background: k >= 7 ? '#FFE08A' : undefined }}>
-        <p className="font-display m-0 text-[20px] leading-tight">{t('futures.count', { k })}</p>
-        <p className="font-display m-0 mt-1 text-[18px] leading-tight">{t('futures.goalsCount', { g })}</p>
-        {g < k && <p className="m-0 mt-1 text-[13px] font-extrabold">{t('futures.goalsWarn')}</p>}
-        <p className="m-0 mt-1 text-[14px] font-extrabold">{fb ? t('futures.first', { when: when(fb.point), bill: label(fb.bill) }) : t('futures.none')}</p>
-        <p className="m-0 mt-2 text-[12px] font-bold opacity-80">{t('futures.autopilot')}</p>
+
+      <section className="paper p-3" aria-live="polite">
+        <h2 className="font-sign lang-fit m-0 text-[15px]">{pick}{pick === 'F2' ? ` · ${t('futures.played')}` : ''}</h2>
+        <ul className="m-0 mt-1 flex list-none flex-wrap gap-1.5 p-0 text-[12px] font-extrabold">
+          <li className="rounded-md border-2 border-ink px-1.5" style={{ background: '#FFE08A' }}>💰 {t('futures.sponsorChip', { sponsor: money(sf.sponsor), at: t(`futures.at.${sf.sponsorAt}`) })}</li>
+          <li className="rounded-md border-2 border-ink px-1.5" style={{ background: '#D6ECF5' }}>👥 {t(`futures.crowd.${crowdWord}`)}</li>
+          <li className="rounded-md border-2 border-ink px-1.5" style={{ background: '#F7C9C0' }}>🔧 {t('futures.repair', { n: sf.elec })}</li>
+          <li className="rounded-md border-2 border-ink px-1.5" style={{ background: '#CDE8C4' }}>🎁 {sf.donation ? t('futures.donation') : t('futures.noDonationChip')}</li>
+        </ul>
+        {done || pick === 'F2' ? (
+          <>
+            <p className="m-0 mt-2 text-[14px] font-extrabold">{sel.result.survived ? '✓ ' + t('futures.money') : '✕ ' + t('futures.moneyShort', { when: when(sel.result.shortfalls[0]?.[0] ?? 'FD') })}</p>
+            {ranks.length > 0 && (
+              <ul className="m-0 mt-1 flex list-none flex-wrap gap-1 p-0 text-[12px] font-extrabold">
+                {ranks.map((gid) => <li key={gid} className="rounded-md border-2 border-ink px-1.5" style={{ background: sel.result.goals.includes(gid) ? '#CDE8C4' : '#F7C9C0' }}>{sel.result.goals.includes(gid) ? '✓' : '✕'} {t(`goals.${gid}.name`)}</li>)}
+              </ul>
+            )}
+          </>
+        ) : <p className="m-0 mt-2 text-[12px] font-bold opacity-80">{t('futures.lightFirst')}</p>}
       </section>
-      <MomentLesson futures />
-      <button type="button" className="ink-btn pink self-center" onClick={() => decide({ k: 'seen', screen: 'futures' })}>{t('futures.go')} ▶</button>
+
+      {done && (
+        <section className="paper anim-squash p-3 text-center" style={{ background: g >= 7 ? '#FFE08A' : undefined }}>
+          <p className="font-display m-0 text-[20px] leading-tight">{t('futures.count', { k })}</p>
+          <p className="font-display m-0 mt-1 text-[18px] leading-tight">{t('futures.goalsCount', { g })}</p>
+          {g < k && <p className="m-0 mt-1 text-[13px] font-extrabold">{t('futures.goalsWarn')}</p>}
+          <p className="m-0 mt-1 text-[14px] font-extrabold">{fb ? t('futures.first', { when: when(fb.point), bill: label(fb.bill) }) : t('futures.none')}</p>
+          {weak && <button type="button" className="ink-btn cream mt-2" onClick={() => setPick(weak.id)}>{t('futures.weak', { id: weak.id })}</button>}
+          <p className="m-0 mt-2 text-[12px] font-bold opacity-80">{t('futures.autopilot')}</p>
+        </section>
+      )}
+      {done && <MomentLesson futures />}
+      <button type="button" className="ink-btn pink self-center" disabled={!done} style={{ opacity: done ? 1 : 0.5 }} onClick={() => decide({ k: 'seen', screen: 'futures' })}>{t('futures.go')} ▶</button>
     </div>
   )
 }
