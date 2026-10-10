@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { LIGHT_KEYS, interestCover } from '../engine/lights'
@@ -42,25 +43,48 @@ export function LightChip({ k, state, active, onTap }: { k: LightKey; state: Lig
   )
 }
 
-/** Six-quarter mini chart: six fixed slots (newest on the right), thick bars, green above zero and red below. */
-export function MiniChart({ values, mode, height = 52 }: { values: number[]; mode: 'signed' | 'level'; height?: number }) {
-  const SLOTS = 6
-  const max = Math.max(1e-6, ...values.map((v) => Math.abs(v)))
-  const W = 168, H = height, gap = 8
-  const bw = (W - gap * (SLOTS - 1)) / SLOTS
-  const mid = mode === 'signed' ? H / 2 : H - 3
-  const offset = SLOTS - values.length
+/** Six-quarter line plot: soft area, ink line, dots; hover or touch a point for that quarter's value and its change. */
+export function MiniChart({ values, mode, height = 52, endQ, fmt }: { values: number[]; mode: 'signed' | 'level'; height?: number; endQ?: number; fmt?: (v: number) => string }) {
+  const [hi, setHi] = useState<number | null>(null)
+  const W = 168, H = height, padX = 6, padY = 6
+  const n = values.length
+  const lo = mode === 'signed' ? Math.min(0, ...values) : Math.min(...values)
+  const top = mode === 'signed' ? Math.max(0, ...values) : Math.max(...values)
+  const span = Math.max(1e-6, top - lo)
+  const x = (i: number) => (n === 1 ? W / 2 : padX + (i * (W - padX * 2)) / (n - 1))
+  const y = (v: number) => padY + (1 - (v - lo) / span) * (H - padY * 2)
+  const pts = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`)
+  const base = mode === 'signed' ? y(0) : H - padY
+  const area = `M${x(0).toFixed(1)},${base.toFixed(1)} L${pts.join(' L')} L${x(n - 1).toFixed(1)},${base.toFixed(1)} Z`
+  const label = (i: number) => (endQ === undefined ? '' : endQ - (n - 1 - i) <= 0 ? '0' : `Q${endQ - (n - 1 - i)}`)
+  const show = (v: number) => (fmt ? fmt(v) : Number.isInteger(v) ? String(v) : v.toFixed(1))
+  const move = (e: React.PointerEvent<SVGSVGElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    const px = ((e.clientX - r.left) / r.width) * W
+    let best = 0
+    for (let i = 1; i < n; i++) if (Math.abs(x(i) - px) < Math.abs(x(best) - px)) best = i
+    setHi(best)
+  }
+  const cur = hi === null ? null : values[hi]
+  const prev = hi === null || hi === 0 ? null : values[hi - 1]
+  const change = cur === null || prev === null || prev === 0 ? null : ((cur - prev) / Math.abs(prev)) * 100
+  const col = (v: number) => (mode === 'signed' ? (v >= 0 ? '#3F7A3A' : '#C8442F') : '#8A6D3B')
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={values.map((v) => v.toFixed(1)).join(', ')} style={{ display: 'block', maxHeight: H * 1.4 }}>
-      {Array.from({ length: SLOTS }, (_, i) => <rect key={'g' + i} x={i * (bw + gap)} y={H - 3} width={bw} height={3} rx="1.5" fill="#2B1A17" opacity=".12" />)}
-      {mode === 'signed' && <line x1="0" x2={W} y1={mid} y2={mid} stroke="#2B1A17" strokeWidth="1.5" strokeDasharray="3 3" opacity=".5" />}
-      {values.map((v, i) => {
-        const h = Math.max(2.5, (Math.abs(v) / max) * (mode === 'signed' ? H / 2 - 3 : H - 8))
-        const up = v >= 0
-        const y = mode === 'signed' ? (up ? mid - h : mid) : mid - h
-        return <rect key={i} x={(i + offset) * (bw + gap)} y={y} width={bw} height={h} rx="2" fill={mode === 'level' ? '#8A6D3B' : up ? '#3F7A3A' : '#C8442F'} stroke="#2B1A17" strokeWidth="1.6" />
-      })}
-    </svg>
+    <div className="relative" style={{ touchAction: 'pan-y' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={values.map((v) => show(v)).join(', ')} style={{ display: 'block', maxHeight: H * 1.4, cursor: 'crosshair' }} onPointerMove={move} onPointerDown={move} onPointerLeave={() => setHi(null)}>
+        {mode === 'signed' && <line x1={padX} x2={W - padX} y1={y(0)} y2={y(0)} stroke="#2B1A17" strokeWidth="1" strokeDasharray="3 3" opacity=".45" />}
+        <path d={area} fill="#8A6D3B" opacity=".14" />
+        <polyline points={pts.join(' ')} fill="none" stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        {values.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={hi === i ? 4.2 : i === n - 1 ? 3.4 : 2.2} fill={hi === i || i === n - 1 ? col(v) : '#FFF3D6'} stroke="#2B1A17" strokeWidth="1.5" />)}
+        {hi !== null && <line x1={x(hi)} x2={x(hi)} y1={padY} y2={H - padY} stroke="#2B1A17" strokeWidth="1" opacity=".25" />}
+      </svg>
+      {hi !== null && cur !== null && (
+        <div className="pointer-events-none absolute -top-8 z-10 whitespace-nowrap rounded-md border-2 border-ink bg-[#FFF3D6] px-1.5 py-0.5 text-[11px] font-extrabold leading-tight shadow-[2px_2px_0_#2B1A17]" style={{ left: `${(x(hi) / W) * 100}%`, transform: `translateX(${hi === 0 ? '0' : hi === n - 1 ? '-100%' : '-50%'})` }}>
+          {label(hi) && <span className="opacity-60">{label(hi)} · </span>}{show(cur)}
+          {change !== null && Math.abs(change) >= 0.5 && <span style={{ color: change >= 0 ? '#3F7A3A' : '#C8442F' }}> {change >= 0 ? '▲' : '▼'}{Math.abs(change).toFixed(0)}%</span>}
+        </div>
+      )}
+    </div>
   )
 }
 
