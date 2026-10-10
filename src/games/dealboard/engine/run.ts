@@ -25,6 +25,7 @@ export type Action =
   | { type: 'payEmergency' }
   | { type: 'continue' }
   | { type: 'tip'; follow: boolean }
+  | { type: 'task'; choice: number }
   | { type: 'rewind' }
 
 const why = (r: ReasonOption | null | undefined) => (r ? { reason: r.id, reasonKey: r.key, reasonKind: r.kind, reasonParams: r.params } : {})
@@ -109,8 +110,8 @@ function advance(r: RunState, m: MarketRun): RunState {
   const next: RunState = { ...r, turn, phase: 'desk', lesson: null, asked: {}, soldThisTurn: 0, soldRed: false, emergencySales: [] }
   // a surprise bill or a windfall lands as the quarter opens; a tip waits for the player's answer
   const wild = wildcardFor(r.seed, turn, m.picked, m.emergencyTurn)
-  if (wild && wild.kind !== 'tip') {
-    const delta = wild.kind === 'bill' ? -Math.min(next.cash, wild.amount) : wild.amount
+  if (wild && wild.kind === 'bill') {
+    const delta = -Math.min(next.cash, wild.amount)
     next.cash += delta
     next.wild = { ...(r.wild ?? {}), [turn]: { state: 'applied', delta } }
   }
@@ -263,6 +264,13 @@ export function act(run: RunState, a: Action): RunState {
       if (run.phase === 'lesson') return run.after === 'yearEnd' ? { ...run, lesson: null, phase: 'yearEnd' } : advance({ ...run, lesson: null }, m)
       if (run.phase !== 'yearEnd') return run
       return advance(run, m)
+    }
+
+    case 'task': {
+      const w = wildcardFor(run.seed, run.turn, m.picked, m.emergencyTurn)
+      if (run.phase !== 'desk' || !w || w.kind !== 'gift' || run.wild?.[run.turn]) return run
+      const right = a.choice === 0
+      return { ...run, cash: run.cash + (right ? w.amount : 0), wild: { ...(run.wild ?? {}), [run.turn]: { state: right ? 'earned' : 'missed', delta: right ? w.amount : 0 } } }
     }
 
     case 'tip': {

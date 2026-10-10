@@ -3,6 +3,13 @@ import { TURNS } from './board'
 import { hashSeed, int, mulberry32, shuffle, streamFor } from './rng'
 import type { CompanyId } from './types'
 
+export const TASK_COUNT = 8
+
+/** The money question behind a windfall: which question, and in what order its three answers are shown (answer 0 is the right one). */
+export function taskFor(seed: string, turn: number): { n: number; order: number[] } {
+  return { n: (hashSeed(seed) + turn) % TASK_COUNT, order: shuffle(mulberry32(hashSeed(`${seed}:task:${turn}`)), [0, 1, 2]) }
+}
+
 /** What a followed tip puts in. */
 export const WILD_TIP = 5000
 

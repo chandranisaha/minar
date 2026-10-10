@@ -76,7 +76,7 @@ export interface RunState {
   // run-long tracking for scoring and lessons
   emergencyDone: boolean
   /** wildcards met: quarter -> what happened and the cash it moved */
-  wild?: Record<number, { state: 'applied' | 'followed' | 'ignored'; delta: number }>
+  wild?: Record<number, { state: 'applied' | 'followed' | 'ignored' | 'earned' | 'missed'; delta: number }>
   emergencyForcedSale: boolean
   jails: number
   jailedTurn: number

@@ -16,7 +16,7 @@ import { AlertStrip, MarketLine, Sheet, useInr } from './Panels'
 import { FounderFace, FounderProfile } from './Founder'
 import { IconBank, IconCash, IconEye, IconPeople } from './icons'
 import { rivalAlerts } from '../engine/rivals'
-import { WILD_TIP, wildcardFor } from '../engine/wildcards'
+import { WILD_TIP, taskFor, wildcardFor } from '../engine/wildcards'
 import { ReviewCard } from './Review'
 import { ASK_STATS, StatRow } from './Stats'
 import type { TradeMode } from './TradeDialog'
@@ -213,9 +213,34 @@ function Wildcard({ run, m, dispatch }: { run: RunState; m: MarketRun; dispatch:
   const w = wildcardFor(run.seed, run.turn, m.picked, m.emergencyTurn)
   if (!w) return null
   const done = run.wild?.[run.turn]
-  if (w.kind !== 'tip') {
-    const amt = Math.abs(done?.delta ?? w.amount)
-    return <AlertStrip tag={t('wild.tag')} tone={w.kind === 'gift' ? 'good' : 'bad'}>{t(`wild.${w.kind}${w.variant}`, { amount: money(amt) })}</AlertStrip>
+  if (w.kind === 'bill') {
+    return <AlertStrip tag={t('wild.tag')} tone="bad">{t(`wild.bill${w.variant}`, { amount: money(Math.abs(done?.delta ?? w.amount)) })}</AlertStrip>
+  }
+  if (w.kind === 'gift') {
+    const { n, order } = taskFor(run.seed, run.turn)
+    const answered = done !== undefined
+    return (
+      <AlertStrip tag={t('wild.tag')} tone="good">
+        <span className="block font-extrabold">{t(`wild.gift${w.variant}`, { amount: money(w.amount) })}</span>
+        <span className="mt-1.5 block">{t(`task.q.${n}.q`)}</span>
+        <span className="mt-2 grid gap-1.5">
+          {order.map((o) => {
+            const right = o === 0
+            const pickedOne = done?.state === 'earned' ? right : false
+            return (
+              <button key={o} type="button" disabled={answered} onClick={() => dispatch({ type: 'task', choice: o })} className="min-h-11 rounded-lg border-2 border-ink px-2.5 py-1.5 text-left text-[14px] font-bold leading-snug" style={{ background: !answered ? '#FFF3D6' : right ? '#CFE6B8' : '#FFF3D6', opacity: answered && !right && !pickedOne ? 0.6 : 1 }}>
+                {t(`task.q.${n}.a${o}`)}
+              </button>
+            )
+          })}
+        </span>
+        {answered && (
+          <span className="mt-2 block text-[13px] leading-snug">
+            <span className="font-extrabold" style={{ color: done.state === 'earned' ? '#2f6f4a' : '#C8442F' }}>{done.state === 'earned' ? t('task.right', { amount: money(w.amount) }) : t('task.wrong')}</span> {t(`task.q.${n}.why`)}
+          </span>
+        )}
+      </AlertStrip>
+    )
   }
   const name = t(`companies.${w.companyId}.name`)
   const tooPoor = run.cash < WILD_TIP || !canBuy(run)
