@@ -6,12 +6,16 @@ import te from './locales/te.json'
 import dealboardEn from './games/dealboard/content/en.json'
 import dealboardLessons from './games/dealboard/content/lessons.json'
 import dealboardPlay from './games/dealboard/content/play.json'
+import dbTeCore from './games/dealboard/content/te/core.json'
+import dbTePlay from './games/dealboard/content/te/play.json'
+import dbTeLearn from './games/dealboard/content/te/learn.json'
+import dbTeLessons from './games/dealboard/content/te/lessons.json'
 import dealboardLearn from './games/dealboard/content/learn.json'
 import { useGame } from './store/game'
 
 void i18n.use(initReactI18next).init({
   // game namespaces ship in English first; hi/te fall back to it until translated
-  resources: { en: { translation: en, dealboard: { ...dealboardEn, ...dealboardPlay, ...dealboardLearn, ...dealboardLessons } }, hi: { translation: hi }, te: { translation: te } },
+  resources: { en: { translation: en, dealboard: { ...dealboardEn, ...dealboardPlay, ...dealboardLearn, ...dealboardLessons } }, hi: { translation: hi }, te: { translation: te, dealboard: { ...dbTeCore, ...dbTePlay, ...dbTeLearn, ...dbTeLessons } } },
   lng: useGame.getState().language,
   fallbackLng: 'en',
   interpolation: { escapeValue: false },

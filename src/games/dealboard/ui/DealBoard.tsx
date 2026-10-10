@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TitleCard } from '../../../components/TitleCard'
-import { useLite } from '../../../store/game'
+import { useGame, useLite } from '../../../store/game'
 import { BOARD, TURNS } from '../engine/board'
 import { houses, invested, marketFor, needsDecision, netWorth, type RunState } from '../engine/run'
 import { computeScore, type Score } from '../engine/scoring'
@@ -55,12 +55,38 @@ function BackButton({ onExit, compact }: { onExit: () => void; compact?: boolean
   )
 }
 
+/** Language choice at the start. The game ships in English and Telugu; any other hub language shows English. */
+function LangPick() {
+  const lang = useGame((s) => s.language)
+  const setLanguage = useGame((s) => s.setLanguage)
+  const current = lang === 'te' ? 'te' : 'en'
+  return (
+    <div className="ink-chip flex items-center gap-1 p-1" role="group" aria-label="Language / భాష">
+      {([['en', 'English'], ['te', 'తెలుగు']] as const).map(([code, label]) => (
+        <button
+          key={code}
+          type="button"
+          aria-pressed={current === code}
+          onClick={() => setLanguage(code)}
+          className="h-11 min-w-20 rounded-lg px-3 text-[15px] font-extrabold"
+          style={{ background: current === code ? '#E5457A' : 'transparent', color: current === code ? '#FFF3D6' : '#2B1A17', border: current === code ? '2.5px solid #2B1A17' : '2.5px solid transparent', fontFamily: code === 'te' ? 'var(--font-body)' : undefined }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function Intro({ onStart, onExit }: { onStart: () => void; onExit: () => void }) {
   const { t } = useTranslation('dealboard')
   const steps = t('intro', { returnObjects: true }) as string[]
   return (
     <div className="mx-auto flex min-h-[calc(100%-40px)] max-w-[560px] flex-col gap-4 px-4 pb-6 pt-3">
-      <BackButton onExit={onExit} />
+      <div className="flex items-start justify-between gap-2">
+        <BackButton onExit={onExit} />
+        <LangPick />
+      </div>
       <TitleCard eyebrow={t('eyebrow')} title={t('title')}>
         <p className="m-0">{t('tagline')}</p>
       </TitleCard>

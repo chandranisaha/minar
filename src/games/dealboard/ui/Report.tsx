@@ -16,12 +16,12 @@ function Radar({ score }: { score: Score }) {
   }
   const poly = (f: (i: number) => number) => SKILLS.map((_, i) => pt(i, f(i)).join(',')).join(' ')
   return (
-    <svg viewBox={`-36 -4 ${size + 72} ${size + 8}`} width="100%" style={{ maxWidth: 320 }} role="img" aria-label={SKILLS.map((k) => `${t(`report.skills.${k}.name`)} ${score[k]} of 20`).join(', ')}>
+    <svg viewBox={`-50 -12 ${size + 100} ${size + 24}`} width="100%" style={{ maxWidth: 320 }} role="img" aria-label={SKILLS.map((k) => `${t(`report.skills.${k}.name`)} ${score[k]} of 20`).join(', ')}>
       {[0.25, 0.5, 0.75, 1].map((f) => <polygon key={f} points={poly(() => f)} fill="none" stroke="#2B1A17" strokeOpacity={f === 1 ? 0.7 : 0.25} strokeWidth="1.5" />)}
       {SKILLS.map((_, i) => <line key={i} x1={c} y1={c} x2={pt(i, 1)[0]} y2={pt(i, 1)[1]} stroke="#2B1A17" strokeOpacity=".25" />)}
       <polygon points={poly((i) => Math.max(0.04, score[SKILLS[i]] / 20))} fill="#E5457A" fillOpacity=".4" stroke="#2B1A17" strokeWidth="2.5" strokeLinejoin="round" />
       {SKILLS.map((k, i) => {
-        const [x, y] = pt(i, 1.2)
+        const [x, y] = pt(i, 1.32)
         return <text key={k} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="9.5" fontWeight="800" fill="#2B1A17">{t(`report.skills.${k}.name`)}</text>
       })}
     </svg>

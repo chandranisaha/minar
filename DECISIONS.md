@@ -99,3 +99,13 @@ with hover stats, and stop starting and ending a quarter every two seconds."
 - **Every quarter explains itself.** The recap lists each holding's move with up to three plain-language reasons computed from the
   engine's inputs (market, sector, company events, profit, customers, runway, CEO, "excitement not earnings").
 - Founder-question scoring is unchanged: research is still judged by lights asked before buying.
+
+## Deal Board in Telugu
+- A language picker (English | తెలుగు) sits on the Deal Board start screen. It sets the hub language, so the whole app follows. Hindi
+  is not translated for this game yet and shows English.
+- Telugu text lives in `src/games/dealboard/content/te/` (core, play, learn, lessons) and mirrors the English files key for key.
+  `tests/telugu.test.ts` fails if a key is missing, a `{{placeholder}}` differs, English is left in a Telugu string, a real brand
+  appears, or a rupee sign is doubled in front of a money placeholder.
+- Company names, CEO and the short sector names stay in Latin script (fictional brand names); everything else is Telugu.
+- **Needs a native-speaker review** before real use, especially the finance terms (చక్రవడ్డీ, ద్రవ్యత, వైవిధ్యీకరణ, రన్‌వే) and the
+  long "Learn more" explanations.
