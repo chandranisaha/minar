@@ -257,3 +257,14 @@ html[lang="te"] .db-root .font-display, html[lang="te"] .db-root .font-sign { fo
   border-radius: 12px 9px 13px 8px / 9px 13px 8px 12px; color: #2b1a17;
 }
 .db-root .paper { background: #fff3d6; border: 4px solid #2b1a17; border-radius: 6px 10px 5px 11px; box-shadow: 6px 7px 0 #2b1a17; }
+
+/* never let a browser's forced dark mode repaint the cream cards: the game is drawn for light */
+.db-root { color-scheme: only light; forced-color-adjust: none; }
+
+/* centre every screen in the window; the root is a column so auto margins centre vertically as well as sideways */
+.db-root { display: flex; flex-direction: column; }
+.db-root > .db-layout { margin-block: auto; width: 100%; }
+.db-root > .db-guardrail { margin-top: auto; flex-shrink: 0; }
+/* start and meet screens are small cards: on laptops and bigger they grow so they read comfortably */
+@media (min-width: 1024px) and (min-height: 700px) { .db-roomy { zoom: 1.22; } }
+@media (min-width: 1500px) and (min-height: 900px) { .db-roomy { zoom: 1.4; } }

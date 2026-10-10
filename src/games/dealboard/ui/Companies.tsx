@@ -62,7 +62,7 @@ export function Meet({ m, onStart }: { m: MarketRun; onStart: () => void }) {
   const { t } = useTranslation('dealboard')
   const tips = t('meet.tips', { returnObjects: true }) as string[]
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-4 pb-6 pt-3">
+    <div className="db-roomy mx-auto my-auto flex w-full max-w-[640px] flex-col gap-4 px-4 pb-6 pt-3">
       <TitleCard eyebrow={t('meet.eyebrow')} title={t('meet.title')}><p className="m-0">{t('meet.intro')}</p></TitleCard>
       <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-2">
         {m.picked.map((id) => {

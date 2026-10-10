@@ -85,7 +85,7 @@ function Intro({ onStart, onExit }: { onStart: () => void; onExit: () => void })
   const { t } = useTranslation('dealboard')
   const steps = t('intro', { returnObjects: true }) as string[]
   return (
-    <div className="mx-auto flex min-h-[calc(100%-40px)] max-w-[560px] flex-col gap-4 px-4 pb-6 pt-3">
+    <div className="db-roomy mx-auto my-auto flex w-full max-w-[560px] flex-col gap-4 px-4 pb-6 pt-3">
       <div className="flex items-start justify-between gap-2">
         <BackButton onExit={onExit} />
         <LangPick />
