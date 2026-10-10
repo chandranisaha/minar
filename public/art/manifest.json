@@ -48,5 +48,95 @@
   "w": 553,
   "h": 998,
   "src": "Sunlit Old-Town Alleyway Fa\u00e7ades-1.png"
+ },
+ "story-flowers": {
+  "w": 1100,
+  "h": 724,
+  "src": "Vibrant Indian Flower Stall Cutout.png"
+ },
+ "prop-tree": {
+  "w": 641,
+  "h": 710,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-lamp": {
+  "w": 173,
+  "h": 550,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-bicycle": {
+  "w": 394,
+  "h": 287,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-lights": {
+  "w": 348,
+  "h": 217,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-pigeon-fly": {
+  "w": 141,
+  "h": 137,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-pigeon-a": {
+  "w": 119,
+  "h": 99,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-pigeon-b": {
+  "w": 116,
+  "h": 125,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-pot-big": {
+  "w": 260,
+  "h": 258,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-pot-tall": {
+  "w": 150,
+  "h": 240,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-pot-small": {
+  "w": 105,
+  "h": 174,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-crates": {
+  "w": 304,
+  "h": 236,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-cart": {
+  "w": 414,
+  "h": 375,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-waterpot": {
+  "w": 165,
+  "h": 303,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "prop-clothesline": {
+  "w": 570,
+  "h": 251,
+  "src": "Watercolour Storybook Prop Collection-2.png"
+ },
+ "shop-save": {
+  "w": 640,
+  "h": 585,
+  "src": "Vintage Irani Caf\u00e9 Storefront Vignette.png"
+ },
+ "receipt": {
+  "w": 800,
+  "h": 736,
+  "src": "Vintage Watercolour Receipt with Ribbon.png"
+ },
+ "scene-charminar": {
+  "w": 1500,
+  "h": 955,
+  "src": "Charminar at Golden Hour Bazaar.png"
  }
 }

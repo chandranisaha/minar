@@ -6,9 +6,11 @@ import { useGame } from '../store/game'
 import { useIris } from '../components/Iris'
 import { GoalBar, Coin, LangSwitch } from '../components/Hud'
 import { TitleCard } from '../components/TitleCard'
-import { CharminarArt } from '../components/CharminarArt'
+import { SceneArt } from '../components/CharminarArt'
 import { Backdrop, Stage } from './story/Stage'
 import { B1Dawn, B2Persona, B3Flowers, B4Goal, B5Bazaar } from './story/Beats'
+import { B3Painted, B4Painted } from './story/BeatsPainted'
+import { useManifest } from '../art/ArtSlot'
 import { stepped } from '../lib/stepped'
 import { useShortLandscape } from '../world/input'
 
@@ -26,8 +28,8 @@ function Cover({ onStart }: { onStart: () => void }) {
         <circle cx="200" cy="470" r="150" fill="#FFF1B0" opacity=".7" />
         <rect y="660" width="400" height="100" fill="#C98B58" stroke="#2B1A17" strokeWidth="4" />
       </Backdrop>
-      <div className="absolute left-1/2 w-[108%] -translate-x-1/2" style={{ bottom: '12%', maxWidth: 600 }}>
-        <CharminarArt className="block w-full" />
+      <div className="absolute left-1/2 w-[135%] -translate-x-1/2" style={{ bottom: '0%', maxWidth: 820 }}>
+        <SceneArt className="block w-full" />
       </div>
       <div className="absolute inset-x-0 top-[17%] px-5">
         <div className="anim-pop mx-auto max-w-[440px]">
@@ -58,6 +60,7 @@ export default function Story() {
   const onReady = useCallback(() => setReady5(true), [])
   const swipe = useRef<{ x: number; y: number } | null>(null)
   const sideways = useShortLandscape()
+  const art = useManifest()
 
   const finish = useCallback(() => {
     if (!useGame.getState().persona) setPersona('college')
@@ -103,8 +106,8 @@ export default function Story() {
           {step === -1 && <Cover onStart={next} />}
           {step === 0 && <B1Dawn />}
           {step === 1 && <B2Persona onPicked={() => undefined} />}
-          {step === 2 && <B3Flowers />}
-          {step === 3 && <B4Goal />}
+          {step === 2 && (art['story-flowers'] ? <B3Painted /> : <B3Flowers />)}
+          {step === 3 && (art.receipt ? <B4Painted /> : <B4Goal />)}
           {step === 4 && <B5Bazaar onReady={onReady} />}
         </motion.div>
       </div>

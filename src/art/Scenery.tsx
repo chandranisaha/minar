@@ -77,37 +77,9 @@ export function Facade({ x, base, w, h, wall, shade, shutter, roof = 'tile', lau
   )
 }
 
-/** side-street wall segment (flush against the lane edges) */
-function WallSegment({ x, y, w = 92, h = 250, wall, shade, shutter, flip }: { x: number; y: number; w?: number; h?: number; wall: string; shade: string; shutter: string; flip?: boolean }) {
-  const dir = flip ? -1 : 1
-  const ex = flip ? x : x + w // lane-facing edge
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} fill={wall} stroke={INK} strokeWidth={SW} />
-      <rect x={x} y={y} width={w} height={26} fill={shade} opacity=".5" />
-      {/* windows */}
-      {[24, 98].map((dy) => (
-        <g key={dy}>
-          <rect x={ex - dir * 52 - 15} y={y + dy} width={30} height={46} fill={C.jasmine} stroke={INK} strokeWidth={2.4} />
-          <rect x={ex - dir * 52 - 11} y={y + dy + 5} width={22} height={36} fill={C.dusk} />
-          <rect x={ex - dir * 52 - 25} y={y + dy} width={10} height={46} fill={shutter} stroke={INK} strokeWidth={2} />
-          <rect x={ex - dir * 52 + 15} y={y + dy} width={10} height={46} fill={shutter} stroke={INK} strokeWidth={2} />
-        </g>
-      ))}
-      {/* balcony */}
-      <rect x={flip ? ex : ex - 38} y={y + 160} width={38} height={10} fill={C.jasmine} stroke={INK} strokeWidth={2.4} />
-      <path d={`M${flip ? ex + 4 : ex - 34} ${y + 160} v-18 M${flip ? ex + 19 : ex - 19} ${y + 160} v-18 M${flip ? ex + 34 : ex - 4} ${y + 160} v-18`} stroke={INK} strokeWidth={2.4} />
-      <path d={`M${flip ? ex : ex - 38} ${y + 142} h38`} stroke={INK} strokeWidth={3} />
-      {/* door + awning */}
-      <rect x={ex - dir * 44 - 15} y={y + h - 62} width={30} height={62} fill="#7A2A22" stroke={INK} strokeWidth={2.6} />
-      <path d={`M${ex - dir * 44 - 24} ${y + h - 62} h48 l-4 -14 h-40z`} fill={C.mustard} stroke={INK} strokeWidth={2.4} strokeLinejoin="round" />
-    </g>
-  )
-}
-
 /* ------------------------------------------------------------------ the static world backdrop */
 
-export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buildings = false }: { skyline?: boolean; buildings?: boolean }) {
+export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false }: { skyline?: boolean }) {
   const id = useId().replace(/:/g, '')
   const lite = useLite()
   return (
@@ -184,18 +156,6 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
         <path d="M730 520 V478 H800 V520Z M748 478 Q764 450 782 478Z" />
       </g>
 
-      {/* back row of buildings behind the monument */}
-      <g filter={lite ? undefined : `url(#${id}-paint)`}>
-        <Facade x={-20} base={600} w={160} h={190} wall="#F2A56B" shade="#D9743F" shutter={C.sage} laundry ac />
-        <Facade x={130} base={600} w={140} h={150} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} roof="flat" />
-        <Facade x={730} base={600} w={140} h={165} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} />
-        <Facade x={860} base={600} w={160} h={200} wall="#F0907A" shade="#C65A47" shutter={C.sage} arch laundry />
-        <Facade x={-190} base={600} w={160} h={170} wall="#F7D18A" shade="#D6A04A" shutter={C.coral} roof="flat" />
-        <Facade x={1010} base={600} w={160} h={180} wall="#F2A56B" shade="#D9743F" shutter={C.teal} ac />
-        <Facade x={-330} base={600} w={150} h={200} wall="#8FC9C4" shade="#5E9D9B" shutter={C.sage} />
-        <Facade x={1160} base={600} w={150} h={210} wall="#F7D18A" shade="#D6A04A" shutter={C.coral} laundry />
-      </g>
-
       {/* ground */}
       <rect x="-420" y="580" width="1840" height="820" fill={`url(#${id}-ground)`} />
       <rect x="-420" y="580" width="1840" height="820" fill={`url(#${id}-cob)`} opacity=".55" />
@@ -224,32 +184,6 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
         <path d="M700 720 H930 L850 800 H620Z" />
         <path d="M70 1080 H300 L210 1160 H-10Z" />
         <path d="M700 1080 H930 L850 1160 H620Z" />
-      </g>
-
-      {/* left & right street walls */}
-      <g>
-        {!buildings && (
-          <>
-        <WallSegment x={-22} y={590} wall="#F2A56B" shade="#D9743F" shutter={C.sage} />
-        <WallSegment x={-22} y={840} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} h={250} />
-        <WallSegment x={-22} y={1090} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} h={220} />
-        <WallSegment x={930} y={590} wall="#F0907A" shade="#C65A47" shutter={C.sage} flip />
-        <WallSegment x={930} y={840} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} flip />
-        <WallSegment x={930} y={1090} wall="#A7D1A1" shade="#6BA46A" shutter={C.coral} flip h={220} />
-          </>
-        )}
-        <WallSegment x={-114} y={590} wall="#F0907A" shade="#C65A47" shutter={C.teal} />
-        <WallSegment x={-114} y={840} wall="#F7D18A" shade="#D6A04A" shutter={C.sage} />
-        <WallSegment x={-114} y={1090} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} h={220} />
-        <WallSegment x={-206} y={590} wall="#F7D18A" shade="#D6A04A" shutter={C.coral} />
-        <WallSegment x={-206} y={840} wall="#F2A56B" shade="#D9743F" shutter={C.teal} />
-        <WallSegment x={-206} y={1090} wall="#F0907A" shade="#C65A47" shutter={C.sage} h={220} />
-        <WallSegment x={1022} y={590} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} flip />
-        <WallSegment x={1022} y={840} wall="#F2A56B" shade="#D9743F" shutter={C.sage} flip />
-        <WallSegment x={1022} y={1090} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} flip h={220} />
-        <WallSegment x={1114} y={590} wall="#A7D1A1" shade="#6BA46A" shutter={C.teal} flip />
-        <WallSegment x={1114} y={840} wall="#F0907A" shade="#C65A47" shutter={C.sage} flip />
-        <WallSegment x={1114} y={1090} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} flip h={220} />
       </g>
 
       {/* low front kerb + dark vignette at the south edge */}

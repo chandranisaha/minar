@@ -6,7 +6,8 @@ import { useGame } from '../../store/game'
 import { Pigeon, Cloud } from '../../art/Scenery'
 import { LOOKS, Toon } from '../../art/Toon'
 import { C } from '../../art/palette'
-import { CharminarArt } from '../../components/CharminarArt'
+import { SceneArt } from '../../components/CharminarArt'
+import { useManifest } from '../../art/ArtSlot'
 import { TitleCard } from '../../components/TitleCard'
 import { WorldScene } from '../../world/WorldScene'
 import { stepped } from '../../lib/stepped'
@@ -16,6 +17,7 @@ const INK = C.ink
 /* ------------------------------------------------------------------ 1. dawn at the Charminar */
 export function B1Dawn() {
   const { t } = useTranslation()
+  const art = useManifest()
   const flock = useMemo(
     () => [
       { x: 18, y: 63, fx: -380, fy: -520, d: 0.9 }, { x: 28, y: 66, fx: -300, fy: -640, d: 1.05 }, { x: 40, y: 62, fx: -120, fy: -700, d: 1.2 },
@@ -49,8 +51,8 @@ export function B1Dawn() {
         <path d="M0 640 H400" stroke={INK} strokeWidth="4" />
         <rect y="640" width="400" height="120" fill="#7A2A22" opacity=".18" />
       </Backdrop>
-      <div className="absolute left-1/2 w-[112%] -translate-x-1/2" style={{ bottom: '17%', maxWidth: 620 }}>
-        <CharminarArt className="block w-full" style={{ filter: 'saturate(.85) brightness(.92) hue-rotate(-10deg) drop-shadow(0 0 30px rgba(255,195,107,.5))' }} />
+      <div className="absolute left-1/2 w-[135%] -translate-x-1/2" style={{ bottom: '0%', maxWidth: 820 }}>
+        <SceneArt className="block w-full" style={{ filter: 'saturate(.9) brightness(.86) hue-rotate(-12deg)' }} />
       </div>
       {flock.map((p, i) => (
         <div
@@ -58,7 +60,11 @@ export function B1Dawn() {
           className="absolute"
           style={{ left: `${p.x}%`, top: `${p.y}%`, width: 38, height: 32, ['--fx' as string]: `${p.fx}px`, ['--fy' as string]: `${p.fy}px`, animation: `fly-away 2.6s steps(26) ${p.d}s both` }}
         >
-          <Pigeon flip={i % 2 === 0} className="anim-hop" style={{ width: '100%', height: '100%', animationDelay: `${i * 0.2}s` }} />
+          {art['prop-pigeon-fly'] ? (
+            <img src="/art/prop-pigeon-fly.webp" alt="" draggable={false} style={{ width: 52, transform: i % 2 ? 'scaleX(-1)' : undefined, animation: 'flap .3s steps(2) infinite' }} />
+          ) : (
+            <Pigeon flip={i % 2 === 0} className="anim-hop" style={{ width: '100%', height: '100%', animationDelay: `${i * 0.2}s` }} />
+          )}
         </div>
       ))}
       <div className="absolute inset-x-0 top-[13%] px-5">

@@ -24,6 +24,9 @@ const BLOCKS: Rect[] = [
   ...Object.values(SHOP_LAYOUT).map((s) => s.foot),
   CHARMINAR.foot,
   { x: 780, y: 1165, w: 150, h: 130 }, // flower cart
+  { x: 90, y: 786, w: 44, h: 32 }, // left lamp post
+  { x: 866, y: 786, w: 44, h: 32 }, // right lamp post
+  { x: 580, y: 1212, w: 60, h: 30 }, // water pot
   { x: 0, y: 0, w: W, h: 590 }, // north: back row of buildings
   { x: 0, y: 1285, w: W, h: 115 }, // south kerb
   { x: 0, y: 0, w: 72, h: H }, // west wall

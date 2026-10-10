@@ -110,3 +110,6 @@ html[data-lite="true"] .grain, html[data-lite="true"] .scratches { display: none
 
 /* tracked-out caps break Devanagari/Telugu conjuncts: never letter-space those scripts */
 html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }
+
+@keyframes pigeon-cross { 0% { transform: translate(-140px, 40px) } 100% { transform: translate(1140px, -90px) } }
+@keyframes flap { 0% { transform: scaleY(1) } 100% { transform: scaleY(.84) translateY(5px) } }
