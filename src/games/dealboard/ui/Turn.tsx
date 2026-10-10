@@ -118,7 +118,7 @@ function Pitch({ run, m, id, dispatch, onPass, onTrade }: { run: RunState; m: Ma
         </div>
       )}
 
-      <div className="flex flex-wrap justify-end gap-2">
+      <div className="db-actions flex items-stretch justify-center gap-2">
         <button type="button" className="ink-btn cream" onClick={() => onPass(id)}>{t('pitch.pass')}</button>
         <button type="button" className="ink-btn pink" disabled={!canBuy(run)} style={{ opacity: canBuy(run) ? 1 : 0.5 }} onClick={() => onTrade('invest', id)}>{t('pitch.bid')} ▸</button>
       </div>
@@ -158,7 +158,7 @@ function CheckIn({ run, m, id, dispatch, onTrade }: { run: RunState; m: MarketRu
           </details>
         </div>
       </div>
-      <div className="flex flex-wrap justify-end gap-2">
+      <div className="db-actions flex items-stretch justify-center gap-2">
         <button type="button" className="ink-btn cream" onClick={() => onTrade('sell', id)}>{t('portfolio.sell')}</button>
         <button type="button" className="ink-btn cream" disabled={!canBuy(run)} style={{ opacity: canBuy(run) ? 1 : 0.5 }} onClick={() => onTrade('buyMore', id)}>{t('portfolio.buyMore')}</button>
         <button type="button" className="ink-btn pink" onClick={() => dispatch({ type: 'hold', companyId: id })}>{t('desk.hold')} ▸</button>

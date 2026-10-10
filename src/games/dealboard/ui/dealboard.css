@@ -268,3 +268,7 @@ html[lang="te"] .db-root .font-display, html[lang="te"] .db-root .font-sign { fo
 /* start and meet screens are small cards: on laptops and bigger they grow so they read comfortably */
 @media (min-width: 1024px) and (min-height: 700px) { .db-roomy { zoom: 1.22; } }
 @media (min-width: 1500px) and (min-height: 900px) { .db-roomy { zoom: 1.4; } }
+
+/* sheet buttons sit centred, side by side on one line; long labels wrap inside their button instead of dropping to a new row */
+.db-actions > .ink-btn { flex: 1 1 0; min-width: 0; max-width: 260px; padding: 6px 12px; font-size: 14px; line-height: 1.15; white-space: normal; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.db-actions > .ink-btn:only-child { flex: 0 1 auto; max-width: 100%; }

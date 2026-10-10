@@ -87,7 +87,7 @@ export function LessonCard({ run, onContinue, onReplay }: { run: RunState; onCon
         </div>
       )}
 
-      <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
+      <div className="db-actions mt-3 flex items-stretch justify-center gap-2">
         {!earned && (
           <button type="button" className="ink-btn cream" disabled={usedReplay} style={{ opacity: usedReplay ? 0.5 : 1 }} title={usedReplay ? t('lesson.replayUsed') : t('lesson.replayHint')} onClick={onReplay}>
             ⟲ {t('lesson.replay')}

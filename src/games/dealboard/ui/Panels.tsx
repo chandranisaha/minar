@@ -22,7 +22,7 @@ export function Sheet({ eyebrow, title, icon, tone, children, actions }: { eyebr
         </div>
       </div>
       {children && <div className="mt-2 text-[15px] leading-snug">{children}</div>}
-      {actions && <div className="mt-3 flex flex-wrap items-center justify-end gap-2">{actions}</div>}
+      {actions && <div className="db-actions mt-3 flex items-stretch justify-center gap-2">{actions}</div>}
     </section>
   )
 }
