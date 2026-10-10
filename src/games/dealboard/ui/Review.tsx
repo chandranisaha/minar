@@ -80,3 +80,22 @@ export function ReviewCard({ entry, defaultOpen = false }: { entry: ReviewEntry;
     </details>
   )
 }
+
+/** A flat, borderless decision row for the final report: coloured edge, one line, tap for the pointers. */
+export function ReviewRow({ entry, colour }: { entry: ReviewEntry; colour: string }) {
+  const { t } = useTranslation('dealboard')
+  const title = useEntryTitle()
+  return (
+    <details className="group">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2.5 py-1.5 pl-3 [&::-webkit-details-marker]:hidden" style={{ borderLeft: `4px solid ${colour}` }}>
+        <Mark id={entry.companyId} size={24} />
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block text-[11px] font-extrabold uppercase tracking-wider opacity-55">{t('quarterShort', { n: entry.q })}</span>
+          <span className="block text-[14px] font-extrabold">{title(entry)}</span>
+        </span>
+        <span className="shrink-0 text-[13px] font-extrabold transition-transform group-open:rotate-180" aria-hidden>▾</span>
+      </summary>
+      <div className="mb-2 ml-3 border-l-4 py-1 pl-3" style={{ borderColor: colour, opacity: 0.95 }}><Pointers entry={entry} /></div>
+    </details>
+  )
+}

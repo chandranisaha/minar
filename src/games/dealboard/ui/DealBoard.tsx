@@ -187,6 +187,11 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
     if (trade.mode === 'sell' && fraction >= 1) setStudy(null)
   }
 
+  // the final judgement takes the whole screen: no board, just the report
+  if (run.phase === 'done' && final) {
+    return <Report run={run} score={final} onComplete={onComplete ?? NOOP} onAgain={() => quit()} onExit={onExit} />
+  }
+
   return (
     // phones: header, board, sheet stacked; wide screens: board beside the sheet
     <div className="mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-5">
@@ -208,9 +213,7 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
         <p className="m-0 text-center text-[12px] text-jasmine/80">{t('boardHint')}</p>
       </div>
       <div className="lg:sticky lg:top-3 lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto lg:pr-1">
-        {run.phase === 'done' && final ? (
-          <Report run={run} score={final} onComplete={onComplete ?? NOOP} onAgain={() => quit()} onExit={onExit} />
-        ) : run.phase === 'yearEnd' ? (
+        {run.phase === 'yearEnd' ? (
           <YearEnd run={run} m={m} />
         ) : (
           <TurnPanel run={run} m={m} dispatch={dispatch} onRewind={() => dispatch({ type: 'rewind' })} onOpen={setStudy} onTrade={(mode, id) => setTrade({ mode, id })} onPass={setPassFor} />
