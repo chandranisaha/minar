@@ -1,0 +1,186 @@
+{
+  "title": "Festival Countdown",
+  "guardrail": "Made-up prices. Real life is different.",
+  "day": "Day {{n}}",
+  "exit": "Back to Charminar",
+  "ammi": "Ammi",
+  "brother": "Little brother",
+  "friendship": "Friends",
+  "friendshipMood": { "happy": "Friends happy", "meh": "Friends unsure", "sad": "Friends upset" },
+  "festivals": {
+    "diwali": { "name": "Diwali", "items": { "sweets": "Sweets (sugar, ghee, besan)", "outfit": "Brother's new shirt", "gift": "Bangles for Ammi", "decor": "Diyas and oil" } },
+    "eid": { "name": "Eid", "items": { "sweets": "Sevai and dry fruits", "outfit": "Brother's new kurta", "gift": "A shawl for Ammi", "decor": "Lanterns and attar" } },
+    "bonalu": { "name": "Bonalu", "items": { "sweets": "Jaggery, rice and ghee", "outfit": "Brother's new shirt", "gift": "Bangles for Ammi", "decor": "Lamps and neem leaves" } },
+    "sankranti": { "name": "Sankranti", "items": { "sweets": "Sesame and jaggery", "outfit": "Brother's new shirt", "gift": "A saree border for Ammi", "decor": "Kites and string" } },
+    "christmas": { "name": "Christmas", "items": { "sweets": "Cake supplies", "outfit": "Brother's new shirt", "gift": "A shawl for Ammi", "decor": "Star and lights" } }
+  },
+  "jars": {
+    "label": "Your money jars",
+    "needs": { "name": "Needs", "for": "Ammi's list" },
+    "gift": { "name": "Gift", "for": "A surprise for Ammi" },
+    "fun": { "name": "Fun", "for": "Mela plans with friends" },
+    "spare": { "name": "Spare", "for": "For surprises" }
+  },
+  "friends": { "arjun": "Arjun", "ayesha": "Ayesha", "sunny": "Sunny" },
+  "intro": {
+    "eyebrow": "Plan & Budget",
+    "tagline": "3 days. ₹2,000. One festival to pull off.",
+    "pick": "Which festival is your family getting ready for?",
+    "more": "More festivals",
+    "line1": "Three days to the festival, beta! Here's {{money}} for everything. First, my list:",
+    "line2": "And if there's a little left... a small surprise for me? Keep the rest for fun with your friends.",
+    "hint": "Oh, and Mamu's family might drop in this year...",
+    "start": "Take the money",
+    "demo": "Demo (90 s)"
+  },
+  "plan": {
+    "title": "Split the money",
+    "sub": "Put Ammi's {{money}} into jars. Whatever you don't put in a jar stays as spare in your pocket.",
+    "add": "Add ₹50 to {{jar}}",
+    "remove": "Take ₹50 from {{jar}}",
+    "ayesha": "Keep a little spare. Something always comes up during festivals.",
+    "needsEmpty": "The Needs jar is empty. Ammi's list has to come from somewhere!",
+    "start": "Let's go to the bazaar"
+  },
+  "banner": {
+    "go": "Let's go",
+    "d1": { "title": "3 days to go!", "body": "Laad Bazaar is busy, but prices are still normal." },
+    "d2": { "title": "Festival rush!", "body": "Everyone is shopping now. Prices are up 10%." },
+    "d3": { "title": "Last day!", "body": "The bazaar is packed and prices are up 25%. Lights are going up everywhere." }
+  },
+  "card": {
+    "listTag": "On Ammi's list",
+    "giftTag": "Ammi's surprise",
+    "shopSub": "Same thing, three shops. Tap one.",
+    "deferred": "You put this off yesterday. It's still on the list.",
+    "flimsy": "looks flimsy",
+    "buy": "Buy · {{money}}",
+    "ask": "Ask for less",
+    "later": "Buy later",
+    "without": "Go without it",
+    "free": "free",
+    "next": "Next"
+  },
+  "shops": {
+    "daamfix": { "name": "Daam Fix", "tag": "Fixed price", "hello": "One price for everyone. No haggling, sorry!" },
+    "chacha": { "name": "Chacha's stall", "tag": "Friendly", "hello": "Arre, come come! Best in the lane." },
+    "aunty": { "name": "Aunty's stall", "tag": "Tough haggler", "hello": "Best quality in the whole bazaar!" },
+    "megasale": { "name": "Mega Sale", "tag": "50% OFF!!", "hello": "Half price! Today only! Hurry!" },
+    "sasta": { "name": "Sasta Corner", "tag": "Super cheap", "hello": "Cheapest in Hyderabad, guaranteed! Quick, quick!" }
+  },
+  "haggle": {
+    "chacha": { "counter": "For you? Okay, {{money}}." },
+    "aunty": { "counter": "Hmm... fine, {{money}}. Final!", "refuse": "No discount, beta. Quality costs money." },
+    "megasale": { "counter": "It's already half price! Okay... {{money}}." },
+    "sasta": { "counter": "Arre, take it for {{money}}!" }
+  },
+  "invites": {
+    "wheel": { "text": "Giant wheel tonight, everyone! You coming?", "yes": "Ride", "swap": "Watch and take photos", "no": "Not today" },
+    "kulfi": { "text": "Kulfi for everyone?", "yes": "Kulfi", "swap": "Cutting chai instead", "no": "Not today" },
+    "biryani": { "text": "Biryani at the big stall! Coming?", "yes": "A full plate each", "swap": "Split one plate", "no": "Not today" },
+    "loan": { "text": "Bro, lend me ₹100? I'll pay you back tomorrow, promise.", "yes": "Lend", "swap": "Lend half", "no": "Sorry, can't", "history": "Last time he paid back half." },
+    "covers": { "text": "Light-up phone covers! We all get one?", "yes": "Buy one", "swap": "Just look around", "no": "Not today" }
+  },
+  "mamu": {
+    "text": "Mamu's family just arrived! We need snacks for everyone.",
+    "pay": "Pay {{money}} from Spare"
+  },
+  "torn": {
+    "text": "Bhaiya... the seam split before I even wore it!",
+    "rebuy": "Buy a good one · {{money}}",
+    "old": "He'll wear his old clothes"
+  },
+  "ring": {
+    "sign": "Ring toss · {{money}}",
+    "text": "Three rings. Land one and win the giant teddy!",
+    "play": "Play · {{money}}",
+    "skip": "Walk past"
+  },
+  "out": {
+    "best": "That's the best price on the street. Nice!",
+    "paidMore": "Done, but you paid {{extra}} more than the cheapest good shop.",
+    "haggled": "You asked, and saved {{saved}}.",
+    "fakesale": "\"Was {{was}}\" sounds like a steal, but a good one was {{best}} next door.",
+    "cheap": "Only {{price}}! Let's hope it lasts.",
+    "late": "Waiting cost you {{extra}} more for the {{item}}.",
+    "borrowed": "The {{to}} jar was short, so {{money}} came out of {{from}}.",
+    "later": "Okay, later. Prices go up as the festival gets closer.",
+    "without": "No {{item}} this year. Ammi will have to manage.",
+    "yes": "Great evening! {{money}} well spent.",
+    "swap": "Cheaper plan, same fun. Everyone's happy.",
+    "no": "Money saved, but {{friend}} looks a bit hurt.",
+    "loan": "You lent Sunny {{money}}. He says tomorrow...",
+    "loanNo": "Sunny shrugs. Your money stays with you.",
+    "mamuSpare": "Your spare money covered it. No stress!",
+    "mamuBorrowed": "No spare left, so {{money}} came out of {{from}}.",
+    "rebuy": "The cheap one cost {{cheap}}, and now another {{money}}. Paying twice hurts.",
+    "old": "He'll wear his old clothes. The cheap one didn't last.",
+    "tossWin": "You won the giant teddy!",
+    "tossLose": "So close! No teddy.",
+    "odds": "About 1 in 12 players wins. Each try costs {{cost}}.",
+    "tossSkip": "You walk past. The teddy stays on the shelf."
+  },
+  "ideas": {
+    "needs": { "name": "Needs before wants", "rule": "Needs first, then fun." },
+    "budget": { "name": "Sticking to a plan", "rule": "A plan only works if each jar does its job." },
+    "compare": { "name": "Compare prices", "rule": "Check two shops before you buy." },
+    "fakesale": { "name": "Fake discounts", "rule": "Compare the price, not the % off." },
+    "cheap": { "name": "Cheap can cost more", "rule": "If it breaks, you pay twice." },
+    "early": { "name": "Buy early", "rule": "Prices rise when everyone wants the same thing." },
+    "ask": { "name": "It's okay to ask", "rule": "A polite \"any less?\" can save money." },
+    "buffer": { "name": "Keep a buffer", "rule": "Spare money stops surprises from breaking your plan." },
+    "swap": { "name": "Saying no kindly", "rule": "Suggest a cheaper plan instead of just refusing." },
+    "opportunity": { "name": "Every rupee has a cost", "rule": "Money spent on fun came out of something else." },
+    "lending": { "name": "Lending is a risk", "rule": "Only lend what you can afford not to get back." },
+    "odds": { "name": "The odds favour the stall", "rule": "Games of chance are built so most people lose." }
+  },
+  "borrow": {
+    "title": "The {{jar}} jar is short by {{money}}",
+    "sub": "Borrow from another jar. It'll show up on your plan at the end.",
+    "empty": "empty",
+    "cancel": "Never mind"
+  },
+  "toast": { "notEnough": "Not enough money in all your jars." },
+  "scene": {
+    "title": "Festival morning!",
+    "sweets": "{{item}} on the plate.",
+    "noSweets": "An empty plate. Ammi is improvising.",
+    "lights": { "full": "Every light is glowing.", "half": "The cheap lights flicker. Half are dead.", "dark": "No lights this year. The house is dark." },
+    "brother": { "new": "Your brother, proud in his new outfit.", "old": "Your brother in old clothes, a little sad.", "torn": "Your brother's cheap outfit tore. He's in old clothes." },
+    "gift": "Ammi opens your gift and smiles.",
+    "noGift": "No gift. Ammi smiles anyway: \"Maybe next year.\"",
+    "friends": "Your friends drop by!",
+    "noFriends": "Your phone buzzes once: \"Happy festival.\"",
+    "teddy": "The giant teddy sits in the corner.",
+    "sunnyPaid": "Sunny paid you back {{money}}!",
+    "sunnyNot": "Sunny hasn't paid you back.",
+    "gullak": "Ammi puts {{money}} left over into the family gullak.",
+    "continue": "See how your plan went",
+    "yourPlan": "Your plan",
+    "otherPlan": "Someone who spent on fun first",
+    "showOther": "Compare with an impulsive plan",
+    "hideOther": "Hide the other plan"
+  },
+  "report": {
+    "lit": "The Plan & Budget minaret is lit!",
+    "notLit": "Not lit yet. Same game, new plan? Try again.",
+    "star": {
+      "ghar": "Ghar: everything on Ammi's list",
+      "gift": "Gift: a surprise for Ammi",
+      "dost": "Dost: friends still close",
+      "plan": "Plan: borrowed ₹100 or less between jars"
+    },
+    "tryNext": "Next time, try: {{tip}}",
+    "tips": { "ghar": "buy Ammi's list early, before prices rise", "gift": "keep the Gift jar for the gift", "dost": "swap for a cheaper plan instead of saying no", "plan": "keep some spare for surprises" },
+    "title": "Your plan vs what happened",
+    "sub": "Green is spent within the plan. Striped is over the plan.",
+    "spentOf": "{{spent}} of {{planned}}",
+    "borrowedIn": "{{money}} borrowed from other jars",
+    "held": "Your plan held. That's budgeting.",
+    "borrowed": "You moved {{money}} between jars. That's where the plan bent.",
+    "ideas": "What you figured out",
+    "replay": "Play again (same prices)",
+    "continue": "Continue"
+  },
+  "demo": { "badge": "DEMO", "skip": "Skip to festival morning" }
+}

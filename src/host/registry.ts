@@ -1,12 +1,19 @@
 import { PILLAR_IDS, type PillarId } from '../content/data'
 import { isDevMode } from '../lib/dev'
 import { ADAPTERS } from './adapters'
-import { GAME_FOLDERS } from './config'
+import { GAME_ENTRIES, GAME_FOLDERS } from './config'
 import { PLACEHOLDERS } from './placeholders'
 import type { GameModule, PillarGame } from './types'
 
 /** every real game that exists right now: '/src/games/<folder>/index.tsx' -> lazy importer. Empty until teammates add folders. */
 const REAL_GAMES = import.meta.glob<GameModule>('/src/games/*/index.{ts,tsx}')
+/** games that export their own component instead of an index.tsx: only their presence is checked here */
+const ENTRY_FILES = import.meta.glob('/src/games/*/*.tsx')
+/** the wrappers that adapt those games to GameProps (loaded only when the game file exists) */
+const WRAPPERS: Partial<Record<PillarId, () => Promise<GameModule>>> = {
+  plan: () => import('./wrappers/FestivalGame'),
+  save: () => import('./wrappers/PayRunGame'),
+}
 
 const REAL_KEY = 'mm-real'
 
@@ -14,7 +21,10 @@ const REAL_KEY = 'mm-real'
 function realLoader(pillar: PillarId): (() => Promise<GameModule>) | undefined {
   const folder = GAME_FOLDERS[pillar]
   const hit = Object.keys(REAL_GAMES).find((k) => k.startsWith(`/src/games/${folder}/index.`))
-  return hit ? REAL_GAMES[hit] : undefined
+  if (hit) return REAL_GAMES[hit]
+  const entry = GAME_ENTRIES[pillar]
+  const wrapper = WRAPPERS[pillar]
+  return entry && wrapper && `/src/games/${folder}/${entry.file}.tsx` in ENTRY_FILES ? wrapper : undefined
 }
 
 export const hasRealGame = (pillar: PillarId): boolean => realLoader(pillar) !== undefined

@@ -12,6 +12,15 @@ export const GAME_FOLDERS: Record<PillarId, string> = {
   safe: 'casefiles',
 }
 
+/**
+ * Games that do not have an index.tsx but export their own component (Festival Countdown, Pay Run). The shell loads them through a
+ * wrapper that maps GameProps onto the game's real props. `file` is the game's entry file; the wrapper is used only if it exists.
+ */
+export const GAME_ENTRIES: Partial<Record<PillarId, { file: string }>> = {
+  plan: { file: 'FestivalCountdown' },
+  save: { file: 'PayRun' },
+}
+
 /** the order pillars are offered after a game ends ("Continue" goes to the next unfinished one) */
 export const PILLAR_ORDER: PillarId[] = ['plan', 'save', 'invest', 'safe']
 

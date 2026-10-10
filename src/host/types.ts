@@ -74,6 +74,8 @@ export interface GameProps {
   installId?: string
   /** call exactly once when the player finishes (or quits). Pass the game's own payload; the shell adapts it. */
   onComplete: (payload: unknown) => void
+  /** the game's own Exit/Done button should call this to leave the game page (the host provides it) */
+  onExit?: () => void
 }
 
 /** What a game's index file must export: a default React component taking GameProps. */

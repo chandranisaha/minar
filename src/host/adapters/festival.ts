@@ -17,6 +17,13 @@ import { asRecord, clamp, clamp01, hasNum, num, pickNum, pickRecord, skill, skil
 
 /** the spec's scoring maxima per part */
 const MAX = { needs: 25, plan: 25, shopping: 20, goal: 15, balance: 15 } as const
+/**
+ * The REAL game (src/games/festival) scores with different parts than the spec: { needs 0-40, gift 0-20, friends 0-20, plan 0-30, total },
+ * and also sends `minaretLit` (its own clear rule: 3 or more stars or a total of 70+). Both shapes are understood.
+ */
+const REAL_MAX = { needs: 40, plan: 30, gift: 20 } as const
+const REAL_FRIENDS_GOOD = 20
+const REAL_FRIENDS_MIDDLING = 10
 const STAR_KEYS = ['ghar', 'gift', 'dost', 'plan'] as const
 /** spec: 3 or more stars OR a planner score of 70 or more lights the pillar */
 const CLEAR_STARS = 3
@@ -44,11 +51,16 @@ export const adaptFestival: GameAdapter = (payload): GameResult => {
 
   const starCount = STAR_KEYS.filter((k) => stars[k] === true).length
   const total = clamp(num(score.total, 0), 0, 100)
-  const cleared = finished && (starCount >= CLEAR_STARS || total >= CLEAR_TOTAL)
+  const realShape = hasNum(score.gift) || hasNum(score.friends)
+  const cleared = finished && (typeof p.minaretLit === 'boolean' ? p.minaretLit : starCount >= CLEAR_STARS || total >= CLEAR_TOTAL)
   const quality = finished ? (hasTotal ? total / 100 : starCount / STAR_KEYS.length) : 0
   const partial = cleared ? 1 : finished ? Math.min(PARTIAL_CAP, quality) : Math.min(PARTIAL_CAP, clamp01(num(p.progress, 0)))
 
   let friendship: number | undefined = pickNum(evidence, ['friendship'])
+  if (friendship === undefined && finished && realShape) {
+    const f = num(score.friends, 0)
+    friendship = f >= REAL_FRIENDS_GOOD ? FRIENDSHIP_DOST : f >= REAL_FRIENDS_MIDDLING ? 50 : 25
+  }
   if (friendship === undefined && finished) {
     const bal = hasNum(score.balance) ? score.balance : undefined
     friendship = bal !== undefined ? FRIENDSHIP_FROM_BALANCE.find((r) => bal >= r.min)?.friendship : stars.dost === true ? FRIENDSHIP_DOST : FRIENDSHIP_NO_DOST
@@ -59,16 +71,16 @@ export const adaptFestival: GameAdapter = (payload): GameResult => {
     cleared,
     quality: clamp01(quality),
     partial: clamp01(partial),
-    skills: skills({
-      prioritising: skill(score.needs, MAX.needs),
-      planning: skill(score.plan, MAX.plan),
-      patience: skill(score.shopping, MAX.shopping),
-      saving: skill(score.goal, MAX.goal),
-    }),
+    skills: skills(
+      realShape
+        ? { prioritising: skill(score.needs, REAL_MAX.needs), planning: skill(score.plan, REAL_MAX.plan), saving: skill(score.gift, REAL_MAX.gift) }
+        : { prioritising: skill(score.needs, MAX.needs), planning: skill(score.plan, MAX.plan), patience: skill(score.shopping, MAX.shopping), saving: skill(score.goal, MAX.goal) },
+    ),
     lessonsSeen: strings(p.lessonsSeen),
     joySignals: {
       ...(friendship !== undefined ? { friendship } : {}),
-      treatsBought: Math.max(0, num(evidence.ringTossPlays, 0)),
+      treatsBought: Math.max(0, num(evidence.ringTossPlays, evidence.ringToss === true ? 1 : 0)),
+      ...(evidence.lentToSunny === true ? { lentToFriends: 1 } : {}),
       restedOrBalanced: Math.max(0, num(evidence.swaps, 0)),
     },
     raw: payload,

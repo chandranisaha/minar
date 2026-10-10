@@ -1,0 +1,6 @@
+[
+  { "id": "sweets", "base": 420, "jar": "needs", "day": 1, "shops": ["daamfix", "chacha", "megasale"] },
+  { "id": "outfit", "base": 400, "jar": "needs", "day": 1, "shops": ["aunty", "megasale", "sasta"] },
+  { "id": "gift", "base": 300, "jar": "gift", "day": 2, "shops": ["daamfix", "aunty", "megasale"] },
+  { "id": "decor", "base": 120, "jar": "needs", "day": 3, "shops": ["daamfix", "megasale", "sasta"] }
+]

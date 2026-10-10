@@ -39,15 +39,20 @@ export const adaptPayRun: GameAdapter = (payload): GameResult => {
     const v = pickNum(partsRec, [...PARTS[name].keys])
     if (v !== undefined) part[name] = clamp(v, 0, PARTS[name].max)
   }
+  const goalReached = p.goalReached === true
+  const jarEarly = pickNum(p, ['jar', 'jarTotal'])
+  const goalEarly = pickNum(p, ['goal', 'goalAmount']) ?? GOAL_JAR
   const reportedTotal = pickNum(p, ['habitTotal', 'habitScore', 'total'])
   const haveParts = Object.keys(part).length > 0
   const summed = (Object.keys(part) as PartName[]).reduce((s, k) => s + (part[k] ?? 0), 0)
-  const total = clamp(haveParts ? summed : (reportedTotal ?? 0), 0, 100)
-  const finished = haveParts || reportedTotal !== undefined || p.goalReached !== undefined
+  // the REAL game reports no habit parts (src/host/wrappers/PayRunGame.tsx sends only jar, goal, shifts, goalReached):
+  // then the quality is how full the jar is, and a reached goal is a full jar
+  const jarOnly = !haveParts && reportedTotal === undefined && jarEarly !== undefined
+  const total = clamp(haveParts ? summed : (reportedTotal ?? (jarOnly ? (p.goalReached === true ? 1 : clamp01(jarEarly / goalEarly)) * 100 : 0)), 0, 100)
+  const finished = haveParts || reportedTotal !== undefined || p.goalReached !== undefined || jarOnly
   if (!finished) warn('payrun', 'no habit-score parts or goalReached in the payload; treating this as a quit')
 
-  const goalReached = p.goalReached === true
-  const cleared = finished && (goalReached || total >= HABIT_CLEAR)
+  const cleared = finished && (goalReached || (!jarOnly && total >= HABIT_CLEAR))
   const shifts = Math.max(0, Math.floor(num(p.shifts, 0)))
   const jar = pickNum(p, ['jar', 'jarTotal'])
   const goal = pickNum(p, ['goal', 'goalAmount']) ?? GOAL_JAR
