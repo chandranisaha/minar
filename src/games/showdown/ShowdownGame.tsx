@@ -2,6 +2,7 @@ import './i18n'
 import { LangSwitch } from '../../components/Hud'
 import { Bunting, Rooftops } from '../../components/Scenery'
 import { useShowdown, useView } from './state/store'
+import { DateScreen } from './ui/Dates'
 import { Brief, Goals, PredictP1, Start } from './ui/Intro'
 import { GuardrailFooter } from './ui/kit'
 import { Market } from './ui/Market'
@@ -27,8 +28,9 @@ export default function ShowdownGame({ onExit }: ShowdownProps) {
     case 'p1': body = <PredictP1 />; break
     case 'market': body = <Market />; break
     case 'plancheck': body = <PlanCheck />; break
+    case 'date': body = <DateScreen key={step.point} point={step.point!} />; break
     default:
-      // the date screens, Festival Day, the ten futures, transfer and the report are built in the next steps
+      // the Festival Day scene, the ten futures, transfer and the report are built in the next steps
       body = (
         <div className="paper p-4 text-center">
           <p className="m-0 text-[16px] font-extrabold">🔒 Plan locked. Next screen: {step.screen}{step.point ? ` (${step.point})` : ''}</p>

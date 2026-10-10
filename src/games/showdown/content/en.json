@@ -258,5 +258,83 @@
     "lockNote": "After this, the plan is frozen. The dates play out.",
     "needAnswer": "Answer the guess to lock the plan.",
     "back": "Back to the market"
+  },
+  "date": {
+    "n": "Money date {{n}} of 5",
+    "in": "Money in",
+    "out": "Money out",
+    "balance": "Balance",
+    "nothingIn": "Nothing arrives.",
+    "nothingOut": "Nothing due.",
+    "next": "Next date",
+    "toFestival": "See the festival",
+    "needChoice": "Make your choice to go on.",
+    "ins": {
+      "donation": "Rao uncle's donation",
+      "sponsor": "Sponsor's payment",
+      "event": "Event money ({{crowd}} visitors)",
+      "sunny": "Sunny gave back"
+    },
+    "outs": {
+      "permits": "Permits",
+      "electrical": "Electrical repair (surprise)",
+      "rush": "Rush plates",
+      "stage": "Bigger stage",
+      "sunnycash": "Cash to Sunny",
+      "speakers": "Speakers, against a bill"
+    },
+    "cards": {
+      "W1": "Permits are due, and the first payments go out.",
+      "W2": "Rao uncle's donation has arrived.",
+      "W2none": "Rao uncle's donation did not come.",
+      "W2bill": "Surprise! An electrical fault. The repair is a bill.",
+      "W3": "The second hall payment is due.",
+      "FDsponsor": "The sponsor's money arrives this morning.",
+      "FDcrowd": "{{crowd}} visitors came.",
+      "FDrush": "You ordered {{plates}} plates. {{n}} rush plates cost {{cost}} extra.",
+      "FDowed": "{{money}} stayed unpaid. It is recorded as owed."
+    },
+    "cast": {
+      "rao": "As promised, here it is.",
+      "sunny": "Trust me. I know a guy.",
+      "ayesha": "I note down every payment.",
+      "shobha": "The big day. Let's count the crowd."
+    },
+    "e2": {
+      "title": "A bigger stage?",
+      "body": "The donation is in. A bigger stage costs ₹5,000.",
+      "hold": "Hold it as cash",
+      "stage": "Spend ₹5,000 on a bigger stage",
+      "note": "A bigger stage draws about 10% more visitors. More visitors need more plates.",
+      "noCash": "Not enough cash for this.",
+      "doneHold": "You held the cash.",
+      "doneStage": "You bought the bigger stage."
+    },
+    "e4": {
+      "title": "Sunny's offer",
+      "body": "Sunny can buy speakers if you give him ₹2,000 now.",
+      "refuse": "No, thanks",
+      "cash": "Give ₹2,000 in cash",
+      "bill": "Pay ₹2,000 against a bill",
+      "noCash": "Not enough cash for this.",
+      "doneRefuse": "You said no, thanks.",
+      "doneCash": "You gave Sunny ₹2,000 in cash.",
+      "doneBill": "You paid ₹2,000 against a bill."
+    }
+  },
+  "short": {
+    "title": "The bills are more than the cash",
+    "line": "Due {{due}}. In hand {{cash}}. Short by {{need}}.",
+    "pick": "Choose what happens to each bill. Nothing is marked as better.",
+    "dueNow": "Due now {{money}}",
+    "extend": "Extend to Festival Day · +5% ({{fee}})",
+    "daamfix": "Daam Fix does not extend.",
+    "fd": "A bill can't move past Festival Day.",
+    "cancel": "Cancel it",
+    "lose": "You lose the {{paid}} already paid.",
+    "loseNone": "Nothing has been paid yet.",
+    "risk": "Goal at risk: {{goal}} (rank {{rank}})",
+    "owe": "Leave {{money}} unpaid",
+    "owedNote": "On Festival Day an unpaid bill is recorded as owed, with a 10% fee."
   }
 }

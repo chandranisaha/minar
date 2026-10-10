@@ -39,7 +39,7 @@ export type ShortfallAction = { item?: string; action: 'extend' | 'cancel' | 'ow
 export type ShortfallMap = Partial<Record<Point, ShortfallAction[]>>
 
 export interface LedgerLine { arr: number; pay: [string, number][]; cash: number }
-export interface Pending { point: Point; need: number; items: { item: string; due: number; canExtend: boolean; canCancel: boolean }[] }
+export interface Pending { point: Point; need: number; due: number; cash: number; items: { item: string; due: number; canExtend: boolean; canCancel: boolean }[] }
 
 export interface RunResult {
   ledger: Partial<Record<Point, LedgerLine>>

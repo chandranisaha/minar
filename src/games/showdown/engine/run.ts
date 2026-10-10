@@ -167,7 +167,7 @@ export function runPlan(plan: Plan, futureId: string, choices: Choices = {}, opt
       if (mode === 'play' && need > EPS && !owed) {
         // pause for the player only if there is something they could still extend or cancel
         const options = due.filter(([k, x]) => isItem(k) && x > 0 && item(k).cat !== 'venue').map(([k, x]) => ({ item: k, due: x, canExtend: canExtend(k) && p !== 'FD', canCancel: true }))
-        if (options.length) return result({ point: p, need, items: options })
+        if (options.length) return result({ point: p, need, due: due.reduce((a, [, x]) => a + x, 0), cash, items: options })
       }
       totalDue = due.reduce((a, [, x]) => a + x, 0)
       if (totalDue > cash + EPS) unpaid.push([p, pyRound(totalDue - cash)])
