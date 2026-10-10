@@ -13,6 +13,7 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 RULES = [  # (keywords any-of, slot, max width)
+    (['island background', 'island-bg', 'floating island'], 'island-bg', 2400),
     (['golden hour'], 'scene-charminar', 1500),
     (['charminar'], 'charminar', 1000),
     (['bangle'], 'shop-plan', 640),

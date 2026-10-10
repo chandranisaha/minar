@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Money Mohalla",
-    "tagline": "One year. One goal. Four lanes of the bazaar."
+    "tagline": "One island. Four lessons. One goal."
   },
   "lang": {
     "en": "EN",
@@ -52,10 +52,11 @@
     "persona": "You",
     "startHere": "Start here",
     "enter": "Enter",
-    "walkHint": "Drag the joystick or tap to walk. Tap a shop to go in.",
+    "walkHint": "Tap a place to walk there. Drag to look around.",
     "keysHint": "Arrow keys / WASD to walk · Enter to go in",
     "completed": "Done",
-    "illustrative": "Illustrative amounts. Not real offers or advice."
+    "illustrative": "Illustrative amounts. Not real offers or advice.",
+    "settings": "Settings"
   },
   "personas": {
     "school": {
@@ -77,34 +78,29 @@
   },
   "story": {
     "b1": {
-      "title": "One Year. One Goal.",
-      "caption": "Hyderabad wakes up. The pigeons are early. So are you."
+      "title": "One year. One goal.",
+      "caption": "Hyderabad, early morning. A quiet island, and a long way to go."
     },
     "b2": {
-      "title": "Choose your player",
-      "caption": "Who is walking into the bazaar today?"
+      "title": "Who is heading out?",
+      "caption": "Pick the person you will be this year."
     },
     "b3": {
       "title": "Nani's flower stall",
-      "caption": "Nani presses a small cloth bundle into your hands.",
+      "caption": "She places a small cloth bundle in your hands.",
       "quote": "This is what we could save. The rest is up to you.",
       "sign": "Nani"
     },
     "b4": {
-      "title": "The Goal",
-      "caption": "Fee due in 12 months. Fill the bar, one smart choice at a time.",
+      "title": "The goal",
+      "caption": "Fee due in 12 months. Each good choice fills the bar.",
       "receipt": "FEE RECEIPT",
       "amount": "Amount due",
       "deadline": "Due in 12 months",
       "paid": "Paid so far",
       "stamp": "DUE"
     },
-    "b5": {
-      "title": "The bazaar opens",
-      "caption": "Four doors. Four lessons. All yours.",
-      "ask": "Where will you go first?"
-    },
-    "step": "Scene {{n}} of 5",
+    "step": "Scene {{n}} of 4",
     "rotate": "Turn your phone upright to play the story."
   },
   "buttons": {
@@ -114,7 +110,7 @@
     "back": "Back",
     "go": "Let's go!",
     "replay": "Replay story",
-    "backToCharminar": "Back to Charminar",
+    "backToCharminar": "Back to the island",
     "markComplete": "Mark as complete",
     "lite": "Lite mode",
     "rewind": "Rewind"
@@ -134,14 +130,19 @@
     "skills": "Skills you practised"
   },
   "celebrate": {
-    "title": "Goal reached!",
-    "body": "Four lamps lit. Nani is proud of you.",
-    "nani": "Shabash!",
-    "again": "Keep exploring"
+    "title": "Goal reached",
+    "body": "The college gate is open. Well done.",
+    "again": "Continue"
   },
   "dashboard": {
     "title": "Dashboard",
     "body": "Your skills will show up here soon."
   },
-  "lang_notice": "Language"
+  "lang_notice": "Language",
+  "island": {
+    "dock": "Arrival dock",
+    "plaza": "Charminar plaza",
+    "gate": "College gate",
+    "gateLocked": "The gate opens when all four lessons are done."
+  }
 }
