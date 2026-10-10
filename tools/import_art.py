@@ -70,6 +70,8 @@ SELLER_BOXES = {
     'rest': (725, 525, 965, 805), 'pick': (5, 510, 315, 810), 'stand': (32, 5, 305, 515),
 }
 
+CAFE_BOXES = {'worried': (668, 650, 922, 1008), 'relieved': (934, 662, 1178, 1008)}
+
 SKIP = ['character asset sheet', 'character game asset']
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -90,6 +92,10 @@ for fn in sorted(files):
         continue
     low = fn.lower()
     if os.environ.get('ART_ONLY') and os.environ['ART_ONLY'].lower() not in low:
+        continue
+    if 'caf' in low and 'character' in low:
+        for nm in cut_props(os.path.join(src, fn), CAFE_BOXES, 'char-cafe-'):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
         continue
     if 'bangle seller' in low:
         for nm in cut_props(os.path.join(src, fn), SELLER_BOXES, 'char-seller-'):

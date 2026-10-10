@@ -1,4 +1,4 @@
-import { memo, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { memo, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PILLARS, type PillarId } from '../content/data'
 import { CharminarSvg } from '../art/Charminar'
@@ -27,7 +27,7 @@ const LAMP_FRAC = [{ x: 0.223, y: 0.019 }, { x: 0.8, y: 0.019 }, { x: 0.31, y: 0
 /** shopkeeper placement over painted stalls: centre x and counter-top y, as fractions of the stall image */
 const KEEPER: Record<PillarId, { cx: number; counter: number; mood: 'happy' | 'worried' | 'sly' | 'cycle'; s: number }> = {
   plan: { cx: 0.47, counter: 0.7, mood: 'happy', s: 1 },
-  save: { cx: 0.555, counter: 0.77, mood: 'cycle', s: 0.8 },
+  save: { cx: 0.575, counter: 0.77, mood: 'cycle', s: 0.8 },
   invest: { cx: 0.56, counter: 0.7, mood: 'happy', s: 1 },
   safe: { cx: 0.43, counter: 0.57, mood: 'sly', s: 0.72 },
 }
@@ -39,28 +39,29 @@ const SIGN: Partial<Record<PillarId, { key: string; x: number; y: number; color:
   save: { key: 'world.chai', x: 0.515, y: 0.15, color: '#E8B04A', size: 17, rot: 0 },
   invest: { key: 'world.pearls', x: 0.625, y: 0.17, color: '#7A2A22', size: 21, rot: 0 },
 }
-/** painted shopkeepers (from character sheets): idle poses alternate, the hover pose plays the reaction */
-const ART_KEEPER: Partial<Record<PillarId, { idle: string[]; hover: string; ref: string; width: number; drop: number }>> = {
-  plan: { idle: ['char-seller-arrange'], hover: 'char-seller-arrange', ref: 'char-seller-hold', width: 0.34, drop: 20 },
+/** painted shopkeepers (from character sheets): a fixed idle pose that floats, and a reaction pose played only when triggered.
+ * anchor = fraction of the pose height where the counter / table line sits (poses that include their own table). */
+interface ArtKeeperCfg { idle: string; hover: string; ref: string; width: number; drop?: number; anchor?: number }
+const ART_KEEPER: Partial<Record<PillarId, ArtKeeperCfg>> = {
+  plan: { idle: 'char-seller-arrange', hover: 'char-seller-hold', ref: 'char-seller-hold', width: 0.34, drop: 20 },
+  save: { idle: 'char-cafe-worried', hover: 'char-cafe-relieved', ref: 'char-cafe-worried', width: 0.3, anchor: 0.79 },
 }
 
-function ArtKeeper({ a, cfg, active, cx, counter, sw, sh }: { a: Record<string, { w: number; h: number }>; cfg: NonNullable<(typeof ART_KEEPER)[PillarId]>; active: boolean; cx: number; counter: number; sw: number; sh: number }) {
-  const [f, setF] = useState(0)
-  useEffect(() => {
-    if (active) return
-    const id = window.setInterval(() => setF((x) => (x + 1) % cfg.idle.length), 1500)
-    return () => window.clearInterval(id)
-  }, [active, cfg.idle.length])
-  const name = active ? cfg.hover : cfg.idle[f]
+function ArtKeeper({ a, cfg, active, cx, counter, sw, sh }: { a: Record<string, { w: number; h: number }>; cfg: ArtKeeperCfg; active: boolean; cx: number; counter: number; sw: number; sh: number }) {
+  const name = active ? cfg.hover : cfg.idle
   const m = a[name]
   const ref = a[cfg.ref]
   if (!m || !ref) return null
   const k = (sw * cfg.width) / ref.w // same sheet scale for every pose
   const w = m.w * k, h = m.h * k
+  const drop = cfg.drop ?? 0
+  const top = cfg.anchor !== undefined ? counter * sh - h * cfg.anchor : counter * sh - h + drop
   return (
-    <div style={{ position: 'absolute', left: cx * sw - w / 2, top: counter * sh - h + cfg.drop, width: w, height: h, clipPath: `inset(-60px -60px ${cfg.drop}px -60px)` }}>
+    <div style={{ position: 'absolute', left: cx * sw - w / 2, top, width: w, height: h, clipPath: cfg.anchor !== undefined ? undefined : `inset(-60px -60px ${drop}px -60px)` }}>
       <div className={active ? 'anim-float-fast' : 'anim-float'} style={{ width: '100%', height: '100%' }}>
-        <img src={`/art/${name}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
+        <div key={String(active)} className={active ? 'anim-squash' : undefined} style={{ width: '100%', height: '100%', transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+          <img src={`/art/${name}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
+        </div>
       </div>
     </div>
   )
