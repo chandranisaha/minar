@@ -37,7 +37,7 @@ export function GoalBar({ className = '', intro = false }: { className?: string;
       <Coin />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2 font-sign lang-fit leading-none" style={{ fontSize: 14 }}>
-          <span className="truncate">{t('hud.goal')}</span>
+          <span className="hidden min-[430px]:inline">{t("hud.goal")}</span>
           <span className="whitespace-nowrap" style={{ fontSize: 13 }}>
             {inr(saved, lang)} <span className="opacity-60">/ {inr(goal, lang)}</span>
           </span>

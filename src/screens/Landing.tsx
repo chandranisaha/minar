@@ -28,7 +28,7 @@ export default function Landing() {
     <div className="absolute inset-0 overflow-hidden">
       <Overworld />
       <TopHud />
-      {hint && (
+      {hint && done < 4 && (
         <div className="pointer-events-none absolute inset-x-0 z-30 flex justify-center px-3" style={{ top: 76 }}>
           <div className="ink-chip font-sign lang-fit anim-pop px-3 py-1.5 text-center text-[13px]">
             <span className="sm:hidden">{t('hud.walkHint')}</span>

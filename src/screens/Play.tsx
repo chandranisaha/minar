@@ -39,7 +39,7 @@ export default function Play() {
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#5BB5D6, #FFE3A8 55%, #F2A56B)' }}>
       <TopHud />
-      <div className="mx-auto flex min-h-full max-w-xl flex-col items-center gap-4 px-4 pb-28 pt-24">
+      <div className="mx-auto flex min-h-full max-w-xl flex-col items-center gap-4 px-4 pb-44 pt-24">
         <div className="w-full">
           <TitleCard eyebrow={t('play.chapter', { n: p.n })} title={t(`pillars.${id}.name`)}>
             <p className="m-0 font-semibold">{t(`pillars.${id}.game`)}</p>

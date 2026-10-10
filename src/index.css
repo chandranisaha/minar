@@ -107,3 +107,6 @@ html[data-lite="true"] .grain, html[data-lite="true"] .scratches { display: none
 .anim-walk { animation: walk-bob .28s steps(3) infinite; transform-origin: 50% 100%; }
 @keyframes idle-breathe { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.015,.985) } }
 .anim-idle { animation: idle-breathe 1.2s steps(4) infinite; transform-origin: 50% 100%; }
+
+/* tracked-out caps break Devanagari/Telugu conjuncts: never letter-space those scripts */
+html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }
