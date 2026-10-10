@@ -39,6 +39,8 @@ export interface SceneProps {
   platesCount?: number
   /** bumps whenever a coin lands in a jar, so the scene can clink */
   pulse?: { jar: 'spend' | 'save' | 'emergency'; n: number } | null
+  /** the intro plays fizz values on the table bottles */
+  demo?: { fun: number; friends: number } | null
   reached?: boolean
   lite?: boolean
 }
@@ -57,11 +59,47 @@ export function moodFor(step: Step, beat: SceneProps['beat'], reached: boolean):
   }
 }
 
-/** a ramune bottle: five painted stages, never a number */
-export function Bottle({ x, y, v, kind, h = 46 }: { x: number; y: number; v: number; kind: 'fun' | 'friends'; h?: number }) {
+/** every bottle-*.webp shares one canvas (w / h), cut by tools/cut_bottles.py: the glass stands bottom-centre, the popped stage's splash fits inside */
+const BOTTLE_ASPECT = 218 / 220
+
+/**
+ * A ramune bottle on the table. It grows and leans toward the edge as it fills (five painted stages, never a number),
+ * glows and bobs a warning when it is nearly full, and at the top it tips off the table onto the floor.
+ */
+export function Bottle({ x, y, v, kind, h = 46, lite }: { x: number; y: number; v: number; kind: 'fun' | 'friends'; h?: number; lite?: boolean }) {
   const s = stageOf(v)
-  const w = h * (178 / 222)
-  return <image href={`${C}/bottle-${kind}-${s}.webp`} x={x - w / 2} y={y - h} width={w} height={h} className={s === 3 ? 'cafe-rattle' : s === 4 ? 'cafe-pop' : undefined} />
+  const w = h * BOTTLE_ASPECT
+  const k = [1, 1.12, 1.3, 1.5, 1.5][s]
+  const tilt = [0, 2, 6, 14, 0][s]
+  const nudge = [0, 0, 2, 8, 0][s]
+  const alert = s >= 3 && s < 4
+  const src = `${C}/bottle-${kind}-${s}.webp`
+  if (s === 4) {
+    return (
+      <g transform={`translate(${x} ${y})`}>
+        <g className="cafe-tipover">
+          <image href={src} x={-w / 2} y={-h} width={w} height={h} />
+        </g>
+        {!lite && <circle className="cafe-marble-roll" cx={26} cy={70} r={3.4} fill="#BFE3F0" stroke={INK} strokeWidth="1" />}
+      </g>
+    )
+  }
+  return (
+    <g transform={`translate(${x + nudge} ${y})`}>
+      {s >= 2 && !lite && <ellipse className={`cafe-alertring ${alert ? 'is-hot' : ''}`} cx={0} cy={-h * 0.55} rx={h * 0.76} ry={h * 0.62} fill="none" stroke={alert ? '#D8503A' : '#F0B04A'} strokeWidth="2" />}
+      <g style={{ transformBox: 'fill-box', transformOrigin: '50% 100%', transform: `rotate(${tilt}deg) scale(${k})`, transition: 'transform .7s cubic-bezier(.3,1.4,.5,1)' }}>
+        <g className={alert ? 'cafe-shiver' : s === 2 ? 'cafe-sway' : undefined}>
+          <image href={src} x={-w / 2} y={-h} width={w} height={h} />
+        </g>
+      </g>
+      {alert && (
+        <g className="cafe-bang" transform={`translate(0 ${-h * k - 6})`}>
+          <circle r="7" fill="#D8503A" stroke={INK} strokeWidth="1.3" />
+          <text y="3.6" textAnchor="middle" fontSize="10" fontWeight="900" fill="#fff">!</text>
+        </g>
+      )}
+    </g>
+  )
 }
 
 function Cloud({ stage, dark }: { stage: number; dark: boolean }) {
@@ -94,7 +132,8 @@ function Envelope({ x, y }: { x: number; y: number }) {
   )
 }
 
-export function Scene({ step, run, player, saucers = [null, null], vendor, beat = null, focus = null, platesCount = 0, pulse = null, reached = false, lite }: SceneProps) {
+export function Scene({ step, run, player, saucers = [null, null], vendor, beat = null, focus = null, platesCount = 0, pulse = null, demo = null, reached = false, lite }: SceneProps) {
+  const fz = demo ?? run.fizz
   const bg = lite ? `${ART}/cafe-interior-lite.webp` : `${ART}/cafe-interior.webp`
   const stage = cloudStage(step)
   const raining = step === 'pay' || (step === 'rain' && beat !== 'calm')
@@ -197,10 +236,10 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
       {!phoneOff || cracked
         ? <image href={`${C}/${cracked ? 'phone-cracked' : 'phone'}.webp`} x={cracked ? 238 : 330} y={cracked ? 248 : 176} width={32} height={22} preserveAspectRatio="xMidYMax meet" className={cracked ? 'cafe-fall' : undefined} />
         : <image href={`${C}/phone.webp`} x={330} y={176} width={32} height={22} className="cafe-slide" />}
-      {/* the fizz bottles */}
+      {/* the fizz bottles: they sit at the table's edge so a full one can tip off it */}
       <g opacity={dim('bottle')} filter={glow('bottle')}>
-        <Bottle x={338} y={192} v={run.fizz.fun} kind="fun" h={44} />
-        <Bottle x={354} y={194} v={run.fizz.friends} kind="friends" h={38} />
+        <Bottle x={340} y={191} v={fz.fun} kind="fun" h={42} lite={lite} />
+        <Bottle x={358} y={192} v={fz.friends} kind="friends" h={36} lite={lite} />
       </g>
       {/* the little things: a plate for each */}
       {platesCount > 0 && (

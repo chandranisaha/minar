@@ -166,10 +166,10 @@ function Gauges({ run }: { run: Run }) {
     const v = run.fizz[kind]
     const s = stageOf(v)
     return (
-      <div className={`cafe-gauge ${focus === 'bottle' ? 'is-hot' : ''}`} key={kind}>
-        <img src={`/art/cafe/bottle-${kind}-${s}.webp`} alt="" className={`cafe-gauge-bottle ${s >= 3 ? 'is-fizzing' : ''}`} draggable={false} />
+      <div className={`cafe-gauge ${focus === 'bottle' ? 'is-hot' : ''} ${s >= 3 ? 'is-alert' : ''}`} key={kind}>
+        <img src={`/art/cafe/bottle-${kind}-${s}.webp`} alt="" className={`cafe-gauge-bottle ${s >= 3 ? 'is-fizzing' : ''}`} style={{ transform: `scale(${[1, 1.05, 1.18, 1.4, 1.4][s]})` }} draggable={false} />
         <div className="min-w-0 flex-1">
-          <div className="cafe-gauge-label">{label}<span>{stage(v)}</span></div>
+          <div className="cafe-gauge-label">{label}<span>{s === 3 ? t('gauge.alert') : stage(v)}</span></div>
           <div className="cafe-gauge-bar" role="img" aria-label={`${label}: ${stage(v)}`}>
             {[0, 1, 2, 3, 4].map((i) => <i key={i} className={i <= s && (s > 0 || i === 0) ? `on s${s}` : ''} />)}
           </div>
@@ -202,6 +202,7 @@ function Gauges({ run }: { run: Run }) {
             <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why2')}</p>
             <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why3')}</p>
             <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why4')}</p>
+            <p className="my-1.5 text-[14.5px] font-bold leading-snug">{t('gauge.why5')}</p>
             <div className="mt-2 flex justify-end"><Btn onClick={() => setOpen(false)}>{t('gauge.close')}</Btn></div>
           </div>
         </div>

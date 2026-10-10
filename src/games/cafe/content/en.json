@@ -387,7 +387,13 @@
     "seeWhere": "See where it went",
     "playAgain": "Play again",
     "done": "Back to the island",
-    "nobody": "Everyone learns this by doing."
+    "nobody": "Everyone learns this by doing.",
+    "mood": "Mood",
+    "mm0": "Low. A month of mostly no's is tiring. Plan one small treat next time.",
+    "mm1": "So-so. A bit more room for things you enjoy would help.",
+    "mm2": "Okay. Not tired, not thrilled.",
+    "mm3": "Good. You made room for things that matter to you.",
+    "mm4": "Great. Treats and friends kept the month fun."
   },
   "arch": {
     "fastmover": {
@@ -664,6 +670,23 @@
     "m3": "good",
     "m4": "great",
     "intro": "See the two bottles up top? Every no to a want makes them fizzier. Yes lets them settle.",
-    "tag": "Pressure: how much you're holding back"
+    "tag": "Pressure: how much you're holding back",
+    "why5": "If a bottle fills up, it pops and you get the Big Night. If your mood ends low, your report says so, and it's a sign to plan a small treat.",
+    "alert": "Almost full!"
+  },
+  "meet": {
+    "p1": "This is your Wants bottle. Every time you say no to something you want, it gets a little fizzier.",
+    "p1s": "Games, clothes, treats. Watch the bottle on the table.",
+    "p2": "And this is your Friends bottle. Matches, outings and dinners fill it the same way.",
+    "p2s": "Skipping plans with friends builds it up.",
+    "p3": "Say yes to something and the bottle settles. Say no again and again, and it keeps filling.",
+    "p3s": "It isn't a number to manage. It's how much you're holding back.",
+    "p4": "When a bottle is full, it pops. Then it's the Big Night: spend ₹60 to ₹100, go for half, or stay home.",
+    "p4s": "Stay home and the fizz comes with you into next month, bigger.",
+    "p5": "And this is your mood. Treats, friends and kindness lift it. A month of only no's wears it down.",
+    "p5s": "It doesn't change your money. It shows in your report at the end.",
+    "p6": "Wants cost money too. When Spend runs out, the rest comes out of your goal.",
+    "p6s": "Bills can't be skipped. Wants can. That's the real choice this month.",
+    "go": "Got it, let's start"
   }
 }

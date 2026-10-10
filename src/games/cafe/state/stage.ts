@@ -8,6 +8,8 @@ export interface StageState {
   beat: SceneProps['beat']
   focus: SceneProps['focus']
   plates: number
+  /** the intro plays the bottles itself: fizz values to show instead of the run's */
+  demo: { fun: number; friends: number } | null
   pulse: { jar: 'spend' | 'save' | 'emergency'; n: number } | null
   clink: (jar: 'spend' | 'save' | 'emergency') => void
   set: (s: Partial<Omit<StageState, 'set' | 'reset'>>) => void
@@ -21,6 +23,7 @@ export const useStage = create<StageState>()((set, get) => ({
   beat: null,
   focus: null,
   plates: 0,
+  demo: null,
   pulse: null,
   clink: (jar) => set((st) => ({ pulse: { jar, n: (st.pulse?.n ?? 0) + 1 } })),
   set: (s) => set(s),
@@ -29,5 +32,5 @@ export const useStage = create<StageState>()((set, get) => ({
     s[i] = v
     set({ saucers: s })
   },
-  reset: () => set({ saucers: [null, null], vendor: undefined, beat: null, focus: null, pulse: null }),
+  reset: () => set({ saucers: [null, null], vendor: undefined, beat: null, focus: null, pulse: null, demo: null }),
 }))

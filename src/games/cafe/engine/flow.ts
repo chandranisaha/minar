@@ -6,12 +6,12 @@ import type { BillId, Run } from './types'
  * Steps that do not apply this month are skipped. Pure, so the order is testable.
  */
 export type Step =
-  | 'entry' | 'walkin' | 'goal' | 'predict1' | 'payday' | 'bignight0'
+  | 'entry' | 'walkin' | 'goal' | 'predict1' | 'meet' | 'payday' | 'bignight0'
   | 'bill:auto' | 'window' | 'bill:data' | 'trolley' | 'predict2' | 'plates' | 'worth'
   | 'bignight' | 'teja' | 'bill:lunch' | 'rain' | 'pay' | 'tally' | 'thennow' | 'onechange'
 
 export const ORDER: Step[] = [
-  'entry', 'walkin', 'goal', 'predict1', 'payday', 'bignight0',
+  'entry', 'walkin', 'goal', 'predict1', 'meet', 'payday', 'bignight0',
   'bill:auto', 'window', 'bill:data', 'trolley', 'predict2', 'plates', 'worth',
   'bignight', 'teja', 'bill:lunch', 'rain', 'pay', 'tally', 'thennow', 'onechange',
 ]
@@ -21,6 +21,7 @@ export function applies(s: Step, run: Run, monthsDone: number): boolean {
     case 'walkin':
     case 'goal':
     case 'predict1':
+    case 'meet':
       return run.month === 1
     // a Big Night carried over from last month arrives on Day 1
     case 'bignight0':
@@ -66,3 +67,7 @@ export function cloudStage(s: Step): 0 | 1 | 2 | 3 | 4 {
   if (s === 'tally' || s === 'thennow' || s === 'onechange') return 4
   return p as 0 | 1 | 2 | 3 | 4
 }
+
+/** screens that are mostly a conversation keep the picture big; screens full of choices glide to side by side */
+const QUIET: Step[] = ['entry', 'walkin', 'goal', 'predict1', 'predict2', 'plates', 'rain']
+export const isBusy = (s: Step): boolean => !QUIET.includes(s)

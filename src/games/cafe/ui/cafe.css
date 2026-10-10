@@ -1,12 +1,21 @@
 /* Pocket Panic: café stage + panel. Warm, calm to look at; stepped motion; every effect off under reduced motion / Lite. */
 .cafe { position: absolute; inset: 0; background: #22180F; color: #3A2A24; overflow: hidden; }
 
-/* picture on top, always whole; the subtitle dock sits underneath and never covers it */
+/* picture + subtitle dock live in one box. Quiet screens: picture big on top. Busy screens: the box glides to side by side
+   (wide screens) or the picture shrinks to a strip (phones), so the choices never need scrolling. */
 .cafe { display: flex; flex-direction: column; background: #1E150E; }
-.cafe-stage { position: relative; flex: none; width: 100%; aspect-ratio: 16 / 9; max-height: 46svh; container-type: size; background: #1E150E; }
-.cafe-svg { display: block; width: min(100cqw, calc(100cqh * 16 / 9)); height: auto; margin: 0 auto; border-radius: 0 0 14px 14px; }
-@media (min-width: 700px) {
-  .cafe-stage { flex: 1 1 0; min-height: 0; aspect-ratio: auto; max-height: none; display: grid; place-items: center; }
+.cafe-main { --sw: 100%; --sh: min(56.25vw, 44%); --dl: 0%; --dt: var(--sh); --dw: 100%; --dh: calc(100% - var(--sh)); position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
+.cafe-main[data-busy] { --sh: min(40vw, 26%); }
+.cafe-stage, .cafe-dock { position: absolute; transition: left .6s cubic-bezier(.4, 0, .2, 1), top .6s cubic-bezier(.4, 0, .2, 1), width .6s cubic-bezier(.4, 0, .2, 1), height .6s cubic-bezier(.4, 0, .2, 1); }
+.cafe-stage { left: 0; top: 0; width: var(--sw); height: var(--sh); container-type: size; background: #1E150E; }
+.cafe-svg { position: absolute; inset: 0; margin: auto; display: block; width: min(100cqw, calc(100cqh * 16 / 9)); height: auto; border-radius: 12px; }
+.cafe-dock { left: var(--dl); top: var(--dt); width: var(--dw); height: var(--dh); z-index: 10; display: flex; flex-direction: column; }
+.cafe-dock-inner { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px max(10px, env(safe-area-inset-bottom)); background: #FBF3DE; border-top: 3px solid #3A2A24; box-shadow: 0 -6px 18px rgba(0, 0, 0, .35); }
+@media (min-width: 760px) {
+  .cafe-main { --sh: 64%; }
+  .cafe-main[data-busy] { --sw: 58%; --sh: 100%; --dl: 58%; --dt: 0%; --dw: 42%; --dh: 100%; }
+  .cafe-dock-inner { padding: 16px max(18px, calc((100% - 760px) / 2)) 12px; }
+  .cafe-main[data-busy] .cafe-dock-inner { padding: 18px 20px 12px; border-top: none; border-left: 3px solid #3A2A24; box-shadow: -6px 0 18px rgba(0, 0, 0, .35); }
 }
 
 /* top bar: above the picture, not over it */
@@ -22,13 +31,6 @@
 .cafe-jarchip.is-hot { transform: scale(1.08); box-shadow: 0 0 0 3px #FFE9A8; }
 .cafe-jarchip.is-dim { opacity: .55; }
 
-/* the subtitle dock: dialogue + controls, under the picture */
-.cafe-dock { position: relative; z-index: 10; flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
-.cafe-dock-inner { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px max(10px, env(safe-area-inset-bottom)); background: #FBF3DE; border-top: 3px solid #3A2A24; box-shadow: 0 -6px 18px rgba(0, 0, 0, .35); }
-@media (min-width: 700px) {
-  .cafe-dock { flex: none; max-height: 47svh; }
-  .cafe-dock-inner { padding: 14px max(18px, calc((100% - 760px) / 2)) 12px; }
-}
 .cafe-foot { margin: 8px 0 0; font-size: 10.5px; color: #3A2A24; opacity: .55; text-align: center; }
 
 /* ---- captions and buttons ---- */
@@ -227,3 +229,31 @@ html[data-lite='true'] .cafe *, .cafe .is-lite * { animation: none !important; }
 .cafe-gauges { flex-wrap: nowrap; }
 @media (max-width: 520px) { .cafe-gauges { flex-wrap: wrap; } .cafe-gauge { flex-basis: 30%; } .cafe-gauge-help { position: absolute; right: 12px; bottom: 6px; } .cafe-hud { position: relative; } }
 @media (max-width: 520px) { .cafe-gauges { flex-wrap: nowrap; padding-right: 0; } .cafe-gauge { flex: 1 1 0; } .cafe-gauge-help { position: static; margin-left: 0; width: 28px; height: 28px; } .cafe-gauge-bottle { height: 30px; } .cafe-gauge-label { font-size: 10px; } .cafe-gauge-label span { display: none; } }
+
+/* ---- bottles that demand attention ---- */
+.cafe-tipover { animation: cafe-tip .9s cubic-bezier(.5, 0, .9, .6) forwards; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes cafe-tip { 0% { transform: rotate(14deg) } 35% { transform: rotate(40deg) translate(6px, 0) } 100% { transform: translate(22px, 66px) rotate(96deg) } }
+.cafe-marble-roll { animation: cafe-marblek 1.2s .8s cubic-bezier(.3, .6, .4, 1) both; }
+@keyframes cafe-marblek { from { transform: translateX(-16px); opacity: 0 } to { transform: none; opacity: 1 } }
+.cafe-shiver { animation: cafe-shiverk .22s linear infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes cafe-shiverk { 0%, 100% { transform: translateX(-1px) rotate(-1.5deg) } 50% { transform: translateX(1px) rotate(1.5deg) } }
+.cafe-sway { animation: cafe-swayk 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes cafe-swayk { 0%, 100% { transform: rotate(-1.5deg) } 50% { transform: rotate(2deg) } }
+.cafe-alertring { opacity: .55; animation: cafe-ringk 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.cafe-alertring.is-hot { opacity: .95; animation-duration: .7s; }
+@keyframes cafe-ringk { 0%, 100% { transform: scale(.92); opacity: .25 } 50% { transform: scale(1.12); opacity: .95 } }
+.cafe-bang { animation: cafe-bangk .6s ease-in-out infinite; transform-box: fill-box; }
+@keyframes cafe-bangk { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+.cafe-gauge.is-alert { border-color: #D8503A; animation: cafe-alertk .8s ease-in-out infinite; }
+@keyframes cafe-alertk { 0%, 100% { box-shadow: 0 0 0 0 rgba(216, 80, 58, .0) } 50% { box-shadow: 0 0 0 4px rgba(216, 80, 58, .55) } }
+.cafe-gauge-bottle { transform-origin: 50% 100%; transition: transform .5s cubic-bezier(.3, 1.4, .5, 1); }
+
+/* ---- the intro (Meet) ---- */
+.cafe-meet-row { display: flex; align-items: flex-end; justify-content: center; gap: 14px; min-height: 120px; }
+.cafe-meet-bottle { position: relative; width: 78px; height: 118px; }
+.cafe-meet-bottle img { position: absolute; inset: 0; margin: auto; height: 100%; width: auto; opacity: 0; transform: scale(.8); transition: opacity .35s, transform .5s cubic-bezier(.3, 1.4, .5, 1); }
+.cafe-meet-bottle img.is-on { opacity: 1; transform: scale(1); }
+.cafe-meet-word { align-self: center; font-weight: 800; font-size: 18px; min-width: 84px; }
+.cafe-meet-mood { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 70%; }
+.cafe-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(58, 42, 36, .25); display: inline-block; }
+.cafe-dot.on { background: #C8604A; }

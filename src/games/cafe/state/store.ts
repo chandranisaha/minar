@@ -78,3 +78,6 @@ export const useCafe = create<CafeState>()(
     },
   ),
 )
+
+// dev only: lets the screenshot scripts drive the live store
+if (import.meta.env.DEV && typeof window !== 'undefined') (window as unknown as { __cafe: typeof useCafe }).__cafe = useCafe

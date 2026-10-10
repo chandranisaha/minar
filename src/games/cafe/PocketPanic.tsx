@@ -3,13 +3,14 @@ import './ui/cafe.css'
 import { useCallback, useEffect } from 'react'
 import type { GameResult } from '../../lib/gameResult'
 import { useGame, useLite } from '../../store/game'
-import { billOf } from './engine/flow'
+import { billOf, isBusy } from './engine/flow'
 import type { Tally } from './engine/types'
 import { useStage } from './state/stage'
 import { useCafe } from './state/store'
 import { Bill } from './ui/Bill'
 import { Hud, Ledger, PauseOverlay, PhaseCard } from './ui/kit'
 import { Entry, GoalPick, Predict1, WalkIn } from './ui/Opening'
+import { Meet } from './ui/Meet'
 import { Payday } from './ui/Payday'
 import { BigNight, Teja } from './ui/People'
 import { Pay, RainRound } from './ui/Rain'
@@ -68,6 +69,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
       case 'walkin': return <WalkIn />
       case 'goal': return <GoalPick />
       case 'predict1': return <Predict1 />
+      case 'meet': return <Meet />
       case 'payday': return <Payday key={`pay-${run.month}`} />
       case 'bignight0':
       case 'bignight': return <BigNight key={`bn-${run.month}`} />
@@ -88,14 +90,16 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
 
   return (
     <div className="cafe" data-slow={slow ? 'true' : undefined}>
-      <div className="cafe-stage" aria-hidden={step === 'entry'}>
-        <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} reached={run.jars.save >= 250} lite={lite} />
-      </div>
       {step !== 'entry' && <Hud step={step} run={run} />}
-      <div className="cafe-dock">
-        <div className="cafe-dock-inner">
-          {panel}
-          {step !== 'entry' && <Foot />}
+      <div className="cafe-main" data-busy={isBusy(step) && step !== 'entry' ? '1' : undefined}>
+        <div className="cafe-stage" aria-hidden={step === 'entry'}>
+          <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} demo={stage.demo} reached={run.jars.save >= 250} lite={lite} />
+        </div>
+        <div className="cafe-dock">
+          <div className="cafe-dock-inner">
+            {panel}
+            {step !== 'entry' && <Foot />}
+          </div>
         </div>
       </div>
       <PhaseCard step={step} month={run.month} />

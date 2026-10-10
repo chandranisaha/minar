@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { GOAL } from '../engine/content'
 import { flips, settle } from '../engine/tally'
 import { EXPERIMENTS, type Experiment, type MonthSummary, type Tally as TallyT } from '../engine/types'
+import { moodOf, moodStage } from '../engine/mood'
 import { useCafe } from '../state/store'
 import { Btn, Caption } from './kit'
 import { useCt } from './text'
@@ -58,6 +59,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
       [t('tally.little'), `₹${tally.little}`, run.predict2 !== undefined ? t('tally.littleGuess', { range: band(run.predict2) }) : ''],
       [t('tally.cushion'), `₹${tally.cushionUsed + tally.cushionKept}`, t('tally.cushionSplit', { u: tally.cushionUsed, k: tally.cushionKept })],
       [t('tally.cost'), `₹${tally.extra + tally.lentOut}`, t('tally.costSplit', { e: tally.extra, l: tally.lentOut })],
+      [t('tally.mood'), ['😞', '😕', '😐', '🙂', '😄'][moodStage(moodOf(run))], t(`tally.mm${moodStage(moodOf(run))}`)],
     ]
     return (
       <div className="flex flex-col gap-2">
