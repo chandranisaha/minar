@@ -41,7 +41,7 @@ const SIGN: Partial<Record<PillarId, { key: string; x: number; y: number; color:
 }
 /** painted shopkeepers (from character sheets): idle poses alternate, the hover pose plays the reaction */
 const ART_KEEPER: Partial<Record<PillarId, { idle: string[]; hover: string; ref: string; width: number; drop: number }>> = {
-  plan: { idle: ['char-seller-arrange', 'char-seller-hold'], hover: 'char-seller-laugh', ref: 'char-seller-hold', width: 0.5, drop: 26 },
+  plan: { idle: ['char-seller-arrange'], hover: 'char-seller-arrange', ref: 'char-seller-hold', width: 0.34, drop: 20 },
 }
 
 function ArtKeeper({ a, cfg, active, cx, counter, sw, sh }: { a: Record<string, { w: number; h: number }>; cfg: NonNullable<(typeof ART_KEEPER)[PillarId]>; active: boolean; cx: number; counter: number; sw: number; sh: number }) {
@@ -59,7 +59,7 @@ function ArtKeeper({ a, cfg, active, cx, counter, sw, sh }: { a: Record<string, 
   const w = m.w * k, h = m.h * k
   return (
     <div style={{ position: 'absolute', left: cx * sw - w / 2, top: counter * sh - h + cfg.drop, width: w, height: h, clipPath: `inset(-60px -60px ${cfg.drop}px -60px)` }}>
-      <div key={String(active)} className={active ? 'anim-squash' : 'anim-bob'} style={{ width: '100%', height: '100%', transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+      <div className={active ? 'anim-float-fast' : 'anim-float'} style={{ width: '100%', height: '100%' }}>
         <img src={`/art/${name}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />
       </div>
     </div>

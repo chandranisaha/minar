@@ -113,3 +113,9 @@ html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }
 
 @keyframes pigeon-cross { 0% { transform: translate(-140px, 40px) } 100% { transform: translate(1140px, -90px) } }
 @keyframes flap { 0% { transform: scaleY(1) } 100% { transform: scaleY(.84) translateY(5px) } }
+
+/* painted characters float: a slow stepped hover, faster when the player is near */
+@keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+.anim-float { animation: float 2.4s steps(12) infinite; }
+.anim-float-fast { animation: float 1.2s steps(10) infinite; }
+@media (prefers-reduced-motion: reduce) { .anim-float, .anim-float-fast { animation: none !important; } }
