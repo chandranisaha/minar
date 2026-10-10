@@ -49,3 +49,16 @@ Text rendered inside the scene art (shop signs, OFFER! board) comes from `world.
 | `coach.*` | Tips, Dismiss All, Your Goal, Stay Happy, Progress, The Hub | Very short tooltip-style text; ensure the translation is punchy. |
 | `avatars.*`, `festivals.*` | Boy, Girl, Diwali, Eid, etc | Ensure cultural appropriateness and spelling for festival names. |
 
+## Festival Countdown (Pillar 1)
+
+Strings live in `src/games/festival/content/{en,hi,te}.json` (namespace `festival`). A test checks every key and `{{placeholder}}`
+exists in all three files, but not the wording. Please review especially:
+
+| Key | English | Concern |
+| --- | --- | --- |
+| `jars.*` | Needs, Gift, Fun, Spare | Telugu uses అవసరాలు / బహుమతి / సరదా / మిగులు; check these read naturally for money jars. |
+| `borrow.*` | "borrow from another jar" | Rendered as उधार लो / అప్పు తీసుకో; it means moving money between your own jars, so check it doesn't sound like a loan from a person. |
+| `ideas.*.name` | Opportunity cost, Emergency buffer, Comparison shopping | Plain phrases were used instead of textbook terms; confirm they land with students. |
+| `shops.*.hello`, `haggle.*` | Shopkeeper lines | Should sound like light, natural Hyderabadi bazaar talk in each language. |
+| `festivals.*.items` | Item names per festival | Check each festival's items with someone who celebrates it. |
+| `invites.*` | Friends' messages | Casual register ("bhai", "bro"); check it matches how 16-year-olds actually talk. |

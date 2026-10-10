@@ -223,7 +223,7 @@ describe('registry', () => {
       expect(e.placeholder).toBe(PLACEHOLDERS[id])
     }
   })
-  it('uses the real game where one exists (Festival Countdown, Pay Run, Case Files) and the placeholder where not yet', async () => {
+  it('uses the real game where one exists (Festival Countdown, Pocket Panic, Case Files) and the placeholder where not yet', async () => {
     expect(hasRealGame('plan')).toBe(true)
     expect(hasRealGame('save')).toBe(true)
     expect(hasRealGame('safe')).toBe(true)
@@ -231,7 +231,7 @@ describe('registry', () => {
   })
   it('each pillar maps to its own folder name', () => {
     expect(new Set(Object.values(GAME_FOLDERS)).size).toBe(4)
-    expect(GAME_FOLDERS).toEqual({ plan: 'festival', save: 'payrun', invest: 'dealboard', safe: 'casefiles' })
+    expect(GAME_FOLDERS).toEqual({ plan: 'festival', save: 'cafe', invest: 'dealboard', safe: 'casefiles' })
   })
   it('PILLAR_ORDER lists every pillar once', () => {
     expect([...PILLAR_ORDER].sort()).toEqual([...PILLAR_IDS].sort())

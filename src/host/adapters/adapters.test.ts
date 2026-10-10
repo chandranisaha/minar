@@ -272,3 +272,25 @@ describe('Case Files: Mohalla Detective', () => {
     expect(adaptCaseFiles({ status: 'in_progress', progress: 0.4 }).partial).toBe(0.4)
   })
 })
+
+describe('Pocket Panic (save)', () => {
+  const ev = { payFirst: true, track: true, small: true, emergency: true, plan: true, wait: true, goals: true, borrow: true, lend: true }
+  const cafe = (over: object = {}) => ({ game: 'cafe', cohortCode: '', seed: 's', score: { balance: 3, saved: 500, behaviours: 9, total: 9 }, evidence: ev, lessonsSeen: ['a'], minaretLit: true, ...over })
+  it('a full run is cleared with top quality and skills, and ignores play money', () => {
+    const r = ADAPTERS.save(cafe())
+    expect(r).toMatchObject({ pillar: 'save', cleared: true, quality: 1, partial: 1, lessonsSeen: ['a'] })
+    expect(r.skills).toEqual({ saving: 1, planning: 1, patience: 1 })
+  })
+  it('a weak run is not cleared and is partial', () => {
+    const r = ADAPTERS.save(cafe({ minaretLit: false, score: { balance: 0, saved: 0, behaviours: 3, total: 3 }, evidence: { payFirst: true } }))
+    expect(r.cleared).toBe(false)
+    expect(r.partial).toBeCloseTo(3 / 9)
+  })
+  it('a quit has no skills and keeps progress below 1', () => {
+    const r = ADAPTERS.save({ game: 'cafe', progress: 0.4 })
+    expect(r).toMatchObject({ cleared: false, partial: 0.4, skills: {} })
+  })
+  it('an old Pay Run payload still goes to the Pay Run adapter', () => {
+    expect(ADAPTERS.save({ game: 'payrun', goalReached: true, jar: 1800, goal: 1800, shifts: 8 }).cleared).toBe(true)
+  })
+})

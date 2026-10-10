@@ -57,3 +57,7 @@ The games position themselves with `absolute inset-0`. The host now gives the pl
 - **Pay Run reaching its goal** was covered by tests of the adapter (goal reached gives a cleared, full-quality result), not by playing a whole season.
 
 - `src/world/input.ts`: shim for Deal Board (re-exports useTouchUi from src/island).
+
+## Pocket Panic replaced Pay Run (Save & Manage)
+
+`src/games/cafe` (from origin/pocketpanic) is now the Save game: wrapper `src/host/wrappers/PocketPanicGame.tsx`, adapter `adapters/cafe.ts` (behaviours 0-9 give quality; no play money is read). It resumes its own saved month, so no seed is passed. Pay Run's files, wrapper and adapter are kept but unused; to bring it back, set `save` back to `payrun` / `PayRun` in `src/host/config.ts` and the registry wrapper. Merge choices: kept the shell's `package*.json` and `src/art/palette.ts` and the existing festival files; took Pocket Panic's `lib/gameResult.ts` (adds the 'cafe' id).

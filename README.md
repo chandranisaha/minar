@@ -25,7 +25,8 @@ npm run build      # type-check + production build into dist/
 npm run preview
 ```
 
-Routes: `/` hub, `/story` opening story (auto on first visit, replay from the HUD), `/play/:pillar` placeholder shell
+Routes: `/` hub, `/story` opening story (auto on first visit, replay from the HUD), `/play/plan` Festival Countdown (Pillar 1, see
+`src/games/festival/README.md`; `?demo` starts Demo mode), `/play/:pillar` placeholder shell for the other pillars
 (has a "Mark as complete" dev button), `/dashboard` stub, `/kit` art-kit review page.
 
 **Controls:** tap/click a place to walk there; drag to pan, pinch / wheel / +- to zoom. Keyboard: Tab to a place, Enter to walk.

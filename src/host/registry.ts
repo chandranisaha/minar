@@ -12,7 +12,7 @@ const ENTRY_FILES = import.meta.glob('/src/games/**/*.tsx')
 /** the wrappers that adapt those games to GameProps (loaded only when the game file exists) */
 const WRAPPERS: Partial<Record<PillarId, () => Promise<GameModule>>> = {
   plan: () => import('./wrappers/FestivalGame'),
-  save: () => import('./wrappers/PayRunGame'),
+  save: () => import('./wrappers/PocketPanicGame'),
   invest: () => import('./wrappers/DealBoardGame'),
   safe: () => import('./wrappers/CaseFilesGame'),
 }

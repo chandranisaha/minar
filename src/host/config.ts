@@ -7,7 +7,7 @@ import type { GameLevel } from './types'
  */
 export const GAME_FOLDERS: Record<PillarId, string> = {
   plan: 'festival',
-  save: 'payrun',
+  save: 'cafe',
   invest: 'dealboard',
   safe: 'casefiles',
 }
@@ -18,7 +18,7 @@ export const GAME_FOLDERS: Record<PillarId, string> = {
  */
 export const GAME_ENTRIES: Partial<Record<PillarId, { file: string }>> = {
   plan: { file: 'FestivalCountdown' },
-  save: { file: 'PayRun' },
+  save: { file: 'PocketPanic' },
   invest: { file: 'ui/DealBoard' },
   safe: { file: 'Pillar4' },
 }
