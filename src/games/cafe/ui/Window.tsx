@@ -143,7 +143,7 @@ export function WindowRound() {
   }
   return (
     <div className="flex flex-col gap-2">
-      {wave === 0 && resolved === 0 && <Caption text={t('window.hint')} />}
+      {wave === 0 && resolved === 0 && <Caption text={t('gauge.intro')} sub={t('window.hint')} />}
       {lines.length > 0 && <Caption text={lines[lines.length - 1]} />}
       {items.map((id, i) => (
         <Offer key={`${wave}-${id}`} id={id} slot={i as 0 | 1} onResolved={(l) => { setLines((x) => [...x, l]); setResolved((r) => r + 1) }} />

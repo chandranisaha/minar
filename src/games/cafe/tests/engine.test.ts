@@ -5,6 +5,7 @@ import {
   applyPayment, billAmount, buyWindow, chooseBigNight, chooseTeja, confirmPayday, declineWindow, newRun, openBigNight,
   payBill, paydayError, paymentError, rainBill, tejaAvailable, trolleyOk, trolleySkip,
 } from '../engine/economy'
+import { moodOf, moodStage } from '../engine/mood'
 import { popped, stageOf } from '../engine/pressure'
 import { nextMonth, settle, summarize } from '../engine/tally'
 import type { Run } from '../engine/types'
@@ -189,5 +190,21 @@ describe('months', () => {
     const m2 = newRun({ seed: 'S', goal: 'trip', month: 2, lastSurprise: 1 })
     expect(billAmount(m2, 'auto')).toBe(30)
     expect(newRun({ seed: 'S', goal: 'trip', month: 2, lastSurprise: 1 }).waves).toEqual(m2.waves)
+  })
+})
+
+describe('mood (display only)', () => {
+  test('treats, friends and kindness lift it; refusing wants and staying in wear it down; it never touches the money', () => {
+    const base = fresh()
+    expect(moodOf(base)).toBe(50)
+    const treat = buyWindow(base, 'gamepack', { spend: 50 }, 'get')
+    expect(moodOf(treat)).toBeGreaterThan(moodOf(base))
+    const refused = declineWindow(base, 'gamepack', 'pass')
+    expect(moodOf(refused)).toBeLessThan(moodOf(base))
+    const kind = chooseTeja(base, 'gift30')
+    expect(moodOf(kind)).toBeGreaterThan(moodOf(base))
+    expect(kind.jars.save).toBe(base.jars.save)
+    expect(moodStage(0)).toBe(0)
+    expect(moodStage(100)).toBe(4)
   })
 })

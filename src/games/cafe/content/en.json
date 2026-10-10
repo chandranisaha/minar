@@ -158,16 +158,59 @@
     "bottles": "Fun bottle: {{fun}}. Friends bottle: {{friends}}."
   },
   "items": {
-    "gamepack": { "name": "Game pack", "pitch": "New game pack! Only ₹50! All your friends have it!", "get": "Bought it! Hope you play it a lot.", "coolYes": "You still wanted it. Fair enough.", "coolNo": "You didn't really need it. Nice." },
-    "jacket": { "name": "Jacket", "pitch": "Sale ends today! Jacket for ₹200! Last one!", "get": "A jacket? It's still hot in Hyderabad!", "coolYes": "Still wanted it. Okay.", "coolNo": "He says 'today only' every day.", "pass": "He'll be back tomorrow with the same sale." },
-    "match": { "name": "Match ticket", "pitch": "Cricket match tonight! Few tickets left!", "get": "Enjoy the match!", "soldOut": "Sold out while you waited. Sometimes that happens.", "soldOutNo": "Sold out. You're fine with it." },
-    "cover": { "name": "Phone cover", "pitch": "Phone covers! Just ₹40!", "get": "A cover. Protects your phone.", "coolYes": "Thought about it and bought it. Smart.", "coolNo": "No cover. Hope you don't drop your phone." },
-    "chai": { "name": "Chai", "line": "Chai? Just ₹10." },
-    "samosa": { "name": "Samosa", "line": "Hot samosa, ₹20." },
-    "cold": { "name": "Cold drink", "line": "Cold drink, ₹20." },
-    "coins": { "name": "Game coins", "line": "Game coins, ₹30." },
-    "biscuit": { "name": "Biscuits", "line": "Biscuits, ₹10." },
-    "ice": { "name": "Ice cream", "line": "Ice cream, ₹30." }
+    "gamepack": {
+      "name": "Game pack",
+      "pitch": "New game pack! Only ₹50! All your friends have it!",
+      "get": "Bought it! Hope you play it a lot.",
+      "coolYes": "You still wanted it. Fair enough.",
+      "coolNo": "You didn't really need it. Nice."
+    },
+    "jacket": {
+      "name": "Jacket",
+      "pitch": "Sale ends today! Jacket for ₹200! Last one!",
+      "get": "A jacket? It's still hot in Hyderabad!",
+      "coolYes": "Still wanted it. Okay.",
+      "coolNo": "He says 'today only' every day.",
+      "pass": "He'll be back tomorrow with the same sale."
+    },
+    "match": {
+      "name": "Match ticket",
+      "pitch": "Cricket match tonight! Few tickets left!",
+      "get": "Enjoy the match!",
+      "soldOut": "Sold out while you waited. Sometimes that happens.",
+      "soldOutNo": "Sold out. You're fine with it."
+    },
+    "cover": {
+      "name": "Phone cover",
+      "pitch": "Phone covers! Just ₹40!",
+      "get": "A cover. Protects your phone.",
+      "coolYes": "Thought about it and bought it. Smart.",
+      "coolNo": "No cover. Hope you don't drop your phone."
+    },
+    "chai": {
+      "name": "Chai",
+      "line": "Chai? Just ₹10."
+    },
+    "samosa": {
+      "name": "Samosa",
+      "line": "Hot samosa, ₹20."
+    },
+    "cold": {
+      "name": "Cold drink",
+      "line": "Cold drink, ₹20."
+    },
+    "coins": {
+      "name": "Game coins",
+      "line": "Game coins, ₹30."
+    },
+    "biscuit": {
+      "name": "Biscuits",
+      "line": "Biscuits, ₹10."
+    },
+    "ice": {
+      "name": "Ice cream",
+      "line": "Ice cream, ₹30."
+    }
   },
   "trolley": {
     "l1": "Here comes Yusuf with his snack cart. Small things, cheap prices.",
@@ -201,9 +244,9 @@
     "fun": "FUN",
     "friends": "FRIENDS",
     "s0": "calm",
-    "s1": "a little fizzy",
+    "s1": "fizzy",
     "s2": "bubbling",
-    "s3": "about to pop",
+    "s3": "nearly full",
     "s4": "popped",
     "label": "{{bottle}} bottle: {{stage}}"
   },
@@ -347,13 +390,34 @@
     "nobody": "Everyone learns this by doing."
   },
   "arch": {
-    "fastmover": { "name": "The Fast Mover", "line": "You acted fast in trouble. Speed cost you extra, but you knew it." },
-    "openhand": { "name": "The Kind Friend", "line": "You helped your friend first. Kind! Just watch the timing next time." },
-    "windowwaiter": { "name": "The Thinker", "line": "You waited before buying. Some you kept, some you skipped. Great habit." },
-    "quietholder": { "name": "The Saver", "line": "You said no all month. It worked, but you missed out on fun." },
-    "shelffirst": { "name": "The Planner", "line": "You saved first and lived on the rest. That's the smart way." },
-    "doorwatcher": { "name": "The Ready One", "line": "You kept emergency money. The surprise came, and you were ready." },
-    "evenkeeper": { "name": "The Balancer", "line": "A bit of everything. Play again to find your style." }
+    "fastmover": {
+      "name": "The Fast Mover",
+      "line": "You acted fast in trouble. Speed cost you extra, but you knew it."
+    },
+    "openhand": {
+      "name": "The Kind Friend",
+      "line": "You helped your friend first. Kind! Just watch the timing next time."
+    },
+    "windowwaiter": {
+      "name": "The Thinker",
+      "line": "You waited before buying. Some you kept, some you skipped. Great habit."
+    },
+    "quietholder": {
+      "name": "The Saver",
+      "line": "You said no all month. It worked, but you missed out on fun."
+    },
+    "shelffirst": {
+      "name": "The Planner",
+      "line": "You saved first and lived on the rest. That's the smart way."
+    },
+    "doorwatcher": {
+      "name": "The Ready One",
+      "line": "You kept emergency money. The surprise came, and you were ready."
+    },
+    "evenkeeper": {
+      "name": "The Balancer",
+      "line": "A bit of everything. Play again to find your style."
+    }
   },
   "note": {
     "counted": "Counted carefully.",
@@ -375,12 +439,31 @@
   "ledger": {
     "income": "Got ₹{{x}} from Ammamma",
     "split": "Save ₹{{s}}, Emergency ₹{{e}}, Spend ₹{{p}}",
-    "bill": { "auto": "Auto fare ₹{{x}}, from {{from}}", "data": "Phone recharge ₹{{x}}, from {{from}}", "lunch": "Exam lunch ₹{{x}}, from {{from}}" },
+    "bill": {
+      "auto": "Auto fare ₹{{x}}, from {{from}}",
+      "data": "Phone recharge ₹{{x}}, from {{from}}",
+      "lunch": "Exam lunch ₹{{x}}, from {{from}}"
+    },
     "bought": "{{item}}: ₹{{x}}",
     "dropped": "{{item}}: skipped (saved ₹{{x}})",
-    "bignight": { "go": "Big Night: ₹{{x}}", "half": "Big Night (short): ₹{{x}}", "stay": "Big Night: stayed home" },
-    "teja": { "lend100": "Lent Teja ₹{{x}}", "lend50": "Lent Teja ₹{{x}}", "gift30": "Gave Teja ₹{{x}}", "no": "Said no to Teja" },
-    "rain": { "1": "Phone repair ₹{{x}}, from {{from}}", "2": "New tyre ₹{{x}}, from {{from}}", "3": "Lab fee ₹{{x}}, from {{from}}", "4": "Wedding gift and autos ₹{{x}}, from {{from}}", "5": "Doctor and medicine ₹{{x}}, from {{from}}" },
+    "bignight": {
+      "go": "Big Night: ₹{{x}}",
+      "half": "Big Night (short): ₹{{x}}",
+      "stay": "Big Night: stayed home"
+    },
+    "teja": {
+      "lend100": "Lent Teja ₹{{x}}",
+      "lend50": "Lent Teja ₹{{x}}",
+      "gift30": "Gave Teja ₹{{x}}",
+      "no": "Said no to Teja"
+    },
+    "rain": {
+      "1": "Phone repair ₹{{x}}, from {{from}}",
+      "2": "New tyre ₹{{x}}, from {{from}}",
+      "3": "Lab fee ₹{{x}}, from {{from}}",
+      "4": "Wedding gift and autos ₹{{x}}, from {{from}}",
+      "5": "Doctor and medicine ₹{{x}}, from {{from}}"
+    },
     "day": "Day {{d}}"
   },
   "cb": {
@@ -396,14 +479,120 @@
     "saidIdk": "You said no idea. Now you know: surprises happen."
   },
   "cards": {
-    "borrow": { "name": "Loans cost extra", "quick": { "a": "You borrowed ₹{{b}} and paid back ₹{{r}}. That's ₹{{e}} extra, about {{pct}}% in days.", "b": "Fast loans are expensive. Emergency money costs nothing extra.", "c": "Before borrowing, check how much you pay back." } },
-    "emergency": { "name": "Emergency money", "covered": { "a": "Your Emergency jar paid ₹{{c}} of the ₹{{b}} bill.", "b": "With backup money, a surprise is just a small problem, not a debt.", "c": "Put even ₹20 a month aside for surprises." }, "notCovered": { "a": "The ₹{{b}} bill came out of your other jars.", "b": "Without backup money, surprises eat your goal or need a loan.", "c": "Next payday, put some money in Emergency first. Even ₹50 helps." } },
-    "needs": { "name": "Needs vs wants", "went": { "a": "You kept saying no, then spent big on Big Night.", "b": "Saying no again and again can lead to one big spend. Small treats can be cheaper.", "c": "Plan a small amount each month for something fun." }, "stayed": { "a": "You stayed home and kept your money. But you still want to go.", "b": "Saying no is fine. Just notice when it's getting hard.", "c": "Pick one thing you're skipping, and plan when you'll say yes." }, "none": { "a": "Your bills were ₹80. Your wants were ₹{{w}}.", "b": "Bills must be paid. Wants are a choice. Know the difference.", "c": "List next month's bills first. Plan the rest after." } },
-    "small": { "name": "Small spends add up", "low": { "a": "Snacks cost ₹{{x}}, more than you guessed.", "b": "Small amounts feel tiny, so we don't count them.", "c": "Pick one daily snack. Add up what it costs in a month." }, "ok": { "a": "You kept snacks to ₹{{x}}.", "b": "Noticing small spends keeps them small.", "c": "Ask yourself about one small spend: is it worth it?" } },
-    "wait": { "name": "Wait before you buy", "dropped": { "a": "You waited on {{m}} things. Skipped {{d}}, saved ₹{{x}}.", "b": "Waiting shows if you really want it, or just want it now.", "c": "Wait one night before buying anything over ₹100." }, "still": { "a": "You waited on {{m}} things and still bought {{y}}.", "b": "That's a real choice, not an impulse.", "c": "Keep waiting before you buy. You'll learn what you really want." }, "never": { "a": "You decided right away every time.", "b": "Sellers say 'today only' so you don't stop and think.", "c": "Next time, wait one night before buying." } },
-    "lend": { "name": "Lending to friends", "lent": { "a": "Teja still had your ₹{{l}} when the surprise came.", "b": "Lent money isn't yours until it's back. Friends can be late.", "c": "Only lend what you can live without for a while." }, "gift": { "a": "You gave ₹30 as a gift.", "b": "A small gift is simple. Nobody has to remember to pay back.", "c": "If you need it back, give less and call it a gift." }, "no": { "a": "You said no nicely.", "b": "A kind no protects both your friendship and your money.", "c": "Keep this ready: 'Can't this month. Next chai's on me.'" } },
-    "goals": { "name": "Goals and choices", "reached": { "a": "You saved ₹250, spent ₹{{x}} on fun and snacks, and kept ₹{{y}} for emergencies.", "b": "Money can go many places. A goal helps you choose.", "c": "Pick your next goal and set a date." }, "short": { "a": "You were ₹{{x}} short.", "b": "Other things took your goal money. Knowing what is the first step.", "c": "Find what took the most, and set a limit for it." } },
-    "payFirst": { "name": "Save first", "big": { "a": "You saved ₹{{s}} before spending anything.", "b": "Money you save first is safe from small spends later.", "c": "When you get money, save a fixed amount before spending." }, "small": { "a": "You saved ₹{{s}} before spending.", "b": "What you save first, you keep. What's left for later gets spent.", "c": "Decide how much to save before the money comes." } }
+    "borrow": {
+      "name": "Loans cost extra",
+      "quick": {
+        "a": "You borrowed ₹{{b}} and paid back ₹{{r}}. That's ₹{{e}} extra, about {{pct}}% in days.",
+        "b": "Fast loans are expensive. Emergency money costs nothing extra.",
+        "c": "Before borrowing, check how much you pay back."
+      }
+    },
+    "emergency": {
+      "name": "Emergency money",
+      "covered": {
+        "a": "Your Emergency jar paid ₹{{c}} of the ₹{{b}} bill.",
+        "b": "With backup money, a surprise is just a small problem, not a debt.",
+        "c": "Put even ₹20 a month aside for surprises."
+      },
+      "notCovered": {
+        "a": "The ₹{{b}} bill came out of your other jars.",
+        "b": "Without backup money, surprises eat your goal or need a loan.",
+        "c": "Next payday, put some money in Emergency first. Even ₹50 helps."
+      }
+    },
+    "needs": {
+      "name": "Needs vs wants",
+      "went": {
+        "a": "You kept saying no, then spent big on Big Night.",
+        "b": "Saying no again and again can lead to one big spend. Small treats can be cheaper.",
+        "c": "Plan a small amount each month for something fun."
+      },
+      "stayed": {
+        "a": "You stayed home and kept your money. But you still want to go.",
+        "b": "Saying no is fine. Just notice when it's getting hard.",
+        "c": "Pick one thing you're skipping, and plan when you'll say yes."
+      },
+      "none": {
+        "a": "Your bills were ₹80. Your wants were ₹{{w}}.",
+        "b": "Bills must be paid. Wants are a choice. Know the difference.",
+        "c": "List next month's bills first. Plan the rest after."
+      }
+    },
+    "small": {
+      "name": "Small spends add up",
+      "low": {
+        "a": "Snacks cost ₹{{x}}, more than you guessed.",
+        "b": "Small amounts feel tiny, so we don't count them.",
+        "c": "Pick one daily snack. Add up what it costs in a month."
+      },
+      "ok": {
+        "a": "You kept snacks to ₹{{x}}.",
+        "b": "Noticing small spends keeps them small.",
+        "c": "Ask yourself about one small spend: is it worth it?"
+      }
+    },
+    "wait": {
+      "name": "Wait before you buy",
+      "dropped": {
+        "a": "You waited on {{m}} things. Skipped {{d}}, saved ₹{{x}}.",
+        "b": "Waiting shows if you really want it, or just want it now.",
+        "c": "Wait one night before buying anything over ₹100."
+      },
+      "still": {
+        "a": "You waited on {{m}} things and still bought {{y}}.",
+        "b": "That's a real choice, not an impulse.",
+        "c": "Keep waiting before you buy. You'll learn what you really want."
+      },
+      "never": {
+        "a": "You decided right away every time.",
+        "b": "Sellers say 'today only' so you don't stop and think.",
+        "c": "Next time, wait one night before buying."
+      }
+    },
+    "lend": {
+      "name": "Lending to friends",
+      "lent": {
+        "a": "Teja still had your ₹{{l}} when the surprise came.",
+        "b": "Lent money isn't yours until it's back. Friends can be late.",
+        "c": "Only lend what you can live without for a while."
+      },
+      "gift": {
+        "a": "You gave ₹30 as a gift.",
+        "b": "A small gift is simple. Nobody has to remember to pay back.",
+        "c": "If you need it back, give less and call it a gift."
+      },
+      "no": {
+        "a": "You said no nicely.",
+        "b": "A kind no protects both your friendship and your money.",
+        "c": "Keep this ready: 'Can't this month. Next chai's on me.'"
+      }
+    },
+    "goals": {
+      "name": "Goals and choices",
+      "reached": {
+        "a": "You saved ₹250, spent ₹{{x}} on fun and snacks, and kept ₹{{y}} for emergencies.",
+        "b": "Money can go many places. A goal helps you choose.",
+        "c": "Pick your next goal and set a date."
+      },
+      "short": {
+        "a": "You were ₹{{x}} short.",
+        "b": "Other things took your goal money. Knowing what is the first step.",
+        "c": "Find what took the most, and set a limit for it."
+      }
+    },
+    "payFirst": {
+      "name": "Save first",
+      "big": {
+        "a": "You saved ₹{{s}} before spending anything.",
+        "b": "Money you save first is safe from small spends later.",
+        "c": "When you get money, save a fixed amount before spending."
+      },
+      "small": {
+        "a": "You saved ₹{{s}} before spending.",
+        "b": "What you save first, you keep. What's left for later gets spent.",
+        "c": "Decide how much to save before the money comes."
+      }
+    }
   },
   "chit": {
     "quick": "This week: put ₹20 aside for emergencies.",
@@ -452,5 +641,29 @@
     "tejaEpilogue1": "Teja said Friday. Friday hasn't come yet.",
     "tejaEpilogue2": "Friday came. Teja paid back ₹{{x}} and bought you chai."
   },
-  "pred3": { "150": "₹150", "175": "₹175", "200": "₹200", "250": "₹250" }
+  "pred3": {
+    "150": "₹150",
+    "175": "₹175",
+    "200": "₹200",
+    "250": "₹250"
+  },
+  "gauge": {
+    "title": "How things feel",
+    "wants": "Wants",
+    "friends": "Friends",
+    "mood": "Mood",
+    "help": "What are these?",
+    "close": "Got it",
+    "why1": "Every time you say no to something you want, that bottle gets a bit fizzier. It's not a number to manage. It's just how much you're holding back.",
+    "why2": "Say yes to something and it settles. If a bottle gets full it pops, and you get the Big Night.",
+    "why3": "The wants bottle is games, clothes and treats. The friends bottle is matches, outings and dinners.",
+    "why4": "Mood goes up with treats you chose, time with friends and being kind. It goes down when you say no to everything. It doesn't change your money.",
+    "m0": "low",
+    "m1": "so-so",
+    "m2": "okay",
+    "m3": "good",
+    "m4": "great",
+    "intro": "See the two bottles up top? Every no to a want makes them fizzier. Yes lets them settle.",
+    "tag": "Pressure: how much you're holding back"
+  }
 }

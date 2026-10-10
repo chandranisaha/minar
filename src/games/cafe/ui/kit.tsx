@@ -5,6 +5,8 @@ import { paid, paymentError, paymentTotal, startingPayment } from '../engine/eco
 import { dayOf, phaseOf, type Step } from '../engine/flow'
 import type { Payment, Run, Source } from '../engine/types'
 import { useGame } from '../../../store/game'
+import { moodOf, moodStage } from '../engine/mood'
+import { stageOf } from '../engine/pressure'
 import { useStage } from '../state/stage'
 import { useCafe } from '../state/store'
 import { playerFace } from './Scene'
@@ -152,6 +154,62 @@ export function SourcePicker({ run, amount, quick = false, onPay, onCancel, titl
 
 /* ------------------------------------------------------------------ HUD: goal card, Month bar, ledger, pause */
 
+/** the pressure and mood gauges: two ramune bottles (five painted stages each, never a number) and a mood bar */
+function Gauges({ run }: { run: Run }) {
+  const { t, stage } = useCt()
+  const [open, setOpen] = useState(false)
+  const focus = useStage((s) => s.focus)
+  const m = moodOf(run)
+  const ms = moodStage(m)
+  const face = ['😞', '😕', '😐', '🙂', '😄'][ms]
+  const bottle = (kind: 'fun' | 'friends', label: string) => {
+    const v = run.fizz[kind]
+    const s = stageOf(v)
+    return (
+      <div className={`cafe-gauge ${focus === 'bottle' ? 'is-hot' : ''}`} key={kind}>
+        <img src={`/art/cafe/bottle-${kind}-${s}.webp`} alt="" className={`cafe-gauge-bottle ${s >= 3 ? 'is-fizzing' : ''}`} draggable={false} />
+        <div className="min-w-0 flex-1">
+          <div className="cafe-gauge-label">{label}<span>{stage(v)}</span></div>
+          <div className="cafe-gauge-bar" role="img" aria-label={`${label}: ${stage(v)}`}>
+            {[0, 1, 2, 3, 4].map((i) => <i key={i} className={i <= s && (s > 0 || i === 0) ? `on s${s}` : ''} />)}
+          </div>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <>
+      <div className="cafe-gauges">
+        {bottle('fun', t('gauge.wants'))}
+        {bottle('friends', t('gauge.friends'))}
+        <div className="cafe-gauge">
+          <span className="cafe-gauge-face" aria-hidden>{face}</span>
+          <div className="min-w-0 flex-1">
+            <div className="cafe-gauge-label">{t('gauge.mood')}<span>{t(`gauge.m${ms}`)}</span></div>
+            <div className="cafe-gauge-bar is-mood" role="img" aria-label={`${t('gauge.mood')}: ${t(`gauge.m${ms}`)}`}><b style={{ width: `${Math.max(6, m)}%` }} /></div>
+          </div>
+        </div>
+        <button type="button" className="cafe-gauge-help" aria-label={t('gauge.help')} onClick={() => setOpen(true)}>?</button>
+      </div>
+      {open && (
+        <div className="cafe-sheet" role="dialog" aria-label={t('gauge.title')} onClick={() => setOpen(false)}>
+          <div className="paper w-[min(92vw,440px)] p-4" onClick={(e) => e.stopPropagation()}>
+            <div className="font-display text-[22px]">{t('gauge.title')}</div>
+            <div className="my-2 flex items-center justify-center gap-2">
+              {[0, 1, 2, 3, 4].map((i) => <img key={i} src={`/art/cafe/bottle-fun-${i}.webp`} alt="" className="h-14 w-auto" draggable={false} />)}
+            </div>
+            <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why1')}</p>
+            <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why2')}</p>
+            <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why3')}</p>
+            <p className="my-1.5 text-[14.5px] leading-snug">{t('gauge.why4')}</p>
+            <div className="mt-2 flex justify-end"><Btn onClick={() => setOpen(false)}>{t('gauge.close')}</Btn></div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function Hud({ step, run }: { step: Step; run: Run }) {
   const { t } = useCt()
   const setLedgerOpen = useCafe((s) => s.setLedgerOpen)
@@ -160,6 +218,7 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
   const day = dayOf(step)
   const phase = phaseOf(step)
   const pct = Math.min(1, run.jars.save / GOAL)
+  const showGauges = ['window', 'bill:data', 'trolley', 'predict2', 'plates', 'worth', 'bignight', 'teja', 'bill:lunch', 'rain', 'pay', 'tally'].includes(step)
   const chip = (k: 'spend' | 'save' | 'emergency', icon: string) => (
     <span className={`cafe-jarchip ${focus === k ? 'is-hot' : focus ? 'is-dim' : ''}`}>
       <img src={`/art/cafe/${icon}.webp`} alt="" className="h-5 w-5 object-contain" draggable={false} /><small>{t(`jars.${k}`)}</small>₹{run.jars[k]}
@@ -192,6 +251,7 @@ export function Hud({ step, run }: { step: Step; run: Run }) {
       {step !== 'payday' && (
         <div className="cafe-jars">{chip('spend', 'tumbler')}{chip('save', 'gullak')}{chip('emergency', 'umbrella-closed')}</div>
       )}
+      {showGauges && <Gauges run={run} />}
     </div>
   )
 }

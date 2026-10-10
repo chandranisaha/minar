@@ -203,3 +203,27 @@ html[data-lite='true'] .cafe *, .cafe .is-lite * { animation: none !important; }
 @keyframes cafe-swapk { from { opacity: 0; transform: translateY(4px) scale(.97) } to { opacity: 1; transform: none } }
 .cafe-bob { animation: cafe-bob 1.6s ease-in-out infinite; transform-box: fill-box; }
 .cafe-say.is-note { background-image: url(/art/cafe/scroll.webp); background-size: 100% 100%; }
+
+/* ---- pressure and mood gauges ---- */
+.cafe-gauges { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cafe-gauge { display: flex; align-items: center; gap: 5px; flex: 1 1 108px; min-width: 0; padding: 3px 8px 3px 4px; border-radius: 12px; background: rgba(251, 240, 210, .94); border: 1.5px solid #3A2A24; transition: box-shadow .25s, transform .25s; }
+.cafe-gauge.is-hot { box-shadow: 0 0 0 3px #FFE9A8; transform: scale(1.04); }
+.cafe-gauge-bottle { height: 34px; width: auto; flex: none; }
+.cafe-gauge-bottle.is-fizzing { animation: cafe-rattle .5s steps(2) infinite; }
+.cafe-gauge-face { flex: none; width: 28px; text-align: center; font-size: 22px; line-height: 1; }
+.cafe-gauge-label { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: #3A2A24; }
+.cafe-gauge-label span { font-weight: 700; text-transform: none; opacity: .7; letter-spacing: 0; }
+.cafe-gauge-bar { display: flex; gap: 2px; height: 8px; margin-top: 2px; }
+.cafe-gauge-bar i { flex: 1; border-radius: 2px; background: rgba(58, 42, 36, .18); transition: background .3s; }
+.cafe-gauge-bar i.on { background: #E8B04A; }
+.cafe-gauge-bar i.on.s2 { background: #E8862F; }
+.cafe-gauge-bar i.on.s3, .cafe-gauge-bar i.on.s4 { background: #D8503A; }
+.cafe-gauge-bar.is-mood { display: block; border-radius: 4px; background: rgba(58, 42, 36, .18); overflow: hidden; }
+.cafe-gauge-bar.is-mood b { display: block; height: 100%; background: linear-gradient(90deg, #E86C4A, #F0C14B 50%, #6BBF6A); background-size: 300px 100%; transition: width .5s ease; }
+.cafe-gauge-help { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid #3A2A24; background: #FBF0D2; font-weight: 900; font-size: 15px; cursor: pointer; }
+.cafe-gauge-label span { white-space: nowrap; font-size: 10.5px; }
+.cafe-gauge { flex: 1 1 84px; }
+.cafe-gauge-help { margin-left: auto; }
+.cafe-gauges { flex-wrap: nowrap; }
+@media (max-width: 520px) { .cafe-gauges { flex-wrap: wrap; } .cafe-gauge { flex-basis: 30%; } .cafe-gauge-help { position: absolute; right: 12px; bottom: 6px; } .cafe-hud { position: relative; } }
+@media (max-width: 520px) { .cafe-gauges { flex-wrap: nowrap; padding-right: 0; } .cafe-gauge { flex: 1 1 0; } .cafe-gauge-help { position: static; margin-left: 0; width: 28px; height: 28px; } .cafe-gauge-bottle { height: 30px; } .cafe-gauge-label { font-size: 10px; } .cafe-gauge-label span { display: none; } }
