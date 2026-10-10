@@ -38,6 +38,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
   const run = useCafe((s) => s.run)
   const restart = useCafe((s) => s.restart)
   const stage = useStage()
+  const { t } = useCt()
   const lite = useLite()
   const slow = useCafe((s) => s.slow)
   const gender = useGame((s) => s.gender)
@@ -103,6 +104,11 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
             {step !== 'entry' && <Foot />}
           </div>
         </div>
+      </div>
+      <div className="cafe-rotate" role="alert">
+        <svg viewBox="0 0 80 80" className="cafe-rotate-icon" aria-hidden><rect x="26" y="8" width="28" height="56" rx="5" fill="#FBF0D2" stroke="#3A2A24" strokeWidth="3" /><circle cx="40" cy="57" r="2.5" fill="#3A2A24" /></svg>
+        <div className="font-display text-[22px]">{t('hud.rotate')}</div>
+        <div className="text-[14px] opacity-80">{t('hud.rotateSub')}</div>
       </div>
       <PhaseCard step={step} month={run.month} />
       <Ledger />

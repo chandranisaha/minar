@@ -9,6 +9,16 @@ import { Letter } from './Letter'
 import { GOAL_ART } from './Scene'
 import { useCt } from './text'
 
+/** best effort: Android Chrome lets a fullscreen page lock to landscape; everywhere else the rotate screen does the job */
+async function lockLandscape() {
+  try {
+    if (window.matchMedia('(max-width: 700px)').matches) {
+      await document.documentElement.requestFullscreen?.()
+      await (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.('landscape')
+    }
+  } catch { /* not supported: the rotate screen covers it */ }
+}
+
 /** Entry card: names the café, what the player will learn, and the guardrails. */
 export function Entry({ onExit }: { onExit: () => void }) {
   const { t } = useCt()
@@ -28,7 +38,7 @@ export function Entry({ onExit }: { onExit: () => void }) {
       <p className="m-0 text-[11.5px] opacity-70">{t('entry.privacy')} {t('hud.notFinancialAdvice')}</p>
       <div className="flex justify-center gap-2">
         <Btn kind="cream" onClick={onExit}>◂ {t('hud.quit')}</Btn>
-        <Btn onClick={next}>{t('entry.start')} ▸</Btn>
+        <Btn onClick={() => { void lockLandscape(); next() }}>{t('entry.start')} ▸</Btn>
       </div>
     </div>
   )

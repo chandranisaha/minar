@@ -32,7 +32,9 @@
     "notFinancialAdvice": "Not financial advice.",
     "ledgerEmpty": "Nothing written yet.",
     "you": "You",
-    "tapToContinue": "Tap to continue"
+    "tapToContinue": "Tap to continue",
+    "rotate": "Turn your phone sideways to play",
+    "rotateSub": "The café needs the wide view."
   },
   "jars": {
     "spend": "Spend",

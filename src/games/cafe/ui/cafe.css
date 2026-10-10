@@ -313,3 +313,35 @@ html[data-lite='true'] .cafe *, .cafe .is-lite * { animation: none !important; }
   100% { transform: none }
 }
 .cafe-letter-take { animation-delay: 3.7s !important; }
+
+/* ---- phones play in landscape ---- */
+.cafe-rotate { display: none; }
+@media (orientation: portrait) and (max-width: 700px) {
+  .cafe-rotate { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; background: #1E150E; color: #FBF0D2; }
+  .cafe-rotate-icon { width: 92px; height: 92px; animation: cafe-turn 2.4s ease-in-out infinite; }
+}
+@keyframes cafe-turn { 0%, 25% { transform: rotate(0) } 55%, 100% { transform: rotate(-90deg) } }
+/* short landscape screens: squeeze the top bar so the picture and the dialogue keep their room */
+@media (max-height: 520px) and (orientation: landscape) {
+  .cafe-hud { padding: 4px 8px; gap: 3px; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .cafe-hud-row { flex: 1 1 60%; gap: 6px; }
+  .cafe-hud-row .ink-chip { padding: 2px 8px; }
+  .cafe-jars, .cafe-gauges { gap: 4px; flex-wrap: nowrap; }
+  .cafe-jarchip { padding: 1px 7px 1px 4px; font-size: 11px; }
+  .cafe-jarchip small { display: none; }
+  .cafe-gauge { padding: 1px 6px 1px 3px; flex: 1 1 0; }
+  .cafe-gauge-bottle { height: 24px; }
+  .cafe-gauge-label { font-size: 9.5px; }
+  .cafe-gauge-label span:not(.cafe-star) { display: none; }
+  .cafe-gauge-bar { height: 5px; }
+  .cafe-gauge-help { width: 22px; height: 22px; font-size: 12px; }
+  .cafe-stake { display: none; }
+  .cafe-main, .cafe-main[data-busy] { --sw: 56%; --dl: 56%; --dw: 44%; }
+  .cafe-dock-inner { padding: 8px 12px 6px !important; }
+  .cafe-say { padding: 6px 8px; gap: 7px; }
+  .cafe-say-face { width: 36px; height: 36px; }
+  .cafe-say-text { font-size: 14px; }
+  .cafe-foot { display: none; }
+  .cafe .ink-btn { min-height: 38px; font-size: 13.5px; }
+  .cafe-offer, .cafe-card, .cafe-src { padding: 6px 8px; }
+}
