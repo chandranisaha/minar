@@ -67,42 +67,45 @@ export function Ask({ q, opts, value, onPick, onLock, go, note }: { q: string; o
  * The two cash lines, as a table so every number has text (a negative is "Short", never just a colour).
  * The certain line is what the cushion is measured on.
  */
+/** The money path: how much money is left in the kitty after each date's bills, as bars, with what "spare money" means. */
 export function CashLinesTable({ lines }: { lines: CashLines }) {
   const { t, money, when } = useSd()
-  // a negative is the amount plus the word "Short" and an arrow, so colour is never the only signal
-  const cell = (n: number) => (
-    <span style={{ color: n < 0 ? '#7A2A22' : undefined }}>
-      <span className="block whitespace-nowrap">{money(n)}</span>
-      {n < 0 && <span className="block text-[11px] font-extrabold">▼ {t('lines.short')}</span>}
-    </span>
-  )
+  const top = Math.max(1, ...POINTS.flatMap((p) => [lines.optimistic[p], lines.cautious[p]]))
+  const lowest = (['W1', 'W2', 'W3'] as const).reduce((a, p) => (lines.cautious[p] < lines.cautious[a] ? p : a), 'W1' as Point)
+  const short = lines.cushion < 0
   return (
-    <div className="flex flex-col gap-1.5">
-      <table className="w-full table-fixed border-collapse text-[13px]">
-        <caption className="sr-only">{t('lines.title')}</caption>
-        <thead>
-          <tr className="text-left text-[11px]">
-            <th scope="col" className="w-[28%] py-1 align-bottom">{t('lines.date')}</th>
-            <th scope="col" className="w-[36%] py-1 pl-1 text-right align-bottom leading-tight">{t('lines.optimistic')}</th>
-            <th scope="col" className="w-[36%] py-1 pl-1 text-right align-bottom leading-tight">{t('lines.cautious')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {POINTS.map((p) => (
-            <tr key={p} className="border-t-2 border-dashed border-[#D9A86A] font-bold">
-              <th scope="row" className="py-1.5 text-left font-extrabold">{when(p)}</th>
-              <td className="py-1.5 text-right">{cell(lines.optimistic[p])}</td>
-              <td className="py-1.5 text-right">{cell(lines.cautious[p])}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="m-0 text-[12px] font-bold opacity-80">{t('lines.note')}</p>
-      <p className="m-0 text-[12px] font-bold opacity-80">{t('lines.fd')}</p>
-      <div className="ink-chip px-3 py-1.5" style={{ background: lines.cushion < 0 ? '#F7C9C0' : '#E6F2DF' }}>
-        <div className="text-[14px] font-extrabold">{lines.cushion < 0 ? '▼ ' : ''}{t('lines.cushion', { money: money(lines.cushion) })}</div>
-        <div className="text-[12px] font-bold opacity-80">{t('lines.cushionNote')}</div>
+    <div className="flex flex-col gap-2">
+      <h2 className="font-sign lang-fit m-0 text-[15px]">{t('lines.title')}</h2>
+      <p className="m-0 text-[13px] font-bold leading-snug">{t('lines.intro')}</p>
+      <ul className="m-0 flex list-none flex-col gap-2 p-0" aria-label={t('lines.title')}>
+        {POINTS.map((p) => {
+          const sure = lines.cautious[p]
+          const all = lines.optimistic[p]
+          return (
+            <li key={p}>
+              <div className="flex items-baseline justify-between text-[13px] font-extrabold">
+                <span>{when(p)}</span>
+                <span style={{ color: sure < 0 ? '#7A2A22' : undefined }}>{sure < 0 ? `▼ ${t('lines.shortBy', { money: money(-sure) })}` : t('lines.sure', { money: money(sure) })}</span>
+              </div>
+              <div className="relative h-5 overflow-hidden rounded-md border-2 border-ink" style={{ background: '#FFF8E6' }} aria-hidden>
+                <div className="absolute inset-y-0 left-0" style={{ width: `${(Math.max(all, 0) / top) * 100}%`, background: 'repeating-linear-gradient(45deg,#F3D58A,#F3D58A 5px,#FFF1C4 5px,#FFF1C4 10px)' }} />
+                <div className="absolute inset-y-0 left-0" style={{ width: `${(Math.max(sure, 0) / top) * 100}%`, background: '#3F7A3A' }} />
+                {sure < 0 && <div className="absolute inset-0 grid place-items-center text-[11px] font-extrabold" style={{ background: '#F7C9C0', color: '#7A2A22' }}>{t('lines.short')}</div>}
+              </div>
+              {all > sure && <div className="text-right text-[11px] font-bold opacity-80">{t('lines.promised', { money: money(all) })}</div>}
+            </li>
+          )
+        })}
+      </ul>
+      <p className="m-0 flex flex-wrap gap-x-3 text-[11px] font-bold">
+        <span><span aria-hidden style={{ color: '#3F7A3A' }}>■</span> {t('lines.keySure')}</span>
+        <span><span aria-hidden style={{ color: '#E8B04A' }}>▨</span> {t('lines.keyPromised')}</span>
+      </p>
+      <div className="rounded-xl border-[3px] border-ink px-3 py-2" style={{ background: short ? '#F7C9C0' : '#E6F2DF' }}>
+        <div className="text-[15px] font-extrabold">{short ? '▼ ' + t('lines.verdictShort', { when: when(lowest), money: money(-lines.cushion) }) : t('lines.verdictOk', { money: money(lines.cushion) })}</div>
+        <div className="mt-0.5 text-[12px] font-bold leading-snug">{short ? t('lines.explainShort') : t('lines.explainOk', { when: when(lowest) })}</div>
       </div>
+      <p className="m-0 text-[11px] font-bold opacity-80">{t('lines.note')}</p>
     </div>
   )
 }

@@ -95,14 +95,19 @@ function ItemSheet({ id, onClose, onSigned }: { id: string; onClose: () => void;
                 🤝 {deal.haggles >= maxHaggles(id) ? t('sheet.best') : m.actionsLeft <= 0 ? t('sheet.noActions') : t('sheet.haggleTo', { price: money(nextPrice) })}
               </button>
             ) : <p className="m-0 text-center text-[13px] font-bold opacity-80">{t('sheet.daamfix')}</p>}
+            {def.ladder.length > 1 && <p className="m-0 text-[12px] font-bold opacity-80">{t('sheet.haggleHelp')}</p>}
             {canPayLater(id) && (
               <button type="button" className="ink-btn cream" disabled={deal.late || m.actionsLeft <= 0} style={{ opacity: deal.late || m.actionsLeft <= 0 ? 0.6 : 1 }} aria-pressed={deal.late} onClick={() => decide({ k: 'payLater', item: id })}>
                 🗓 {deal.late ? t('sheet.payLaterOn') : t('sheet.payLater')}
               </button>
             )}
+            {canPayLater(id) && (
+              <p className="m-0 text-[12px] font-bold opacity-80">{t('sheet.payLaterHelp')}</p>
+            )}
             {id === 'basic' && !m.readBasic && (
               <button type="button" className="ink-btn cream" disabled={m.actionsLeft <= 0} style={{ opacity: m.actionsLeft <= 0 ? 0.6 : 1 }} onClick={() => decide({ k: 'read', item: 'basic' })}>🔍 {t('sheet.read')}</button>
             )}
+            {id === 'basic' && !m.readBasic && <p className="m-0 text-[12px] font-bold opacity-80">{t('sheet.readHelp')}</p>}
             {id === 'basic' && m.readBasic && <p className="m-0 text-[13px] font-extrabold">🔍 {t('sheet.fine', { amount: money(def.addon!), when: when(def.addonAt!) })}</p>}
           </div>
         )}
@@ -256,7 +261,6 @@ export function Market() {
       </section>
 
       <section className="paper p-3">
-        <h2 className="font-sign lang-fit m-0 mb-1 text-[15px]">{t('market.lines')}</h2>
         <CashLinesTable lines={lines} />
       </section>
 

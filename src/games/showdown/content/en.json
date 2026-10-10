@@ -256,7 +256,10 @@
     "arjunCombo": "Everything in one deal. Sign it now!",
     "ayeshaBasic": "Read what is not in the price.",
     "ayeshaGeneral": "Check when each payment is due.",
-    "perPlate": "a plate"
+    "perPlate": "a plate",
+    "haggleHelp": "Haggling: ask the seller for a lower price. It can work, but it uses up an action.",
+    "payLaterHelp": "Pay later: you hold on to your cash for now and pay at the end, but the seller adds 5%.",
+    "readHelp": "Fine print: extra costs the seller does not put in the big price. Reading it shows the real total."
   },
   "ask": {
     "P2": {
@@ -287,16 +290,26 @@
     "go": "Lock in my guess"
   },
   "lines": {
-    "title": "Your money, date by date",
+    "title": "Will your money last?",
+    "intro": "This is the money left in your kitty after paying each date's bills. Green is money you are sure of.",
+    "sure": "{{money}} left",
+    "shortBy": "{{money}} short",
+    "short": "Not enough",
+    "promised": "{{money}} if every promise arrives",
+    "keySure": "Money you are sure of",
+    "keyPromised": "Plus money people promised (sponsor, donation, ticket sales). It may not come.",
+    "verdictOk": "Spare money for surprises: {{money}}",
+    "explainOk": "Spare money is what is left over when it is tightest ({{when}}), counting only sure money. Surprise bills of ₹500 to ₹2,000 will come out of it. The more you keep, the safer you are.",
+    "verdictShort": "On {{when}} you would be {{money}} short",
+    "explainShort": "You would not have enough sure money to pay that date's bills. Take something out, pick a cheaper offer, or pay later.",
+    "note": "Bills counted are the ones you signed, plus permits. Surprise bills are not counted yet. On Festival Day we also count the event money you expect.",
+    "date": "Date",
+    "ok": "OK",
+    "cushion": "Spare money: {{money}}",
+    "cushionNote": "",
     "optimistic": "If every promise arrives",
     "cautious": "Only what's certain",
-    "date": "Date",
-    "cushion": "Cushion: {{money}}",
-    "cushionNote": "Past surprise bills ran ₹500 to ₹2,000.",
-    "short": "Short",
-    "ok": "OK",
-    "note": "Bills shown are the ones you signed, plus permits. Surprise bills are not included.",
-    "fd": "On Festival Day, the line also counts the event money you expect."
+    "fd": ""
   },
   "check": {
     "title": "Plan check",
