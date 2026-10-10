@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { C, inkBorder } from '../../art/palette'
 
 /** Portrait "cinema frame": fills a phone, and sits centred (phone-shaped) on desktop. */
 export function useStageSize() {
@@ -15,13 +16,13 @@ export function useStageSize() {
 export function Stage({ children, bg }: { children: ReactNode; bg?: string }) {
   const { w, h } = useStageSize()
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: '#2B1A17' }}>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: C.ink }}>
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{ background: 'repeating-linear-gradient(135deg, #3a231f 0 14px, #2B1A17 14px 28px)', opacity: 0.9 }}
+        style={{ background: `repeating-linear-gradient(135deg, ${C.inkSoft} 0 14px, ${C.ink} 14px 28px)`, opacity: 0.9 }}
       />
-      <div className="absolute left-1/2 top-0 overflow-hidden" style={{ width: w, height: h, transform: 'translateX(-50%)', background: bg, borderLeft: w < window.innerWidth ? '5px solid #2B1A17' : undefined, borderRight: w < window.innerWidth ? '5px solid #2B1A17' : undefined, boxShadow: '0 0 0 3px #D9A520' }}>
+      <div className="absolute left-1/2 top-0 overflow-hidden" style={{ width: w, height: h, transform: 'translateX(-50%)', background: bg, borderLeft: w < window.innerWidth ? inkBorder(5) : undefined, borderRight: w < window.innerWidth ? inkBorder(5) : undefined, boxShadow: `0 0 0 3px ${C.gold}` }}>
         {children}
       </div>
     </div>

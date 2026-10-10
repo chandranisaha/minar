@@ -7,6 +7,7 @@ import { Bicycle, Crates, FlowerCart, Overhead, Pigeon, PotPlant, Tree, WorldBac
 import { LOOKS, Toon } from '../art/Toon'
 import { useManifest } from '../art/ArtSlot'
 import { CHARMINAR, H, SHOP_LAYOUT, W } from './layout'
+import { C, alpha, flat, inkBorder } from '../art/palette'
 
 const Obj = ({ x, y, w, h, z, children, style }: { x: number; y: number; w: number; h: number; z: number; children: ReactNode; style?: CSSProperties }) => (
   <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, zIndex: z, pointerEvents: 'none', ...style }}>{children}</div>
@@ -40,13 +41,13 @@ function Lamp({ lit, x, y }: { lit: boolean; x: number; y: number }) {
     <div style={{ position: 'absolute', left: x, top: y, width: 0, height: 0 }}>
       {lit ? (
         <>
-          <div className="anim-twinkle" style={{ position: 'absolute', left: -60, top: -60, width: 120, height: 120, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,241,176,.95) 0, rgba(255,201,74,.55) 35%, rgba(255,201,74,0) 70%)' }} />
+          <div className="anim-twinkle" style={{ position: 'absolute', left: -60, top: -60, width: 120, height: 120, borderRadius: '50%', background: `radial-gradient(circle, ${alpha(C.sunGlow,.95)} 0, ${alpha(C.lampGlow,.55)} 35%, ${alpha(C.lampGlow,0)} 70%)` }} />
           {[0, 45, 90, 135].map((a) => (
-            <div key={a} className="anim-twinkle" style={{ position: 'absolute', left: -1.5, top: -26, width: 3, height: 52, borderRadius: 2, background: '#FFE9A0', transform: `rotate(${a}deg)` }} />
+            <div key={a} className="anim-twinkle" style={{ position: 'absolute', left: -1.5, top: -26, width: 3, height: 52, borderRadius: 2, background: C.lampRay, transform: `rotate(${a}deg)` }} />
           ))}
         </>
       ) : (
-        <div style={{ position: 'absolute', left: -11, top: -11, width: 22, height: 22, borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%, #A39284, #6E5E52)', border: '2.5px solid #2B1A17' }} />
+        <div style={{ position: 'absolute', left: -11, top: -11, width: 22, height: 22, borderRadius: '50%', background: `radial-gradient(circle at 35% 30%, ${C.lampStoneLight}, ${C.lampStoneDark})`, border: inkBorder(2.5) }} />
       )}
     </div>
   )
@@ -54,8 +55,8 @@ function Lamp({ lit, x, y }: { lit: boolean; x: number; y: number }) {
 
 function Seal() {
   return (
-    <div className="anim-pop" style={{ position: 'absolute', right: 8, top: 6, width: 38, height: 38, borderRadius: '50%', background: '#D9A520', border: '4px solid #2B1A17', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '2px 3px 0 #2B1A17' }}>
-      <svg width="22" height="22" viewBox="0 0 22 22"><path d="M4 11 l5 6 l10 -12" stroke="#2B1A17" strokeWidth="4.4" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+    <div className="anim-pop" style={{ position: 'absolute', right: 8, top: 6, width: 38, height: 38, borderRadius: '50%', background: C.gold, border: inkBorder(4), display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: flat(2, 3) }}>
+      <svg width="22" height="22" viewBox="0 0 22 22"><path d="M4 11 l5 6 l10 -12" stroke={C.ink} strokeWidth="4.4" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
     </div>
   )
 }
@@ -93,7 +94,7 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
         )
       })}
       {art['deco-rangoli'] && (
-        <img src="/art/deco-rangoli.webp" alt="" draggable={false} style={{ position: 'absolute', left: 190, top: 770, width: 620, height: 374, zIndex: 3, pointerEvents: 'none', WebkitMaskImage: 'radial-gradient(ellipse at center, #000 52%, transparent 71%)', maskImage: 'radial-gradient(ellipse at center, #000 52%, transparent 71%)', opacity: 0.95 }} />
+        <img src="/art/deco-rangoli.webp" alt="" draggable={false} style={{ position: 'absolute', left: 190, top: 770, width: 620, height: 374, zIndex: 3, pointerEvents: 'none', WebkitMaskImage: `radial-gradient(ellipse at center, ${C.black} 52%, transparent 71%)`, maskImage: `radial-gradient(ellipse at center, ${C.black} 52%, transparent 71%)`, opacity: 0.95 }} />
       )}
 
       {/* door rings on the ground */}
@@ -106,9 +107,9 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
               className={lit ? 'anim-pulse' : undefined}
               style={{
                 width: '100%', height: '100%', borderRadius: '50%',
-                border: `4px solid ${done[p.id] ? '#D9A520' : lit ? '#FFF3D6' : 'rgba(43,26,23,.5)'}`,
-                background: done[p.id] ? 'rgba(217,165,32,.45)' : lit ? 'rgba(255,225,120,.75)' : 'radial-gradient(ellipse, rgba(255,230,150,.5), rgba(255,243,214,.12))',
-                boxShadow: lit || done[p.id] ? '0 0 26px 10px rgba(255,210,90,.75)' : '0 0 14px 2px rgba(255,200,90,.45)',
+                border: `4px solid ${done[p.id] ? C.gold : lit ? C.jasmine : alpha(C.ink,.5)}`,
+                background: done[p.id] ? alpha(C.gold,.45) : lit ? alpha(C.glowYellow,.75) : `radial-gradient(ellipse, ${alpha(C.glowPale,.5)}, ${alpha(C.jasmine,.12)})`,
+                boxShadow: lit || done[p.id] ? `0 0 26px 10px ${alpha(C.lampLit,.75)}` : `0 0 14px 2px ${alpha(C.glowAmber,.45)}`,
                 opacity: lit || done[p.id] ? 1 : 0.8,
               }}
             />
@@ -161,7 +162,7 @@ export const WorldScene = memo(function WorldScene({ lamps, done, react, doorGlo
               </div>
             </div>
             {p.id === 'safe' && (
-              <div className="font-sign anim-blink" style={{ position: 'absolute', left: OFFER_POS.x * sw, top: OFFER_POS.y * sh, transform: 'translate(-50%,-50%) rotate(-5deg)', fontSize: 17, color: '#D8503A', textShadow: '1px 1px 0 #2B1A17, -1px -1px 0 #2B1A17, 1px -1px 0 #2B1A17, -1px 1px 0 #2B1A17', whiteSpace: 'nowrap' }}>
+              <div className="font-sign anim-blink" style={{ position: 'absolute', left: OFFER_POS.x * sw, top: OFFER_POS.y * sh, transform: 'translate(-50%,-50%) rotate(-5deg)', fontSize: 17, color: C.coral, textShadow: `1px 1px 0 ${C.ink}, -1px -1px 0 ${C.ink}, 1px -1px 0 ${C.ink}, -1px 1px 0 ${C.ink}`, whiteSpace: 'nowrap' }}>
                 {t('world.offer')}
               </div>
             )}

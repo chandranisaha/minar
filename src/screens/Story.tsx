@@ -11,6 +11,7 @@ import { Backdrop, Stage } from './story/Stage'
 import { B1Dawn, B2Persona, B3Flowers, B4Goal, B5Bazaar } from './story/Beats'
 import { stepped } from '../lib/stepped'
 import { useShortLandscape } from '../world/input'
+import { C, MOTION, alpha } from '../art/palette'
 
 const LAST = 4
 
@@ -20,11 +21,11 @@ function Cover({ onStart }: { onStart: () => void }) {
     <div className="absolute inset-0">
       <Backdrop>
         <defs>
-          <linearGradient id="cv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#5BB5D6" /><stop offset=".55" stopColor="#FFE3A8" /><stop offset="1" stopColor="#F9A94C" /></linearGradient>
+          <linearGradient id="cv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={C.sky} /><stop offset=".55" stopColor={C.skyCream} /><stop offset="1" stopColor={C.skyOrange} /></linearGradient>
         </defs>
         <rect width="400" height="760" fill="url(#cv)" />
-        <circle cx="200" cy="470" r="150" fill="#FFF1B0" opacity=".7" />
-        <rect y="660" width="400" height="100" fill="#C98B58" stroke="#2B1A17" strokeWidth="4" />
+        <circle cx="200" cy="470" r="150" fill={C.sunGlow} opacity=".7" />
+        <rect y="660" width="400" height="100" fill={C.groundTan} stroke={C.ink} strokeWidth="4" />
       </Backdrop>
       <div className="absolute left-1/2 w-[108%] -translate-x-1/2" style={{ bottom: '12%', maxWidth: 600 }}>
         <CharminarArt className="block w-full" />
@@ -69,11 +70,11 @@ export default function Story() {
   const next = useCallback(() => {
     if (!canNext) return
     if (step >= LAST) return finish()
-    iris.run(() => setStep((s) => s + 1), undefined, 0.38)
+    iris.run(() => setStep((s) => s + 1), undefined, MOTION.irisBeat)
   }, [canNext, step, finish, iris])
   const back = useCallback(() => {
     if (step <= 0) return
-    iris.run(() => setStep((s) => s - 1), undefined, 0.3)
+    iris.run(() => setStep((s) => s - 1), undefined, MOTION.irisBack)
   }, [step, iris])
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function Story() {
   return (
     <Stage>
       <div className="absolute inset-0" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style={{ touchAction: 'pan-y' }}>
-        <motion.div key={step} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, ease: stepped(6) }}>
+        <motion.div key={step} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: MOTION.beatFade, ease: stepped(MOTION.beatFadeSteps) }}>
           {step === -1 && <Cover onStart={next} />}
           {step === 0 && <B1Dawn />}
           {step === 1 && <B2Persona onPicked={() => undefined} />}
@@ -110,7 +111,7 @@ export default function Story() {
       </div>
 
       {/* top: language + skip, always visible */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 p-2" style={{ paddingTop: 'max(8px, env(safe-area-inset-top))' }}>
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[var(--z-hud)] p-2" style={{ paddingTop: 'max(8px, env(safe-area-inset-top))' }}>
         <div className="flex items-start justify-between gap-2">
           <div className="pointer-events-auto">{step >= 0 && <LangSwitch />}</div>
           <button type="button" className="ink-btn pointer-events-auto" onClick={finish}>
@@ -126,7 +127,7 @@ export default function Story() {
 
       {/* bottom: progress ticker + next */}
       {step >= 0 && (
-        <div className="absolute inset-x-0 bottom-0 z-40 flex items-center justify-between gap-2 p-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+        <div className="absolute inset-x-0 bottom-0 z-[var(--z-hud)] flex items-center justify-between gap-2 p-3" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
           <button type="button" className="ink-btn cream" onClick={back} disabled={step === 0} aria-label={t('buttons.back')} style={{ opacity: step === 0 ? 0.35 : 1 }}>◀</button>
           <div className="flex items-center gap-1.5" role="img" aria-label={t('story.step', { n: step + 1 })}>
             {[0, 1, 2, 3, 4].map((i) => (
@@ -139,7 +140,7 @@ export default function Story() {
         </div>
       )}
       {sideways && (
-        <div className="absolute inset-0 z-50 grid place-items-center p-6" style={{ background: 'rgba(30,42,68,.94)' }} role="alert">
+        <div className="absolute inset-0 z-[var(--z-overlay)] grid place-items-center p-6" style={{ background: alpha(C.dusk,.94) }} role="alert">
           <div className="paper max-w-sm p-4 text-center">
             <div className="text-[40px]" aria-hidden>⟳📱</div>
             <p className="font-sign lang-fit m-0 text-[18px]">{t('story.rotate')}</p>

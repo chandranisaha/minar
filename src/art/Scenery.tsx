@@ -99,7 +99,7 @@ function WallSegment({ x, y, w = 92, h = 250, wall, shade, shutter, flip }: { x:
       <path d={`M${flip ? ex + 4 : ex - 34} ${y + 160} v-18 M${flip ? ex + 19 : ex - 19} ${y + 160} v-18 M${flip ? ex + 34 : ex - 4} ${y + 160} v-18`} stroke={INK} strokeWidth={2.4} />
       <path d={`M${flip ? ex : ex - 38} ${y + 142} h38`} stroke={INK} strokeWidth={3} />
       {/* door + awning */}
-      <rect x={ex - dir * 44 - 15} y={y + h - 62} width={30} height={62} fill="#7A2A22" stroke={INK} strokeWidth={2.6} />
+      <rect x={ex - dir * 44 - 15} y={y + h - 62} width={30} height={62} fill={C.maroon} stroke={INK} strokeWidth={2.6} />
       <path d={`M${ex - dir * 44 - 24} ${y + h - 62} h48 l-4 -14 h-40z`} fill={C.mustard} stroke={INK} strokeWidth={2.4} strokeLinejoin="round" />
     </g>
   )
@@ -116,17 +116,17 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
         <linearGradient id={`${id}-sky`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#4FA9CF" />
           <stop offset=".38" stopColor="#8FD0DA" />
-          <stop offset=".7" stopColor="#FFE3A8" />
-          <stop offset="1" stopColor="#F9A94C" />
+          <stop offset=".7" stopColor={C.skyCream} />
+          <stop offset="1" stopColor={C.skyOrange} />
         </linearGradient>
         <radialGradient id={`${id}-sun`}>
-          <stop offset="0" stopColor="#FFF1B0" stopOpacity=".95" />
+          <stop offset="0" stopColor={C.sunGlow} stopOpacity=".95" />
           <stop offset=".5" stopColor="#FFD27A" stopOpacity=".55" />
           <stop offset="1" stopColor="#FFD27A" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={`${id}-ground`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#E9B078" />
-          <stop offset=".55" stopColor="#D49A62" />
+          <stop offset=".55" stopColor={C.cobble} />
           <stop offset="1" stopColor="#B27442" />
         </linearGradient>
         <pattern id={`${id}-cob`} width="84" height="58" patternUnits="userSpaceOnUse">
@@ -156,7 +156,7 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
       {/* sky + golden hour sun */}
       <rect x="-420" width="1840" height="600" fill={`url(#${id}-sky)`} />
       <circle cx="500" cy="360" r="260" fill={`url(#${id}-sun)`} />
-      <circle cx="500" cy="360" r="86" fill="#FFF1B0" opacity=".85" />
+      <circle cx="500" cy="360" r="86" fill={C.sunGlow} opacity=".85" />
       {skyline ? (
         <image href="/art/bg-skyline.webp" x="-200" y="150" width="1400" height="451" preserveAspectRatio="none" />
       ) : (
@@ -186,12 +186,12 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
 
       {/* back row of buildings behind the monument */}
       <g filter={lite ? undefined : `url(#${id}-paint)`}>
-        <Facade x={-20} base={600} w={160} h={190} wall="#F2A56B" shade="#D9743F" shutter={C.sage} laundry ac />
+        <Facade x={-20} base={600} w={160} h={190} wall={C.peach} shade="#D9743F" shutter={C.sage} laundry ac />
         <Facade x={130} base={600} w={140} h={150} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} roof="flat" />
         <Facade x={730} base={600} w={140} h={165} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} />
         <Facade x={860} base={600} w={160} h={200} wall="#F0907A" shade="#C65A47" shutter={C.sage} arch laundry />
         <Facade x={-190} base={600} w={160} h={170} wall="#F7D18A" shade="#D6A04A" shutter={C.coral} roof="flat" />
-        <Facade x={1010} base={600} w={160} h={180} wall="#F2A56B" shade="#D9743F" shutter={C.teal} ac />
+        <Facade x={1010} base={600} w={160} h={180} wall={C.peach} shade="#D9743F" shutter={C.teal} ac />
         <Facade x={-330} base={600} w={150} h={200} wall="#8FC9C4" shade="#5E9D9B" shutter={C.sage} />
         <Facade x={1160} base={600} w={150} h={210} wall="#F7D18A" shade="#D6A04A" shutter={C.coral} laundry />
       </g>
@@ -205,7 +205,7 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
 
       {/* rangoli in the plaza */}
       <g transform="translate(500 955)">
-        <ellipse rx="150" ry="74" fill="#FFF3D6" opacity=".55" stroke={INK} strokeWidth="2.6" />
+        <ellipse rx="150" ry="74" fill={C.jasmine} opacity=".55" stroke={INK} strokeWidth="2.6" />
         <ellipse rx="118" ry="58" fill="none" stroke={C.pink} strokeWidth="6" strokeDasharray="14 9" />
         <ellipse rx="86" ry="42" fill="#F5C26B" opacity=".7" stroke={INK} strokeWidth="2.2" />
         {Array.from({ length: 12 }, (_, i) => {
@@ -217,7 +217,7 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
       </g>
 
       {/* long golden-hour shadows, cast down-left */}
-      <g fill="#7A2A22" opacity=".2">
+      <g fill={C.maroon} opacity=".2">
         <path d="M340 760 L660 760 L560 900 L240 900Z" />
         <path d="M300 1000 L540 1000 L440 1130 L200 1130Z" transform="translate(-170 -280)" />
         <path d="M70 720 H300 L200 800 H-20Z" />
@@ -230,7 +230,7 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
       <g>
         {!buildings && (
           <>
-        <WallSegment x={-22} y={590} wall="#F2A56B" shade="#D9743F" shutter={C.sage} />
+        <WallSegment x={-22} y={590} wall={C.peach} shade="#D9743F" shutter={C.sage} />
         <WallSegment x={-22} y={840} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} h={250} />
         <WallSegment x={-22} y={1090} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} h={220} />
         <WallSegment x={930} y={590} wall="#F0907A" shade="#C65A47" shutter={C.sage} flip />
@@ -242,10 +242,10 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
         <WallSegment x={-114} y={840} wall="#F7D18A" shade="#D6A04A" shutter={C.sage} />
         <WallSegment x={-114} y={1090} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} h={220} />
         <WallSegment x={-206} y={590} wall="#F7D18A" shade="#D6A04A" shutter={C.coral} />
-        <WallSegment x={-206} y={840} wall="#F2A56B" shade="#D9743F" shutter={C.teal} />
+        <WallSegment x={-206} y={840} wall={C.peach} shade="#D9743F" shutter={C.teal} />
         <WallSegment x={-206} y={1090} wall="#F0907A" shade="#C65A47" shutter={C.sage} h={220} />
         <WallSegment x={1022} y={590} wall="#8FC9C4" shade="#5E9D9B" shutter={C.coral} flip />
-        <WallSegment x={1022} y={840} wall="#F2A56B" shade="#D9743F" shutter={C.sage} flip />
+        <WallSegment x={1022} y={840} wall={C.peach} shade="#D9743F" shutter={C.sage} flip />
         <WallSegment x={1022} y={1090} wall="#F7D18A" shade="#D6A04A" shutter={C.teal} flip h={220} />
         <WallSegment x={1114} y={590} wall="#A7D1A1" shade="#6BA46A" shutter={C.teal} flip />
         <WallSegment x={1114} y={840} wall="#F0907A" shade="#C65A47" shutter={C.sage} flip />
@@ -253,8 +253,8 @@ export const WorldBackdrop = memo(function WorldBackdrop({ skyline = false, buil
       </g>
 
       {/* low front kerb + dark vignette at the south edge */}
-      <rect x="-420" y="1290" width="1840" height="130" fill="#8A4F2B" stroke={INK} strokeWidth={SW} />
-      <rect x="-420" y="1290" width="1840" height="16" fill="#C98B58" stroke={INK} strokeWidth={SW} />
+      <rect x="-420" y="1290" width="1840" height="130" fill={C.wood} stroke={INK} strokeWidth={SW} />
+      <rect x="-420" y="1290" width="1840" height="16" fill={C.groundTan} stroke={INK} strokeWidth={SW} />
       <rect x="-420" y="1250" width="1840" height="170" fill={`url(#${id}-edge)`} />
     </svg>
   )
@@ -289,8 +289,8 @@ export const Overhead = memo(function Overhead() {
       {[bulbs, bulbs2].map((set, k) =>
         set.map((b, i) => (
           <g key={`${k}-${i}`} className="anim-twinkle" style={{ animationDelay: `${((i + k) % 3) * 0.3}s` }}>
-            <circle cx={b.x} cy={b.y + 7} r={13} fill="#FFD25A" opacity=".28" />
-            <path d={`M${b.x - 4} ${b.y + 2} h8 l-1 6 a4.4 5 0 1 1 -6 0z`} fill={['#FFE9A0', '#FFC94A', '#FFB4C8'][i % 3]} stroke={INK} strokeWidth={1.6} />
+            <circle cx={b.x} cy={b.y + 7} r={13} fill={C.lampLit} opacity=".28" />
+            <path d={`M${b.x - 4} ${b.y + 2} h8 l-1 6 a4.4 5 0 1 1 -6 0z`} fill={[C.lampRay, C.lampGlow, '#FFB4C8'][i % 3]} stroke={INK} strokeWidth={1.6} />
           </g>
         )),
       )}
@@ -329,7 +329,7 @@ export function Pigeon({ flip, className, style }: { flip?: boolean; className?:
 
 export function Tree({ className }: { className?: string }) {
   const blobs = [
-    [60, 70, 52, '#3F7A3A'], [130, 50, 56, '#4F8F3F'], [200, 74, 54, '#3F7A3A'], [96, 112, 50, '#6BA83F'], [170, 112, 52, '#5C9A3C'],
+    [60, 70, 52, C.sage], [130, 50, 56, '#4F8F3F'], [200, 74, 54, C.sage], [96, 112, 50, '#6BA83F'], [170, 112, 52, '#5C9A3C'],
     [128, 80, 46, '#8DC04A'], [64, 40, 28, '#9BD04E'], [186, 40, 26, '#B4DB58'],
   ] as const
   return (
@@ -346,8 +346,8 @@ export function Tree({ className }: { className?: string }) {
       {/* hanging glowing stars */}
       {[50, 90, 130, 170, 210].map((x, i) => (
         <g key={x} className="anim-twinkle" style={{ animationDelay: `${i * 0.2}s` }}>
-          <path d={`M${x} ${100 + (i % 2) * 14} V${150 + (i % 3) * 18}`} stroke="#FFF3D6" strokeWidth="1.6" opacity=".85" />
-          <path d={`M${x} ${146 + (i % 3) * 18} l3 7 l7 1 l-5 5 l1 7 l-6 -4 l-6 4 l1 -7 l-5 -5 l7 -1z`} fill="#FFE9A0" stroke={INK} strokeWidth="1.2" />
+          <path d={`M${x} ${100 + (i % 2) * 14} V${150 + (i % 3) * 18}`} stroke={C.jasmine} strokeWidth="1.6" opacity=".85" />
+          <path d={`M${x} ${146 + (i % 3) * 18} l3 7 l7 1 l-5 5 l1 7 l-6 -4 l-6 4 l1 -7 l-5 -5 l7 -1z`} fill={C.lampRay} stroke={INK} strokeWidth="1.2" />
         </g>
       ))}
     </svg>
@@ -362,7 +362,7 @@ export function PotPlant({ className }: { className?: string }) {
         <path key={i} d={`M55 62 Q${x} ${y + 24} ${x} ${y}`} stroke={INK} strokeWidth="14" fill="none" strokeLinecap="round" transform={`rotate(${r} 55 62)`} />
       ))}
       {[[34, 30, -28], [56, 14, 0], [78, 30, 28], [44, 40, -12], [68, 40, 12]].map(([x, y, r], i) => (
-        <path key={i} d={`M55 62 Q${x} ${y + 24} ${x} ${y}`} stroke={['#3F7A3A', '#5C9A3C', '#4F8F3F'][i % 3]} strokeWidth="8" fill="none" strokeLinecap="round" transform={`rotate(${r} 55 62)`} />
+        <path key={i} d={`M55 62 Q${x} ${y + 24} ${x} ${y}`} stroke={[C.sage, '#5C9A3C', '#4F8F3F'][i % 3]} strokeWidth="8" fill="none" strokeLinecap="round" transform={`rotate(${r} 55 62)`} />
       ))}
       <path d="M22 62 H88 L80 102 Q55 110 30 102Z" fill={C.terracotta} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
       <path d="M18 56 H92 V66 H18Z" fill="#E5703A" stroke={INK} strokeWidth={SW} />
@@ -408,7 +408,7 @@ export function FlowerCart({ className }: { className?: string }) {
   const bloom = (x: number, y: number, c: string, k: number) => (
     <g key={k}>
       <circle cx={x} cy={y} r={11} fill={c} stroke={INK} strokeWidth="2" />
-      <circle cx={x - 3} cy={y - 3} r={3} fill="#FFF3D6" opacity=".8" />
+      <circle cx={x - 3} cy={y - 3} r={3} fill={C.jasmine} opacity=".8" />
     </g>
   )
   return (
@@ -422,13 +422,13 @@ export function FlowerCart({ className }: { className?: string }) {
           {[0, 1, 2, 3, 4].map((k) => <circle key={k} cx={70 + i * 50} cy={66 + k * 11} r={7} fill={C.marigold} stroke={INK} strokeWidth="1.8" />)}
         </g>
       ))}
-      <rect x="22" y="120" width="196" height="54" rx="4" fill="#8A4F2B" stroke={INK} strokeWidth={SW} />
+      <rect x="22" y="120" width="196" height="54" rx="4" fill={C.wood} stroke={INK} strokeWidth={SW} />
       {[0, 1, 2, 3].map((i) => (
         <g key={i}>
           <path d={`M${40 + i * 46} 124 h38 l-4 44 h-30z`} fill="#6D7A92" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
-          <circle cx={59 + i * 46} cy="118" r="20" fill={['#FFF3D6', '#E5457A', '#FFF3D6', '#F28C28'][i]} stroke={INK} strokeWidth="2.6" />
-          {bloom(48 + i * 46, 112, ['#FFF3D6', '#F26BA0', '#FFFFFF', '#F5A623'][i], i)}
-          {bloom(70 + i * 46, 114, ['#FFFFFF', '#E5457A', '#FFF3D6', '#F28C28'][i], i + 9)}
+          <circle cx={59 + i * 46} cy="118" r="20" fill={[C.jasmine, C.pink, C.jasmine, C.marigold][i]} stroke={INK} strokeWidth="2.6" />
+          {bloom(48 + i * 46, 112, [C.jasmine, C.roseLight, C.white, C.marigoldLight][i], i)}
+          {bloom(70 + i * 46, 114, [C.white, C.pink, C.jasmine, C.marigold][i], i + 9)}
         </g>
       ))}
     </svg>

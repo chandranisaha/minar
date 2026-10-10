@@ -13,6 +13,7 @@
 
 /* ---- Design tokens (see DESIGN.md) ---- */
 @theme {
+  --color-ink: #2b1a17;
   --color-terracotta: #d9632e;
   --color-marigold: #f28c28;
   --color-mustard: #e8b04a;
@@ -24,8 +25,54 @@
   --color-pink: #e5457a;
   --color-gold: #d9a520;
   --color-dusk: #1e2a44;
-  --color-ink: #2b1a17;
   --color-maroon: #7a2a22;
+  --color-stone: #f0d9a8;
+  --color-stone-shade: #d9a86a;
+  --color-peach: #f2a56b;
+  --color-cobble: #d49a62;
+  --color-cobble-dark: #b97a48;
+  --color-glove: #fff3d6;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-ink-soft: #3a231f;
+  --color-paper-tan: #f2d9a8;
+  --color-track: #e9d3a6;
+  --color-skin: #f9c97a;
+  --color-slate: #4b5a63;
+  --color-stone-grey: #d9d3c6;
+  --color-coin-light: #f0c24a;
+  --color-lamp-lit: #ffd25a;
+  --color-lamp-unlit: #8c7b6e;
+  --color-lamp-ray: #ffe9a0;
+  --color-lamp-stone-light: #a39284;
+  --color-lamp-stone-dark: #6e5e52;
+  --color-lamp-glow: #ffc94a;
+  --color-glow-pale: #ffe696;
+  --color-glow-yellow: #ffe178;
+  --color-glow-amber: #ffc85a;
+  --color-sky-cream: #ffe3a8;
+  --color-sky-orange: #f9a94c;
+  --color-sun-glow: #fff1b0;
+  --color-ground-tan: #c98b58;
+  --color-night-sky: #2a2a5e;
+  --color-dawn-purple: #7c4a8e;
+  --color-dawn-pink: #f28c9a;
+  --color-dawn-gold: #ffc36b;
+  --color-hill-purple: #6a4a7a;
+  --color-rose-light: #f26ba0;
+  --color-rose-bright: #ff8fb8;
+  --color-marigold-light: #f5a623;
+  --color-marigold-deep: #e8742a;
+  --color-cream-white: #fff8e1;
+  --color-cream-pale: #fff0c4;
+  --color-cream: #f7e6b8;
+  --color-rule-line: #f3e1b4;
+  --color-sand-line: #c9a867;
+  --color-yellow: #f4c430;
+  --color-gold-dark: #b98a14;
+  --color-wood: #8a4f2b;
+  --color-night-wall-end: #3b1f26;
+  --color-floor-dark: #3b2a26;
   --font-display: "Chango", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
   --font-sign: "Bowlby One", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
   --font-body: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
@@ -33,10 +80,25 @@
   --shadow-flat-sm: 2px 3px 0 var(--color-ink);
 }
 
-:root { color-scheme: light; --ink: #2b1a17; --lang-scale: 1; }
+:root {
+  color-scheme: light; --ink: var(--color-ink); --lang-scale: 1;
+  /* semantic aliases (TS twin: S in src/art/palette.ts) */
+  --surface: var(--color-jasmine); --surface-ink: var(--color-ink); --accent: var(--color-pink);
+  --success: var(--color-sage); --warning: var(--color-marigold); --danger: var(--color-coral);
+  --joy-bright: var(--color-lamp-lit); --joy-dim: #b8923a; --joy-flicker: var(--color-lamp-unlit);
+  /* stacking scale (TS twin: Z) */
+  --z-scene: 30; --z-hud: 40; --z-overlay: 50; --z-modal: 60; --z-film: 90; --z-transition: 100;
+  /* hand-cut corners */
+  --radius-btn: 14px 10px 16px 9px / 10px 15px 9px 14px;
+  --radius-chip: 12px 9px 13px 8px / 9px 13px 8px 12px;
+  --radius-paper: 6px 10px 5px 11px;
+  /* stepped animation timings */
+  --dur-bob: .9s; --dur-bob-sm: .8s; --dur-sway: 2.4s; --dur-pulse: 1s; --dur-blink: .9s; --dur-twinkle: 1.4s;
+  --dur-hop: 3.6s; --dur-squash: .55s; --dur-unfurl: .35s; --dur-pop: .45s; --dur-walk: .28s; --dur-idle: 1.2s; --dur-shifty: 2.6s;
+}
 html[lang="hi"] { --lang-scale: .95; }
 html[lang="te"] { --lang-scale: .92; }
-html, body, #root { height: 100%; margin: 0; background: #2b1a17; }
+html, body, #root { height: 100%; margin: 0; background: var(--color-ink); }
 body {
   font-family: var(--font-body); font-weight: 500; color: var(--ink);
   overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
@@ -52,7 +114,7 @@ html[lang="te"] .font-display, html[lang="te"] .font-sign { font-family: "Noto S
   min-height: 48px; min-width: 48px; padding: 0 18px; cursor: pointer;
   font-family: var(--font-sign); font-size: 16px; color: var(--color-ink); letter-spacing: .02em;
   background: var(--color-mustard); border: 3px solid var(--color-ink);
-  border-radius: 14px 10px 16px 9px / 10px 15px 9px 14px;
+  border-radius: var(--radius-btn);
   box-shadow: var(--shadow-flat); transition: transform .08s steps(2), box-shadow .08s steps(2);
 }
 .ink-btn:hover { transform: translate(-1px,-2px) rotate(-1deg); box-shadow: 5px 6px 0 var(--color-ink); }
@@ -63,9 +125,9 @@ html[lang="te"] .font-display, html[lang="te"] .font-sign { font-family: "Noto S
 .ink-btn.cream { background: var(--color-jasmine); }
 .ink-chip {
   background: var(--color-jasmine); border: 3px solid var(--color-ink); box-shadow: var(--shadow-flat-sm);
-  border-radius: 12px 9px 13px 8px / 9px 13px 8px 12px; color: var(--color-ink);
+  border-radius: var(--radius-chip); color: var(--color-ink);
 }
-.paper { background: var(--color-jasmine); border: 4px solid var(--color-ink); border-radius: 6px 10px 5px 11px; box-shadow: 6px 7px 0 var(--color-ink); }
+.paper { background: var(--color-jasmine); border: 4px solid var(--color-ink); border-radius: var(--radius-paper); box-shadow: 6px 7px 0 var(--color-ink); }
 
 /* ---- stepped animation primitives: ~10fps "on twos/threes" ---- */
 @keyframes bob { 0%,100% { transform: translateY(0) scale(1,1) } 50% { transform: translateY(-5px) scale(.97,1.04) } }
@@ -85,16 +147,16 @@ html[lang="te"] .font-display, html[lang="te"] .font-sign { font-family: "Noto S
 @keyframes fly-away { 0% { transform: translate(0,0) scale(1) } 100% { transform: translate(var(--fx), var(--fy)) scale(.4) } }
 @keyframes flicker { 0%,100% { opacity: .9 } 30% { opacity: .5 } 60% { opacity: 1 } }
 
-.anim-bob { animation: bob .9s steps(9) infinite; transform-origin: 50% 100%; }
-.anim-bob-sm { animation: bob-sm .8s steps(6) infinite; }
-.anim-sway { animation: sway 2.4s steps(12) infinite; transform-origin: 50% 0; }
-.anim-pulse { animation: pulse-step 1s steps(8) infinite; }
-.anim-blink { animation: blink-sign .9s steps(1) infinite; }
-.anim-twinkle { animation: twinkle 1.4s steps(2) infinite; }
-.anim-hop { animation: hop 3.6s steps(18) infinite; }
-.anim-squash { animation: squash-pop .55s steps(11) 1; transform-origin: 50% 100%; }
-.anim-unfurl { animation: unfurl .35s steps(7) 1 both; transform-origin: 50% 0; }
-.anim-pop { animation: pop-in .45s steps(9) 1 both; }
+.anim-bob { animation: bob var(--dur-bob) steps(9) infinite; transform-origin: 50% 100%; }
+.anim-bob-sm { animation: bob-sm var(--dur-bob-sm) steps(6) infinite; }
+.anim-sway { animation: sway var(--dur-sway) steps(12) infinite; transform-origin: 50% 0; }
+.anim-pulse { animation: pulse-step var(--dur-pulse) steps(8) infinite; }
+.anim-blink { animation: blink-sign var(--dur-blink) steps(1) infinite; }
+.anim-twinkle { animation: twinkle var(--dur-twinkle) steps(2) infinite; }
+.anim-hop { animation: hop var(--dur-hop) steps(18) infinite; }
+.anim-squash { animation: squash-pop var(--dur-squash) steps(11) 1; transform-origin: 50% 100%; }
+.anim-unfurl { animation: unfurl var(--dur-unfurl) steps(7) 1 both; transform-origin: 50% 0; }
+.anim-pop { animation: pop-in var(--dur-pop) steps(9) 1 both; }
 
 html[data-lite="true"] .grain, html[data-lite="true"] .scratches { display: none !important; }
 @media (prefers-reduced-motion: reduce) {
@@ -102,11 +164,11 @@ html[data-lite="true"] .grain, html[data-lite="true"] .scratches { display: none
 }
 
 @keyframes shifty { 0%,35% { transform: translateX(-2px) } 45%,85% { transform: translateX(3px) } 100% { transform: translateX(-2px) } }
-.toon-shifty { animation: shifty 2.6s steps(1) infinite; }
+.toon-shifty { animation: shifty var(--dur-shifty) steps(1) infinite; }
 @keyframes walk-bob { 0%,100% { transform: translateY(0) scale(1,1) } 50% { transform: translateY(-4px) scale(.95,1.06) } }
-.anim-walk { animation: walk-bob .28s steps(3) infinite; transform-origin: 50% 100%; }
+.anim-walk { animation: walk-bob var(--dur-walk) steps(3) infinite; transform-origin: 50% 100%; }
 @keyframes idle-breathe { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.015,.985) } }
-.anim-idle { animation: idle-breathe 1.2s steps(4) infinite; transform-origin: 50% 100%; }
+.anim-idle { animation: idle-breathe var(--dur-idle) steps(4) infinite; transform-origin: 50% 100%; }
 
 /* tracked-out caps break Devanagari/Telugu conjuncts: never letter-space those scripts */
 html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }

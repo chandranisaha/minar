@@ -143,5 +143,255 @@
     "title": "डैशबोर्ड",
     "body": "तुम्हारे हुनर यहाँ जल्द दिखेंगे।"
   },
-  "lang_notice": "भाषा"
+  "lang_notice": "भाषा",
+  "host": {
+    "exit": "बाहर",
+    "exitConfirm": "यह खेल छोड़ें? खेल के अंदर की प्रगति सेव नहीं हो सकती।",
+    "exitYes": "छोड़ें",
+    "exitNo": "खेलते रहें",
+    "play": "खेलें",
+    "loading": "खेल लोड हो रहा है…",
+    "errorTitle": "यह खेल चल नहीं पाया",
+    "errorBody": "कुछ गड़बड़ हो गई। अब तक की आपकी प्रगति सुरक्षित है।",
+    "errorBack": "वापस",
+    "banner": "काल्पनिक संख्याएँ। असली ज़िंदगी अलग होती है।",
+    "newSeed": "नया सीड (डेव)",
+    "placeholder": {
+      "label": "अस्थायी खेल",
+      "seed": "सीड",
+      "great": "शानदार रन",
+      "ok": "ठीक रन",
+      "poor": "कमज़ोर रन",
+      "quit": "छोड़ें"
+    }
+  },
+  "result": {
+    "cleared": "पूरा हुआ",
+    "notCleared": "अभी पूरा नहीं हुआ",
+    "state": "स्थिति",
+    "partial": "{{percent}}% तक पहुँचे",
+    "improved": "पहले से बेहतर",
+    "quality": "आपने कितना अच्छा किया",
+    "goal": "लक्ष्य मीटर",
+    "happy": "खुशी सूचकांक",
+    "before": "पहले",
+    "after": "बाद में",
+    "skills": "जो हुनर आपने आज़माए",
+    "noSkills": "कोई हुनर दर्ज नहीं हुआ।",
+    "lessons": "आपने क्या सीखा",
+    "noLessons": "अभी कोई सीख नहीं।",
+    "continue": "आगे बढ़ें",
+    "next": "अगला: {{name}}",
+    "replay": "फिर से खेलें",
+    "back": "वापस",
+    "progressLink": "अपनी प्रगति देखें"
+  },
+  "state": {
+    "notStarted": "शुरू नहीं हुआ",
+    "partial": "जारी है",
+    "bright": "पूरी",
+    "dim": "हल्की",
+    "flicker": "फीकी"
+  },
+  "skills": {
+    "planning": "योजना",
+    "prioritising": "पहले ज़रूरतें",
+    "saving": "बचत",
+    "riskSense": "जोखिम की समझ",
+    "patience": "धैर्य",
+    "scamSense": "ठगी की पहचान"
+  },
+  "progress": {
+    "title": "आपकी प्रगति",
+    "back": "वापस",
+    "goalLabel": "लक्ष्य मीटर",
+    "goalValue": "{{target}} में से {{saved}}",
+    "summary": {
+      "none": "अभी कोई स्तंभ पूरा नहीं हुआ",
+      "allBright": "सभी {{total}} स्तंभ पूरे और चमकदार",
+      "lit": "{{total}} में से {{lit}} स्तंभ पूरे",
+      "litDim": "{{total}} में से {{lit}} पूरे, {{dim}} हल्के",
+      "litFaint": "{{total}} में से {{lit}} पूरे, {{flicker}} फीके",
+      "litDimFaint": "{{total}} में से {{lit}} पूरे, {{dim}} हल्के, {{flicker}} फीके"
+    },
+    "partial": "{{percent}}% तक पहुँचे",
+    "details": "ब्योरा",
+    "hideDetails": "ब्योरा छिपाएँ",
+    "quality": "सबसे अच्छा नतीजा",
+    "attempts": "कितनी बार खेले",
+    "lessons": "देखी हुई सीख",
+    "skills": "आज़माए हुनर",
+    "none": "अभी कोई नहीं",
+    "action": {
+      "start": "खेलें",
+      "continue": "जारी रखें",
+      "replay": "फिर खेलें",
+      "brighten": "चमकाने के लिए फिर खेलें"
+    },
+    "penalty": {
+      "title": "कुछ स्तंभ कम गिने जा रहे हैं",
+      "body": "आपके {{count}} स्तंभ पूरे करते समय खुशी सूचकांक कम था, इसलिए {{amount}} रुका हुआ है।",
+      "how": "सुधारने के लिए: जीवन-पल से छोटा ब्रेक लें, फिर स्तंभ को चमकाने के लिए दोबारा खेलें। दोबारा खेलने से स्तंभ सिर्फ़ बेहतर हो सकता है।"
+    }
+  },
+  "happy": {
+    "title": "खुशी सूचकांक",
+    "band": {
+      "glowing": "चमकदार",
+      "ok": "ठीक",
+      "tired": "थका हुआ"
+    },
+    "tiredNote": "आपने बिना ब्रेक के लगातार {{count}} खेल पूरे किए। छोटा ब्रेक आपका ख़्याल रखता है और खुशी सूचकांक बढ़ाता है।",
+    "toast": {
+      "title": "आपका खुशी सूचकांक घट रहा है",
+      "body": "खुशी कम होने पर पूरा किया गया स्तंभ कम गिना जाता है। छोटा ब्रेक लें, फिर चमकाने के लिए दोबारा खेलें।",
+      "dismiss": "समझ गया"
+    }
+  },
+  "moments": {
+    "title": "अपना ख़्याल रखें",
+    "open": "अपना ख़्याल रखें",
+    "close": "बंद करें",
+    "cost": "{{amount}} लगेंगे",
+    "free": "मुफ़्त",
+    "gain": "अभी +{{gain}} खुशी",
+    "gainFaded": "अभी असर कम: दोहराने पर घटता है",
+    "used": "{{count}} बार इस्तेमाल",
+    "cannotAfford": "अभी पर्याप्त बचत नहीं",
+    "choose": "चुनें",
+    "chai": {
+      "name": "दोस्तों के साथ चाय",
+      "description": "गरम चाय पर थोड़ी गपशप।"
+    },
+    "festivalTreat": {
+      "name": "त्योहार की कोई खास चीज़",
+      "description": "जश्न मनाने के लिए कुछ खास।"
+    },
+    "restAtHome": {
+      "name": "घर पर आराम",
+      "description": "आराम करने और ताज़ा होने की एक शाम।"
+    }
+  },
+  "balance": {
+    "title": "आप और आपका भविष्य",
+    "earned": "लक्ष्य की ओर कमाया",
+    "spent": "खुद पर खर्च",
+    "why": "स्तंभ पूरे करने से लक्ष्य मीटर भरता है। अपना ख़्याल रखने से खुशी सूचकांक ऊँचा रहता है और स्तंभ पूरे गिने जाते हैं। दोनों ज़रूरी हैं।",
+    "next": {
+      "none": "लक्ष्य मीटर भरना शुरू करने के लिए एक स्तंभ पूरा करें।",
+      "allWork": "छोटा ब्रेक आज़माएँ: जीवन-पल से खुशी सूचकांक बढ़ता है।",
+      "balanced": "यही लय रखें: एक स्तंभ पूरा करें, फिर छोटा ब्रेक लें।",
+      "selfHeavy": "लक्ष्य मीटर पीछे रह रहा है: बराबरी के लिए एक स्तंभ पूरा करें।"
+    }
+  },
+  "wire": {
+    "title": "Wireframe index (dev)",
+    "intro": "Every wireframe screen and component. Use the DEV panel to change Happy and clear pillars and watch them update.",
+    "screens": "Screens",
+    "legacy": "legacy overworld",
+    "live": "Live components"
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Money Mohalla",
+      "body": "Select a language to continue."
+    },
+    "problem": {
+      "title": "The Goal",
+      "body": "Your fee is due in 12 months. Let's earn the rest."
+    },
+    "persona": {
+      "title": "Who are you?",
+      "body": "Choose your player."
+    },
+    "festival": {
+      "title": "Your Festival",
+      "body": "Choose a festival to celebrate."
+    },
+    "avatar": {
+      "title": "Your Avatar",
+      "body": "Choose how you look."
+    },
+    "skills": {
+      "title": "Four Pillars",
+      "body": "Learn these four skills."
+    },
+    "win": {
+      "title": "How to win",
+      "body": "Finish a pillar, earn its badge, fill the goal meter. Finish all four and you've earned your fee."
+    },
+    "happy": {
+      "title": "Stay Happy",
+      "body": "Money isn't everything. Look after yourself, or your badges count for less."
+    },
+    "controls": {
+      "title": "How to move",
+      "text": "Drag to walk, tap to enter."
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back"
+  },
+  "hub": {
+    "title": "Money Mohalla Hub",
+    "lookAfterYourself": "Look after yourself",
+    "teaches": "Teaches:",
+    "time": "Time:",
+    "minutes": "mins",
+    "bestQuality": "Best Score:",
+    "cta": {
+      "start": "Play",
+      "continue": "Continue",
+      "replay": "Replay",
+      "brighten": "Replay to brighten",
+      "back": "Back"
+    },
+    "plan": {
+      "tagline": "Count down to your festival",
+      "teaches": "Planning and budgeting"
+    },
+    "save": {
+      "tagline": "Two bad weeks",
+      "teaches": "Saving and managing"
+    },
+    "invest": {
+      "tagline": "Deal Board",
+      "teaches": "Understanding investing"
+    },
+    "safe": {
+      "tagline": "Case Files",
+      "teaches": "Staying safe from scams"
+    }
+  },
+  "coach": {
+    "header": "Tips",
+    "dismissAll": "Dismiss All",
+    "goal": {
+      "title": "Your Goal",
+      "body": "Fill the meter to win."
+    },
+    "happy": {
+      "title": "Stay Happy",
+      "body": "Keep your index up."
+    },
+    "progress": {
+      "title": "Progress",
+      "body": "Check how you're doing."
+    },
+    "hub": {
+      "title": "The Hub",
+      "body": "Choose a pillar to play."
+    }
+  },
+  "avatars": {
+    "male": "Boy",
+    "female": "Girl"
+  },
+  "festivals": {
+    "diwali": "Diwali",
+    "eid": "Eid",
+    "bonalu": "Bonalu",
+    "sankranti": "Sankranti",
+    "christmas": "Christmas"
+  }
 }

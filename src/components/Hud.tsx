@@ -6,14 +6,17 @@ import { LANGS, PERSONAS, inr, type Lang } from '../content/data'
 import { useGame, useLite } from '../store/game'
 import { useTouchUi } from '../world/input'
 import { stepped } from '../lib/stepped'
+import { C, MOTION, inkBorder } from '../art/palette'
+
+// TODO(final-ui): LampMeter, GoalBar and the chip row are placeholder HUD styling; keep the data props, restyle through tokens.
 
 export function Coin({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden className="shrink-0">
-      <circle cx="20" cy="20" r="17" fill="#D9A520" stroke="#2B1A17" strokeWidth="3.4" />
-      <circle cx="20" cy="20" r="11.5" fill="#F0C24A" stroke="#2B1A17" strokeWidth="1.8" strokeDasharray="3 2.4" />
-      <text x="20" y="27" textAnchor="middle" fontSize="19" fontWeight="900" fill="#2B1A17" fontFamily="serif">₹</text>
-      <path d="M9 14 q3 -6 9 -7" stroke="#FFF3D6" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <circle cx="20" cy="20" r="17" fill={C.gold} stroke={C.ink} strokeWidth="3.4" />
+      <circle cx="20" cy="20" r="11.5" fill={C.coinLight} stroke={C.ink} strokeWidth="1.8" strokeDasharray="3 2.4" />
+      <text x="20" y="27" textAnchor="middle" fontSize="19" fontWeight="900" fill={C.ink} fontFamily="serif">₹</text>
+      <path d="M9 14 q3 -6 9 -7" stroke={C.jasmine} strokeWidth="2.4" fill="none" strokeLinecap="round" />
     </svg>
   )
 }
@@ -29,7 +32,7 @@ export function GoalBar({ className = '', intro = false }: { className?: string;
   const width = useTransform(mv, (v) => `${v * 100}%`)
   const first = useRef(true)
   useEffect(() => {
-    const c = animate(mv, pct, { duration: first.current && intro ? 1.2 : 0.7, ease: stepped(12) })
+    const c = animate(mv, pct, { duration: first.current && intro ? MOTION.goalBarFirst : MOTION.goalBar, ease: stepped(MOTION.steps) })
     first.current = false
     return () => c.stop()
   }, [pct, mv, intro])
@@ -43,8 +46,8 @@ export function GoalBar({ className = '', intro = false }: { className?: string;
             {inr(saved, lang)} <span className="opacity-60">/ {inr(goal, lang)}</span>
           </span>
         </div>
-        <div className="relative mt-1 h-3.5 overflow-hidden rounded-full border-[2.5px] border-ink bg-[#E9D3A6]" role="progressbar" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={Math.round(saved)}>
-          <motion.div className="h-full" style={{ width, background: 'repeating-linear-gradient(115deg,#E5457A 0 9px,#F28C28 9px 18px)' }} />
+        <div className="relative mt-1 h-3.5 overflow-hidden rounded-full border-[2.5px] border-ink bg-track" role="progressbar" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={Math.round(saved)}>
+          <motion.div className="h-full" style={{ width, background: `repeating-linear-gradient(115deg,${C.pink} 0 9px,${C.marigold} 9px 18px)` }} />
         </div>
       </div>
     </div>
@@ -57,7 +60,7 @@ export function PersonaChip() {
   if (!persona) return null
   return (
     <div className="ink-chip flex h-[52px] items-center gap-2 pl-1 pr-3" title={t(`personas.${persona}.name`)}>
-      <img src={`/art/faces/${PERSONAS[persona].face}.png`} alt="" className="h-10 w-10 rounded-full border-[2.5px] border-ink bg-[#F9C97A] object-cover object-top" draggable={false} />
+      <img src={`/art/faces/${PERSONAS[persona].face}.png`} alt="" className="h-10 w-10 rounded-full border-[2.5px] border-ink bg-skin object-cover object-top" draggable={false} />
       <span className="font-sign lang-fit hidden text-[13px] sm:block">{t(`personas.${persona}.name`)}</span>
     </div>
   )
@@ -76,7 +79,7 @@ export function LangSwitch() {
           onClick={() => setLanguage(l)}
           aria-pressed={lang === l}
           className="font-sign h-11 min-w-12 rounded-lg px-2 text-[15px]"
-          style={{ background: lang === l ? '#E5457A' : 'transparent', color: lang === l ? '#FFF3D6' : '#2B1A17', border: lang === l ? '2.5px solid #2B1A17' : '2.5px solid transparent', fontFamily: l === 'en' ? undefined : 'var(--font-body)', fontWeight: 800 }}
+          style={{ background: lang === l ? C.pink : 'transparent', color: lang === l ? C.jasmine : C.ink, border: lang === l ? inkBorder(2.5) : '2.5px solid transparent', fontFamily: l === 'en' ? undefined : 'var(--font-body)', fontWeight: 800 }}
         >
           {t(`lang.${l}`)}
         </button>
@@ -118,9 +121,9 @@ export function LampMeter() {
         const h = i < 2 ? 30 : 24
         return (
           <svg key={id} width="16" height="40" viewBox="0 0 16 40" aria-hidden>
-            {lit && <circle cx="8" cy={40 - h - 5} r="9" fill="#FFD25A" opacity=".5" className="anim-twinkle" />}
-            <path d={`M5 ${40 - h} L3 ${40 - h - 8} Q8 ${40 - h - 14} 13 ${40 - h - 8} L11 ${40 - h}Z`} fill={lit ? '#FFD25A' : '#8C7B6E'} stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" />
-            <rect x="4" y={40 - h} width="8" height={h} fill="#F0D9A8" stroke="#2B1A17" strokeWidth="2" />
+            {lit && <circle cx="8" cy={40 - h - 5} r="9" fill={C.lampLit} opacity=".5" className="anim-twinkle" />}
+            <path d={`M5 ${40 - h} L3 ${40 - h - 8} Q8 ${40 - h - 14} 13 ${40 - h - 8} L11 ${40 - h}Z`} fill={lit ? C.lampLit : C.lampUnlit} stroke={C.ink} strokeWidth="2" strokeLinejoin="round" />
+            <rect x="4" y={40 - h} width="8" height={h} fill={C.stone} stroke={C.ink} strokeWidth="2" />
           </svg>
         )
       })}
@@ -130,7 +133,7 @@ export function LampMeter() {
 
 export function TopHud({ showGoal = true }: { showGoal?: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start gap-2 p-2" style={{ paddingTop: 'max(8px, env(safe-area-inset-top))' }}>
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-[var(--z-hud)] flex items-start gap-2 p-2" style={{ paddingTop: 'max(8px, env(safe-area-inset-top))' }}>
       {showGoal && <GoalBar className="pointer-events-auto min-w-0 max-w-[520px] flex-1" />}
       <div className="pointer-events-auto ml-auto flex shrink-0 gap-1.5">
         <LampMeter />
@@ -149,7 +152,7 @@ export function BottomHud({ replay = true }: { replay?: boolean }) {
   if (touch) {
     // phone / tablet: the left thumb zone belongs to the joystick; controls stack on the right
     return (
-      <div className="pointer-events-none absolute bottom-0 right-0 z-40 flex flex-col items-end gap-2 p-2" style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom))', paddingRight: 'max(8px, env(safe-area-inset-right))' }}>
+      <div className="pointer-events-none absolute bottom-0 right-0 z-[var(--z-hud)] flex flex-col items-end gap-2 p-2" style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom))', paddingRight: 'max(8px, env(safe-area-inset-right))' }}>
         <div className="pointer-events-auto flex gap-2">
           <button type="button" className="ink-chip grid h-12 w-12 place-items-center text-[20px]" aria-pressed={lite} aria-label={t('hud.lite')} title={t('hud.lite')} onClick={() => setLite(!lite)}>
             {lite ? '☀' : '✦'}
@@ -167,7 +170,7 @@ export function BottomHud({ replay = true }: { replay?: boolean }) {
     )
   }
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex flex-wrap items-end justify-between gap-2 p-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[var(--z-hud)] flex flex-wrap items-end justify-between gap-2 p-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
       <div className="pointer-events-auto">
         <LangSwitch />
       </div>

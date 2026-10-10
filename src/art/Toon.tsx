@@ -1,6 +1,8 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { C } from './palette'
 
+// TODO(final-ui): rubber-hose shopkeepers are placeholders; DECISIONS.md suggests redrawing them in the character-sheet style.
+
 /**
  * Rubber-hose character rig (original designs).
  * Limbs are noodle-tubes: a thick ink stroke under a thinner colour stroke. Gloved hands,
@@ -21,11 +23,11 @@ export interface ToonLook {
 }
 
 export const LOOKS: Record<string, ToonLook> = {
-  bangle: { skin: '#B8693A', hair: '#2B1A17', hairStyle: 'bun', top: '#E5457A', bottom: '#2F6F73', bindi: true, scarf: '#F28C28', trim: '#D9A520' },
-  chai: { skin: '#C77D47', hair: '#2B1A17', hairStyle: 'curly', top: '#5BB5D6', bottom: '#7A2A22', trim: '#FFF3D6' },
-  pearl: { skin: '#A8602F', hair: '#EDE6D6', hairStyle: 'topi', top: '#FFF3D6', bottom: '#1E2A44', glasses: 'round', moustache: true, trim: '#D9A520' },
-  upi: { skin: '#B5683B', hair: '#2B1A17', hairStyle: 'hood', top: '#3F7A3A', bottom: '#1E2A44', glasses: 'shades', trim: '#E8B04A' },
-  nani: { skin: '#B8693A', hair: '#E8E2D6', hairStyle: 'bun', top: '#E5457A', bottom: '#FFF3D6', glasses: 'round', bindi: true, scarf: '#FFF3D6', trim: '#D9A520' },
+  bangle: { skin: '#B8693A', hair: C.ink, hairStyle: 'bun', top: C.pink, bottom: C.teal, bindi: true, scarf: C.marigold, trim: C.gold },
+  chai: { skin: '#C77D47', hair: C.ink, hairStyle: 'curly', top: C.sky, bottom: C.maroon, trim: C.jasmine },
+  pearl: { skin: '#A8602F', hair: '#EDE6D6', hairStyle: 'topi', top: C.jasmine, bottom: C.dusk, glasses: 'round', moustache: true, trim: C.gold },
+  upi: { skin: '#B5683B', hair: C.ink, hairStyle: 'hood', top: C.sage, bottom: C.dusk, glasses: 'shades', trim: C.mustard },
+  nani: { skin: '#B8693A', hair: '#E8E2D6', hairStyle: 'bun', top: C.pink, bottom: C.jasmine, glasses: 'round', bindi: true, scarf: C.jasmine, trim: C.gold },
 }
 
 const INK = C.ink

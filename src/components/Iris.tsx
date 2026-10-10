@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState, type
 import { animate, motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { stepped } from '../lib/stepped'
+import { C, MOTION } from '../art/palette'
 
 type IrisCtx = {
   go: (to: string, origin?: { x: number; y: number }) => void
@@ -20,10 +21,10 @@ export function IrisProvider({ children }: { children: ReactNode }) {
   const cx = useMotionValue(0)
   const cy = useMotionValue(0)
   const lock = useRef(false)
-  const bg = useMotionTemplate`radial-gradient(circle at ${cx}px ${cy}px, transparent ${r}px, #2B1A17 ${r}px)`
+  const bg = useMotionTemplate`radial-gradient(circle at ${cx}px ${cy}px, transparent ${r}px, ${C.ink} ${r}px)`
 
   const run = useCallback(
-    (cb: () => void, origin?: { x: number; y: number }, dur = 0.55) => {
+    (cb: () => void, origin?: { x: number; y: number }, dur: number = MOTION.irisDefault) => {
       if (lock.current) return
       lock.current = true
       const W = window.innerWidth, H = window.innerHeight
@@ -32,14 +33,14 @@ export function IrisProvider({ children }: { children: ReactNode }) {
       cy.set(origin?.y ?? H / 2)
       r.set(max)
       setBusy(true)
-      animate(r, 0, { duration: dur, ease: stepped(12) }).then(() => {
+      animate(r, 0, { duration: dur, ease: stepped(MOTION.steps) }).then(() => {
         cb()
         window.setTimeout(() => {
-          animate(r, max, { duration: dur, ease: stepped(12) }).then(() => {
+          animate(r, max, { duration: dur, ease: stepped(MOTION.steps) }).then(() => {
             setBusy(false)
             lock.current = false
           })
-        }, 120)
+        }, Math.round(MOTION.irisHold * 1000))
       })
     },
     [cx, cy, r],
@@ -50,7 +51,7 @@ export function IrisProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={value}>
       {children}
-      {busy && <motion.div aria-hidden style={{ background: bg }} className="fixed inset-0 z-[100]" />}
+      {busy && <motion.div aria-hidden style={{ background: bg }} className="fixed inset-0 z-[var(--z-transition)]" />}
     </Ctx.Provider>
   )
 }

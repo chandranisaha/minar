@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { LOOKS, Toon } from '../art/Toon'
 import { TitleCard } from './TitleCard'
 import { useGame } from '../store/game'
+import { C, alpha, inkBorder } from '../art/palette'
 
-const COLORS = ['#E5457A', '#F28C28', '#E8B04A', '#5BB5D6', '#FFF3D6', '#D8503A']
+// TODO(final-ui): placeholder celebration (procedural fireworks and Nani toon).
+
+const COLORS = [C.pink, C.marigold, C.mustard, C.sky, C.jasmine, C.coral]
 
 function Burst({ x, y, delay, color, size }: { x: number; y: number; delay: number; color: string; size: number }) {
   return (
     <div className="absolute" style={{ left: `${x}%`, top: `${y}%`, width: 0, height: 0, animation: `firework 1.4s steps(9) ${delay}s infinite` }}>
       {Array.from({ length: 14 }, (_, i) => (
-        <div key={i} style={{ position: 'absolute', left: -3, top: -size, width: 6, height: size * 0.62, background: color, border: '2px solid #2B1A17', borderRadius: 4, transformOrigin: `3px ${size}px`, transform: `rotate(${(360 / 14) * i}deg)` }} />
+        <div key={i} style={{ position: 'absolute', left: -3, top: -size, width: 6, height: size * 0.62, background: color, border: inkBorder(2), borderRadius: 4, transformOrigin: `3px ${size}px`, transform: `rotate(${(360 / 14) * i}deg)` }} />
       ))}
     </div>
   )
@@ -26,7 +29,7 @@ export function Celebration() {
     el?.focus()
   }, [])
   return (
-    <div className="absolute inset-0 z-[60] flex items-center justify-center" style={{ background: 'rgba(30,42,68,.55)' }} role="dialog" aria-label={t('celebrate.title')}>
+    <div className="absolute inset-0 z-[var(--z-modal)] flex items-center justify-center" style={{ background: alpha(C.dusk,.55) }} role="dialog" aria-label={t('celebrate.title')}>
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {bursts.map((b, i) => <Burst key={i} {...b} />)}
       </div>

@@ -6,6 +6,10 @@ import { BottomHud, TopHud } from '../components/Hud'
 import { TitleCard } from '../components/TitleCard'
 import { useIris } from '../components/Iris'
 import { useGame } from '../store/game'
+import { C } from '../art/palette'
+
+// LEGACY, no longer routed (replaced by src/ui/wire/GameHostScreen.tsx). Kept only until the old UI is retired.
+// TODO(final-ui): this whole screen is a dummy placeholder. The real pillar games (built by teammates) replace it; do not build on its layout.
 
 /** Shared shell the four mini-games plug into: goal bar, title card, back button, rewind stub, recap card. */
 function RecapCard() {
@@ -37,7 +41,7 @@ export default function Play() {
   const done = completed.includes(id)
   const Shop = SHOPS[id]
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#5BB5D6, #FFE3A8 55%, #F2A56B)' }}>
+    <div className="absolute inset-0 overflow-y-auto" style={{ background: `linear-gradient(${C.sky}, ${C.skyCream} 55%, ${C.peach})` }}>
       <TopHud />
       <div className="mx-auto flex min-h-full max-w-xl flex-col items-center gap-4 px-4 pb-44 pt-24">
         <div className="w-full">

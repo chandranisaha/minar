@@ -52,11 +52,11 @@ function Minaret({ cx, yTop, yBase, w, back, lit, glowId }: { cx: number; yTop: 
           <g>
             <circle cx={cx} cy={yTop - 22} r={30} fill={`url(#${glowId})`} className="anim-twinkle" />
             {[0, 45, 90, 135].map((a) => (
-              <rect key={a} x={cx - 1.5} y={yTop - 22 - 22} width={3} height={44} rx={1.5} fill="#FFE9A0" transform={`rotate(${a} ${cx} ${yTop - 22})`} className="anim-twinkle" />
+              <rect key={a} x={cx - 1.5} y={yTop - 22 - 22} width={3} height={44} rx={1.5} fill={C.lampRay} transform={`rotate(${a} ${cx} ${yTop - 22})`} className="anim-twinkle" />
             ))}
           </g>
         )}
-        <path d={`M${cx - 7} ${yTop - 16} L${cx - 9} ${yTop - 26} Q${cx} ${yTop - 36} ${cx + 9} ${yTop - 26} L${cx + 7} ${yTop - 16}Z`} fill={lit ? '#FFD25A' : '#7B6A5E'} stroke={INK} strokeWidth={2.6} strokeLinejoin="round" />
+        <path d={`M${cx - 7} ${yTop - 16} L${cx - 9} ${yTop - 26} Q${cx} ${yTop - 36} ${cx + 9} ${yTop - 26} L${cx + 7} ${yTop - 16}Z`} fill={lit ? C.lampLit : '#7B6A5E'} stroke={INK} strokeWidth={2.6} strokeLinejoin="round" />
         {lit && <ellipse cx={cx} cy={yTop - 24} rx={3} ry={5} fill="#FFF8D8" />}
         <circle cx={cx} cy={yTop - 38} r={2.6} fill={C.gold} stroke={INK} strokeWidth={1.4} />
       </g>
@@ -79,14 +79,14 @@ export function CharminarSvg({ lamps = [false, false, false, false], className, 
     <svg viewBox="0 0 400 520" className={className} style={{ overflow: 'visible', ...style }} role="img" aria-label="Charminar">
       <defs>
         <radialGradient id={glow}>
-          <stop offset="0" stopColor="#FFF1B0" stopOpacity=".95" />
-          <stop offset=".45" stopColor="#FFC94A" stopOpacity=".5" />
-          <stop offset="1" stopColor="#FFC94A" stopOpacity="0" />
+          <stop offset="0" stopColor={C.sunGlow} stopOpacity=".95" />
+          <stop offset=".45" stopColor={C.lampGlow} stopOpacity=".5" />
+          <stop offset="1" stopColor={C.lampGlow} stopOpacity="0" />
         </radialGradient>
         <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FFE3A8" />
-          <stop offset=".6" stopColor="#F9A94C" />
-          <stop offset="1" stopColor="#D9632E" />
+          <stop offset="0" stopColor={C.skyCream} />
+          <stop offset=".6" stopColor={C.skyOrange} />
+          <stop offset="1" stopColor={C.terracotta} />
         </linearGradient>
         {!lite && (
           <filter id={wob} x="-5%" y="-5%" width="110%" height="110%">

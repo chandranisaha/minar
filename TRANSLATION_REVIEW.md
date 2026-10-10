@@ -17,3 +17,35 @@ phrasing rather than word-for-word output. **A native speaker should review ever
 | `story.b4.stamp` | "DUE" | बाकी / బాకీ (= outstanding). Confirm it reads right on a fee receipt. |
 
 Text rendered inside the scene art (shop signs, OFFER! board) comes from `world.*` keys in the same files.
+
+## Added with the game host (neutral wording, needs a native speaker)
+
+| Key | English | Concern |
+| --- | --- | --- |
+| `host.*`, `result.*`, `state.*`, `skills.*` | exit, play, loading, error, banner, result labels, skill names | All Hindi and Telugu in this block were drafted for this build and need review, especially the register of the error text |
+| `state.bright` / `state.dim` / `state.flicker` | Full / Dim / Faint | Chosen to be neutral about the final visual theme. Hindi पूरी / हल्की / फीकी and Telugu పూర్తి / మసక / మందం may read oddly for "how fully a pillar counts" |
+| `result.happy` | Happy Index | Hindi खुशी सूचकांक, Telugu సంతోష సూచిక: check these are natural for a student |
+| `skills.riskSense`, `skills.scamSense` | Risk sense, Scam sense | Short coined phrases; confirm what students actually say |
+| `host.placeholder.*` | Placeholder game, Great run... | Developer-facing only; can be left in English |
+
+## Added with the progress, Happy Index and life-moment screens (neutral wording, needs a native speaker)
+
+| Key | English | Concern |
+| --- | --- | --- |
+| `progress.*` | summary lines such as "{{lit}} of {{total}} complete, {{dim}} dim" | Hindi and Telugu word order and the numbers-in-the-middle phrasing were drafted; check they read naturally, especially "dim" (हल्के / మసక) and "faint" (फीके / మందం) |
+| `progress.penalty.*` | "Some pillars count for less..." | Tone must stay gentle and never blame; please check the Hindi and Telugu do not sound like a scolding |
+| `happy.band.*` | Glowing, OK, Tired | Tired as a state of the player (थका हुआ / అలసట) versus tired as a hint to rest; confirm both read well |
+| `happy.tiredNote`, `happy.toast.*` | break and low-Happy wording | Check "break" (ब्रेक / విరామం) is what students say |
+| `moments.*` | A chai with friends, A festival treat, Rest at home | Names and one-line descriptions; the festival one should feel natural without naming a specific festival |
+| `balance.*` | "You and your future", why both matter, next-step lines | One plain sentence that must not sound like financial advice |
+| `wire.*` | Wireframe index (dev) | Developer-only page; deliberately left in English in every language file |
+
+## Added with Onboarding and Hub (Prompt B)
+
+| Key | English | Concern |
+| --- | --- | --- |
+| `onboarding.*` | Welcome, The Goal, Who are you, Four Pillars, Stay Happy, How to move | Ensure the tone is encouraging and clear, especially "Let's earn the rest" and "Money isn't everything". |
+| `hub.*` | Money Mohalla Hub, Look after yourself, Teaches, Time, mins, Best Score, CTA buttons | Check "Look after yourself" translates well as a button label. The hub taglines (`plan.tagline`, etc) must sound natural. |
+| `coach.*` | Tips, Dismiss All, Your Goal, Stay Happy, Progress, The Hub | Very short tooltip-style text; ensure the translation is punchy. |
+| `avatars.*`, `festivals.*` | Boy, Girl, Diwali, Eid, etc | Ensure cultural appropriateness and spelling for festival names. |
+

@@ -5,8 +5,10 @@ import { PILLARS, type PillarId } from '../content/data'
 import { useGame, useLite } from '../store/game'
 import { useIris } from '../components/Iris'
 import { WorldScene } from './WorldScene'
+import { PillarSignboard, StartHereTag } from './Signboard'
 import { joy, useTouchUi } from './input'
 import { COLS, DOOR_RADIUS, H, ROWS, SHOP_LAYOUT, START, T, W, canStand, cellOf, grid, nearestWalkable, walkable } from './layout'
+import { C, alpha } from '../art/palette'
 
 type Dir = 'down' | 'up' | 'left' | 'right'
 const SPEED = 235
@@ -263,7 +265,7 @@ export function Overworld() {
     <div
       ref={box}
       className="absolute inset-0 touch-none overflow-hidden"
-      style={{ background: '#2B1A17', cursor: 'pointer' }}
+      style={{ background: C.ink, cursor: 'pointer' }}
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={onUp}
@@ -275,9 +277,9 @@ export function Overworld() {
         <WorldScene lamps={lamps} done={doneMap} react={reactMap} doorGlow={glow}>
           {/* hero */}
           <div ref={heroEl} style={{ position: 'absolute', left: 0, top: 0, width: HERO_W, height: HERO_H, pointerEvents: 'none', willChange: 'transform' }}>
-            <div style={{ position: 'absolute', left: 8, right: 8, bottom: -4, height: 14, borderRadius: '50%', background: 'rgba(43,26,23,.3)' }} />
+            <div style={{ position: 'absolute', left: 8, right: 8, bottom: -4, height: 14, borderRadius: '50%', background: alpha(C.ink,.3) }} />
             <div ref={heroBob} className="anim-idle" style={{ width: '100%', height: '100%' }}>
-              <img ref={heroImg} src={frameSrc('down', 0)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', filter: 'drop-shadow(0 0 0 #2B1A17)' }} />
+              <img ref={heroImg} src={frameSrc('down', 0)} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', filter: `drop-shadow(0 0 0 ${C.ink})` }} />
             </div>
           </div>
 
@@ -304,22 +306,11 @@ export function Overworld() {
                     style={{ position: 'absolute', left: L.x < 500 ? L.x : L.x + L.w, top: L.y + 4, zIndex: 4000, transform: `translate(${L.x < 500 ? '0' : '-100%'},-100%) scale(${1 / view.s})`, transformOrigin: L.x < 500 ? '0 100%' : '100% 100%', pointerEvents: 'none' }}
                   >
                     {show ? (
-                      <div className="anim-unfurl" key={`${p.id}-${reactKey[p.id]}`} style={{ width: 232 }}>
-                        <div className="paper" style={{ padding: '8px 12px 10px', textAlign: 'center', background: '#FFF3D6', borderColor: '#2B1A17', borderRadius: '4px 4px 14px 14px', boxShadow: '4px 5px 0 #2B1A17' }}>
-                          <div className="font-sign lang-fit" style={{ fontSize: 18, lineHeight: 1.15, color: p.color === '#D9A520' ? '#7A2A22' : '#2B1A17' }}>
-                            <span style={{ display: 'inline-block', width: 24, height: 24, lineHeight: '19px', borderRadius: '50%', border: '3px solid #2B1A17', background: p.color, color: '#FFF3D6', fontSize: 14, marginRight: 8, verticalAlign: 'middle' }}>{p.n}</span>
-                            {t(`pillars.${p.id}.name`)}
-                          </div>
-                          <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3, marginTop: 4 }}>{t(`pillars.${p.id}.hook`)}</div>
-                          {doneMap[p.id] && <div className="font-sign" style={{ fontSize: 11, color: '#3F7A3A', marginTop: 3 }}>✓ {t('hud.completed')}</div>}
-                        </div>
-                        <div style={{ margin: L.x < 500 ? '0 0 0 40px' : '0 40px 0 auto', width: 0, height: 0, borderLeft: '9px solid transparent', borderRight: '9px solid transparent', borderTop: '12px solid #2B1A17' }} />
+                      <div className="anim-unfurl" key={`${p.id}-${reactKey[p.id]}`}>
+                        <PillarSignboard pillar={p} done={doneMap[p.id]} leftSide={L.x < 500} />
                       </div>
                     ) : (
-                      <div style={{ animation: 'bounce-arrow .7s steps(5) infinite', textAlign: 'center', transform: `translateX(${L.x < 500 ? '50%' : '-50%'})` }}>
-                        <div className="ink-chip font-sign lang-fit" style={{ fontSize: 15, padding: '5px 12px', background: '#E5457A', color: '#FFF3D6', whiteSpace: 'nowrap' }}>{t('hud.startHere')}</div>
-                        <div style={{ margin: '0 auto', width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderTop: '14px solid #2B1A17' }} />
-                      </div>
+                      <StartHereTag leftSide={L.x < 500} />
                     )}
                   </div>
                 )}
@@ -331,7 +322,7 @@ export function Overworld() {
 
       {/* keyboard / touch "Enter" prompt when standing at a doorway */}
       {near && !pending && (
-        <div className="pointer-events-none absolute inset-x-0 z-30 flex justify-center" style={{ bottom: touchUi ? 188 : 96 }}>
+        <div className="pointer-events-none absolute inset-x-0 z-[var(--z-scene)] flex justify-center" style={{ bottom: touchUi ? 188 : 96 }}>
           <button type="button" className="ink-btn pink pointer-events-auto anim-pop" onClick={() => enter(near)}>
             ▶ {t('hud.enter')}: {t(`pillars.${near}.name`)}
           </button>

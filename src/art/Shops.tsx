@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { C } from './palette'
 import { LOOKS, Toon } from './Toon'
 
+// TODO(final-ui): procedural placeholder shops (fallback when no painted art exists). Chai cafe has no painted art yet.
+
 const INK = C.ink
 const SW = 3.4
 
@@ -65,7 +67,7 @@ export function BangleStall({ react, done, className }: ShopProps) {
   return (
     <svg viewBox="0 0 240 250" className={className} style={{ overflow: 'visible' }} role="img" aria-hidden>
       <ellipse cx="120" cy="244" rx="118" ry="9" fill={INK} opacity=".2" />
-      <rect x="18" y="64" width="204" height="178" fill="#2F6F73" stroke={INK} strokeWidth={SW} />
+      <rect x="18" y="64" width="204" height="178" fill={C.teal} stroke={INK} strokeWidth={SW} />
       <rect x="18" y="64" width="62" height="178" fill="#215558" opacity=".55" />
       <path d="M18 120 H222 M18 172 H222" stroke="#7BC0C4" strokeWidth={2} opacity=".6" />
       {/* hanging bangle racks */}
@@ -103,9 +105,9 @@ export function ChaiCafe({ react, done, className }: ShopProps) {
     <svg viewBox="0 0 240 250" className={className} style={{ overflow: 'visible' }} role="img" aria-hidden>
       <defs>
         <pattern id={`${id}-chk`} width="20" height="20" patternUnits="userSpaceOnUse">
-          <rect width="20" height="20" fill="#FFF3D6" />
-          <rect width="10" height="10" fill="#5BB5D6" />
-          <rect x="10" y="10" width="10" height="10" fill="#5BB5D6" />
+          <rect width="20" height="20" fill={C.jasmine} />
+          <rect width="10" height="10" fill={C.sky} />
+          <rect x="10" y="10" width="10" height="10" fill={C.sky} />
         </pattern>
       </defs>
       <ellipse cx="120" cy="244" rx="118" ry="9" fill={INK} opacity=".2" />
@@ -114,12 +116,12 @@ export function ChaiCafe({ react, done, className }: ShopProps) {
       <rect x="14" y="196" width="212" height="46" fill={`url(#${id}-chk)`} stroke={INK} strokeWidth={SW} />
       {/* arched window + door */}
       <path d="M28 190 V120 Q28 92 56 90 Q84 92 84 120 V190Z" fill={C.dusk} stroke={INK} strokeWidth={SW} />
-      <path d="M36 186 V122 Q36 100 56 98" fill="none" stroke="#5BB5D6" strokeWidth={2} opacity=".6" />
-      <path d="M160 190 V112 Q160 86 188 84 Q216 86 216 112 V190Z" fill="#7A2A22" stroke={INK} strokeWidth={SW} />
+      <path d="M36 186 V122 Q36 100 56 98" fill="none" stroke={C.sky} strokeWidth={2} opacity=".6" />
+      <path d="M160 190 V112 Q160 86 188 84 Q216 86 216 112 V190Z" fill={C.maroon} stroke={INK} strokeWidth={SW} />
       {/* biscuit jars */}
       {[0, 1, 2].map((i) => (
         <g key={i}>
-          <rect x={92 + i * 22} y={124} width={17} height={22} rx={3} fill="#FFF3D6" stroke={INK} strokeWidth={2.4} />
+          <rect x={92 + i * 22} y={124} width={17} height={22} rx={3} fill={C.jasmine} stroke={INK} strokeWidth={2.4} />
           <rect x={90 + i * 22} y={118} width={21} height={8} rx={3} fill={C.marigold} stroke={INK} strokeWidth={2.4} />
         </g>
       ))}
@@ -129,7 +131,7 @@ export function ChaiCafe({ react, done, className }: ShopProps) {
         <g key={x} className="anim-sway" style={{ transformOrigin: `${x}px 62px`, transformBox: 'view-box' }}>
           <path d={`M${x} 62 V76`} stroke={INK} strokeWidth={2.4} />
           <path d={`M${x - 8} 90 Q${x - 11} 78 ${x} 76 Q${x + 11} 78 ${x + 8} 90Z`} fill={C.marigold} stroke={INK} strokeWidth={2.6} />
-          <ellipse cx={x} cy={88} rx={5} ry={3.5} fill="#FFE9A0" />
+          <ellipse cx={x} cy={88} rx={5} ry={3.5} fill={C.lampRay} />
         </g>
       ))}
       <Awning x={6} y={38} w={228} a={C.teal} b={C.jasmine} n={8} />
@@ -142,10 +144,10 @@ export function ChaiCafe({ react, done, className }: ShopProps) {
         <Toon look={LOOKS.chai} mood="cycle" excited={react} x={26} y={110} width={72} height={108} />
       </g>
       <ellipse cx="62" cy="205" rx="40" ry="9" fill="#EDE7DA" stroke={INK} strokeWidth={SW} opacity="0" />
-      {[48, 78].map((x) => <path key={x} d={`M${x - 6} 194 L${x - 4} 206 H${x + 4} L${x + 6} 194Z`} fill="#F2A56B" stroke={INK} strokeWidth={2.2} />)}
+      {[48, 78].map((x) => <path key={x} d={`M${x - 6} 194 L${x - 4} 206 H${x + 4} L${x + 6} 194Z`} fill={C.peach} stroke={INK} strokeWidth={2.2} />)}
       {/* kettle on the stove */}
       <g>
-        <rect x="150" y="196" width="68" height="46" rx="4" fill="#3b2a26" stroke={INK} strokeWidth={SW} />
+        <rect x="150" y="196" width="68" height="46" rx="4" fill={C.floorDark} stroke={INK} strokeWidth={SW} />
         <path d="M158 198 q4 -4 8 0 M178 198 q4 -4 8 0 M198 198 q4 -4 8 0" stroke={C.marigold} strokeWidth={3} fill="none" />
         <path d="M156 196 Q154 164 184 162 Q214 164 212 196Z" fill={C.gold} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
         <path d="M160 190 Q160 172 172 168" stroke={C.jasmine} strokeWidth={3} fill="none" opacity=".7" />
@@ -177,20 +179,20 @@ export function PearlShop({ react, done, className }: ShopProps) {
     <svg viewBox="0 0 240 250" className={className} style={{ overflow: 'visible' }} role="img" aria-hidden>
       <defs>
         <radialGradient id={`${id}-pearl`} cx=".35" cy=".3" r=".8">
-          <stop offset="0" stopColor="#FFFFFF" />
+          <stop offset="0" stopColor={C.white} />
           <stop offset=".55" stopColor="#FFE9EE" />
           <stop offset="1" stopColor="#E9B7C4" />
         </radialGradient>
         <radialGradient id={`${id}-glow`}>
-          <stop offset="0" stopColor="#FFF3D6" stopOpacity=".9" />
-          <stop offset="1" stopColor="#FFF3D6" stopOpacity="0" />
+          <stop offset="0" stopColor={C.jasmine} stopOpacity=".9" />
+          <stop offset="1" stopColor={C.jasmine} stopOpacity="0" />
         </radialGradient>
       </defs>
       <ellipse cx="120" cy="244" rx="118" ry="9" fill={INK} opacity=".2" />
       <rect x="16" y="56" width="208" height="186" fill="#1E4A4A" stroke={INK} strokeWidth={SW} />
       <rect x="16" y="56" width="58" height="186" fill="#143838" opacity=".6" />
       {/* arched display window with velvet */}
-      <path d="M30 196 V104 Q30 66 120 62 Q210 66 210 104 V196Z" fill="#7A2A22" stroke={C.gold} strokeWidth={5} />
+      <path d="M30 196 V104 Q30 66 120 62 Q210 66 210 104 V196Z" fill={C.maroon} stroke={C.gold} strokeWidth={5} />
       <path d="M30 196 V104 Q30 66 120 62 Q210 66 210 104 V196Z" fill="none" stroke={INK} strokeWidth={SW} />
       {[40, 66, 92].map((y, i) => (
         <g key={y}>
@@ -238,7 +240,7 @@ export function UpiKiosk({ react, done, className }: ShopProps) {
   return (
     <svg viewBox="0 0 240 250" className={className} style={{ overflow: 'visible' }} role="img" aria-hidden>
       <ellipse cx="120" cy="244" rx="118" ry="9" fill={INK} opacity=".2" />
-      <rect x="22" y="70" width="196" height="172" fill="#E8B04A" stroke={INK} strokeWidth={SW} />
+      <rect x="22" y="70" width="196" height="172" fill={C.mustard} stroke={INK} strokeWidth={SW} />
       <rect x="22" y="70" width="56" height="172" fill="#C99533" opacity=".6" />
       {/* roof + sign */}
       <path d="M8 70 L28 40 H212 L232 70Z" fill={C.coral} stroke={INK} strokeWidth={SW} strokeLinejoin="round" />
@@ -261,7 +263,7 @@ export function UpiKiosk({ react, done, className }: ShopProps) {
       </g></g>
       {Array.from({ length: 8 }, (_, i) => {
         const a = (i / 8) * Math.PI * 2
-        return <circle key={i} cx={176 + Math.cos(a) * 41} cy={106 + Math.sin(a) * 41} r={3.2} fill="#FFF1B0" stroke={INK} strokeWidth={1.4} className="anim-blink" style={{ animationDelay: `${(i % 2) * 0.45}s` }} />
+        return <circle key={i} cx={176 + Math.cos(a) * 41} cy={106 + Math.sin(a) * 41} r={3.2} fill={C.sunGlow} stroke={INK} strokeWidth={1.4} className="anim-blink" style={{ animationDelay: `${(i % 2) * 0.45}s` }} />
       })}
       <defs>
         <clipPath id={`${id}-c`}>

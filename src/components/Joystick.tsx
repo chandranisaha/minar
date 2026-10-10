@@ -1,5 +1,8 @@
 import { useRef, useState } from 'react'
 import { joy, useTouchUi } from '../world/input'
+import { C, alpha, flat, inkBorder } from '../art/palette'
+
+// TODO(final-ui): placeholder joystick styling (behaviour must stay as is).
 
 const SIZE = 132
 const R = 42 // knob travel
@@ -37,7 +40,7 @@ export function Joystick() {
       ref={pad}
       role="application"
       aria-label="Joystick"
-      className="absolute z-40 select-none"
+      className="absolute z-[var(--z-hud)] select-none"
       style={{ left: 'max(14px, env(safe-area-inset-left))', bottom: 'max(18px, env(safe-area-inset-bottom))', width: SIZE, height: SIZE, touchAction: 'none' }}
       onPointerDown={(e) => { e.stopPropagation(); (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); setDown(true); move(e) }}
       onPointerMove={(e) => { if (down) move(e) }}
@@ -47,19 +50,19 @@ export function Joystick() {
     >
       <div
         className="absolute inset-0 rounded-full"
-        style={{ background: 'rgba(255,243,214,.82)', border: '4px solid #2B1A17', boxShadow: '4px 5px 0 #2B1A17', opacity: down ? 1 : 0.9 }}
+        style={{ background: alpha(C.jasmine,.82), border: inkBorder(4), boxShadow: flat(4, 5), opacity: down ? 1 : 0.9 }}
       />
       {/* direction chevrons */}
       {[0, 90, 180, 270].map((a) => (
         <svg key={a} width="22" height="14" viewBox="0 0 22 14" className="absolute left-1/2 top-1/2" style={{ transform: `translate(-50%,-50%) rotate(${a}deg) translateY(-48px)` }} aria-hidden>
-          <path d="M3 11 L11 3 L19 11" fill="none" stroke="#2B1A17" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" opacity=".55" />
+          <path d="M3 11 L11 3 L19 11" fill="none" stroke={C.ink} strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" opacity=".55" />
         </svg>
       ))}
       <div
         className="absolute left-1/2 top-1/2 rounded-full"
-        style={{ width: 58, height: 58, marginLeft: -29, marginTop: -29, transform: `translate(${k.x}px, ${k.y}px)`, background: '#E5457A', border: '4px solid #2B1A17', boxShadow: down ? '1px 2px 0 #2B1A17' : '3px 4px 0 #2B1A17' }}
+        style={{ width: 58, height: 58, marginLeft: -29, marginTop: -29, transform: `translate(${k.x}px, ${k.y}px)`, background: C.pink, border: inkBorder(4), boxShadow: down ? flat(1, 2) : flat(3, 4) }}
       >
-        <div className="absolute rounded-full" style={{ left: 9, top: 8, width: 16, height: 10, background: 'rgba(255,243,214,.7)', transform: 'rotate(-25deg)' }} />
+        <div className="absolute rounded-full" style={{ left: 9, top: 8, width: 16, height: 10, background: alpha(C.jasmine,.7), transform: 'rotate(-25deg)' }} />
       </div>
     </div>
   )

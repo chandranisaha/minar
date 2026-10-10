@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useLite } from '../store/game'
+import { C, alpha } from './palette'
 
 const TILE = 128
 /** four pre-rendered noise tiles, cycled at ~10fps: grain "on twos" with near-zero CPU cost */
@@ -59,7 +60,7 @@ export function FilmOverlay() {
   }, [lite])
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-[90]">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-[var(--z-film)]">
       {!lite && (
         <>
           <div ref={grain} className="grain absolute inset-0" style={{ backgroundSize: `${TILE}px ${TILE}px`, opacity: 0.55 }} />
@@ -70,7 +71,7 @@ export function FilmOverlay() {
           </div>
         </>
       )}
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 50% 45%, transparent 58%, rgba(43,26,23,.34) 100%)' }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 45%, transparent 58%, ${alpha(C.ink,.34)} 100%)` }} />
     </div>
   )
 }
