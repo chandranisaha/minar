@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import type { CompanyId } from '../engine/types'
@@ -72,7 +73,8 @@ export function FounderProfile({ id, onClose }: { id: CompanyId; onClose: () => 
     { k: 'yrs', v: t(`founders.${id}.yrs`), l: t('pitch3.yrsL') },
     { k: 'starts', v: t(`founders.${id}.starts`), l: t('pitch3.startsL') },
   ]
-  return (
+  const host = typeof document === 'undefined' ? null : document.querySelector<HTMLElement>('.db-root')
+  const node = (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label={t(`founders.${id}.name`)} onKeyDown={(e) => e.key === 'Escape' && onClose()} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div ref={ref} tabIndex={-1} className="paper db-sheet db-in max-h-[92vh] w-full max-w-[440px] overflow-y-auto outline-none">
         <div className="relative flex items-end gap-3 border-b-[3px] border-ink px-4 pt-4" style={{ background: `linear-gradient(135deg, ${colour}, ${colour}CC)` }}>
@@ -130,4 +132,5 @@ export function FounderProfile({ id, onClose }: { id: CompanyId; onClose: () => 
       </div>
     </div>
   )
+  return host ? createPortal(node, host) : node
 }

@@ -196,7 +196,7 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
 
   return (
     // phones: header, board, sheet stacked; wide screens: board beside the sheet
-    <div className="db-layout mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-5">
+    <div className="db-layout mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-5">
       <Header run={run} m={m} onExit={onExit} />
       <div className="db-boardwrap flex flex-col gap-2">
         <Board run={run} m={m} tokenAt={shown} pitching={pitching} onOpen={setStudy}>
