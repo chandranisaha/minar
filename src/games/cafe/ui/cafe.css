@@ -11,11 +11,9 @@
 .cafe-svg { position: absolute; inset: 0; margin: auto; display: block; width: min(100cqw, calc(100cqh * 16 / 9)); height: auto; border-radius: 12px; }
 .cafe-dock { left: var(--dl); top: var(--dt); width: var(--dw); height: var(--dh); z-index: 10; display: flex; flex-direction: column; }
 .cafe-dock-inner { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px max(10px, env(safe-area-inset-bottom)); background: #FBF3DE; border-top: 3px solid #3A2A24; box-shadow: 0 -6px 18px rgba(0, 0, 0, .35); }
-@media (min-width: 760px) {
-  .cafe-main { --sh: 64%; }
-  .cafe-main[data-busy] { --sw: 58%; --sh: 100%; --dl: 58%; --dt: 0%; --dw: 42%; --dh: 100%; }
-  .cafe-dock-inner { padding: 16px max(18px, calc((100% - 760px) / 2)) 12px; }
-  .cafe-main[data-busy] .cafe-dock-inner { padding: 18px 20px 12px; border-top: none; border-left: 3px solid #3A2A24; box-shadow: -6px 0 18px rgba(0, 0, 0, .35); }
+@media (min-width: 760px), (orientation: landscape) and (min-width: 560px) {
+  .cafe-main, .cafe-main[data-busy] { --sw: 58%; --sh: 100%; --dl: 58%; --dt: 0%; --dw: 42%; --dh: 100%; }
+  .cafe-dock-inner { padding: 18px 20px 12px; border-top: none; border-left: 3px solid #3A2A24; box-shadow: -6px 0 18px rgba(0, 0, 0, .35); }
 }
 
 /* top bar: above the picture, not over it */
@@ -257,3 +255,45 @@ html[data-lite='true'] .cafe *, .cafe .is-lite * { animation: none !important; }
 .cafe-meet-mood { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 70%; }
 .cafe-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(58, 42, 36, .25); display: inline-block; }
 .cafe-dot.on { background: #C8604A; }
+
+/* ---- Ammamma's letter, full screen ---- */
+.cafe-letter { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, rgba(40, 28, 16, .72), rgba(20, 12, 6, .94)); animation: cafe-fadein .5s ease both; padding: 16px; }
+@keyframes cafe-fadein { from { opacity: 0 } to { opacity: 1 } }
+.cafe-env-big { display: flex; flex-direction: column; align-items: center; gap: 14px; background: none; border: none; cursor: pointer; animation: cafe-envin .8s cubic-bezier(.3, 1.3, .5, 1) both; }
+@keyframes cafe-envin { from { transform: translateY(40px) scale(.5) rotate(-6deg); opacity: 0 } to { transform: none; opacity: 1 } }
+.cafe-env-svg { width: min(78vw, 460px); height: auto; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .5)); }
+.cafe-letter-tap { color: #FBF0D2; font-weight: 800; letter-spacing: .08em; animation: cafe-blink 1.2s ease-in-out infinite; }
+.cafe-env-open { position: relative; width: min(94vw, 640px); height: min(92svh, 760px); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; }
+.cafe-env-svg.is-front { position: relative; z-index: 3; width: min(60vw, 300px); margin-bottom: 0; animation: cafe-envdrop .9s ease 2.2s forwards; }
+@keyframes cafe-envdrop { to { transform: translateY(40px) scale(.85); opacity: 0 } }
+.cafe-flap { transform-box: fill-box; transform-origin: 50% 0%; animation: cafe-flapk .7s ease-in-out .1s both; }
+@keyframes cafe-flapk { from { transform: scaleY(1) } to { transform: scaleY(-1) } }
+.cafe-sheet-wrap { position: absolute; left: 0; right: 0; top: 0; bottom: 70px; display: grid; place-items: center; perspective: 1100px; }
+.cafe-sheet-paper { position: relative; width: min(94vw, 600px); aspect-ratio: 1444 / 854; transform-origin: 50% 100%; animation: cafe-unfold2 2s cubic-bezier(.25, .8, .3, 1) .5s both; }
+@keyframes cafe-unfold2 {
+  0% { transform: translateY(46%) scale(.34, .12) rotateX(60deg); opacity: 0 }
+  30% { transform: translateY(18%) scale(.4, .3) rotateX(30deg); opacity: 1 }
+  62% { transform: translateY(-4%) scale(.6, .75) rotateX(10deg) }
+  100% { transform: none }
+}
+.cafe-paper-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .5)); }
+.cafe-paper-text { position: absolute; inset: 14% 9% 12% 9%; display: flex; flex-direction: column; gap: 3%; }
+.cafe-line { margin: 0; font-size: clamp(16px, 3.4vw, 26px); line-height: 1.35; color: #5B3A2A; opacity: 0; animation: cafe-line .7s ease forwards; }
+.cafe-line.is-sign { margin-top: auto; text-align: right; font-weight: 700; }
+.cafe-notes { position: absolute; left: 0; right: 0; top: 100%; height: 40px; }
+.cafe-notes i { position: absolute; top: 4px; font-style: normal; font-weight: 900; font-size: 14px; width: 30px; height: 20px; display: grid; place-items: center; background: #8CC07A; border: 1.5px solid #3A2A24; border-radius: 3px; opacity: 0; animation: cafe-noteup .7s ease forwards; }
+.cafe-letter-take { position: relative; z-index: 2; margin-bottom: 8px; opacity: 0; animation: cafe-fadein .5s ease 4.4s forwards; }
+.cafe-envslide { animation: cafe-envslidek 1s cubic-bezier(.4, .1, .3, 1) both; }
+@keyframes cafe-envslidek { from { transform: translate(98px, -4px) } 50% { transform: translate(46px, -18px) } to { transform: none } }
+
+/* ---- stars: the stakes ---- */
+.cafe-star { color: rgba(58, 42, 36, .3); font-size: 13px; margin-right: 3px; }
+.cafe-star.on { color: #E8A21F; text-shadow: 0 0 6px rgba(232, 162, 31, .7); }
+.cafe-stake { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 5px 10px; border-radius: 10px; background: rgba(251, 240, 210, .12); color: #FBF0D2; font-size: 12.5px; font-weight: 700; }
+.cafe-stake b { color: #F3B531; letter-spacing: 2px; font-size: 14px; }
+.cafe-stake.is-risk { background: #D8503A; color: #fff; animation: cafe-alertk .8s ease-in-out infinite; }
+.cafe-stake.is-risk b { color: #fff; }
+.cafe-stamp.is-perfect { border-color: #C8860A; color: #C8860A; font-size: 24px; background: linear-gradient(135deg, #FFF3C4, #F6D774); box-shadow: 0 0 0 3px #FFF3C4, 0 0 18px rgba(232, 162, 31, .8); }
+@keyframes cafe-line { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+@keyframes cafe-noteup { from { opacity: 0; transform: translateY(20px) rotate(0) } to { opacity: 1; transform: translateY(-4px) rotate(-6deg) } }
+.cafe-stake b em { font-style: normal; opacity: .3; }

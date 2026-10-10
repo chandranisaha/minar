@@ -39,6 +39,8 @@ export interface SceneProps {
   platesCount?: number
   /** bumps whenever a coin lands in a jar, so the scene can clink */
   pulse?: { jar: 'spend' | 'save' | 'emergency'; n: number } | null
+  /** Ammamma's envelope: on the counter, sliding over, or on the table */
+  letter?: 'counter' | 'slide' | 'table' | null
   /** the intro plays fizz values on the table bottles */
   demo?: { fun: number; friends: number } | null
   reached?: boolean
@@ -132,7 +134,7 @@ function Envelope({ x, y }: { x: number; y: number }) {
   )
 }
 
-export function Scene({ step, run, player, saucers = [null, null], vendor, beat = null, focus = null, platesCount = 0, pulse = null, demo = null, reached = false, lite }: SceneProps) {
+export function Scene({ step, run, player, saucers = [null, null], vendor, beat = null, focus = null, platesCount = 0, pulse = null, demo = null, letter = null, reached = false, lite }: SceneProps) {
   const fz = demo ?? run.fizz
   const bg = lite ? `${ART}/cafe-interior-lite.webp` : `${ART}/cafe-interior.webp`
   const stage = cloudStage(step)
@@ -146,7 +148,8 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
   const showTeja = step === 'teja' || (focus === 'teja' && lent > 0)
   const chachaPose = beat === 'freeze' || beat === 'crack' ? 'shock' : ['predict1', 'predict2', 'worth', 'bignight', 'bignight0'].includes(step) ? 'think' : 'idle'
   const mood = moodFor(step, beat, reached)
-  const envelope = ['walkin', 'goal', 'predict1', 'payday'].includes(step) && run.month === 1 && !run.payday
+  const env = letter ?? (['goal', 'predict1', 'meet', 'payday'].includes(step) && run.month === 1 && !run.payday ? 'table' : null)
+  const envelope = env === 'table'
   const clink = (j: 'spend' | 'save' | 'emergency') => (pulse?.jar === j ? 'cafe-clink' : undefined)
   const umbrellaOpen = raining && (run.rainPaid.emergency ?? 0) > 0
   return (
@@ -217,7 +220,9 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
       <image href={`${C}/bistro-chair-r.webp`} x={350} y={188} width={46} height={72} preserveAspectRatio="xMidYMax meet" opacity=".95" />
 
       {/* on the table: Ammamma's envelope until payday is split */}
-      {envelope && <g transform="translate(296 172) scale(1.5) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
+      {env === 'table' && <g transform="translate(296 172) scale(1.5) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
+      {env === 'counter' && <g transform="translate(392 166) scale(1.2) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
+      {env === 'slide' && <g transform="translate(296 172)"><g className="cafe-envslide"><g transform="scale(1.5) translate(-18 -2)"><Envelope x={0} y={0} /></g></g></g>}
       {/* the tumbler (Spend) */}
       <g opacity={dim('spend')} filter={glow('spend')} className={clink('spend')}>
         <image href={`${C}/tumbler.webp`} x={270} y={166} width={22} height={24} preserveAspectRatio="xMidYMax meet" />

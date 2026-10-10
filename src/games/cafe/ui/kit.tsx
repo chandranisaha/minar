@@ -5,6 +5,7 @@ import { paid, paymentError, paymentTotal, startingPayment } from '../engine/eco
 import { dayOf, phaseOf, type Step } from '../engine/flow'
 import type { Payment, Run, Source } from '../engine/types'
 import { useGame } from '../../../store/game'
+import { balance, starCount } from '../engine/balance'
 import { moodOf, moodStage } from '../engine/mood'
 import { stageOf } from '../engine/pressure'
 import { useStage } from '../state/stage'
@@ -161,6 +162,8 @@ function Gauges({ run }: { run: Run }) {
   const focus = useStage((s) => s.focus)
   const m = moodOf(run)
   const ms = moodStage(m)
+  const bal = balance(run)
+  const risk = stageOf(run.fizz.fun) >= 3 || stageOf(run.fizz.friends) >= 3
   const face = ['😞', '😕', '😐', '🙂', '😄'][ms]
   const bottle = (kind: 'fun' | 'friends', label: string) => {
     const v = run.fizz[kind]
@@ -169,7 +172,7 @@ function Gauges({ run }: { run: Run }) {
       <div className={`cafe-gauge ${focus === 'bottle' ? 'is-hot' : ''} ${s >= 3 ? 'is-alert' : ''}`} key={kind}>
         <img src={`/art/cafe/bottle-${kind}-${s}.webp`} alt="" className={`cafe-gauge-bottle ${s >= 3 ? 'is-fizzing' : ''}`} style={{ transform: `scale(${[1, 1.05, 1.18, 1.4, 1.4][s]})` }} draggable={false} />
         <div className="min-w-0 flex-1">
-          <div className="cafe-gauge-label">{label}<span>{s === 3 ? t('gauge.alert') : stage(v)}</span></div>
+          <div className="cafe-gauge-label"><span className={`cafe-star ${bal[kind === 'fun' ? 'wants' : 'friends'] ? 'on' : ''}`} aria-hidden>★</span>{label}<span>{s === 3 ? t('gauge.alert') : stage(v)}</span></div>
           <div className="cafe-gauge-bar" role="img" aria-label={`${label}: ${stage(v)}`}>
             {[0, 1, 2, 3, 4].map((i) => <i key={i} className={i <= s && (s > 0 || i === 0) ? `on s${s}` : ''} />)}
           </div>
@@ -185,11 +188,15 @@ function Gauges({ run }: { run: Run }) {
         <div className="cafe-gauge">
           <span className="cafe-gauge-face" aria-hidden>{face}</span>
           <div className="min-w-0 flex-1">
-            <div className="cafe-gauge-label">{t('gauge.mood')}<span>{t(`gauge.m${ms}`)}</span></div>
+            <div className="cafe-gauge-label"><span className={`cafe-star ${bal.mood ? 'on' : ''}`} aria-hidden>★</span>{t('gauge.mood')}<span>{t(`gauge.m${ms}`)}</span></div>
             <div className="cafe-gauge-bar is-mood" role="img" aria-label={`${t('gauge.mood')}: ${t(`gauge.m${ms}`)}`}><b style={{ width: `${Math.max(6, m)}%` }} /></div>
           </div>
         </div>
         <button type="button" className="cafe-gauge-help" aria-label={t('gauge.help')} onClick={() => setOpen(true)}>?</button>
+      </div>
+      <div className={`cafe-stake ${risk ? 'is-risk' : ''}`} role="status">
+        <b aria-hidden>{'★'.repeat(starCount(bal))}<em>{'★'.repeat(3 - starCount(bal))}</em></b>
+        <span>{risk ? t('gauge.risk') : t('gauge.stake')}</span>
       </div>
       {open && (
         <div className="cafe-sheet" role="dialog" aria-label={t('gauge.title')} onClick={() => setOpen(false)}>
@@ -318,6 +325,7 @@ export function PauseOverlay({ onExit }: { onExit: () => void }) {
   const slow = useCafe((s) => s.slow)
   const setPaused = useCafe((s) => s.setPaused)
   const setSlow = useCafe((s) => s.setSlow)
+  const restart = useCafe((s) => s.restart)
   if (!paused) return null
   return (
     <div className="cafe-sheet" role="dialog" aria-label={t('hud.pauseTitle')}>
@@ -329,6 +337,7 @@ export function PauseOverlay({ onExit }: { onExit: () => void }) {
         </label>
         <div className="flex flex-col gap-2">
           <Btn onClick={() => setPaused(false)}>{t('hud.resume')} ▸</Btn>
+          <Btn kind="cream" onClick={() => restart()}>↻ {t('tally.playAgain')}</Btn>
           <Btn kind="cream" onClick={onExit}>{t('hud.quit')}</Btn>
         </div>
       </div>

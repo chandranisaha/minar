@@ -96,7 +96,8 @@
     "rOne": "One. Okay, let's see.",
     "rTwo": "Two or more? Ready for anything, I see.",
     "rIdk": "Fair enough. Nobody really knows.",
-    "after": "Okay! Now let's sort your money."
+    "after": "Okay! Now let's sort your money.",
+    "give": "Before you sit. This came for you. From Ammamma."
   },
   "r1": {
     "l1": "Smart people decide where money goes before spending it.",
@@ -393,7 +394,12 @@
     "mm1": "So-so. A bit more room for things you enjoy would help.",
     "mm2": "Okay. Not tired, not thrilled.",
     "mm3": "Good. You made room for things that matter to you.",
-    "mm4": "Great. Treats and friends kept the month fun."
+    "mm4": "Great. Treats and friends kept the month fun.",
+    "balance": "Balance",
+    "bAll": "All three stars. Nicely balanced.",
+    "bFail": "Missed: {{list}}",
+    "perfect": "PERFECT MONTH",
+    "perfectLine": "Goal reached, bottles calm, mood good. That is the hardest month to have."
   },
   "arch": {
     "fastmover": {
@@ -672,7 +678,9 @@
     "intro": "See the two bottles up top? Every no to a want makes them fizzier. Yes lets them settle.",
     "tag": "Pressure: how much you're holding back",
     "why5": "If a bottle fills up, it pops and you get the Big Night. If your mood ends low, your report says so, and it's a sign to plan a small treat.",
-    "alert": "Almost full!"
+    "alert": "Almost full!",
+    "stake": "Keep all three stars lit and reach your goal for a Perfect Month.",
+    "risk": "A full bottle pops. The Big Night takes ₹60 to ₹100 out of your money."
   },
   "meet": {
     "p1": "This is your Wants bottle. Every time you say no to something you want, it gets a little fizzier.",
@@ -687,6 +695,15 @@
     "p5s": "It doesn't change your money. It shows in your report at the end.",
     "p6": "Wants cost money too. When Spend runs out, the rest comes out of your goal.",
     "p6s": "Bills can't be skipped. Wants can. That's the real choice this month.",
-    "go": "Got it, let's start"
+    "go": "Got it, let's start",
+    "p7": "Keep both bottles calm and your mood good, and you earn three stars. Three stars and your goal make a Perfect Month.",
+    "p7s": "That's the real win. Reaching the money alone is only part of it."
+  },
+  "letter": {
+    "tap": "Tap to open",
+    "dear": "Dear one,",
+    "body": "Here is your money for the month, ₹600. Spend it wisely, and listen to Chacha.",
+    "sign": "With love, Ammamma",
+    "take": "Take the money"
   }
 }

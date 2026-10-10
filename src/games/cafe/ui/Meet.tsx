@@ -16,6 +16,7 @@ const PAGES: Page[] = [
   { key: 'p3', who: 'chacha', kinds: ['fun', 'friends'], loop: DOWN },
   { key: 'p4', who: 'chacha', kinds: ['fun'], loop: [100] },
   { key: 'p5', who: 'chacha', kinds: [], loop: [], mood: true },
+  { key: 'p7', who: 'chacha', kinds: [], loop: [] },
   { key: 'p6', who: 'chacha', kinds: [], loop: [] },
 ]
 

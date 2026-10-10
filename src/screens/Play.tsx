@@ -42,7 +42,7 @@ function SaveGame() {
         cohortCode={params.get('cohort') ?? 'local'}
         onComplete={(r) => {
           saveResult(r)
-          if (r.minaretLit) complete('save')
+          complete('save')
         }}
         onExit={() => nav('/')}
       />

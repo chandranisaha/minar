@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LangSwitch } from '../../../components/Hud'
 import { GOAL, INCOME } from '../engine/content'
 import { GOALS, type GoalId, type Run } from '../engine/types'
+import { useStage } from '../state/stage'
 import { useCafe } from '../state/store'
 import { Btn, Caption, Script } from './kit'
+import { Letter } from './Letter'
 import { useCt } from './text'
 
 /** Entry card: names the café, what the player will learn, and the guardrails. */
@@ -31,17 +33,31 @@ export function Entry({ onExit }: { onExit: () => void }) {
   )
 }
 
-/** Round 0: the walk in. Chacha, the envelope, Ammamma's note. */
+/** Round 0: the walk in. Chacha hands over Ammamma's envelope, the scene goes full screen on her letter, then the story goes on. */
 export function WalkIn() {
   const { t } = useCt()
   const next = useCafe((s) => s.next)
+  const setStage = useStage((s) => s.set)
+  const [part, setPart] = useState<'a' | 'letter' | 'b'>('a')
+  useEffect(() => { setStage({ letter: 'counter' }); return () => setStage({ letter: null }) }, [setStage])
+  if (part === 'letter') {
+    return <Letter onDone={() => { setStage({ letter: 'table' }); setPart('b') }} />
+  }
+  if (part === 'a') {
+    return (
+      <Script
+        lines={[
+          { who: 'scene', text: t('r0.l1') },
+          { text: t('r0.l2') },
+          { text: t('r0.give') },
+        ]}
+        onDone={() => { setStage({ letter: 'slide' }); window.setTimeout(() => setPart('letter'), 1100) }}
+      />
+    )
+  }
   return (
     <Script
       lines={[
-        { who: 'scene', text: t('r0.l1') },
-        { text: t('r0.l2') },
-        { who: 'scene', text: t('r0.l3') },
-        { who: 'note', text: t('r0.note') },
         { text: t('r0.l4') },
         { text: t('r0.l5') },
         { text: t('r0.l6') },

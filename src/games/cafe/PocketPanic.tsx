@@ -3,6 +3,7 @@ import './ui/cafe.css'
 import { useCallback, useEffect } from 'react'
 import type { GameResult } from '../../lib/gameResult'
 import { useGame, useLite } from '../../store/game'
+import { balance, starCount } from './engine/balance'
 import { billOf, isBusy } from './engine/flow'
 import type { Tally } from './engine/types'
 import { useStage } from './state/stage'
@@ -54,7 +55,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
       game: 'cafe',
       cohortCode,
       seed: run.seed,
-      score: { saved: t.saved, behaviours: Object.values(t.evidence).filter(Boolean).length, total: Object.values(t.evidence).filter(Boolean).length },
+      score: { balance: starCount(balance(run)), saved: t.saved, behaviours: Object.values(t.evidence).filter(Boolean).length, total: Object.values(t.evidence).filter(Boolean).length },
       evidence: { ...t.evidence, little: t.little, cushionUsed: t.cushionUsed, borrowCost: t.borrowCost, lent: t.lentOut, billsFromSave: t.billsBySource.save },
       lessonsSeen: t.cards.slice(0, 3).map((c) => c.id),
       minaretLit: t.ending === 'reached' || t.ending === 'reachedCost',
@@ -93,7 +94,7 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
       {step !== 'entry' && <Hud step={step} run={run} />}
       <div className="cafe-main" data-busy={isBusy(step) && step !== 'entry' ? '1' : undefined}>
         <div className="cafe-stage" aria-hidden={step === 'entry'}>
-          <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} demo={stage.demo} reached={run.jars.save >= 250} lite={lite} />
+          <Scene step={step} run={run} player={{ gender, persona }} saucers={stage.saucers} vendor={stage.vendor} beat={stage.beat} focus={stage.focus} platesCount={stage.plates} pulse={stage.pulse} demo={stage.demo} letter={stage.letter} reached={run.jars.save >= 250} lite={lite} />
         </div>
         <div className="cafe-dock">
           <div className="cafe-dock-inner">

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { GOAL } from '../engine/content'
 import { flips, settle } from '../engine/tally'
 import { EXPERIMENTS, type Experiment, type MonthSummary, type Tally as TallyT } from '../engine/types'
+import { balance, isPerfect, starCount, STARS } from '../engine/balance'
 import { moodOf, moodStage } from '../engine/mood'
 import { useCafe } from '../state/store'
 import { Btn, Caption } from './kit'
@@ -23,7 +24,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
   const { t, band, ledgerText } = useCt()
   const run = useCafe((s) => s.run)
   const recordMonth = useCafe((s) => s.recordMonth)
-  const next = useCafe((s) => s.next)
+  const restart = useCafe((s) => s.restart)
   const setLedgerOpen = useCafe((s) => s.setLedgerOpen)
   const tally = useTally()
   const [page, setPage] = useState<Page>('settle')
@@ -43,7 +44,8 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
     const second = reached ? (spentOnWants > 0 ? t('tally.secReachedSpent', { w: spentOnWants }) : t('tally.secReachedNone')) : spentOnWants > 0 ? t('tally.secShortSpent', { x: tally.goalGap }) : t('tally.secShortNone')
     return (
       <div className="flex flex-col gap-3">
-        <div className={`cafe-stamp ${reached ? '' : 'is-notyet'}`}>{reached ? t('phases.survived') : t('phases.notyet')}</div>
+        <div className={`cafe-stamp ${reached ? '' : 'is-notyet'} ${isPerfect(run, reached) ? 'is-perfect' : ''}`}>{isPerfect(run, reached) ? t('tally.perfect') : reached ? t('phases.survived') : t('phases.notyet')}</div>
+        {isPerfect(run, reached) && <Caption text={t('tally.perfectLine')} />}
         {reached && <div className="cafe-petals" aria-hidden>{Array.from({ length: 7 }, (_, i) => <span key={i} style={{ left: `${10 + i * 12}%`, animationDelay: `${i * 0.35}s` }} />)}</div>}
         <Caption text={head} />
         <Caption text={second} />
@@ -59,6 +61,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
       [t('tally.little'), `₹${tally.little}`, run.predict2 !== undefined ? t('tally.littleGuess', { range: band(run.predict2) }) : ''],
       [t('tally.cushion'), `₹${tally.cushionUsed + tally.cushionKept}`, t('tally.cushionSplit', { u: tally.cushionUsed, k: tally.cushionKept })],
       [t('tally.cost'), `₹${tally.extra + tally.lentOut}`, t('tally.costSplit', { e: tally.extra, l: tally.lentOut })],
+      [t('tally.balance'), '★'.repeat(starCount(balance(run))) + '☆'.repeat(3 - starCount(balance(run))), starCount(balance(run)) === 3 ? t('tally.bAll') : t('tally.bFail', { list: STARS.filter((k) => !balance(run)[k]).map((k) => t(`gauge.${k}`)).join(', ') })],
       [t('tally.mood'), ['😞', '😕', '😐', '🙂', '😄'][moodStage(moodOf(run))], t(`tally.mm${moodStage(moodOf(run))}`)],
     ]
     return (
@@ -141,7 +144,7 @@ export function TallyRound({ onFinish, onExit }: { onFinish: (t: TallyT) => void
       <div className="flex flex-wrap justify-end gap-2">
         <Btn kind="cream" onClick={() => setLedgerOpen(true)}>📒 {t('tally.seeWhere')}</Btn>
         <Btn kind="cream" onClick={onExit}>{t('tally.done')}</Btn>
-        <Btn onClick={next}>↻ {t('tally.playAgain')}</Btn>
+        <Btn onClick={() => restart()}>↻ {t('tally.playAgain')}</Btn>
       </div>
     </div>
   )
@@ -194,7 +197,7 @@ export function ThenNow() {
 /** pick one thing to do differently. It is the player's own hypothesis. */
 export function OneChange({ onExit }: { onExit: () => void }) {
   const { t } = useCt()
-  const newMonth = useCafe((s) => s.newMonth)
+  const restart = useCafe((s) => s.restart)
   const [chosen, setChosen] = useState<Experiment | null>(null)
   return (
     <div className="flex flex-col gap-2">
@@ -206,7 +209,7 @@ export function OneChange({ onExit }: { onExit: () => void }) {
       </div>
       <div className="flex justify-end gap-2">
         <Btn kind="cream" onClick={onExit}>{t('tally.done')}</Btn>
-        <Btn disabled={!chosen} onClick={() => chosen && newMonth(chosen)}>{t('replay.again')} ▸</Btn>
+        <Btn disabled={!chosen} onClick={() => chosen && restart()}>{t('replay.again')} ▸</Btn>
       </div>
     </div>
   )

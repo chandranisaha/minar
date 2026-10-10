@@ -5,6 +5,7 @@ import {
   applyPayment, billAmount, buyWindow, chooseBigNight, chooseTeja, confirmPayday, declineWindow, newRun, openBigNight,
   payBill, paydayError, paymentError, rainBill, tejaAvailable, trolleyOk, trolleySkip,
 } from '../engine/economy'
+import { balance, isPerfect, starCount } from '../engine/balance'
 import { moodOf, moodStage } from '../engine/mood'
 import { popped, stageOf } from '../engine/pressure'
 import { nextMonth, settle, summarize } from '../engine/tally'
@@ -206,5 +207,18 @@ describe('mood (display only)', () => {
     expect(kind.jars.save).toBe(base.jars.save)
     expect(moodStage(0)).toBe(0)
     expect(moodStage(100)).toBe(4)
+  })
+})
+
+describe('balance stars (the stakes)', () => {
+  test('a calm bottle, a calm bottle and a good mood earn three stars; a popped bottle loses its star', () => {
+    const base = fresh()
+    expect(starCount(balance(base))).toBe(2) // both calm, mood 50 is not yet good
+    const happy = chooseTeja(buyWindow(base, 'gamepack', { spend: 50 }, 'get'), 'gift30')
+    expect(balance(happy).mood).toBe(true)
+    const popped = { ...base, fizz: { fun: 100, friends: 0 } }
+    expect(balance(popped).wants).toBe(false)
+    expect(isPerfect(happy, true)).toBe(true)
+    expect(isPerfect(happy, false)).toBe(false)
   })
 })
