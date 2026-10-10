@@ -67,7 +67,7 @@ export function Ask({ q, opts, value, onPick, onLock, go, note }: { q: string; o
  * The two cash lines, as a table so every number has text (a negative is "Short", never just a colour).
  * The certain line is what the cushion is measured on.
  */
-/** The money path: how much money is left in the kitty after each date's bills, as bars, with what "spare money" means. */
+/** The money path: how much money is left in the fund after each date's bills, as bars, with what "spare money" means. */
 export function CashLinesTable({ lines }: { lines: CashLines }) {
   const { t, money, when } = useSd()
   const top = Math.max(1, ...POINTS.flatMap((p) => [lines.optimistic[p], lines.cautious[p]]))
@@ -84,7 +84,7 @@ export function CashLinesTable({ lines }: { lines: CashLines }) {
           return (
             <li key={p}>
               <div className="flex items-baseline justify-between text-[13px] font-extrabold">
-                <span>{when(p)}</span>
+                <span>{when(p)} <span className="font-bold opacity-80">· {t('lines.bills', { money: money(lines.due[p]) })}</span></span>
                 <span style={{ color: sure < 0 ? '#7A2A22' : undefined }}>{sure < 0 ? `▼ ${t('lines.shortBy', { money: money(-sure) })}` : t('lines.sure', { money: money(sure) })}</span>
               </div>
               <div className="relative h-5 overflow-hidden rounded-md border-2 border-ink" style={{ background: '#FFF8E6' }} aria-hidden>

@@ -291,13 +291,13 @@
   },
   "lines": {
     "title": "Will your money last?",
-    "intro": "This is the money left in your kitty after paying each date's bills. Green is money you are sure of.",
-    "sure": "{{money}} left",
-    "shortBy": "{{money}} short",
+    "intro": "You start with ₹20,000 in the festival fund. On each date, the bills you signed are paid out of it. The bar shows how much money is still in the fund after that date's bills.",
+    "sure": "{{money}} still in fund",
+    "shortBy": "{{money}} missing",
     "short": "Not enough",
-    "promised": "{{money}} if every promise arrives",
-    "keySure": "Money you are sure of",
-    "keyPromised": "Plus money people promised (sponsor, donation, ticket sales). It may not come.",
+    "promised": "Could be {{money}} if every promise arrives",
+    "keySure": "Money you are sure of (your ₹20,000 minus bills)",
+    "keyPromised": "Plus promised money (sponsor, donation, ticket sales). It may not come.",
     "verdictOk": "Spare money for surprises: {{money}}",
     "explainOk": "Spare money is what is left over when it is tightest ({{when}}), counting only sure money. Surprise bills of ₹500 to ₹2,000 will come out of it. The more you keep, the safer you are.",
     "verdictShort": "On {{when}} you would be {{money}} short",
@@ -309,7 +309,8 @@
     "cushionNote": "",
     "optimistic": "If every promise arrives",
     "cautious": "Only what's certain",
-    "fd": ""
+    "fd": "",
+    "bills": "bills {{money}}"
   },
   "check": {
     "title": "Plan check",
@@ -439,7 +440,7 @@
       "sub": "Every bill and every payment, as the colony reads it.",
       "received": "Money received",
       "paid": "Money paid",
-      "left": "Left in the kitty",
+      "left": "Left in the festival fund",
       "start": "Cash at the start",
       "unrecorded": "UNRECORDED",
       "unrecordedLine": "Cash to Sunny: {{given}} paid, {{back}} came back, {{lost}} has no bill and no record.",
