@@ -16,9 +16,7 @@
       "G": "Profitable, or 12 months or more of cash.",
       "A": "Runway of 6 to 12 months.",
       "R": "Runway under 6 months.",
-      "deflect": "“We are focused on growth.”",
-      "ask2": "How many months can it survive?",
-      "ask3": "{{founder}}, how much cash is left?"
+      "deflect": "“We are focused on growth.”"
     },
     "customers": {
       "name": "Customers",
@@ -27,9 +25,7 @@
       "G": "More customers arriving than leaving, and 75% or more stay.",
       "A": "Customers about steady, 60 to 75% stay.",
       "R": "Losing more customers than it wins, or few sign-ups pay.",
-      "deflect": "“People love us.”",
-      "ask2": "Are people actually paying?",
-      "ask3": "{{founder}}, who is leaving and who is staying?"
+      "deflect": "“People love us.”"
     },
     "debt": {
       "name": "Loans",
@@ -38,9 +34,7 @@
       "G": "No debt, or profit pays the interest 3 times or more.",
       "A": "Profit pays the interest 1.5 to 3 times.",
       "R": "Interest is hard to cover, or debt is growing while margin falls.",
-      "deflect": "“We are investing in growth.”",
-      "ask2": "Any big loans to repay?",
-      "ask3": "{{founder}}, what do you owe the bank?"
+      "deflect": "“We are investing in growth.”"
     },
     "ceo": {
       "name": "Boss’s shares",
@@ -49,9 +43,7 @@
       "G": "No share sales in the last 3 quarters.",
       "A": "One sale in the last 3 quarters.",
       "R": "Sales in 2 or more of the last 3 quarters.",
-      "deflect": "“That is private.”",
-      "ask2": "Is the boss cashing out?",
-      "ask3": "{{founder}}, are you selling your shares?"
+      "deflect": "“That is private.”"
     },
     "detail": {
       "cashProfit": "Profitable this quarter.",

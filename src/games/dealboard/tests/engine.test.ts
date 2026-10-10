@@ -42,28 +42,28 @@ describe('run setup', () => {
     }
   })
 
-  test('the ring has four company corners and twelve quarters in order', () => {
-    expect(RING_SIZE).toBe(16)
+  test('the ring has four company corners and eight quarters in order', () => {
+    expect(RING_SIZE).toBe(12)
     expect(RING.filter((s) => s.kind === 'lot').map((s) => (s.kind === 'lot' ? s.index : -1))).toEqual([0, 1, 2, 3])
     expect(RING.filter((s) => s.kind === 'quarter').map((s) => (s.kind === 'quarter' ? s.q : -1))).toEqual(Array.from({ length: TURNS }, (_, i) => i + 1))
     for (let i = 0; i < 4; i++) expect(RING[lotTile(i)]).toEqual({ kind: 'lot', index: i })
     for (let q = 1; q <= TURNS; q++) expect(RING[quarterTile(q)]).toEqual({ kind: 'quarter', q })
   })
 
-  test('market fall lands in Q8-Q10 and starts at -12%', () => {
+  test('market fall lands in Q5-Q7 and starts at -12%', () => {
     for (const s of SEEDS.slice(0, 50)) {
       const { banners, fallQ } = buildBanners(s, pickCompanies(s))
-      expect(fallQ).toBeGreaterThanOrEqual(8)
-      expect(fallQ).toBeLessThanOrEqual(10)
+      expect(fallQ).toBeGreaterThanOrEqual(5)
+      expect(fallQ).toBeLessThanOrEqual(7)
       expect(banners[fallQ - 1].marketShock).toBe(-0.12)
     }
   })
 
-  test('the family emergency lands between quarters 8 and 10', () => {
+  test('the family emergency lands between quarters 5 and 7', () => {
     for (const s of SEEDS) {
       const t = emergencyTurn(s)
-      expect(t).toBeGreaterThanOrEqual(8)
-      expect(t).toBeLessThanOrEqual(10)
+      expect(t).toBeGreaterThanOrEqual(5)
+      expect(t).toBeLessThanOrEqual(7)
     }
     expect(new Set(SEEDS.map(emergencyTurn)).size).toBeGreaterThan(1)
   })
@@ -80,25 +80,25 @@ describe('run setup', () => {
 })
 
 describe('story arcs (spec "Story arc of each company")', () => {
-  const positive = (id: CompanyId) => share((m) => hist(m, id)[12].price > hist(m, id)[0].price)
+  const positive = (id: CompanyId) => share((m) => hist(m, id)[8].price > hist(m, id)[0].price)
 
   test('Daily Basket: dull and sound', () => {
-    const growth = median(RUNS.map((m) => Math.pow(hist(m, 'dailyBasket')[12].revenue / 40, 1 / 12) - 1))
+    const growth = median(RUNS.map((m) => Math.pow(hist(m, 'dailyBasket')[8].revenue / 40, 1 / 8) - 1))
     expect(growth).toBeGreaterThan(0.03)
     expect(growth).toBeLessThan(0.05)
     expect(share((m) => hist(m, 'dailyBasket').every((s) => s.retention > 0.85))).toBeGreaterThan(0.95)
-    expect(share((m) => hist(m, 'dailyBasket')[12].margin > 0.1)).toBeGreaterThan(0.9)
+    expect(share((m) => hist(m, 'dailyBasket')[8].margin > 0.1)).toBeGreaterThan(0.9)
     expect(positive('dailyBasket')).toBeGreaterThan(0.85)
   })
 
   test('PayEasy: booms, runway shrinks while price rises, then down-round or failure', () => {
     for (const m of RUNS) {
       const h = hist(m, 'payEasy')
-      expect(h[6].runwayMonths!).toBeLessThan(3)
-      if (m.payEasyPath === 'downRound') expect(h[8].events).toContain('downRound')
-      else expect(h[10].failed).toBe(true)
+      expect(h[4].runwayMonths!).toBeLessThan(3)
+      if (m.payEasyPath === 'downRound') expect(h[5].events).toContain('downRound')
+      else expect(h[6].failed).toBe(true)
     }
-    expect(median(RUNS.map((m) => hist(m, 'payEasy')[5].price))).toBeGreaterThan(100)
+    expect(median(RUNS.map((m) => hist(m, 'payEasy')[3].price))).toBeGreaterThan(100)
     expect(positive('payEasy')).toBeLessThan(0.25)
   })
 
@@ -132,15 +132,15 @@ describe('story arcs (spec "Story arc of each company")', () => {
     expect(positive('steelWorks')).toBeLessThan(0.25)
   })
 
-  test('QuickRide: users soar, paying flat, CEO sells Q3-Q5, crash at Q7', () => {
+  test('QuickRide: users soar, paying flat, CEO sells Q2-Q4, crash at Q5', () => {
     for (const m of RUNS) {
       const h = hist(m, 'quickRide')
-      expect([3, 4, 5].map((q) => h[q].ceoTrade)).toEqual(['SELL', 'SELL', 'SELL'])
-      expect(h[7].events).toContain('restated')
-      expect(h[6].users / h[0].users).toBeGreaterThan(3)
-      expect(Math.abs(h[6].customers / h[0].customers - 1)).toBeLessThan(0.2)
+      expect([2, 3, 4].map((q) => h[q].ceoTrade)).toEqual(['SELL', 'SELL', 'SELL'])
+      expect(h[5].events).toContain('restated')
+      expect(h[4].users / h[0].users).toBeGreaterThan(3)
+      expect(Math.abs(h[4].customers / h[0].customers - 1)).toBeLessThan(0.2)
     }
-    expect(median(RUNS.map((m) => hist(m, 'quickRide')[5].price))).toBeGreaterThan(150)
+    expect(median(RUNS.map((m) => hist(m, 'quickRide')[4].price))).toBeGreaterThan(150)
     expect(positive('quickRide')).toBeLessThan(0.25)
   })
 
@@ -150,7 +150,7 @@ describe('story arcs (spec "Story arc of each company")', () => {
     expect(h[2].events).not.toContain('layoffNews')
   })
 
-  test('every company has 13 snapshots (start + 12 quarters)', () => {
-    for (const id of COMPANY_IDS) expect(hist(RUNS[0], id)).toHaveLength(13)
+  test('every company has 9 snapshots (start + 8 quarters)', () => {
+    for (const id of COMPANY_IDS) expect(hist(RUNS[0], id)).toHaveLength(9)
   })
 })

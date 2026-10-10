@@ -99,7 +99,7 @@ describe('a quarter is one screen with one real decision', () => {
       run = act(run, { type: 'hold', companyId: id })
       expect(run.log.length).toBe(before + 1)
       expect(run.log.at(-1)).toMatchObject({ type: 'HOLD', companyId: id })
-      while (run.phase === 'lesson' || run.phase === 'yearEnd') run = act(run, { type: 'continue' })
+      while (run.phase === 'lesson' || run.phase === 'yearEnd' || run.phase === 'emergency') run = run.phase === 'emergency' ? act(run, { type: 'payEmergency' }) : act(run, { type: 'continue' })
     }
     expect(new Set(seen).size).toBe(4)
   })
@@ -110,7 +110,7 @@ describe('a quarter is one screen with one real decision', () => {
       const seed = `hold-${i}`
       const m = marketFor(seed)
       for (const id of m.pitchOrder) {
-        for (let turn = 2; turn <= 12; turn++) {
+        for (let turn = 2; turn <= 8; turn++) {
           const run = { ...newRun(seed), briefed: true, turn, holdings: { [id]: { units: 10, cost: 1000, since: 1 } } } as RunState
           const first = Object.keys(run.holdings)[0] as CompanyId
           const done = { ...run, log: [{ id: 'x', q: turn, type: 'HOLD' as const, companyId: first, tabsOpened: [], questionsAsked: [], known: LIGHTS, price: 100 }] }
@@ -159,7 +159,7 @@ describe('a quarter is one screen with one real decision', () => {
     expect(run.cash).toBe(50000 + Math.round(100 * price - Math.round(100 * price * 0.01)))
   })
 
-  test('the family emergency fires once, in quarters 8 to 10', () => {
+  test('the family emergency fires once, in quarters 5 to 7', () => {
     const run = play('emergency-1', investEvery(25000))
     expect(run.emergencyDone).toBe(true)
     expect(run.phase).toBe('done')
@@ -187,19 +187,20 @@ describe('a quarter is one screen with one real decision', () => {
     expect(play('same-1', investEvery(20000))).toEqual(play('same-1', investEvery(20000)))
   })
 
-  test('a full run always ends in done after 12 quarters', () => {
+  test('a full run always ends in done after 8 quarters', () => {
     for (const seed of ['a1', 'a2', 'a3']) {
       const run = play(seed, investEvery(10000, 1))
       expect(run.phase).toBe('done')
-      expect(run.turn).toBe(12)
-      expect(run.series).toHaveLength(13)
+      expect(run.turn).toBe(8)
+      expect(run.series).toHaveLength(9)
     }
   })
 
   test('idle cash loses 1% a quarter when nothing is invested', () => {
     const run = play('drag-1', () => null)
     expect(run.cashDragLost).toBeGreaterThan(0)
-    expect(run.cash + run.cashDragLost + 25000 - run.loan).toBeGreaterThanOrEqual(99900)
+    const wild = Object.values(run.wild ?? {}).reduce((s, w) => s + w.delta, 0)
+    expect(run.cash + run.cashDragLost + 25000 - run.loan - wild).toBeGreaterThanOrEqual(99900)
   })
 })
 
@@ -222,7 +223,7 @@ describe('lessons come from the player’s own decisions', () => {
   test('selling 70% or more in the market fall with no weak checks is panic: no buying next quarter, lesson 7', () => {
     for (let i = 0; i < 400; i++) {
       const m = marketFor(`dip-${i}`)
-      if (m.fallQ > 10) continue
+      if (m.fallQ > 8) continue
       const t = m.fallQ
       const id = 'dailyBasket'
       const price = m.history[id][t - 1].price
@@ -238,9 +239,9 @@ describe('lessons come from the player’s own decisions', () => {
     }
   })
 
-  test('8 trades or fees above 3% fire lesson 10', () => {
+  test('6 trades or fees above 3% fire lesson 10', () => {
     const m = marketFor('fees-1')
-    let run: RunState = { ...act(newRun('fees-1'), { type: 'brief' }), turn: 5, trades: 8, feesPaid: 200, cash: 90000 }
+    let run: RunState = { ...act(newRun('fees-1'), { type: 'brief' }), turn: 4, trades: 6, feesPaid: 200, cash: 90000 }
     run = act(run, { type: 'pass', companyId: pitchFor(run, m)! })
     expect([run.lesson, ...run.queue].map((l) => l?.id)).toContain(10)
   })
@@ -397,7 +398,7 @@ describe('analytics', () => {
     const run = play('an-1', investEvery(15000, 1))
     const m = marketFor('an-1')
     const a = computeAnalytics(run, m)
-    expect(a.series).toHaveLength(13)
+    expect(a.series).toHaveLength(9)
     expect(a.series[0].networth).toBe(100000)
     expect(a.series.at(-1)!.networth).toBe(a.netWorth)
     expect(a.allocation.reduce((s, x) => s + x.pct, 0)).toBeCloseTo(1, 5)
@@ -458,7 +459,7 @@ describe('why a price moved', () => {
     for (let i = 0; i < 60; i++) {
       const mm = marketFor(`fail-${i}`)
       if (mm.payEasyPath !== 'fail') continue
-      expect(explainQuarter(mm, 'payEasy', 10).reasons[0].key).toBe('event.failed')
+      expect(explainQuarter(mm, 'payEasy', 6).reasons[0].key).toBe('event.failed')
       return
     }
   })

@@ -9,7 +9,7 @@
   ],
   "start": "Start a new game",
   "guardrail": "Simulation with made-up numbers. Real life is different.",
-  "quarter": "Quarter {{n}} of 12",
+  "quarter": "Quarter {{n}} of 8",
   "quarterShort": "Q{{n}}",
   "cash": "Cash",
   "invested": "Invested",

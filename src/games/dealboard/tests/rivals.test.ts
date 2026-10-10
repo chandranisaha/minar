@@ -13,3 +13,22 @@ describe('rival alerts', () => {
     expect(fired).toBeGreaterThan(10)
   })
 })
+
+import { wildcardFor } from '../engine/wildcards'
+import { emergencyTurn } from '../engine/events'
+import { pickCompanies } from '../engine/companies'
+
+describe('wildcards', () => {
+  test('four per run, in different quarters between 2 and 8, never the emergency quarter, one of each kind plus a second tip', () => {
+    for (let s = 0; s < 80; s++) {
+      const seed = `w${s}`
+      const picked = pickCompanies(seed)
+      const em = emergencyTurn(seed)
+      const ws = Array.from({ length: 8 }, (_, i) => ({ t: i + 1, w: wildcardFor(seed, i + 1, picked, em) })).filter((x) => x.w)
+      expect(ws).toHaveLength(4)
+      expect(ws.every((x) => x.t >= 2 && x.t !== em)).toBe(true)
+      expect(ws.map((x) => x.w!.kind).sort()).toEqual(['bill', 'gift', 'tip', 'tip'])
+      for (const x of ws) if (x.w!.kind === 'tip') expect(picked).toContain(x.w!.companyId)
+    }
+  })
+})

@@ -58,7 +58,7 @@ describe('every text the screens ask for exists', () => {
     for (let i = 0; i < 60; i++) {
       const seed = `words-${i}`
       const m = marketFor(seed)
-      for (let turn = 1; turn <= 12; turn++) {
+      for (let turn = 1; turn <= 8; turn++) {
         for (const id of COMPANY_IDS) {
           const base = { ...act(newRun(seed), { type: 'brief' }), turn, holdings: { [id]: { units: 20, cost: 1500 + (turn % 3) * 1500, since: 1 } } } as RunState
           for (const asked of asks) for (const ctx of ctxs) for (const o of reasonOptions(ctx, { ...base, asked: { [id]: asked } }, m, id)) keys.add(o.key)

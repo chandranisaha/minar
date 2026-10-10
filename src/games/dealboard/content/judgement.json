@@ -194,69 +194,40 @@
     "wild": "Wildcard",
     "rival": "A new rival has started winning {{name}}’s customers. More are leaving than joining."
   },
-  "bonus": {
-    "title": "Bonus question",
-    "sub": "A quick check on what you just learned.",
-    "right": "Right!",
-    "wrong": "Not quite. Here is why:",
-    "skip": "Skip",
-    "q": {
-      "0": {
-        "q": "₹10,000 grows 10% a year. After 10 years it is about…",
-        "a0": "₹25,900",
-        "a1": "₹20,000",
-        "a2": "₹11,000",
-        "why": "Growth earns growth, so time does the heavy lifting."
-      },
-      "1": {
-        "q": "Which is better spread out?",
-        "a0": "Three companies in three different sectors",
-        "a1": "Three companies in the same sector",
-        "a2": "One big bet on the best company",
-        "why": "Companies in the same sector often fall together. Spread across different risks."
-      },
-      "2": {
-        "q": "A company has ₹30 lakh and loses ₹3 lakh a month. How long can it last?",
-        "a0": "10 months",
-        "a1": "30 months",
-        "a2": "3 months",
-        "why": "Cash divided by the monthly loss is its runway: 30 ÷ 3 = 10 months."
-      },
-      "3": {
-        "q": "The CEO sells shares every quarter while saying business is booming. What do you check?",
-        "a0": "Cash, customers and debt",
-        "a1": "Nothing, CEOs know best",
-        "a2": "Only the news headlines",
-        "why": "Actions with their own money say more than words. Check the numbers."
-      },
-      "4": {
-        "q": "A fee of 1% on every buy and sell. A buy-then-sell round trip costs about…",
-        "a0": "2%",
-        "a1": "1%",
-        "a2": "0.5%",
-        "why": "You pay once going in and once coming out."
-      },
-      "5": {
-        "q": "A price falls 20% but customers, profit and cash are unchanged. A good first question is…",
-        "a0": "Did the business change, or just the price?",
-        "a1": "How fast can I sell everything?",
-        "a2": "Which friend told me to buy?",
-        "why": "A falling price is not a falling business. Check what actually changed."
-      },
-      "6": {
-        "q": "Someone promises guaranteed 100% returns in 3 months. This is…",
-        "a0": "A red flag for fraud",
-        "a1": "A safe investment",
-        "a2": "Normal for a good company",
-        "why": "No real investment can guarantee returns. Walk away."
-      },
-      "7": {
-        "q": "Money you will need next month should be…",
-        "a0": "In safe cash you can reach quickly",
-        "a1": "In the riskiest company",
-        "a2": "Put into one risky share",
-        "why": "Money needed soon should not ride on a price that can fall."
-      }
-    }
+  "wild": {
+    "tag": "Wildcard",
+    "bill0": "Your phone screen cracked. Repair bill: {{amount}}.",
+    "bill1": "A surprise family wedding gift. It costs you {{amount}}.",
+    "bill2": "Your laptop broke before exams. A new one: {{amount}}.",
+    "gift0": "Festival gift money from relatives: {{amount}} lands in your account.",
+    "gift1": "You won a school quiz prize: {{amount}}.",
+    "gift2": "A small tutoring job paid {{amount}}.",
+    "tip0": "A cousin swears {{name}} will double next quarter. “Put money in now!”",
+    "tip1": "A forwarded message says {{name}} is “guaranteed” to jump. No source given.",
+    "tip2": "A neighbour at the tea stall whispers: “{{name}} is the next big thing.”",
+    "follow": "Follow the tip · {{amount}}",
+    "ignore": "Ignore it",
+    "followed": "You put {{amount}} into {{name}}. You will see how it went next quarter.",
+    "ignored": "You ignored it. A tip is not evidence.",
+    "tooPoor": "Not enough cash to follow it."
+  },
+  "pitch3": {
+    "new": "New company",
+    "what": "What it does",
+    "pitch": "Their pitch",
+    "founder": "Founder",
+    "story": "Read their story",
+    "career": "Career",
+    "look": "Look closer",
+    "close": "Close",
+    "ask": "Do your homework",
+    "askLeft": "{{n}} of 2 checks left",
+    "askNone": "Checks done",
+    "tip": "Each check shows one real number about the company. Checking before you invest raises your Research score.",
+    "cash": "Will it run out of money?",
+    "customers": "Do customers stay and pay?",
+    "debt": "Does it owe a lot?",
+    "ceo": "Is the boss selling shares?",
+    "stars": "Research"
   }
 }

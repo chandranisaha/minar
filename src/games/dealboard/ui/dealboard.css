@@ -18,8 +18,8 @@
   position: relative;
   aspect-ratio: 1;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  grid-template-rows: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
   gap: 4px;
   padding: 8px;
   background: repeating-linear-gradient(135deg, rgba(255, 243, 214, .035) 0 1px, transparent 1px 6px), var(--felt);
@@ -67,8 +67,8 @@
 .db-tile[aria-current="true"] { box-shadow: 0 0 0 3px var(--brass), 3px 3px 0 3px var(--color-ink); z-index: 1; }
 
 .db-centre {
-  grid-column: 2 / 5;
-  grid-row: 2 / 5;
+  grid-column: 2 / 4;
+  grid-row: 2 / 4;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -219,7 +219,7 @@ html[data-lite="true"] .db-hop { animation: none; }
   .db-panel { position: sticky; top: 8px; max-height: calc(100dvh - 90px); overflow-y: auto; }
 }
 .db-boardwrap { container-type: inline-size; }
-@container (max-width: 380px) { .db-centre { gap: 3px; } .db-judge { transform: scale(.85); } }
+@container (max-width: 380px) { .db-centre { gap: 3px; } .db-judge { transform: scale(.78); } }
 
 /* ---- Deal Board keeps its own chunky inked look, whatever the hub's theme is ---- */
 .db-root {

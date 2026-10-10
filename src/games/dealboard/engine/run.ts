@@ -1,10 +1,10 @@
 import type { CompanyId, Decision, LightKey, MarketRun } from './types'
-import { bonusFor } from './bonus'
+import { WILD_TIP, wildcardFor } from './wildcards'
 import { TURNS, YEAR_ENDS } from './board'
 import { TUNING } from './companies'
 import { EMERGENCY_COST } from './events'
 import { redFlags } from './lights'
-import type { ReasonOption } from './reasons'
+import { tipReasons, type ReasonOption } from './reasons'
 import { collectEarned, collectLessons, houseCard, type LessonRef, type QuarterEvents } from './lessons'
 import {
   CASH_DRAG, MIN_BID, reviewFor, TRADE_FEE, decisionQ, investedAt, knownLights, knownQuarter, lightsAt, marketFor,
@@ -24,7 +24,7 @@ export type Action =
   | { type: 'hold'; companyId: CompanyId }
   | { type: 'payEmergency' }
   | { type: 'continue' }
-  | { type: 'bonus'; choice: number }
+  | { type: 'tip'; follow: boolean }
   | { type: 'rewind' }
 
 const why = (r: ReasonOption | null | undefined) => (r ? { reason: r.id, reasonKey: r.key, reasonKind: r.kind, reasonParams: r.params } : {})
@@ -107,6 +107,13 @@ function advance(r: RunState, m: MarketRun): RunState {
   if (r.turn >= TURNS) return { ...r, phase: 'done' }
   const turn = r.turn + 1
   const next: RunState = { ...r, turn, phase: 'desk', lesson: null, asked: {}, soldThisTurn: 0, soldRed: false, emergencySales: [] }
+  // a surprise bill or a windfall lands as the quarter opens; a tip waits for the player's answer
+  const wild = wildcardFor(r.seed, turn, m.picked, m.emergencyTurn)
+  if (wild && wild.kind !== 'tip') {
+    const delta = wild.kind === 'bill' ? -Math.min(next.cash, wild.amount) : wild.amount
+    next.cash += delta
+    next.wild = { ...(r.wild ?? {}), [turn]: { state: 'applied', delta } }
+  }
   next.turnStartInvested = investedAt(next, m, turn - 1)
   next.checkpoints = { ...r.checkpoints, [turn]: strip(next) }
   return next
@@ -258,10 +265,22 @@ export function act(run: RunState, a: Action): RunState {
       return advance(run, m)
     }
 
-    case 'bonus': {
-      if (!bonusFor(run)) return run
-      const right = a.choice === 0
-      return { ...run, bonus: { ...(run.bonus ?? {}), [run.turn]: right } }
+    case 'tip': {
+      const w = wildcardFor(run.seed, run.turn, m.picked, m.emergencyTurn)
+      if (run.phase !== 'desk' || !w || w.kind !== 'tip' || !w.companyId || run.wild?.[run.turn]) return run
+      const id = w.companyId
+      const reasons = tipReasons()
+      if (a.follow) {
+        const bought = buy(run, m, id, WILD_TIP, reasons.follow)
+        if (bought === run) return run
+        return { ...bought, wild: { ...(run.wild ?? {}), [run.turn]: { state: 'followed', delta: -WILD_TIP } } }
+      }
+      const known = knownLights(run, id)
+      return {
+        ...run,
+        wild: { ...(run.wild ?? {}), [run.turn]: { state: 'ignored', delta: 0 } },
+        log: [...run.log, decision(run, 'REJECT', id, { price: priceAt(m, id, knownQuarter(run)), flips: Math.min(2, known.length), known, ...why(reasons.ignore) })],
+      }
     }
 
     case 'rewind': {
@@ -269,7 +288,7 @@ export function act(run: RunState, a: Action): RunState {
       const snap = run.checkpoints[run.turn]
       if (run.phase !== 'lesson' || !snap || run.rewinds.includes(year)) return run
       const restored = { ...snap, checkpoints: Object.fromEntries(Object.entries(run.checkpoints).filter(([k]) => Number(k) <= run.turn)) } as RunState
-      return { ...restored, shown: run.shown, seen: run.seen, bonus: run.bonus, positives: run.positives, flagged: run.flagged, rewinds: [...run.rewinds, year] }
+      return { ...restored, shown: run.shown, seen: run.seen, wild: run.wild, positives: run.positives, flagged: run.flagged, rewinds: [...run.rewinds, year] }
     }
   }
 }

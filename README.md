@@ -19,11 +19,11 @@ Art prompts for the island, landmarks and characters: `ART_PROMPTS.md`. Layout d
 
 ## Deal Board (pillar 3: Understand Investing)
 
-A Monopoly-style ring of 12 quarters. Each quarter you meet one fictional company, ask the founder up to two questions (cash, customers, debt, insider trades), then invest or pass and say why. Between quarters you see how the last one went, answer a quick bonus question and move on.
+A Monopoly-style ring of 8 quarters. Each quarter you meet one fictional company, read its founder's story, run up to two checks (cash, customers, debt, the boss's shares), then invest or pass and say why. Between quarters you see how the last one went and move on.
 
 - **Judgement, not profit:** the score is five skills (research, skepticism, spread, calm, money habits), out of 100, pass mark 60. It never depends on how much money you made.
 - **Learning loop:** every decision is reviewed with what went well and what to improve; lessons fire from what you actually did; one rewind per year; a family emergency tests your cash cushion.
-- **Wildcards:** flashing alerts for a market fall, a sector rally, the family emergency, or a new rival entering a company's market. All come from the real simulated numbers.
+- **Wildcards:** four per run (a surprise bill, a windfall, and two hot tips to follow or ignore), plus flashing alerts for a market fall, a sector rally, the family emergency, or a new rival entering a company's market. Market alerts come from the real simulated numbers.
 - **Final judgement:** a full-screen tabbed card (Overview, Good call, Mixed, Risky, Analytics).
 - **Languages:** English, Hindi and Telugu. The Hindi and Telugu finance terms still need a native-speaker review (see TRANSLATION_REVIEW.md).
 - **Under the hood:** a pure, seeded engine (`src/games/dealboard/engine`) precomputes the whole market from the seed, so a run is reproducible and testable. Deviations from the spec are listed in `DECISIONS.md`.

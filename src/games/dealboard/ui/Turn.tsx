@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { hashSeed } from '../engine/rng'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import { EMERGENCY_COST } from '../engine/events'
 import { explainQuarter } from '../engine/explain'
@@ -14,8 +13,9 @@ import { InfoHeader } from './InfoTip'
 import { LessonCard } from './LessonCard'
 import { LightChip, MiniChart, lightFacts } from './Lights'
 import { AlertStrip, MarketLine, Sheet, useInr } from './Panels'
+import { FounderFace, FounderProfile } from './Founder'
 import { rivalAlerts } from '../engine/rivals'
-import { bonusFor } from '../engine/bonus'
+import { WILD_TIP, wildcardFor } from '../engine/wildcards'
 import { ReviewCard } from './Review'
 import { ASK_STATS, StatRow } from './Stats'
 import type { TradeMode } from './TradeDialog'
@@ -31,17 +31,15 @@ export interface TurnHandlers {
 /** A question you have not asked yet: the check's name and the question, as one tap target. */
 const ASK_ICON: Record<LightKey, string> = { cash: '💰', customers: '👥', debt: '🏦', ceo: '🕵️' }
 
-/** One plain question; the wording rotates by company and run so the four tiles never read the same way twice. */
-function AskTile({ k, id, seed, onAsk, disabled }: { k: LightKey; id: CompanyId; seed: string; onAsk: () => void; disabled: boolean }) {
+/** One check on the company: an icon, what it looks at, and the plain question it answers. */
+function AskTile({ k, onAsk, disabled }: { k: LightKey; onAsk: () => void; disabled: boolean }) {
   const { t } = useTranslation('dealboard')
-  const variant = ['ask', 'ask2', 'ask3'][hashSeed(`${seed}:${id}:${k}`) % 3]
-  const founder = t(`companies.${id}.founder`).split(',')[0]
   return (
     <button type="button" disabled={disabled} onClick={onAsk} className="flex min-h-16 items-center gap-2.5 rounded-lg border-2 border-ink px-2.5 py-1.5 text-left leading-tight" style={{ background: '#FFF3D6', opacity: disabled ? 0.5 : 1 }}>
       <span className="shrink-0 text-[22px]" aria-hidden>{ASK_ICON[k]}</span>
       <span className="min-w-0">
-        <span className="block text-[10px] font-extrabold uppercase tracking-wider opacity-60">{t(`lights.${k}.name`)}</span>
-        <span className="block text-[13px] font-bold">{t(`lights.${k}.${variant}`, { founder })}</span>
+        <span className="block text-[13px] font-extrabold">{t(`lights.${k}.name`)}</span>
+        <span className="block text-[12px] font-semibold opacity-75">{t(`pitch3.${k}`)}</span>
       </span>
     </button>
   )
@@ -57,26 +55,39 @@ function Pitch({ run, m, id, dispatch, onPass, onTrade }: { run: RunState; m: Ma
   const asked = run.asked[id] ?? []
   const known = knownLights(run, id)
   const left = 2 - asked.length
+  const [profile, setProfile] = useState(false)
   const answered = known.filter((k) => founderAnswer(lights, id, k) !== 'X')
   return (
     <div className="space-y-3">
       <div className="overflow-hidden rounded-xl border-[3px] border-ink bg-jasmine" style={{ boxShadow: '3px 4px 0 #2B1A17' }}>
         <div className="flex items-center gap-2 border-b-[3px] border-ink px-3 py-2" style={{ background: SECTOR_COLOUR[COMPANY[id].sector] }}>
-          <Mark id={id} size={28} />
-          <span className="font-sign lang-fit min-w-0 flex-1 truncate text-[18px] text-jasmine" style={{ textShadow: '1.5px 1.5px 0 #2B1A17' }}>{t(`companies.${id}.name`)}</span>
+          <Mark id={id} size={30} />
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.12em] text-jasmine/85">{t('pitch3.new')} · {t(`sectors.${COMPANY[id].sector}`)}</span>
+            <span className="font-sign lang-fit block truncate text-[19px] text-jasmine" style={{ textShadow: '1.5px 1.5px 0 #2B1A17' }}>{t(`companies.${id}.name`)}</span>
+          </span>
           <span className="shrink-0 rounded-full border-2 border-ink bg-mustard px-2 py-0.5 text-[12px] font-extrabold">{t('perShare', { price: money(hist[q].price) })}</span>
         </div>
-        <div className="px-3 py-2.5">
-          <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#8a5a2b]">{t('pitch2.claim')}</div>
-          <div className="text-[16px] font-extrabold leading-snug">{t(`claims.${id}`)}</div>
-          <div className="mt-1 text-[12px] opacity-70">{t(`companies.${id}.founder`)}</div>
+        <div className="space-y-2 px-3 py-2.5">
+          <p className="m-0 text-[15px] font-bold leading-snug">{t(`what.${id}`)}</p>
+          <p className="m-0 text-[14px] leading-snug"><span className="text-[11px] font-extrabold uppercase tracking-wider text-[#8a5a2b]">{t('pitch3.pitch')}</span><br />{t(`claims.${id}`)}</p>
+          <button type="button" onClick={() => setProfile(true)} className="mt-3 flex min-h-14 w-full items-center gap-2.5 rounded-lg border-2 border-ink bg-white/70 px-2 py-1.5 text-left">
+            <span className="shrink-0 overflow-hidden rounded-lg border-2 border-ink"><FounderFace id={id} size={40} /></span>
+            <span className="min-w-0 flex-1 leading-tight">
+              <span className="block text-[11px] font-extrabold uppercase tracking-wider opacity-60">{t('pitch3.founder')}</span>
+              <span className="block truncate text-[14px] font-extrabold">{t(`founders.${id}.name`)}</span>
+              <span className="block truncate text-[12px] opacity-70">{t(`founders.${id}.role`)}</span>
+            </span>
+            <span className="shrink-0 text-[12px] font-extrabold underline decoration-2 underline-offset-4">{t('pitch3.story')} ›</span>
+          </button>
         </div>
       </div>
+      {profile && <FounderProfile id={id} onClose={() => setProfile(false)} />}
 
       <div>
-        <InfoHeader title={`${t('pitch.ask')} · ${left > 0 ? t('pitch.askLeft', { n: left }) : t('pitch.askNone')}`}>{t('pitch.tip')}</InfoHeader>
+        <InfoHeader title={<span>{t('pitch3.ask')} <span className="ml-1 text-[#B8860B]" aria-label={t('pitch3.stars')}>{'★'.repeat(asked.length)}{'☆'.repeat(left)}</span> · {left > 0 ? t('pitch3.askLeft', { n: left }) : t('pitch3.askNone')}</span>}>{t('pitch3.tip')}</InfoHeader>
         <div className="mt-1.5 grid grid-cols-2 gap-1.5" role="group" aria-label={t('lights.title')}>
-          {LIGHT_KEYS.map((k) => (known.includes(k) ? <LightChip key={k} k={k} state={founderAnswer(lights, id, k)} /> : <AskTile key={k} k={k} id={id} seed={run.seed} disabled={left <= 0} onAsk={() => dispatch({ type: 'ask', companyId: id, light: k })} />))}
+          {LIGHT_KEYS.map((k) => (known.includes(k) ? <LightChip key={k} k={k} state={founderAnswer(lights, id, k)} /> : <AskTile key={k} k={k} disabled={left <= 0} onAsk={() => dispatch({ type: 'ask', companyId: id, light: k })} />))}
         </div>
       </div>
 
@@ -194,35 +205,32 @@ function LastQuarter({ run, m, onOpen }: { run: RunState; m: MarketRun; onOpen: 
   )
 }
 
-/** A bonus question about last quarter's lessons: a correct answer earns a little cash. */
-function Bonus({ run, dispatch }: { run: RunState; dispatch: Dispatch }) {
+/** A wildcard: a surprise bill or windfall that has just landed, or a hot tip you can follow or ignore. */
+function Wildcard({ run, m, dispatch }: { run: RunState; m: MarketRun; dispatch: Dispatch }) {
   const { t } = useTranslation('dealboard')
-  const [picked, setPicked] = useState<number | null>(null)
-  const [frozen] = useState(() => bonusFor(run))
-  if (!frozen) return null
-  const { n, order } = frozen
-  const right = picked === 0
+  const money = useInr()
+  const w = wildcardFor(run.seed, run.turn, m.picked, m.emergencyTurn)
+  if (!w) return null
+  const done = run.wild?.[run.turn]
+  if (w.kind !== 'tip') {
+    const amt = Math.abs(done?.delta ?? w.amount)
+    return <AlertStrip tag={t('wild.tag')} tone={w.kind === 'gift' ? 'good' : 'bad'}>{t(`wild.${w.kind}${w.variant}`, { amount: money(amt) })}</AlertStrip>
+  }
+  const name = t(`companies.${w.companyId}.name`)
+  const tooPoor = run.cash < WILD_TIP || !canBuy(run)
   return (
-    <section className="rounded-lg border-2 border-ink bg-white/60 px-3 py-2.5">
-      <div className="db-eyebrow text-[#8a5a2b]">{t('bonus.title')}</div>
-      <p className="m-0 mt-1 text-[15px] font-extrabold leading-snug">{t(`bonus.q.${n}.q`)}</p>
-      <div className="mt-2 grid gap-1.5">
-        {order.map((o) => {
-          const on = picked === o
-          return (
-            <button key={o} type="button" disabled={picked !== null} onClick={() => { setPicked(o); dispatch({ type: 'bonus', choice: o }) }} className="min-h-11 rounded-lg border-2 border-ink px-2.5 py-1.5 text-left text-[14px] font-bold leading-snug" style={{ background: picked === null ? '#FFF3D6' : o === 0 ? '#DCEBC8' : on ? '#F5D9CF' : '#FFF3D6', opacity: picked !== null && !on && o !== 0 ? 0.6 : 1 }}>
-              {t(`bonus.q.${n}.a${o}`)}
-            </button>
-          )
-        })}
-      </div>
-      {picked !== null && (
-        <p className="m-0 mt-2 text-[13px] leading-snug">
-          <span className="font-extrabold" style={{ color: right ? '#2f6f4a' : '#C8442F' }}>{right ? t('bonus.right') : t('bonus.wrong')}</span>{' '}
-          {t(`bonus.q.${n}.why`)}
-        </p>
+    <AlertStrip tag={t('wild.tag')} tone="bad">
+      <span className="block">{t(`wild.tip${w.variant}`, { name })}</span>
+      {!done ? (
+        <span className="mt-2 flex flex-wrap items-center gap-2">
+          <button type="button" className="ink-btn cream" style={{ minHeight: 40, fontSize: 14 }} disabled={tooPoor} onClick={() => dispatch({ type: 'tip', follow: true })}>{t('wild.follow', { amount: money(WILD_TIP) })}</button>
+          <button type="button" className="ink-btn pink" style={{ minHeight: 40, fontSize: 14 }} onClick={() => dispatch({ type: 'tip', follow: false })}>{t('wild.ignore')}</button>
+          {tooPoor && <span className="text-[12px] opacity-75">{t('wild.tooPoor')}</span>}
+        </span>
+      ) : (
+        <span className="mt-1 block text-[13px] font-extrabold">{done.state === 'followed' ? t('wild.followed', { amount: money(WILD_TIP), name }) : t('wild.ignored')}</span>
       )}
-    </section>
+    </AlertStrip>
   )
 }
 
@@ -238,7 +246,7 @@ function Desk({ run, m, dispatch, onOpen, onTrade, onPass }: { run: RunState; m:
       <Sheet title={t('desk.resultsTitle', { n: run.turn - 1 })} tone="#E8B04A" actions={<button type="button" className="ink-btn pink" onClick={() => { setStage('pitch') }}>{t('desk.next')} ▸</button>}>
         <div className="space-y-3">
           <LastQuarter run={run} m={m} onOpen={onOpen} />
-          <Bonus run={run} dispatch={dispatch} />
+          <Wildcard run={run} m={m} dispatch={dispatch} />
         </div>
       </Sheet>
     )

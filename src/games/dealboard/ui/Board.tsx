@@ -8,22 +8,21 @@ import type { CompanyId, MarketRun } from '../engine/types'
 import { HoverCard, Mark, gainPct } from './Companies'
 import { Pawn } from './icons'
 
-/** Grid cell (row, col) of each ring slot on the 5 x 5 board, clockwise from the top-left corner. */
+/** Grid cell (row, col) of each ring slot on the 4 x 4 board, clockwise from the top-left corner. */
 export function cellOf(i: number): [number, number] {
-  if (i <= 4) return [0, i]
-  if (i <= 7) return [i - 4, 4]
-  if (i <= 12) return [4, 12 - i]
-  return [16 - i, 0]
+  if (i <= 3) return [0, i]
+  if (i <= 6) return [i - 3, 3]
+  if (i <= 9) return [3, 9 - i]
+  return [12 - i, 0]
 }
 
 /** Pin the hover card to the side of the tile that keeps it inside the board. */
 function hoverStyle(r: number, c: number): CSSProperties {
   const style: CSSProperties = { position: 'absolute', zIndex: 20 }
-  if (c <= 1) style.left = `${(c / 5) * 100}%`
-  else if (c >= 3) style.right = `${((4 - c) / 5) * 100}%`
-  else { style.left = '50%'; style.transform = 'translateX(-50%)' }
-  if (r <= 1) style.top = `calc(${((r + 1) / 5) * 100}% + 4px)`
-  else style.bottom = `calc(${((5 - r) / 5) * 100}% + 4px)`
+  if (c <= 1) style.left = `${(c / 4) * 100}%`
+  else style.right = `${((3 - c) / 4) * 100}%`
+  if (r <= 1) style.top = `calc(${((r + 1) / 4) * 100}% + 4px)`
+  else style.bottom = `calc(${((4 - r) / 4) * 100}% + 4px)`
   return style
 }
 
@@ -78,7 +77,7 @@ export function Board({ run, m, tokenAt, pitching, onOpen, children }: { run: Ru
         )
       })}
       <div className="db-centre">{children}</div>
-      <div className="db-token" style={{ left: `calc(8px + (100% - 16px) * ${(tc + 0.5) / 5})`, top: `calc(8px + (100% - 16px) * ${(tr + 0.5) / 5})` }}>
+      <div className="db-token" style={{ left: `calc(8px + (100% - 16px) * ${(tc + 0.5) / 4})`, top: `calc(8px + (100% - 16px) * ${(tr + 0.5) / 4})` }}>
         <span key={tokenAt} className="db-hop"><Pawn /></span>
       </div>
       {hover !== null && RING[hover].kind === 'lot' && !touch && (
