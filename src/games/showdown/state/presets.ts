@@ -3,7 +3,7 @@ import { pickTransfer } from '../engine/transfer'
 
 /**
  * Ready-made games for checking and demos: the spec's two reference plans, at any stage.
- * Open /play/plan?showdown&preset=B&at=festival (A or B; at = market, locked, festival, futures, transfer, report).
+ * Open /play/plan?preset=B&at=festival (A or B; at = market, locked, festival, futures, transfer, report).
  */
 const seen = (screen: string): Decision => ({ k: 'seen', screen })
 const INTRO = (ranks: ('G1' | 'G2' | 'G3' | 'G5')[]): Decision[] => [seen('start'), seen('brief'), { k: 'goals', ranked: ranks }, { k: 'predict', id: 'P1', answer: '12' }]

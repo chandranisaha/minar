@@ -25,9 +25,9 @@ npm run build     # must end with "✓ built"
 npm run dev
 ```
 
-Open the new game with `?showdown` (the old Countdown is still the default at `/play/plan` until the last step):
+Open the game (Festival Showdown is now the default at `/play/plan`; the old Countdown is at `/play/plan?old` until it is deleted):
 
-http://localhost:5173/play/plan?showdown
+http://localhost:5173/play/plan
 
 Use your browser's phone view (width 360 to 390) for the real test.
 
@@ -37,16 +37,16 @@ Use your browser's phone view (width 360 to 390) for the real test.
 
 | Link | What you should see |
 | --- | --- |
-| `...?showdown&preset=B&at=market` | Market with goals ranked and Plan B signed. Cash lines: 6,930 / 26,930 / 21,930 / 10,450. Cushion 1,930. Actions left: 3 of 10 |
-| `...?showdown&preset=B&at=locked` | Plan locked. Press Next date. W1 balance 6,930. W2 10,930. W3 5,930. Festival Day 9,034, 448 visitors |
-| `...?showdown&preset=A&at=locked` | Plan A. At Week 3 the **Shortfall sheet** opens: due 10,500, in hand 6,870, short 3,630. Cancel Reliable sound. Ends at 10,434 |
-| `...?showdown&preset=B&at=festival` | Festival Day scene with all layers, all three goals met, public notice |
-| `...?showdown&preset=A&at=festival` | Scene with no sound. "Lights and sound: Goal missed. There was no sound." |
-| `...?showdown&preset=B&at=futures` | Ten futures: holds in 9 of 10 (fails F5) |
-| `...?showdown&preset=A&at=transfer` | Three transfer questions (stress test first), then the report: 45, Careful Planner, minaret not lit |
-| `...?showdown&preset=B&at=report` | Report: 98, Master Treasurer, four stars, six "Got it", minaret lit |
+| `...?preset=B&at=market` | Market with goals ranked and Plan B signed. Cash lines: 6,930 / 26,930 / 21,930 / 10,450. Cushion 1,930. Actions left: 3 of 10 |
+| `...?preset=B&at=locked` | Plan locked. Press Next date. W1 balance 6,930. W2 10,930. W3 5,930. Festival Day 9,034, 448 visitors |
+| `...?preset=A&at=locked` | Plan A. At Week 3 the **Shortfall sheet** opens: due 10,500, in hand 6,870, short 3,630. Cancel Reliable sound. Ends at 10,434 |
+| `...?preset=B&at=festival` | Festival Day scene with all layers, all three goals met, public notice |
+| `...?preset=A&at=festival` | Scene with no sound. "Lights and sound: Goal missed. There was no sound." |
+| `...?preset=B&at=futures` | Ten futures: holds in 9 of 10 (fails F5) |
+| `...?preset=A&at=transfer` | Three transfer questions (stress test first), then the report: 45, Careful Planner, minaret not lit |
+| `...?preset=B&at=report` | Report: 98, Master Treasurer, four stars, six "Got it", minaret lit |
 
-(Use `http://localhost:5173/play/plan?showdown&preset=B&at=report` etc. Opening a preset replaces the saved game on that phone.)
+(Use `http://localhost:5173/play/plan?preset=B&at=report` etc. Opening a preset replaces the saved game on that phone.)
 
 ### Things worth trying by hand
 

@@ -15,7 +15,8 @@ function PlanGame() {
   const nav = useNavigate()
   const [params] = useSearchParams()
   const complete = useGame((s) => s.completePillar)
-  if (params.has('showdown')) {
+  // the new Festival Showdown is the Plan & Budget game; ?old opens the previous Countdown until it is deleted
+  if (!params.has('old')) {
     return (
       <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
         <ShowdownGame
