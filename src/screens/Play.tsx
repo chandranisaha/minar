@@ -6,6 +6,7 @@ import { BottomHud, TopHud } from '../components/Hud'
 import { TitleCard } from '../components/TitleCard'
 import { useIris } from '../components/Iris'
 import { useGame } from '../store/game'
+import DealBoard from '../games/dealboard/ui/DealBoard'
 
 /** Shared shell the four mini-games plug into: goal bar, title card, back button, rewind stub, recap card. */
 function RecapCard() {
@@ -34,6 +35,8 @@ export default function Play() {
   const p = PILLARS.find((x) => x.id === pillar)
   if (!p) return <Navigate to="/" replace />
   const id: PillarId = p.id
+  // pillar 3 is a full game with its own table, header and guardrail banner
+  if (id === 'invest') return <DealBoard onExit={() => iris.go('/')} />
   const done = completed.includes(id)
   const Shop = SHOPS[id]
   return (
