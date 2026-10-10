@@ -404,7 +404,7 @@ export function IslandMap() {
           return (
             <div key={n.id}>
               {(isPillar || n.kind === 'goal') && (
-                <div style={{ position: 'absolute', left: x - 20, top: y + 30 - 360, width: 235, height: 360, pointerEvents: 'none', zIndex: 3500, filter: 'drop-shadow(0 0 2px #fff) drop-shadow(0 4px 3px rgba(58,42,36,.4))' }}>
+                <div style={{ position: 'absolute', left: x + 95, top: y + 70 - 250, width: 165, height: 250, pointerEvents: 'none', zIndex: 3500, filter: 'drop-shadow(0 0 2px #fff) drop-shadow(0 4px 3px rgba(58,42,36,.4))' }}>
                   {n.id === 'plan' && firstTime && completed.length === 0 && <div className="idle ring" style={{ position: 'absolute', left: -14, right: -14, bottom: -8, height: 40, borderRadius: '50%', border: '3px solid #D9573F' }} />}
                   <img src={`/art/${n.kind === 'goal' ? (allDone ? 'flag-done' : 'flag-locked') : isDone ? 'flag-done' : 'flag-open'}.webp`} alt="" draggable={false} className="idle flagwave" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transformOrigin: '50% 100%' }} />
                 </div>
