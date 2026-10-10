@@ -41,6 +41,9 @@ const KEEPERS: Record<string, { idle: string; hover: string; dx: number; dy: num
   safe: { idle: 'npc-kiosk-stand', hover: 'npc-kiosk-phone', dx: -100, dy: 30, h: 184 },
 }
 
+/** flags go on the side opposite the shopkeeper so they never cover anyone */
+const FLAG_SIDE: Record<string, number> = { plan: -1, invest: -1, save: 1, safe: 1, gate: 1 }
+
 let lastPos: number[] | null = null // survives entering a pillar and coming back
 
 export function IslandMap() {
@@ -404,7 +407,7 @@ export function IslandMap() {
           return (
             <div key={n.id}>
               {(isPillar || n.kind === 'goal') && (
-                <div style={{ position: 'absolute', left: x + 95, top: y + 70 - 250, width: 165, height: 250, pointerEvents: 'none', zIndex: 3500, filter: 'drop-shadow(0 0 2px #fff) drop-shadow(0 4px 3px rgba(58,42,36,.4))' }}>
+                <div style={{ position: 'absolute', left: x + (FLAG_SIDE[n.id] ?? 1) * 215 - 82, top: y + 60 - 250, width: 165, height: 250, pointerEvents: 'none', zIndex: 3500, filter: 'drop-shadow(0 0 2px #fff) drop-shadow(0 4px 3px rgba(58,42,36,.4))' }}>
                   {n.id === 'plan' && firstTime && completed.length === 0 && <div className="idle ring" style={{ position: 'absolute', left: -14, right: -14, bottom: -8, height: 40, borderRadius: '50%', border: '3px solid #D9573F' }} />}
                   <img src={`/art/${n.kind === 'goal' ? (allDone ? 'flag-done' : 'flag-locked') : isDone ? 'flag-done' : 'flag-open'}.webp`} alt="" draggable={false} className="idle flagwave" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transformOrigin: '50% 100%' }} />
                 </div>
