@@ -16,7 +16,6 @@ export type Decision =
   | { k: 'lock' }
   | { k: 'event'; id: 'E2' | 'E4'; choice: string }
   | { k: 'shortfall'; point: Point; item?: string; action: ShortfallAction['action'] }
-  | { k: 'transfer'; id: string; answer: string }
 
 export interface Deal { haggles: number; late: boolean }
 export interface Market {

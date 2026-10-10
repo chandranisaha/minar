@@ -4,7 +4,6 @@ import { LESSON_OF, lessonFor, type LessonLine } from './lessons'
 import { answerOf, planOf, type Decision } from './log'
 import { PREDICTIONS, p3Truth, type PredictionId } from './predictions'
 import { score, stars, title, type Score, type Stars } from './score'
-import { transferAnswers } from './transfer'
 
 export interface Report {
   score: Score
@@ -23,7 +22,7 @@ export interface Report {
 export function reportOf(log: Decision[]): Report {
   const facts = factsOf(log)
   const plan = planOf(log)
-  const mastery = masteryOf(facts, transferAnswers(log))
+  const mastery = masteryOf(facts)
   const lowest = [...CONCEPTS].sort((a, b) => mastery[a].points - mastery[b].points || CONCEPTS.indexOf(a) - CONCEPTS.indexOf(b)).slice(0, 3)
   const predictions = (['P1', 'P2', 'P3', 'P4'] as PredictionId[]).map((id) => {
     const answer = answerOf(log, id)?.answer ?? null
@@ -31,7 +30,7 @@ export function reportOf(log: Decision[]): Report {
     return { id, answer, truth, correct: answer === truth, unsure: answer === 'unsure' }
   })
   const sc = score(plan, facts.played, facts.survived)
-  const minaretLit = CONCEPTS.filter((c) => mastery[c].level !== 'not').length >= 4
+  const minaretLit = CONCEPTS.filter((c) => mastery[c].level === 'got').length >= 4
   return { score: sc, stars: stars(plan, facts.played, facts.survived), title: title(sc.total), survived: facts.survived, mastery, lowest, lessons: lowest.map((c) => lessonFor(c, log, facts)), predictions, minaretLit }
 }
 

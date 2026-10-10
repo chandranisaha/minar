@@ -1,58 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { PREDICTIONS, type PredictionId } from '../engine/predictions'
 import { CONCEPTS } from '../engine/concepts'
 import { reportOf, toGameResult } from '../engine/report'
-import { optionOrder, pickTransfer } from '../engine/transfer'
 import type { GameResult } from '../../../lib/gameResult'
 import { useShowdown, useView } from '../state/store'
 import { LessonCard, Say } from './kit'
 import { useSd } from './useSd'
-
-/** S11: three questions about situations the game did not show, one per weakest concept. Feedback names the misconception. */
-export function Transfer() {
-  const { t } = useSd()
-  const code = useShowdown((s) => s.code)
-  const decide = useShowdown((s) => s.decide)
-  const { log } = useView()
-  const picks = useMemo(() => pickTransfer(log), [log])
-  const idx = log.filter((d) => d.k === 'transfer').length
-  const id = picks[idx]
-  const [sel, setSel] = useState<string | null>(null)
-  const [checked, setChecked] = useState(false)
-  if (!id) return null
-  const order = optionOrder(code, id)
-  const label = (o: string) => (o === 'unsure' ? t('transfer.unsureOpt') : t(`transfer.${id}.${o}`))
-  const next = () => { decide({ k: 'transfer', id, answer: sel! }); setSel(null); setChecked(false) }
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="paper p-3">
-        <div className="font-sign lang-fit text-[13px] text-pink">{t('transfer.n', { n: idx + 1 })}</div>
-        <h1 className="font-display lang-fit m-0 text-[20px] leading-tight">{t('transfer.title')}</h1>
-        <p className="m-0 text-[12px] font-bold opacity-80">{t('transfer.sub')}</p>
-      </div>
-      <section className="paper p-3">
-        <p className="m-0 text-[16px] font-extrabold leading-snug">{t(`transfer.${id}.q`)}</p>
-        <div className="mt-2 flex flex-col gap-2" role="radiogroup" aria-label={t(`transfer.${id}.q`)}>
-          {order.map((o) => (
-            <button key={o} type="button" role="radio" aria-checked={sel === o} disabled={checked} onClick={() => setSel(o)} className="ink-chip min-h-12 px-3 text-left text-[15px] font-bold" style={{ background: checked && o === 'ok' ? '#CDE8C4' : sel === o ? '#E8B04A' : undefined }}>
-              {checked && o === 'ok' ? '✓ ' : sel === o ? '● ' : '○ '}{label(o)}
-            </button>
-          ))}
-        </div>
-        {checked && (
-          <p className="m-0 mt-2 text-[14px] font-extrabold leading-snug" role="status">
-            {sel === 'ok' ? t('transfer.right') : sel === 'unsure' ? t('transfer.unsure') : `${t('transfer.wrong')} ${t(`transfer.${id}.${sel === 'w1' ? 'f1' : 'f2'}`)}`}
-          </p>
-        )}
-        {!checked ? (
-          <button type="button" className="ink-btn pink mt-3 w-full" disabled={!sel} style={{ opacity: sel ? 1 : 0.5 }} onClick={() => setChecked(true)}>{t('transfer.check')}</button>
-        ) : (
-          <button type="button" className="ink-btn pink mt-3 w-full" onClick={next}>{idx === 2 ? t('transfer.last') : t('transfer.next')} ▶</button>
-        )}
-      </section>
-    </div>
-  )
-}
 
 const LEVEL_MARK = { got: '●', getting: '◐', not: '○' } as const
 

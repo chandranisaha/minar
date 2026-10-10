@@ -11,7 +11,7 @@ import { Brief, Goals, PredictP1, Start } from './ui/Intro'
 import { GuardrailFooter } from './ui/kit'
 import { Market } from './ui/Market'
 import { PlanCheck } from './ui/PlanCheck'
-import { Report, Transfer } from './ui/Report'
+import { Report } from './ui/Report'
 import { useSd } from './ui/useSd'
 
 export interface ShowdownProps {
@@ -27,7 +27,7 @@ export default function ShowdownGame({ cohortCode = 'local', onComplete, onExit 
   const { step } = useView()
   const load = useShowdown((s) => s.load)
 
-  // /play/plan?showdown&preset=A|B&at=market|locked|festival|futures|transfer jumps to a reference game (for checking and demos)
+  // /play/plan?showdown&preset=A|B&at=market|locked|festival|futures|report jumps to a reference game (for checking and demos)
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
     const plan = q.get('preset')
@@ -46,7 +46,6 @@ export default function ShowdownGame({ cohortCode = 'local', onComplete, onExit 
     case 'date': body = <DateScreen key={step.point} point={step.point!} />; break
     case 'festival': body = <Festival />; break
     case 'futures': body = <Futures />; break
-    case 'transfer': body = <Transfer />; break
     case 'report': body = <Report cohortCode={cohortCode} onComplete={onComplete} onExit={onExit} />; break
   }
 

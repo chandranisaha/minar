@@ -43,7 +43,7 @@ Use your browser's phone view (width 360 to 390) for the real test.
 | `...?preset=B&at=festival` | Festival Day scene with all layers, all three goals met, public notice |
 | `...?preset=A&at=festival` | Scene with no sound. "Lights and sound: Goal missed. There was no sound." |
 | `...?preset=B&at=futures` | Press "Light the diyas": ten diyas light one by one. Money holds in 9 of 10 (F5 goes out). Tap any diya to read its story |
-| `...?preset=A&at=transfer` | Three transfer questions (stress test first), then the report: 45, Careful Planner, minaret not lit |
+| `...?preset=A&at=futures` | (see the diyas above), then the report: 45, Careful Planner, minaret not lit |
 | `...?preset=B&at=report` | Report: 98, Master Treasurer, four stars, six "Got it", minaret lit |
 
 (Use `http://localhost:5173/play/plan?preset=B&at=report` etc. Opening a preset replaces the saved game on that phone.)

@@ -1,9 +1,8 @@
 import type { Decision } from '../engine/log'
-import { pickTransfer } from '../engine/transfer'
 
 /**
  * Ready-made games for checking and demos: the spec's two reference plans, at any stage.
- * Open /play/plan?preset=B&at=festival (A or B; at = market, locked, festival, futures, transfer, report).
+ * Open /play/plan?preset=B&at=festival (A or B; at = market, locked, festival, futures, report).
  */
 const seen = (screen: string): Decision => ({ k: 'seen', screen })
 const INTRO = (ranks: ('G1' | 'G2' | 'G3' | 'G5')[]): Decision[] => [seen('start'), seen('brief'), { k: 'goals', ranked: ranks }, { k: 'predict', id: 'P1', answer: '12' }]
@@ -22,7 +21,7 @@ const DATES: Record<string, Decision[]> = {
   A: [seen('date:W1'), { k: 'event', id: 'E2', choice: 'hold' }, seen('date:W2'), { k: 'shortfall', point: 'W3', item: 'reliable', action: 'cancel' }, { k: 'event', id: 'E4', choice: 'refuse' }, seen('date:W3'), seen('date:FD')],
 }
 
-export const STAGES = ['market', 'locked', 'festival', 'futures', 'transfer', 'report'] as const
+export const STAGES = ['market', 'locked', 'festival', 'futures', 'report'] as const
 export type Stage = (typeof STAGES)[number]
 
 /** The log for a reference plan, up to the screen named by `at`. */
@@ -35,10 +34,8 @@ export function presetLog(plan: 'A' | 'B', at: Stage): Decision[] {
   if (at === 'festival') return festival
   const futures = [...festival, seen('festival')]
   if (at === 'futures') return futures
-  const transfer = [...futures, seen('futures')]
-  if (at === 'transfer') return transfer
-  // report: the three transfer questions answered correctly, plus the two in-market guesses
+  // report: the full game, plus the two in-market guesses for Plan B
   const guesses: Decision[] = [{ k: 'predict', id: 'P2', answer: 'reliable' }, { k: 'predict', id: 'P4', answer: 'parts' }]
-  const withGuesses = plan === 'B' ? [...transfer, ...guesses] : transfer
-  return [...withGuesses, ...pickTransfer(withGuesses).map((id): Decision => ({ k: 'transfer', id, answer: 'ok' }))]
+  const done = [...futures, seen('futures')]
+  return plan === 'B' ? [...done, ...guesses] : done
 }

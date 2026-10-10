@@ -88,8 +88,7 @@ describe('which screen comes next (a reload resumes at the exact screen)', () =>
     log = [...log, { k: 'event', id: 'E2', choice: 'hold' }]; expect(steps()).toEqual({ screen: 'date', point: 'W3' })
     log = [...log, { k: 'event', id: 'E4', choice: 'refuse' }, seen('date:W3'), seen('date:FD')]; expect(steps().screen).toBe('festival')
     log = [...log, seen('festival')]; expect(steps().screen).toBe('futures')
-    log = [...log, seen('futures')]; expect(steps().screen).toBe('transfer')
-    log = [...log, { k: 'transfer', id: 'T1', answer: 'a' }, { k: 'transfer', id: 'T2', answer: 'a' }, { k: 'transfer', id: 'T3', answer: 'a' }]; expect(steps().screen).toBe('report')
+    log = [...log, seen('futures')]; expect(steps().screen).toBe('report')
   })
 })
 

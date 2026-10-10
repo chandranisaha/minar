@@ -471,7 +471,7 @@
       "FD": "on Festival Day"
     },
     "autopilot": "In every festival the same rules decide: extend the biggest bills, then cancel what serves your lowest goals.",
-    "go": "Next: three questions",
+    "go": "See my report",
     "money": "Money held",
     "moneyShort": "Money ran out: {{when}}",
     "goalsMet": "Goals met: {{k}} of {{n}}",
@@ -591,66 +591,6 @@
         "real": "Sales work best on things you had not planned to buy. Look up the normal price before the deal ends.",
         "ask": "What is the normal price? Would I buy this if it had no countdown?"
       }
-    }
-  },
-  "transfer": {
-    "title": "Try it in real life",
-    "sub": "Three everyday situations. Use what you just learned.",
-    "n": "Question {{n}} of 3",
-    "check": "Check my answer",
-    "unsureOpt": "Not sure",
-    "next": "Next question",
-    "last": "See my report",
-    "right": "Right.",
-    "unsure": "That's fine. The idea is on a lesson card in your report.",
-    "wrong": "Not quite.",
-    "T1": {
-      "q": "A club gets ₹12,000 from a sponsor on the 20th. Its ₹7,000 tent is due the 15th and it has ₹3,000. What now?",
-      "ok": "Ask the supplier for a later date or pay part now",
-      "w1": "Wait for the sponsor and pay the full ₹7,000 on the 20th",
-      "w2": "Count the ₹12,000 as cash today and sign for more",
-      "f1": "The tent is due on the 15th. A supplier will not wait unless you ask.",
-      "f2": "A promise is not cash. Count only money in hand."
-    },
-    "T2": {
-      "q": "Sana can pay a ₹3,000 phone repair or a ₹3,000 course. What is the real cost of the repair?",
-      "ok": "The course she gives up",
-      "w1": "₹3,000, nothing else",
-      "w2": "₹0, because she needs it anyway",
-      "f1": "The price is only part of it. What she gives up is the rest.",
-      "f2": "Needing something does not make it free. The money can be spent only once."
-    },
-    "T3": {
-      "q": "A canteen pays ₹6,000 stall rent and ₹15 ingredients per sandwich. Orders halve. Which total falls most?",
-      "ok": "Ingredients",
-      "w1": "Stall rent",
-      "w2": "Both fall by the same amount",
-      "f1": "Rent is fixed. It stays ₹6,000 whatever the orders.",
-      "f2": "Only costs that grow with orders fall when orders halve."
-    },
-    "T4": {
-      "q": "Hall A is ₹5,000 with sound included. Hall B is ₹3,500 plus ₹400 an hour for sound. For 4 hours, which is cheaper?",
-      "ok": "Hall A",
-      "w1": "Hall B, because its price is lower",
-      "w2": "They cost the same",
-      "f1": "Hall B's ₹3,500 is only the start. With 4 hours of sound it is ₹5,100.",
-      "f2": "Add the required extras first: Hall B is ₹5,100 and Hall A is ₹5,000."
-    },
-    "T5": {
-      "q": "A stall plan fails in 6 of 10 imagined situations, all on the same date. What is the best change?",
-      "ok": "Move or soften what falls on that date",
-      "w1": "Hope that date goes better",
-      "w2": "Cut the cheapest cost",
-      "f1": "Naming the date shows where to keep spare money. Hope is not spare money.",
-      "f2": "The problem is the date, not the smallest bill."
-    },
-    "T7": {
-      "q": "An app says \"Yearly ₹1,200, was ₹4,800, ends in 1 hour\". How do you check it?",
-      "ok": "Compare with the monthly price and the earlier price",
-      "w1": "Buy now before it ends",
-      "w2": "Trust the \"was\" price, it is the official one",
-      "f1": "A countdown makes you rush. Check the normal price first.",
-      "f2": "A high \"was\" price can be made up. Compare with what it really cost."
     }
   },
   "report": {

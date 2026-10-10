@@ -48,23 +48,20 @@ export function factsOf(log: Decision[]): Facts {
 
 const pts = (s: Signals) => Number(s.prediction) + Number(s.flag)
 
-/** The three concepts to ask a transfer question about: the three lowest (ties go in concept order). */
+/** The three concepts that showed least in play (ties go in concept order). */
 export function lowestConcepts(facts: Facts, n = 3): ConceptId[] {
   return [...CONCEPTS].sort((a, b) => pts(facts.signals[a]) - pts(facts.signals[b]) || CONCEPTS.indexOf(a) - CONCEPTS.indexOf(b)).slice(0, n)
 }
 
 /**
- * Mastery per concept: 1 point each for the prediction, the behaviour and the transfer question. 3 = Got it, 2 = Getting there, 0 or 1 = Not yet.
- * A concept that was not asked about and was fully shown in play (both signals met) has its transfer point credited, so strong play can reach
- * "Got it". A weaker concept that simply was not asked keeps its play points only, so skipped questions never inflate a result.
+ * Mastery per concept, from what the player did in play: 1 point for the guess and 1 for the behaviour.
+ * 2 = Got it, 1 = Getting there, 0 = Not yet.
  */
-export function masteryOf(facts: Facts, transfer: Partial<Record<ConceptId, boolean>>): Record<ConceptId, { points: number; level: Level }> {
-  const asked = new Set(lowestConcepts(facts))
+export function masteryOf(facts: Facts): Record<ConceptId, { points: number; level: Level }> {
   const out = {} as Record<ConceptId, { points: number; level: Level }>
   for (const c of CONCEPTS) {
-    const played = pts(facts.signals[c])
-    const points = played + (asked.has(c) ? Number(!!transfer[c]) : played === 2 ? 1 : 0)
-    out[c] = { points, level: points >= 3 ? 'got' : points === 2 ? 'getting' : 'not' }
+    const points = pts(facts.signals[c])
+    out[c] = { points, level: points >= 2 ? 'got' : points === 1 ? 'getting' : 'not' }
   }
   return out
 }
