@@ -1,19 +1,20 @@
 # Minar
 
-A financial-literacy game for Indian students (16-22), built for the Vanguard India "Community Stewardship" brief: plan and budget, save and manage, understand investing, stay safe.
-This repo holds the **landing hub, the opening story, the shared game shell** and the first full mini-game, **Deal Board** (pillar 3). The other mini-games plug in as `/play/:pillar`.
-It teaches how to think about money; it never recommends investments, and every number is a made-up simulation.
+A financial-literacy game for Indian students (16-22). This repo holds the **island hub, the opening story and the shared game shell**;
+the four mini-games plug in later as `/play/:pillar`.
 
-The hub is a **Cuphead-style overworld**: a painted Hyderabad bazaar with the Charminar at the centre. You walk a chibi character
-around (tap-to-walk with A* pathfinding, drag to steer, arrow keys / WASD), step up to one of four shop doorways and an iris wipe takes
-you in. Four minaret lamps light as the pillars are completed.
+The hub is a calm, hand-painted **isometric island** (Charminar plaza in the centre). Tap a place and a small character walks the path to it;
+a paper card offers "Enter". Four flags turn gold as pillars complete, and the college gate opens when all four are done.
 
-| Pillar | Doorway |
+| Pillar | Place |
 | --- | --- |
-| 1. Plan & Budget | Bangle stall |
-| 2. Save & Manage | Irani-chai cafe |
-| 3. Understand Investing | Pearl shop |
-| 4. Stay Financially Safe | Recharge / UPI kiosk (with the fake "OFFER!" sign) |
+| 1. Plan & Budget | bangle market |
+| 2. Save & Manage | Irani chai cafe |
+| 3. Understand Investing | pearl shop |
+| 4. Stay Financially Safe | recharge / UPI kiosk |
+| Goal | college gate (opens after all four) |
+
+Art prompts for the island, landmarks and characters: `ART_PROMPTS.md`. Layout data: `src/content/island.json`.
 
 ## Deal Board (pillar 3: Understand Investing)
 
@@ -42,7 +43,7 @@ npm run preview
 Routes: `/` hub, `/story` opening story (auto on first visit, replay from the HUD), `/play/:pillar` placeholder shell
 (has a "Mark as complete" dev button), `/dashboard` stub, `/kit` art-kit review page.
 
-**Controls:** desktop = arrow keys / WASD or click-to-walk; phone/tablet = on-screen analog joystick (Among Us style) or tap-to-walk.
+**Controls:** tap/click a place to walk there; drag to pan, pinch / wheel / +- to zoom. Keyboard: Tab to a place, Enter to walk.
 
 ## Deploy
 

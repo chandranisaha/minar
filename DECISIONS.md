@@ -1,5 +1,19 @@
 # Decisions
 
+## Rework: calm isometric island (latest, supersedes the street-hub notes below)
+Feedback: the front-view street hub was too busy and too funny, and used the wrong camera. Changes:
+- **Camera:** one floating island, high 3/4 isometric view, pale blue water (reference used for angle and composition only).
+- **Removed:** the street/Charminar front view, bunting, laundry, wires, rangoli, pigeon flocks, fireworks, device tilt, OFFER! burst, hooded and sunglasses characters, squash-and-stretch pops, iris wipe, joystick, film scratches and jitter, chunky signboard UI. Old code is kept outside the repo in `codebase/_old_hub/` and in git history.
+- **Layout:** `src/content/island.json` (hotspots, path points, scenery) drives everything: SVG fallback art, hotspot buttons, token routes. Replace the art by dropping `island background.png` in `graphics/` and running `npm run art`; then nudge the percentages.
+- **Interaction:** tap a place, the token walks the cream path (stepped ~8fps, about 1s), a paper card opens with Enter. Hover/focus shows a ring and label only. Plain cross-fade between screens. Pannable and zoomable (drag, pinch, wheel, +/-).
+- **Progress:** flag markers go white to antique gold with a tick; gate opens when all four are done; a few marigold petals drift; one "Goal reached" card.
+- **HUD:** goal pill top-left; persona avatar and gear (language, lite mode, replay story) top-right.
+- **Look:** paper texture plus ~5% grain, muted palette, thin 1.5px ink, DM Serif Display titles (Rozha One for Hindi, Noto Sans Telugu 800 for Telugu).
+- **Story:** cover with a Start button, then 4 calm beats (island pull-in, persona, flower stall, fee letter), skippable, replayable.
+- **Placeholders:** the walking token still uses the old chibi sprites and persona portraits (`public/art/chibi`, `faces`) until new character art arrives; prompts are in `ART_PROMPTS.md`.
+
+---
+
 Made without asking, so the build kept moving. Change any of them freely.
 
 ## Direction changes from the original brief
