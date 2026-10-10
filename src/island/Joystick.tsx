@@ -1,20 +1,17 @@
 import { useRef, useState } from 'react'
-import { joy, useTouchUi } from './input'
+import { joy } from './input'
 
 const SIZE = 132
 const R = 42 // knob travel
 
 /**
  * Among Us-style analog stick: drag the knob, the hero walks that way at a speed proportional to how far you push.
- * Fixed bottom-left (thumb zone), large target, only shown on touch / narrow screens.
+ * Fixed bottom-left (thumb zone), large target, shown on every screen (mouse drag works too).
  */
 export function Joystick() {
-  const show = useTouchUi()
   const pad = useRef<HTMLDivElement>(null)
   const [k, setK] = useState({ x: 0, y: 0 })
   const [down, setDown] = useState(false)
-  if (!show) return null
-
   const move = (e: React.PointerEvent) => {
     const r = pad.current!.getBoundingClientRect()
     let dx = e.clientX - (r.left + r.width / 2)
