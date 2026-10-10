@@ -55,3 +55,5 @@ The games position themselves with `absolute inset-0`. The host now gives the pl
 
 - **Offline reload:** the offline cache is added by a later step, so offline behaviour was not verified.
 - **Pay Run reaching its goal** was covered by tests of the adapter (goal reached gives a cleared, full-quality result), not by playing a whole season.
+
+- `src/world/input.ts`: shim for Deal Board (re-exports useTouchUi from src/island).

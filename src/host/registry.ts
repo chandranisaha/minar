@@ -8,11 +8,12 @@ import type { GameModule, PillarGame } from './types'
 /** every real game that exists right now: '/src/games/<folder>/index.tsx' -> lazy importer. Empty until teammates add folders. */
 const REAL_GAMES = import.meta.glob<GameModule>('/src/games/*/index.{ts,tsx}')
 /** games that export their own component instead of an index.tsx: only their presence is checked here */
-const ENTRY_FILES = import.meta.glob('/src/games/*/*.tsx')
+const ENTRY_FILES = import.meta.glob('/src/games/**/*.tsx')
 /** the wrappers that adapt those games to GameProps (loaded only when the game file exists) */
 const WRAPPERS: Partial<Record<PillarId, () => Promise<GameModule>>> = {
   plan: () => import('./wrappers/FestivalGame'),
   save: () => import('./wrappers/PayRunGame'),
+  invest: () => import('./wrappers/DealBoardGame'),
   safe: () => import('./wrappers/CaseFilesGame'),
 }
 

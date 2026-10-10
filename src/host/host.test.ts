@@ -227,8 +227,7 @@ describe('registry', () => {
     expect(hasRealGame('plan')).toBe(true)
     expect(hasRealGame('save')).toBe(true)
     expect(hasRealGame('safe')).toBe(true)
-    expect(hasRealGame('invest')).toBe(false)
-    expect((await PILLAR_GAMES.invest.load()).default).toBe(PILLAR_GAMES.invest.placeholder)
+    expect(hasRealGame('invest')).toBe(true)
   })
   it('each pillar maps to its own folder name', () => {
     expect(new Set(Object.values(GAME_FOLDERS)).size).toBe(4)
