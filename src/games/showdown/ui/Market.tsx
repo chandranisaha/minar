@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { canPayLater, maxHaggles, schedule, unitPrice } from '../engine/contract'
-import { ITEMS, RULES, item } from '../engine/content'
+import { RULES, item } from '../engine/content'
 import { DEFAULT_PLATES, answerOf, dealOf, isSigned, offer, signBlock } from '../engine/log'
 import { PREDICTIONS } from '../engine/predictions'
 import { POINTS, type Point } from '../engine/types'
@@ -8,7 +8,6 @@ import { useShowdown, useView } from '../state/store'
 import { Ask, CashLinesTable, Say, Sheet } from './kit'
 import { useSd } from './useSd'
 
-const VENDORS = ['daamfix', 'chacha', 'sasta', 'mega'] as const
 const VENDOR_COLOR: Record<string, string> = { daamfix: '#2F6F73', chacha: '#3F7A3A', sasta: '#E8B04A', mega: '#D8503A' }
 
 /** One item, one vendor: price, terms, haggle, pay later, fine print, and the total with required extras. */
@@ -124,25 +123,61 @@ function ItemSheet({ id, onClose, onSigned }: { id: string; onClose: () => void;
   )
 }
 
-function VendorSheet({ vendor, onPick, onClose }: { vendor: string; onPick: (id: string) => void; onClose: () => void }) {
+const NEEDS = [
+  { id: 'kids', emoji: '🎠', goal: 'G1', items: ['kids'] },
+  { id: 'plates', emoji: '🍽', goal: 'G2', items: ['plates'] },
+  { id: 'sound', emoji: '🔊', goal: 'G3', items: ['mini', 'big', 'basic', 'reliable'] },
+  { id: 'lights', emoji: '💡', goal: 'G3', items: ['lights', 'lightsC'] },
+  { id: 'safety', emoji: '🛟', goal: 'G5', items: ['safety', 'p1', 'p2'] },
+  { id: 'combo', emoji: '🎁', goal: 'G3', items: ['combo'] },
+] as const
+const PAY_COLOR: Record<string, string> = { W1: '#E8B04A', W2: '#5BB5D6', W3: '#F28C28', FD: '#3F7A3A' }
+
+/** When the money leaves your pocket: one bar, one coloured piece per date. */
+function PayStrip({ amounts }: { amounts: Partial<Record<Point, number>> }) {
+  const { money, when } = useSd()
+  const parts = POINTS.filter((p: Point) => (amounts[p] ?? 0) > 0)
+  const sum = parts.reduce((a, p) => a + amounts[p]!, 0) || 1
+  return (
+    <div>
+      <div className="flex h-3 overflow-hidden rounded-full border-2 border-ink" aria-hidden>
+        {parts.map((p) => <div key={p} style={{ width: `${(amounts[p]! / sum) * 100}%`, background: PAY_COLOR[p] }} />)}
+      </div>
+      <ul className="m-0 mt-1 flex list-none flex-wrap gap-x-3 p-0 text-[12px] font-bold">
+        {parts.map((p) => <li key={p}><span aria-hidden style={{ color: PAY_COLOR[p] }}>●</span> {when(p)} {money(Math.round(amounts[p]!))}</li>)}
+      </ul>
+    </div>
+  )
+}
+
+/** One need, several offers side by side: price, when you pay, what the seller promises. */
+function NeedSheet({ need, onPick, onClose }: { need: (typeof NEEDS)[number]; onPick: (id: string) => void; onClose: () => void }) {
   const { t, money } = useSd()
   const { market: m } = useView()
-  const items = ITEMS.filter((i) => i.vendor === vendor && i.id !== 'hall')
   return (
-    <Sheet label={t(`market.vendors.${vendor}.name`)} onClose={onClose}>
-      <h2 className="font-display lang-fit m-0 text-[22px]">{t(`market.vendors.${vendor}.name`)}</h2>
-      <p className="m-0 text-[13px] font-bold opacity-80">{t(`market.vendors.${vendor}.tag`)}</p>
-      <ul className="m-0 mt-3 flex list-none flex-col gap-2 p-0">
-        {items.map((i) => {
-          const signed = isSigned(m, i.id)
+    <Sheet label={t(`market.needs.${need.id}.name`)} onClose={onClose}>
+      <h2 className="font-display lang-fit m-0 text-[22px]">{need.emoji} {t(`market.needs.${need.id}.name`)}</h2>
+      <p className="m-0 text-[13px] font-bold opacity-80">{t(`market.needs.${need.id}.why`)}</p>
+      <ul className="m-0 mt-3 flex list-none flex-col gap-2.5 p-0">
+        {need.items.map((id) => {
+          const def = item(id)
+          const signed = isSigned(m, id)
+          const { contract, total } = offer(m, id)
+          const hidden = id === 'basic' && !m.readBasic
+          const [sched] = schedule(contract)
+          const shown = { ...sched }
+          if (hidden) shown.W1 = (shown.W1 ?? 0) - (def.addon ?? 0)
           return (
-            <li key={i.id}>
-              <button type="button" className="ink-chip flex min-h-14 w-full items-center gap-2 px-3 py-2 text-left" style={{ background: signed ? '#CDE8C4' : undefined }} onClick={() => onPick(i.id)}>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-extrabold leading-tight">{signed ? '✓ ' : ''}{t(`items.${i.id}.name`)}</span>
-                  <span className="block text-[12px] font-bold opacity-80">{t(`items.${i.id}.desc`)}</span>
+            <li key={id}>
+              <button type="button" className="ink-chip flex w-full flex-col gap-1.5 !rounded-2xl px-3 py-2 text-left" style={{ background: signed ? '#CDE8C4' : undefined }} onClick={() => onPick(id)}>
+                <span className="flex items-baseline justify-between gap-2">
+                  <span className="text-[15px] font-extrabold leading-tight">{signed ? '✓ ' : ''}{t(`items.${id}.name`)}</span>
+                  <span className="font-display shrink-0 text-[19px]">{money(unitPrice(contract))}{def.unit ? t('market.each') : ''}</span>
                 </span>
-                <span className="font-display text-[18px]">{money(unitPrice(offer(m, i.id).contract))}{i.unit ? '/ea' : ''}</span>
+                <span className="text-[12px] font-bold opacity-80">{t(`items.${id}.desc`)}</span>
+                <span className="w-fit rounded-md border-2 border-ink px-1.5 text-[11px] font-extrabold" style={{ background: VENDOR_COLOR[def.vendor] + '33' }}>{t(`market.vendors.${def.vendor}.name`)} · {t(`market.vendors.${def.vendor}.tag`)}</span>
+                {!def.unit && <PayStrip amounts={shown} />}
+                <span className="text-[13px] font-extrabold">{hidden ? t('market.totalHidden') : def.unit ? t('market.perPlateNote') : t('market.totalIs', { total: money(Math.round(total)) })}</span>
               </button>
             </li>
           )
@@ -153,15 +188,18 @@ function VendorSheet({ vendor, onPick, onClose }: { vendor: string; onPick: (id:
   )
 }
 
-/** S5: four vendors, your actions, what you've signed, and the two cash lines. */
+/** S5: a shopping list of five needs, each tied to a goal. Pick an offer for each, then check the plan. */
 export function Market() {
   const { t, money } = useSd()
   const decide = useShowdown((s) => s.decide)
-  const { market: m, lines } = useView()
-  const [vendor, setVendor] = useState<string | null>(null)
+  const { market: m, plan, lines } = useView()
+  const [needId, setNeedId] = useState<string | null>(null)
   const [itemId, setItemId] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
-  const close = () => { setItemId(null); setVendor(null) }
+  const need = NEEDS.find((n) => n.id === needId) ?? null
+  const spent = m.signed.reduce((a, c) => a + schedule(c)[1], 0)
+  const combo = isSigned(m, 'combo')
+  const covered = NEEDS.filter((n) => n.id !== 'combo' && (n.items.some((i) => isSigned(m, i)) || (combo && ['sound', 'lights', 'safety'].includes(n.id)))).length
   return (
     <div className="flex flex-col gap-3">
       <div className="paper p-3">
@@ -169,38 +207,52 @@ export function Market() {
           <h1 className="font-display lang-fit m-0 text-[22px]">{t('market.title')}</h1>
           <span className="rounded-md border-2 border-ink bg-mustard px-2 py-0.5 text-[13px] font-extrabold" role="status">{t('market.actions', { n: m.actionsLeft, max: RULES.actions })}</span>
         </div>
+        <ol className="m-0 mt-2 flex list-none flex-col gap-1 p-0 text-[13px] font-bold leading-snug">
+          {[1, 2, 3].map((n) => <li key={n}><span className="font-extrabold">{n}.</span> {t(`market.how.${n}`)}</li>)}
+        </ol>
         <p className="m-0 mt-1 text-[12px] font-bold opacity-80">{t('market.actionsNote')}</p>
       </div>
 
       {toast && <p className="ink-chip anim-pop m-0 px-3 py-2 text-[14px] font-extrabold" style={{ background: '#FFE08A' }} role="status" onClick={() => setToast(null)}>{toast}</p>}
 
-      <div className="grid grid-cols-2 gap-2.5">
-        {VENDORS.map((v) => (
-          <button key={v} type="button" onClick={() => setVendor(v)} className="overflow-hidden rounded-xl border-[3px] border-ink text-left" style={{ background: '#FFF8E6', boxShadow: '3px 4px 0 #2B1A17' }}>
-            <div aria-hidden className="h-3" style={{ background: VENDOR_COLOR[v], borderBottom: '2px solid #2B1A17' }} />
-            <div className="p-2">
-              <div className="font-sign lang-fit text-[15px] leading-tight">{t(`market.vendors.${v}.name`)}</div>
-              <div className="min-h-[2.4em] text-[11px] font-bold leading-tight opacity-80">{t(`market.vendors.${v}.tag`)}</div>
-              <div className="mt-1 text-[12px] font-extrabold">{t('market.open')} ▶</div>
-            </div>
-          </button>
-        ))}
-      </div>
-
       <section className="paper p-3">
-        <h2 className="font-sign lang-fit m-0 text-[15px]">{t('market.signed')}</h2>
-        <ul className="m-0 mt-1 flex list-none flex-col gap-1 p-0 text-[14px] font-bold">
-          {m.signed.map((c) => (
-            <li key={c.id} className="flex items-center justify-between gap-2">
-              <span>{c.id === 'hall' ? '🏛 ' + t('market.hall') : t(`items.${c.id}.name`)}{c.id === 'plates' ? ` × ${c.qty}` : ''}</span>
-              {c.id === 'hall' ? <span className="font-display">{money(10000)}</span> : (
-                <span className="flex items-center gap-2"><span className="font-display">{money(Math.round(schedule(c)[1]))}</span>
-                  <button type="button" className="ink-chip grid h-12 w-12 place-items-center" aria-label={t('sheet.drop')} onClick={() => decide({ k: 'drop', item: c.id })}>✕</button></span>
-              )}
+        <h2 className="font-sign lang-fit m-0 text-[15px]">{t('market.list')}</h2>
+        <p className="m-0 text-[12px] font-bold opacity-80">🏛 {t('market.hall')} · {money(10000)}</p>
+        <ul className="m-0 mt-2 flex list-none flex-col gap-2 p-0">
+          {NEEDS.map((n) => {
+            const rank = plan.ranks ? plan.ranks.indexOf(n.goal as never) : -1
+            const mine = m.signed.filter((c) => (n.items as readonly string[]).includes(c.id))
+            return (
+              <li key={n.id}>
+                <button type="button" onClick={() => setNeedId(n.id)} className="ink-chip flex min-h-16 w-full items-center gap-2 !rounded-2xl px-3 py-2 text-left" style={{ background: mine.length ? '#CDE8C4' : undefined }}>
+                  <span aria-hidden className="text-[26px]">{n.emoji}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-extrabold leading-tight">{mine.length ? '✓ ' : ''}{t(`market.needs.${n.id}.name`)}</span>
+                    <span className="block text-[12px] font-bold opacity-80">
+                      {mine.length ? mine.map((c) => t(`items.${c.id}.name`) + (c.id === 'plates' ? ` × ${c.qty}` : '')).join(', ') : t(`market.needs.${n.id}.why`)}
+                    </span>
+                    {rank >= 0 && <span className="mt-0.5 inline-block rounded-md border-2 border-ink bg-mustard px-1.5 text-[11px] font-extrabold">{t('market.goalRank', { n: rank + 1 })}</span>}
+                  </span>
+                  <span className="shrink-0 text-right text-[13px] font-extrabold">
+                    {mine.length ? money(Math.round(mine.reduce((a, c) => a + schedule(c)[1], 0))) : t('market.choose') + ' ▶'}
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+        <div className="mt-3 flex items-baseline justify-between border-t-[3px] border-dashed border-ink/40 pt-2">
+          <span className="text-[13px] font-extrabold">{t('market.sofar', { n: covered, of: NEEDS.length - 1 })}</span>
+          <span className="font-display text-[20px]">{money(Math.round(spent))}</span>
+        </div>
+        <ul className="m-0 mt-1 list-none p-0">
+          {m.signed.filter((c) => c.id !== 'hall').map((c) => (
+            <li key={c.id} className="flex items-center justify-between text-[13px] font-bold">
+              <span>{t(`items.${c.id}.name`)}</span>
+              <button type="button" className="ink-chip grid h-12 w-12 place-items-center" aria-label={t('sheet.drop')} onClick={() => decide({ k: 'drop', item: c.id })}>✕</button>
             </li>
           ))}
         </ul>
-        {m.signed.length === 1 && <p className="m-0 mt-1 text-[12px] font-bold opacity-80">{t('market.none')}</p>}
       </section>
 
       <section className="paper p-3">
@@ -210,9 +262,8 @@ export function Market() {
 
       <button type="button" className="ink-btn pink self-center" onClick={() => decide({ k: 'seen', screen: 'market' })}>{t('market.check')} ▶</button>
 
-      {vendor && !itemId && <VendorSheet vendor={vendor} onPick={setItemId} onClose={close} />}
+      {need && !itemId && <NeedSheet need={need} onPick={setItemId} onClose={() => setNeedId(null)} />}
       {itemId && <ItemSheet id={itemId} onClose={() => setItemId(null)} onSigned={setToast} />}
     </div>
   )
 }
-

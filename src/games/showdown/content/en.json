@@ -128,7 +128,46 @@
     "hall": "Hall (already signed)",
     "lines": "Your money, date by date",
     "check": "Check the plan",
-    "open": "Open"
+    "open": "Open",
+    "how": {
+      "1": "Pick one offer for each job on the list. The goals you ranked tell you which jobs matter most.",
+      "2": "Compare them: the price, and the dates you have to pay.",
+      "3": "Then check the plan. It shows if you will have enough money on every date."
+    },
+    "list": "Your festival shopping list",
+    "needs": {
+      "kids": {
+        "name": "Kids' corner",
+        "why": "For your goal: kids' fun"
+      },
+      "plates": {
+        "name": "Food plates",
+        "why": "For your goal: food for everyone"
+      },
+      "sound": {
+        "name": "Sound system",
+        "why": "Needed for lights and sound"
+      },
+      "lights": {
+        "name": "Lights",
+        "why": "Needed for lights and sound"
+      },
+      "safety": {
+        "name": "Safety pack and posters",
+        "why": "For your goal: packed and safe"
+      },
+      "combo": {
+        "name": "Bundle deal",
+        "why": "Sound, lights and safety in one. Replaces those three."
+      }
+    },
+    "goalRank": "Your goal #{{n}}",
+    "choose": "Choose",
+    "each": " each",
+    "totalIs": "Total: {{total}}",
+    "totalHidden": "Total: not shown. Read the fine print.",
+    "perPlateNote": "Price is for each plate. You choose how many.",
+    "sofar": "{{n}} of {{of}} jobs covered. Total so far"
   },
   "items": {
     "hall": {

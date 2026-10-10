@@ -50,7 +50,7 @@ Use your browser's phone view (width 360 to 390) for the real test.
 
 ### Things worth trying by hand
 
-- Market: open Basic sound. The total stays hidden until you press "Read the fine print".
+- Market: tap "Sound system" and compare the four offers (price, pay-date bar, total). Basic sound hides its total until you read the fine print.
 - Market: build a plan with too little cash and watch the cushion go red with the word "Short".
 - Week 3: with low cash, "Give Sunny cash" is disabled ("Not enough cash").
 - Give Sunny cash with a healthy plan: Festival notice shows **UNRECORDED** and you lose the Clean books star.
