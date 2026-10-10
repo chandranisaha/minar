@@ -175,7 +175,7 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
 
       {/* the bistro table */}
       <image href={`${C}/bistro-table.webp`} x={262} y={174} width={96} height={95} preserveAspectRatio="xMidYMax meet" />
-      <image href={`${C}/bistro-chair-r.webp`} x={350} y={186} width={34} height={76} preserveAspectRatio="xMidYMax meet" opacity=".95" />
+      <image href={`${C}/bistro-chair-r.webp`} x={350} y={188} width={46} height={72} preserveAspectRatio="xMidYMax meet" opacity=".95" />
 
       {/* on the table: Ammamma's envelope until payday is split */}
       {envelope && <g transform="translate(296 172) scale(1.5) translate(-18 -2)"><Envelope x={0} y={0} /></g>}
@@ -215,12 +215,11 @@ export function Scene({ step, run, player, saucers = [null, null], vendor, beat 
       {/* a spinning coin on the table once the money is split */}
       {!envelope && step !== 'entry' && <image href={`${C}/coin.webp`} x={280} y={194} width="9" height="9" className="cafe-spin" />}
 
-      {/* Yusuf and his painted snack cart */}
+      {/* Yusuf, cart and all: the painted picture already includes the trolley */}
       {step === 'trolley' && (
         <g className="cafe-roll">
-          <ellipse cx="90" cy="258" rx="60" ry="6" fill="url(#cafe-shadow)" />
-          <image href={`${C}/cart.webp`} x={92} y={150} width={92} height={108} preserveAspectRatio="xMidYMax meet" />
-          <image href={`${C}/yusuf-wave.webp`} x={20} y={142} width={76} height={116} preserveAspectRatio="xMidYMax meet" />
+          <ellipse cx="96" cy="260" rx="92" ry="7" fill="url(#cafe-shadow)" />
+          <image href={`${C}/yusuf-wave.webp`} x={-6} y={84} width={204} height={178} preserveAspectRatio="xMidYMax meet" />
         </g>
       )}
     </svg>
