@@ -45,7 +45,7 @@ export default function Play() {
   if (!p) return <Navigate to="/" replace />
   const id: PillarId = p.id
   // pillar 3 is a full game with its own table, header and guardrail banner
-  if (id === 'invest') return <DealBoard onExit={() => iris.go('/')} onComplete={(sc) => { recordPillar('invest', sc.total, sc); if (sc.cleared) complete('invest') }} />
+  if (id === 'invest') return <DealBoard onExit={() => nav('/')} onComplete={(sc) => { recordPillar('invest', sc.total, sc); if (sc.cleared) complete('invest') }} />
   const done = completed.includes(id)
   return (
     <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#92C9D3, #F8EBCB 60%)' }}>

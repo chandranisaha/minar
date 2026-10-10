@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TitleCard } from '../../../components/TitleCard'
+import { TitleCard } from './TitleCard'
 import { useGame, useLite } from '../../../store/game'
 import { RING_SIZE, TURNS, quarterTile } from '../engine/board'
 import { invested, marketFor, netWorth, pitchFor, type RunState } from '../engine/run'

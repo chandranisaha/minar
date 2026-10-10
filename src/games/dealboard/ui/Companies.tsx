@@ -5,7 +5,7 @@ import type { CompanyId, MarketRun } from '../engine/types'
 import { InfoHeader } from './InfoTip'
 import { LightChip } from './Lights'
 import { useInr } from './Panels'
-import { TitleCard } from '../../../components/TitleCard'
+import { TitleCard } from './TitleCard'
 
 /** Round sector-coloured mark with the company's initial: the company's token on the board and in lists. */
 export function Mark({ id, size = 26 }: { id: CompanyId; size?: number }) {

@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTouchUi } from '../../../world/input'
+import { useTouchUi } from '../../../island/input'
 import { RING, TURNS } from '../engine/board'
 import { COMPANY, SECTOR_COLOUR } from '../engine/companies'
 import type { RunState } from '../engine/state'
