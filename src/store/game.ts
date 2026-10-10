@@ -5,6 +5,7 @@ import { PERSONAS, SKILLS, type Lang, type PersonaId, type PillarId, type Skill 
 interface GameState {
   language: Lang
   persona: PersonaId | null
+  gender: 'girl' | 'boy'
   startAmount: number
   goalAmount: number
   savedAmount: number
@@ -18,6 +19,7 @@ interface GameState {
   pillarScores: Partial<Record<PillarId, number>>
   setLanguage: (l: Lang) => void
   setPersona: (p: PersonaId) => void
+  setGender: (g: 'girl' | 'boy') => void
   completePillar: (p: PillarId) => void
   /** keeps the best score and raises the matching skills (never lowers them) */
   recordPillar: (p: PillarId, total: number, parts: { spread: number; skepticism: number; calm: number; habits: number }) => void
@@ -34,6 +36,7 @@ export const useGame = create<GameState>()(
     (set, get) => ({
       language: 'en',
       persona: null,
+      gender: 'girl',
       startAmount: 0,
       goalAmount: 0,
       savedAmount: 0,
@@ -44,6 +47,7 @@ export const useGame = create<GameState>()(
       skills: zeroSkills,
       pillarScores: {},
       setLanguage: (language) => set({ language }),
+      setGender: (gender) => set({ gender }),
       setPersona: (persona) => {
         const p = PERSONAS[persona]
         set({ persona, startAmount: p.start, goalAmount: p.goal, savedAmount: p.start, completedPillars: [], celebrated: false })
