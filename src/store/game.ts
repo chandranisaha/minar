@@ -9,7 +9,7 @@ import type { GameResult } from '../host/types'
 import { applyGameResult as applyGameResultPure } from '../progress/applyGameResult'
 import { savedAmountFor } from '../progress/saved'
 import { completedPillarsOf, freshProgress } from '../progress/state'
-import { LEGACY_STORE_KEY, STORE_KEY, STORE_VERSION, migratePersisted, normalizePersisted, type PersistedData } from './persisted'
+import { toAvatar, toGender, type Gender, LEGACY_STORE_KEY, STORE_KEY, STORE_VERSION, migratePersisted, normalizePersisted, type PersistedData } from './persisted'
 import { newInstallId } from './ids'
 
 /** values computed from the saved data on every change. Never saved; recomputed on load. */
@@ -30,6 +30,8 @@ interface Actions {
   setLite: (v: boolean) => void
   resetProgress: () => void
   setAvatar: (a: Avatar) => void
+  /** island UI name for the same choice (girl = female, boy = male) */
+  setGender: (g: Gender) => void
   setFestival: (f: Festival) => void
   setClassCode: (code: string | null) => void
   /** fold a finished game into progress (see src/progress/applyGameResult.ts) */
@@ -56,7 +58,7 @@ const withDerived = <T extends PersistedData>(s: T): T & Derived => ({ ...s, sav
 /** the keys of PersistedData: exactly what is saved to the device */
 const PERSISTED_KEYS = [
   'language', 'persona', 'storySeen', 'celebrated', 'liteMode', 'happyToastSeen', 'coachTipsSeen',
-  'avatar', 'festival', 'installId', 'classCode',
+  'avatar', 'gender', 'festival', 'installId', 'classCode',
   'startAmount', 'goalAmount', 'happy', 'pillars', 'skills', 'diamonds', 'shieldPieces', 'title', 'lifeMomentsUsed', 'lifeMomentSpend', 'sessionsSinceBreak',
 ] as const satisfies readonly (keyof PersistedData)[]
 
@@ -113,7 +115,8 @@ export const useGame = create<GameState>()(
         setCelebrated: (celebrated) => patch({ celebrated }),
         setLite: (liteMode) => patch({ liteMode }),
         resetProgress: () => patch({ celebrated: false, ...freshProgress(get().startAmount, get().goalAmount) }),
-        setAvatar: (avatar) => patch({ avatar }),
+        setAvatar: (avatar) => patch({ avatar, gender: toGender(avatar) }),
+        setGender: (gender) => patch({ gender, avatar: toAvatar(gender) }),
         setFestival: (festival) => patch({ festival }),
         setClassCode: (code) => patch({ classCode: code && code.trim() ? code.trim() : null }),
         applyGameResult: (result) => commit(applyGameResultPure(progressNow(), result)),

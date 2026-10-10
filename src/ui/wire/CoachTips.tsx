@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCoachTips } from '../../features/hub/coach'
 
@@ -22,7 +21,7 @@ export function CoachTips() {
       </div>
       <div style={{ display: 'grid', gap: 8 }}>
         {tips.map((tip) => (
-          <div key={tip.id} data-testid={`coach-tip-${tip.id}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: 8, borderRadius: 4, border: '1px solid var(--color-ink)' }}>
+          <div key={tip.id} data-testid={`coach-tip-${tip.id}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-jasmine)', padding: 8, borderRadius: 4, border: '1px solid var(--color-ink)' }}>
             <div>
               <div style={{ fontWeight: 'bold', fontSize: 14 }}>{t(tip.titleKey)}</div>
               <div style={{ fontSize: 13 }}>{t(tip.bodyKey)}</div>

@@ -1,32 +1,140 @@
 @import "tailwindcss";
-@import "@fontsource/chango/400.css";
-@import "@fontsource/bowlby-one/400.css";
+@import "@fontsource/dm-serif-display/400.css";
 @import "@fontsource/rozha-one/400.css";
 @import "@fontsource/noto-sans/500.css";
+@import "@fontsource/noto-sans/700.css";
 @import "@fontsource/noto-sans/800.css";
 @import "@fontsource/noto-sans-devanagari/500.css";
+@import "@fontsource/noto-sans-devanagari/700.css";
 @import "@fontsource/noto-sans-devanagari/800.css";
-@import "@fontsource/noto-sans-devanagari/900.css";
 @import "@fontsource/noto-sans-telugu/500.css";
+@import "@fontsource/noto-sans-telugu/700.css";
 @import "@fontsource/noto-sans-telugu/800.css";
-@import "@fontsource/noto-sans-telugu/900.css";
 
-/* ---- Design tokens (see DESIGN.md) ---- */
+/* ---- Design tokens (see DESIGN.md): muted, never neon ---- */
 @theme {
-  --color-ink: #2b1a17;
-  --color-terracotta: #d9632e;
+  --color-paper: #F8EBCB;
+  --color-water: #92C9D3;
+  --color-water-deep: #6EB7C9;
+  --color-stone: #F2DFB0;
+  --color-terracotta: #D8683A;
+  --color-ochre: #E8AB3A;
+  --color-sage: #86B35F;
+  --color-green: #4E9050;
+  --color-granite: #8E7C98;
+  --color-coral: #D9573F;
+  --color-gold: #D9A520;
+  --color-ink: #3a2a24;
+  --font-display: "DM Serif Display", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", Georgia, serif;
+  --font-body: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
+}
+
+:root { color-scheme: light; --ink: #3a2a24; --lang-scale: 1; }
+html[lang="hi"] { --lang-scale: .95; }
+html[lang="te"] { --lang-scale: .92; }
+html, body, #root { height: 100%; margin: 0; background: #92C9D3; }
+body {
+  font-family: var(--font-body); font-weight: 500; color: var(--ink);
+  overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
+}
+html[lang="hi"] .font-display { font-family: "Rozha One", "Noto Sans Devanagari", serif; }
+html[lang="te"] .font-display { font-family: "Noto Sans Telugu", sans-serif; font-weight: 800; line-height: 1.3; }
+html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }
+.lang-fit { zoom: var(--lang-scale); }
+
+/* ---- calm paper UI: thin ink outline, small radius, soft flat shadow ---- */
+.paper {
+  background: #FBF0D2; border: 1.5px solid var(--ink); border-radius: 8px;
+  box-shadow: 0 2px 0 rgba(58,42,36,.35), 0 8px 18px rgba(58,42,36,.16);
+}
+.ink-chip {
+  background: #FBF0D2; border: 1.5px solid var(--ink); border-radius: 999px; color: var(--ink);
+  box-shadow: 0 2px 0 rgba(58,42,36,.3);
+}
+.ink-btn {
+  min-height: 44px; min-width: 44px; padding: 0 18px; cursor: pointer;
+  font-family: var(--font-body); font-weight: 700; font-size: 15px; color: #fbf6ea;
+  background: var(--color-terracotta); border: 1.5px solid var(--ink); border-radius: 8px;
+  box-shadow: 0 2px 0 rgba(58,42,36,.45); transition: transform .12s, box-shadow .12s;
+}
+.ink-btn:hover { transform: translateY(-1px); }
+.ink-btn:active { transform: translateY(1px); box-shadow: none; }
+.ink-btn.cream { background: #FBF0D2; color: var(--ink); }
+.ink-btn.pink { background: var(--color-terracotta); }
+.ink-btn:disabled { opacity: .4; cursor: default; transform: none; }
+button:focus-visible { outline: 3px solid var(--color-coral); outline-offset: 3px; }
+
+/* ---- map ---- */
+.island-hit:focus-visible { outline: none; }
+.island-ring {
+  position: absolute; inset: 14px; border-radius: 50%; border: 3px solid rgba(255,250,235,.95);
+  box-shadow: 0 0 0 2px rgba(58,42,36,.55), 0 0 22px rgba(255,236,170,.85); transition: opacity .18s;
+}
+.island-label {
+  position: absolute; white-space: nowrap; pointer-events: none; padding: 6px 14px;
+  font-family: var(--font-display); font-size: 22px; color: var(--ink);
+  background: #FBF0D2; border: 1.5px solid var(--ink); border-radius: 6px; transform-origin: 50% 100%;
+}
+@keyframes ring-pulse { 0%,100% { opacity: .15; transform: scale(.9) } 50% { opacity: .9; transform: scale(1.12) } }
+@keyframes flag { 0%,100% { transform: skewY(0) } 50% { transform: skewY(4deg) } }
+@keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+@keyframes twinkle { 0%,100% { opacity: .75 } 50% { opacity: .25 } }
+@keyframes steam { 0% { transform: translateY(0); opacity: .85 } 100% { transform: translateY(-18px); opacity: 0 } }
+@keyframes petal { 0% { transform: translate(0,-40px) rotate(0); opacity: 0 } 15% { opacity: .9 } 100% { transform: translate(260px, 1500px) rotate(540deg); opacity: 0 } }
+.idle.ring { animation: ring-pulse 2.2s steps(11) infinite; transform-origin: 22px 142px; }
+.idle.flag { animation: flag 1.6s steps(8) infinite; }
+.idle.bob { animation: bob 2.4s steps(10) infinite; }
+.idle.twinkle { animation: twinkle 3s steps(6) infinite; }
+.idle.steam { animation: steam 2.2s steps(8) infinite; }
+.petal {
+  position: absolute; top: 0; width: 22px; height: 14px; border-radius: 80% 0 80% 0; background: #E8862F;
+  border: 1.2px solid var(--ink); animation: petal 11s linear infinite; opacity: 0;
+}
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+.fade-in { animation: fade-in .45s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+.rise { animation: rise .5s ease both; }
+
+html[data-lite="true"] .grain { display: none !important; }
+html[data-lite="true"] .idle, html[data-lite="true"] .petal { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .idle, .petal, .fade-in, .rise { animation: none !important; } }
+
+@keyframes hero-bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+@keyframes hero-breathe { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.012,.988) } }
+.hero-walk { animation: hero-bob .28s steps(3) infinite; transform-origin: 50% 100%; }
+.hero-idle { animation: hero-breathe 1.6s steps(4) infinite; transform-origin: 50% 100%; }
+html[data-lite="true"] .hero-idle { animation: none; }
+
+.gate-glow { background: radial-gradient(ellipse at 50% 70%, rgba(255,226,140,.75), rgba(255,226,140,0) 68%); animation: twinkle 3s steps(6) infinite; }
+html[data-lite="true"] .gate-glow { animation: none; }
+
+@keyframes flagwave { 0%,100% { transform: skewX(0) } 50% { transform: skewX(1.6deg) } }
+.idle.flagwave { animation: flagwave 2s steps(8) infinite; }
+
+@keyframes float-island { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+.idle.float-island { animation: float-island 5s steps(25) infinite; }
+
+/* painted shopkeepers: a lively stepped float (bob + sway + breathing); faster and bigger when the player is at the stall */
+@keyframes npc-float { 0% { transform: translateY(0) rotate(-1.5deg) scale(1,1) } 25% { transform: translateY(-9px) rotate(0) scale(.985,1.02) } 50% { transform: translateY(-16px) rotate(1.5deg) scale(1,1) } 75% { transform: translateY(-9px) rotate(0) scale(1.015,.985) } 100% { transform: translateY(0) rotate(-1.5deg) scale(1,1) } }
+@keyframes npc-float-fast { 0%,100% { transform: translateY(0) rotate(-2.5deg) } 25% { transform: translateY(-14px) rotate(0) } 50% { transform: translateY(-22px) rotate(2.5deg) } 75% { transform: translateY(-14px) rotate(0) } }
+@keyframes squash-pop { 0% { transform: scale(1,1) } 25% { transform: scale(1.18,.8) } 50% { transform: scale(.9,1.2) } 75% { transform: scale(1.06,.95) } 100% { transform: scale(1,1) } }
+.anim-float { animation: npc-float 2.2s steps(14) infinite; transform-origin: 50% 100%; }
+.anim-float-fast { animation: npc-float-fast 1.1s steps(10) infinite; transform-origin: 50% 100%; }
+.anim-squash { animation: squash-pop .5s steps(8) 1; transform-origin: 50% 100%; }
+html[data-lite="true"] .anim-float, html[data-lite="true"] .anim-float-fast { animation: none; }
+@media (prefers-reduced-motion: reduce) { .anim-float, .anim-float-fast, .anim-squash { animation: none; } }
+
+/* shell wireframe tokens (see src/art/palette.ts); main's island palette above wins on shared names */
+@theme {
   --color-marigold: #f28c28;
   --color-mustard: #e8b04a;
   --color-jasmine: #fff3d6;
   --color-sky: #5bb5d6;
   --color-teal: #2f6f73;
-  --color-sage: #3f7a3a;
-  --color-coral: #d8503a;
   --color-pink: #e5457a;
-  --color-gold: #d9a520;
   --color-dusk: #1e2a44;
   --color-maroon: #7a2a22;
-  --color-stone: #f0d9a8;
   --color-stone-shade: #d9a86a;
   --color-peach: #f2a56b;
   --color-cobble: #d49a62;
@@ -73,102 +181,9 @@
   --color-wood: #8a4f2b;
   --color-night-wall-end: #3b1f26;
   --color-floor-dark: #3b2a26;
-  --font-display: "Chango", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
-  --font-sign: "Bowlby One", "Rozha One", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
-  --font-body: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Telugu", system-ui, sans-serif;
-  --shadow-flat: 4px 4px 0 var(--color-ink);
-  --shadow-flat-sm: 2px 3px 0 var(--color-ink);
 }
-
 :root {
-  color-scheme: light; --ink: var(--color-ink); --lang-scale: 1;
-  /* semantic aliases (TS twin: S in src/art/palette.ts) */
-  --surface: var(--color-jasmine); --surface-ink: var(--color-ink); --accent: var(--color-pink);
-  --success: var(--color-sage); --warning: var(--color-marigold); --danger: var(--color-coral);
+  --surface: var(--color-paper); --surface-ink: var(--color-ink); --accent: var(--color-pink); --success: var(--color-sage); --warning: var(--color-marigold); --danger: var(--color-coral);
   --joy-bright: var(--color-lamp-lit); --joy-dim: #b8923a; --joy-flicker: var(--color-lamp-unlit);
-  /* stacking scale (TS twin: Z) */
   --z-scene: 30; --z-hud: 40; --z-overlay: 50; --z-modal: 60; --z-film: 90; --z-transition: 100;
-  /* hand-cut corners */
-  --radius-btn: 14px 10px 16px 9px / 10px 15px 9px 14px;
-  --radius-chip: 12px 9px 13px 8px / 9px 13px 8px 12px;
-  --radius-paper: 6px 10px 5px 11px;
-  /* stepped animation timings */
-  --dur-bob: .9s; --dur-bob-sm: .8s; --dur-sway: 2.4s; --dur-pulse: 1s; --dur-blink: .9s; --dur-twinkle: 1.4s;
-  --dur-hop: 3.6s; --dur-squash: .55s; --dur-unfurl: .35s; --dur-pop: .45s; --dur-walk: .28s; --dur-idle: 1.2s; --dur-shifty: 2.6s;
 }
-html[lang="hi"] { --lang-scale: .95; }
-html[lang="te"] { --lang-scale: .92; }
-html, body, #root { height: 100%; margin: 0; background: var(--color-ink); }
-body {
-  font-family: var(--font-body); font-weight: 500; color: var(--ink);
-  overflow: hidden; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation; user-select: none; -webkit-user-select: none;
-}
-/* display text switches to a script-aware face */
-html[lang="hi"] .font-display, html[lang="hi"] .font-sign { font-family: "Rozha One", "Noto Sans Devanagari", sans-serif; font-weight: 400; }
-html[lang="te"] .font-display, html[lang="te"] .font-sign { font-family: "Noto Sans Telugu", sans-serif; font-weight: 900; line-height: 1.25; }
-.lang-fit { font-size: calc(1em * var(--lang-scale)); }
-
-/* ---- Inked, hand-cut UI primitives ---- */
-.ink-btn {
-  min-height: 48px; min-width: 48px; padding: 0 18px; cursor: pointer;
-  font-family: var(--font-sign); font-size: 16px; color: var(--color-ink); letter-spacing: .02em;
-  background: var(--color-mustard); border: 3px solid var(--color-ink);
-  border-radius: var(--radius-btn);
-  box-shadow: var(--shadow-flat); transition: transform .08s steps(2), box-shadow .08s steps(2);
-}
-.ink-btn:hover { transform: translate(-1px,-2px) rotate(-1deg); box-shadow: 5px 6px 0 var(--color-ink); }
-.ink-btn:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--color-ink); }
-.ink-btn:focus-visible, button:focus-visible { outline: 4px solid var(--color-pink); outline-offset: 3px; }
-.ink-btn.pink { background: var(--color-pink); color: var(--color-jasmine); }
-.ink-btn.teal { background: var(--color-sky); }
-.ink-btn.cream { background: var(--color-jasmine); }
-.ink-chip {
-  background: var(--color-jasmine); border: 3px solid var(--color-ink); box-shadow: var(--shadow-flat-sm);
-  border-radius: var(--radius-chip); color: var(--color-ink);
-}
-.paper { background: var(--color-jasmine); border: 4px solid var(--color-ink); border-radius: var(--radius-paper); box-shadow: 6px 7px 0 var(--color-ink); }
-
-/* ---- stepped animation primitives: ~10fps "on twos/threes" ---- */
-@keyframes bob { 0%,100% { transform: translateY(0) scale(1,1) } 50% { transform: translateY(-5px) scale(.97,1.04) } }
-@keyframes bob-sm { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
-@keyframes sway { 0%,100% { transform: rotate(-3deg) } 50% { transform: rotate(3deg) } }
-@keyframes pulse-step { 0%,100% { transform: scale(1) } 50% { transform: scale(1.08) } }
-@keyframes blink-sign { 0%,49% { opacity: 1 } 50%,100% { opacity: .25 } }
-@keyframes twinkle { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
-@keyframes hop { 0%,60%,100% { transform: translateY(0) } 70% { transform: translateY(-9px) } 80% { transform: translateY(0) } 88% { transform: translateY(-5px) } }
-@keyframes steam { 0% { transform: translateY(0); opacity: .9 } 100% { transform: translateY(-26px) scale(1.5); opacity: 0 } }
-@keyframes squash-pop { 0% { transform: scale(1,1) } 25% { transform: scale(1.22,.74) } 50% { transform: scale(.86,1.28) translateY(-14px) } 75% { transform: scale(1.1,.9) } 100% { transform: scale(1,1) } }
-@keyframes unfurl { 0% { transform: scaleY(0); } 60% { transform: scaleY(1.12); } 100% { transform: scaleY(1); } }
-@keyframes pop-in { 0% { transform: scale(0) rotate(-8deg) } 60% { transform: scale(1.15) rotate(3deg) } 100% { transform: scale(1) rotate(0) } }
-@keyframes spark { 0% { transform: scale(0) } 40% { transform: scale(1.4) } 100% { transform: scale(0) } }
-@keyframes firework { 0% { transform: scale(.1); opacity: 1 } 70% { opacity: 1 } 100% { transform: scale(1); opacity: 0 } }
-@keyframes bounce-arrow { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
-@keyframes fly-away { 0% { transform: translate(0,0) scale(1) } 100% { transform: translate(var(--fx), var(--fy)) scale(.4) } }
-@keyframes flicker { 0%,100% { opacity: .9 } 30% { opacity: .5 } 60% { opacity: 1 } }
-
-.anim-bob { animation: bob var(--dur-bob) steps(9) infinite; transform-origin: 50% 100%; }
-.anim-bob-sm { animation: bob-sm var(--dur-bob-sm) steps(6) infinite; }
-.anim-sway { animation: sway var(--dur-sway) steps(12) infinite; transform-origin: 50% 0; }
-.anim-pulse { animation: pulse-step var(--dur-pulse) steps(8) infinite; }
-.anim-blink { animation: blink-sign var(--dur-blink) steps(1) infinite; }
-.anim-twinkle { animation: twinkle var(--dur-twinkle) steps(2) infinite; }
-.anim-hop { animation: hop var(--dur-hop) steps(18) infinite; }
-.anim-squash { animation: squash-pop var(--dur-squash) steps(11) 1; transform-origin: 50% 100%; }
-.anim-unfurl { animation: unfurl var(--dur-unfurl) steps(7) 1 both; transform-origin: 50% 0; }
-.anim-pop { animation: pop-in var(--dur-pop) steps(9) 1 both; }
-
-html[data-lite="true"] .grain, html[data-lite="true"] .scratches { display: none !important; }
-@media (prefers-reduced-motion: reduce) {
-  .anim-sway, .anim-hop, .anim-twinkle, .anim-pulse, .anim-blink, .anim-bob, .anim-bob-sm { animation: none !important; }
-}
-
-@keyframes shifty { 0%,35% { transform: translateX(-2px) } 45%,85% { transform: translateX(3px) } 100% { transform: translateX(-2px) } }
-.toon-shifty { animation: shifty var(--dur-shifty) steps(1) infinite; }
-@keyframes walk-bob { 0%,100% { transform: translateY(0) scale(1,1) } 50% { transform: translateY(-4px) scale(.95,1.06) } }
-.anim-walk { animation: walk-bob var(--dur-walk) steps(3) infinite; transform-origin: 50% 100%; }
-@keyframes idle-breathe { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.015,.985) } }
-.anim-idle { animation: idle-breathe var(--dur-idle) steps(4) infinite; transform-origin: 50% 100%; }
-
-/* tracked-out caps break Devanagari/Telugu conjuncts: never letter-space those scripts */
-html[lang="hi"] *, html[lang="te"] * { letter-spacing: normal !important; }

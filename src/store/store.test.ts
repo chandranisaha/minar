@@ -167,7 +167,7 @@ describe('store: derived fields', () => {
     store.getState().setPersona('school')
     const keys = Object.keys(JSON.parse(mem.getItem(STORE_KEY) as string).state).sort()
     expect(keys).toEqual(
-      ['avatar', 'celebrated', 'classCode', 'diamonds', 'festival', 'goalAmount', 'happy', 'happyToastSeen', 'installId', 'language', 'lifeMomentSpend', 'lifeMomentsUsed', 'liteMode', 'persona', 'pillars', 'sessionsSinceBreak', 'shieldPieces', 'skills', 'startAmount', 'storySeen', 'title'],
+      ['avatar', 'celebrated', 'classCode', 'coachTipsSeen', 'diamonds', 'festival', 'gender', 'goalAmount', 'happy', 'happyToastSeen', 'installId', 'language', 'lifeMomentSpend', 'lifeMomentsUsed', 'liteMode', 'persona', 'pillars', 'sessionsSinceBreak', 'shieldPieces', 'skills', 'startAmount', 'storySeen', 'title'],
     )
   })
 })

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useGame } from '../../store/game'
 import { ONBOARDING_SCRIPT } from './script'
-import type { Avatar, Festival, PersonaId } from '../../content/data'
 
 export function useOnboarding() {
   const [stepIndex, setStepIndex] = useState(0)

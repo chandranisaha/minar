@@ -51,7 +51,7 @@ export function HubScreen() {
         ) : (
           <main style={{ display: 'grid', gap: 12 }}>
             {pillars.map(p => (
-              <div key={p.id} data-testid={`hub-pillar-${p.id}`} data-state={p.state} style={{ border: '2px solid var(--color-ink)', borderRadius: 8, padding: 12, background: '#fff' }}>
+              <div key={p.id} data-testid={`hub-pillar-${p.id}`} data-state={p.state} style={{ border: '2px solid var(--color-ink)', borderRadius: 8, padding: 12, background: 'var(--color-jasmine)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                   <div>
                     <h3 style={{ margin: 0 }}>{t(p.nameKey)}</h3>

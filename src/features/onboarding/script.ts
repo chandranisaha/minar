@@ -1,4 +1,3 @@
-import { type Avatar, type Festival, type PersonaId } from '../../content/data'
 
 export type StepKind = 'welcome' | 'problem' | 'persona' | 'festival' | 'avatar' | 'skills' | 'win' | 'happy' | 'controls'
 

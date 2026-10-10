@@ -1,6 +1,6 @@
 import type { PillarId } from '../../content/data'
 import { buildProgressView } from '../progress/view'
-import type { ProgressState, PillarStatus } from '../../progress/types'
+import type { ProgressState } from '../../progress/types'
 import { HUB_CONFIG } from './config'
 import type { Brightness } from '../../progress/config'
 

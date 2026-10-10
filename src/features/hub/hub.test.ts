@@ -1,4 +1,5 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+// @vitest-environment jsdom
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useHub, usePillarIntro } from './hooks'
 import { useCoachTips } from './coach'

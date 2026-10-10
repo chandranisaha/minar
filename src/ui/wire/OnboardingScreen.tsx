@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router-dom'
 import { useOnboarding } from '../../features/onboarding/hooks'
 import { useGame } from '../../store/game'
-import { LANGS, PERSONAS, FESTIVALS, type Lang, type PersonaId, type Festival, type Avatar } from '../../content/data'
+import { LANGS, PERSONAS, FESTIVALS, type Lang, type PersonaId, type Avatar } from '../../content/data'
 
 /**
  * Plain wireframe onboarding. 

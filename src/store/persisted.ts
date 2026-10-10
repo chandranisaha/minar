@@ -14,6 +14,10 @@ import { sanitizeProgress } from '../progress/state'
 import type { ProgressState } from '../progress/types'
 import { newInstallId } from './ids'
 
+export type Gender = 'girl' | 'boy'
+export const toGender = (a: Avatar): Gender => (a === 'male' ? 'boy' : 'girl')
+export const toAvatar = (g: Gender): Avatar => (g === 'boy' ? 'male' : 'female')
+
 export const STORE_KEY = 'money-mohalla-v2'
 /** the key the game used before the progress model existed; read once for migration, never written again */
 export const LEGACY_STORE_KEY = 'money-mohalla-v1'
@@ -34,6 +38,8 @@ export interface Settings {
 
 export interface Identity {
   avatar: Avatar
+  /** the island UI's name for the same choice: girl = female, boy = male. Always kept in step with avatar */
+  gender: Gender
   festival: Festival
   /** random per install, created once, never linked to a person */
   installId: string
@@ -62,7 +68,11 @@ export function normalizePersisted(raw: unknown, makeId: () => string = newInsta
     liteMode: typeof p.liteMode === 'boolean' ? p.liteMode : null,
     happyToastSeen: p.happyToastSeen === true,
     coachTipsSeen: p.coachTipsSeen && typeof p.coachTipsSeen === 'object' ? p.coachTipsSeen : {},
-    avatar: p.avatar === 'male' || p.avatar === 'female' ? p.avatar : DEFAULT_AVATAR,
+    ...(() => {
+      const g = (p as { gender?: unknown }).gender
+      const avatar: Avatar = p.avatar === 'male' || p.avatar === 'female' ? p.avatar : g === 'boy' ? 'male' : g === 'girl' ? 'female' : DEFAULT_AVATAR
+      return { avatar, gender: toGender(avatar) }
+    })(),
     festival: FESTIVALS.includes(p.festival as Festival) ? (p.festival as Festival) : DEFAULT_FESTIVAL,
     installId: typeof p.installId === 'string' && p.installId ? p.installId : makeId(),
     classCode: typeof p.classCode === 'string' && p.classCode ? p.classCode : null,

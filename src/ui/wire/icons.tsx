@@ -7,7 +7,11 @@ import type { StateIcon } from '../../features/progress/view'
  */
 const INK = 'var(--color-ink)'
 
-export function StateGlyph({ icon, size = 24 }: { icon: StateIcon; size?: number }) {
+const BY_STATE: Record<string, StateIcon> = { notStarted: 'empty', partial: 'half', bright: 'full', dim: 'dim', flicker: 'faint' }
+
+/** pass `icon`, or a pillar `state` (notStarted / partial / bright / dim / flicker) and the icon is chosen for you */
+export function StateGlyph({ icon, state, size = 24 }: { icon?: StateIcon; state?: string; size?: number }) {
+  icon = icon ?? BY_STATE[state ?? 'notStarted'] ?? 'empty'
   const common = { width: size, height: size, viewBox: '0 0 24 24', 'aria-hidden': true, focusable: false } as const
   switch (icon) {
     case 'empty':
