@@ -25,6 +25,7 @@ def ok(p, minroad, minnode):
     if ((p[0] - plaza[0]) / plaza[2]) ** 2 + ((p[1] - plaza[1]) / plaza[3]) ** 2 < 1: return False
     if near_road(p) < minroad: return False
     if any(math.hypot(p[0] - q[0], p[1] - q[1]) < minnode for q in pts.values()): return False
+    if any(abs(p[0] - q[0]) < 230 and -40 < p[1] - q[1] < 330 for q in [pts[k] for k in ('plan', 'save', 'invest', 'safe', 'gate')]): return False
     if any(((p[0] - b[0] / 100 * W) / (b[2] / 100 * W + 70)) ** 2 + ((p[1] - b[1] / 100 * H) / (b[3] / 100 * H + 60)) ** 2 < 1 for b in d['blockers']): return False
     gb = d['gateBlock']
     if gb[0] / 100 * W - 60 < p[0] < gb[2] / 100 * W + 60 and p[1] < gb[3] / 100 * H + 140: return False
@@ -43,11 +44,11 @@ def put(kind, art_names, n, w_range, minroad, minnode, rim=False, spacing=150):
         a = random.choice(art_names); w = random.uniform(*w_range)
         placed.append(dict(art=a, wx=p[0], wy=p[1], x=round(p[0] / W * 100, 2), y=round(p[1] / H * 100, 2), w=round(w), kind=kind)); got += 1
 names = lambda pre, ids=None: [k for k in man if k.startswith(pre) and (ids is None or int(k.split('-')[-1]) in ids)]
-put('tree', names('deco-tree', [2, 3, 5, 6, 1, 4, 7]), 7, (200, 270), 120, 190, spacing=230)
+put('tree', names('deco-tree', [2, 3, 5, 6, 1, 4, 7]), 12, (210, 290), 105, 170, spacing=190)
 put('tree', ['deco-tree-0'], 1, (360, 400), 170, 230, spacing=300)
 put('rock', names('deco-rock'), 9, (150, 230), 85, 150, rim=True, spacing=170)
-put('bush', names('deco-bush', [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13]), 14, (95, 150), 85, 140, spacing=110)
-put('bush', names('deco-bush', [8, 9, 10, 14, 15, 16, 17, 18]), 6, (100, 150), 85, 140, spacing=110)
+put('bush', names('deco-bush', [0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13]), 22, (110, 170), 80, 130, spacing=95)
+put('bush', names('deco-bush', [8, 9, 10, 14, 15, 16, 17, 18]), 10, (100, 150), 85, 140, spacing=110)
 for p in placed:
     h = p['w'] * man[p['art']]['h'] / man[p['art']]['w']
     p['solid'] = [round(p['w'] * (0.14 if p['kind'] == 'tree' else 0.3) / W * 100, 2), round(p['w'] * (0.05 if p['kind'] == 'tree' else 0.1) / H * 100, 2)] if p['kind'] != 'bush' else None

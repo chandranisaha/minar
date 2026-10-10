@@ -43,22 +43,6 @@ const KEEPERS: Record<string, { idle: string; hover: string; dx: number; dy: num
 
 let lastPos: number[] | null = null // survives entering a pillar and coming back
 
-/** A flag on a pole: white while incomplete, antique gold with a tick once the place is done. */
-function Marker({ done, pulse, locked }: { done: boolean; pulse?: boolean; locked?: boolean }) {
-  return (
-    <svg width="90" height="150" viewBox="0 0 90 150" style={{ overflow: 'visible', display: 'block' }} aria-hidden>
-      <ellipse cx="22" cy="144" rx="22" ry="7" fill="#3A2A24" opacity=".2" />
-      {pulse && <ellipse className="idle ring" cx="22" cy="142" rx="40" ry="14" fill="none" stroke="#D9573F" strokeWidth="3" />}
-      <path d="M22 144 V18" stroke="#3A2A24" strokeWidth="5" strokeLinecap="round" />
-      <circle cx="22" cy="14" r="6" fill="#D9A520" stroke="#3A2A24" strokeWidth="2" />
-      <g className="idle flag" style={{ transformOrigin: '24px 24px' }}>
-        <path d="M24 24 H80 Q70 40 80 56 H24Z" fill={done ? '#D9A520' : locked ? '#CFC7B3' : '#FBF6EA'} stroke="#3A2A24" strokeWidth="2.4" strokeLinejoin="round" />
-        {done && <path d="M40 42 l8 8 l16 -18" fill="none" stroke="#3A2A24" strokeWidth="4.4" strokeLinecap="round" strokeLinejoin="round" />}
-      </g>
-    </svg>
-  )
-}
-
 export function IslandMap() {
   const { t } = useTranslation()
   const nav = useNavigate()
@@ -415,13 +399,13 @@ export function IslandMap() {
           const [x, y] = px([n.x, n.y])
           const isPillar = n.kind === 'pillar'
           const isDone = isPillar && completed.includes(n.id as PillarId)
-          const locked = n.kind === 'goal' && !allDone
           const showLabel = active === n.id || card === n.id
           return (
             <div key={n.id}>
               {(isPillar || n.kind === 'goal') && (
-                <div style={{ position: 'absolute', left: x + 30, top: y - 215, pointerEvents: 'none', zIndex: Math.round(y) + 5, transform: 'scale(1.5)', transformOrigin: '0 100%' }}>
-                  <Marker done={n.kind === 'goal' ? allDone : isDone} locked={locked} pulse={n.id === 'plan' && firstTime && completed.length === 0} />
+                <div style={{ position: 'absolute', left: x + 36, top: y + 12 - 215, width: 142, height: 215, pointerEvents: 'none', zIndex: Math.round(y) + 5, filter: 'drop-shadow(0 4px 3px rgba(58,42,36,.25))' }}>
+                  {n.id === 'plan' && firstTime && completed.length === 0 && <div className="idle ring" style={{ position: 'absolute', left: -14, right: -14, bottom: -8, height: 40, borderRadius: '50%', border: '3px solid #D9573F' }} />}
+                  <img src={`/art/${n.kind === 'goal' ? (allDone ? 'flag-done' : 'flag-locked') : isDone ? 'flag-done' : 'flag-open'}.webp`} alt="" draggable={false} className="idle flagwave" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'bottom', transformOrigin: '50% 100%' }} />
                 </div>
               )}
               <button

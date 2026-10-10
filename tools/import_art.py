@@ -146,6 +146,17 @@ for fn in sorted(files, key=lambda q: os.path.basename(q)):
         for nm in cut_components(fn, hit, maxw=760 if hit == 'deco-dock' else 520):
             done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
         continue
+    if 'flag markers' in low:
+        g = Image.open(fn).convert('RGBA'); third = g.width // 3
+        for i, nm in enumerate(('flag-open', 'flag-done', 'flag-locked')):
+            part = g.crop((i * third, 0, (i + 1) * third, g.height)); part = part.crop(part.getchannel('A').point(lambda v: 255 if v > 12 else 0).getbbox())
+            part.save(os.path.join(out, nm + '.webp'), 'WEBP', quality=90, method=6)
+            manifest[nm] = {'w': part.width, 'h': part.height, 'src': os.path.basename(fn)}; done.append((fn, nm, part.size))
+        continue
+    if 'garlands' in low or 'bunting' in low:
+        for nm in cut_components(fn, 'garland-' + ('lights' if 'light' in low else 'bunting'), min_area=20000, maxw=900):
+            done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))
+        continue
     if 'kiosk guy and nani' in low:
         for nm in cut_props(fn, KN_BOXES, 'npc-'):
             done.append((fn, nm, (manifest[nm]['w'], manifest[nm]['h'])))

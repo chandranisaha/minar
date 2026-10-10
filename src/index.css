@@ -108,3 +108,6 @@ html[data-lite="true"] .hero-idle { animation: none; }
 
 .gate-glow { background: radial-gradient(ellipse at 50% 70%, rgba(255,226,140,.75), rgba(255,226,140,0) 68%); animation: twinkle 3s steps(6) infinite; }
 html[data-lite="true"] .gate-glow { animation: none; }
+
+@keyframes flagwave { 0%,100% { transform: skewX(0) } 50% { transform: skewX(1.6deg) } }
+.idle.flagwave { animation: flagwave 2s steps(8) infinite; }

@@ -328,5 +328,50 @@
   "w": 241,
   "h": 381,
   "src": "Ornate Garden Street Prop Collection.png"
+ },
+ "flag-open": {
+  "w": 545,
+  "h": 857,
+  "src": "Three Fantasy Flag Markers.png"
+ },
+ "flag-done": {
+  "w": 546,
+  "h": 857,
+  "src": "Three Fantasy Flag Markers.png"
+ },
+ "flag-locked": {
+  "w": 539,
+  "h": 858,
+  "src": "Three Fantasy Flag Markers.png"
+ },
+ "garland-lights-0": {
+  "w": 900,
+  "h": 131,
+  "src": "Watercolour Festive Light Garlands.png"
+ },
+ "garland-lights-1": {
+  "w": 900,
+  "h": 242,
+  "src": "Watercolour Festive Light Garlands.png"
+ },
+ "garland-lights-2": {
+  "w": 750,
+  "h": 362,
+  "src": "Watercolour Festive Light Garlands.png"
+ },
+ "garland-bunting-0": {
+  "w": 900,
+  "h": 131,
+  "src": "Watercolour Bunting Garland Collection.png"
+ },
+ "garland-bunting-1": {
+  "w": 900,
+  "h": 224,
+  "src": "Watercolour Bunting Garland Collection.png"
+ },
+ "garland-bunting-2": {
+  "w": 891,
+  "h": 420,
+  "src": "Watercolour Bunting Garland Collection.png"
  }
 }
