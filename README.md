@@ -51,7 +51,6 @@ The tool matches by **filename keyword**, trims transparent borders, converts to
 | `chai` / `irani` / `cafe` | `shop-save` | pillar 2 stall |
 | `pearl` | `shop-invest` | pillar 3 stall |
 | `recharge` / `kiosk` / `upi` | `shop-safe` | pillar 4 kiosk |
-
 | `rangoli` | `deco-rangoli` | plaza floor medallion |
 | `cityscape` / `skyline` | `bg-skyline` | watercolour skyline behind the buildings |
 | `alleyway` frames (`mediterranean`, `old-town`) | `bld-a-*`, `bld-b-*` | street-wall building clusters (split into left/right automatically) |

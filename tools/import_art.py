@@ -22,8 +22,6 @@ RULES = [  # (keywords any-of, slot, max width)
     (['flower', 'jasmine'], 'story-flowers', 1100),
     (['receipt', 'fee'], 'receipt', 800),
     (['nani', 'grandmother', 'grandma'], 'nani', 600),
-    (['tree'], 'deco-tree', 700),
-    (['cart'], 'deco-cart', 700),
 ]
 # two-sided alley frames: split at the widest empty gap into <slot>-left / <slot>-right
 SPLIT = [(['mediterranean', 'open centre'], 'bld-a', 0.12), (['old-town', 'sunlit'], 'bld-b', 0.0)]  # (keywords, slot, crop-bottom fraction)
