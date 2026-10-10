@@ -13,7 +13,12 @@ interface ShowdownStore {
   /** a made-up code that saves the game on this phone; no name, no personal data */
   code: string
   log: Decision[]
+  /** this game's result has been sent to the hub */
+  reported: boolean
+  markReported: () => void
   decide: (d: Decision) => void
+  /** replaces the whole log (preset games for checking and demos) */
+  load: (log: Decision[]) => void
   /** takes back the last "seen" marker for a screen (the Back arrow within a decision) */
   unsee: (screen: string) => void
   restart: () => void
@@ -32,17 +37,20 @@ export const useShowdown = create<ShowdownStore>()(
     (set) => ({
       code: newCode(),
       log: [],
+      reported: false,
+      markReported: () => set({ reported: true }),
       decide: (d) => set((s) => ({ log: [...s.log, d] })),
+      load: (log) => set({ log, reported: false }),
       unsee: (screen) => set((s) => {
         const i = s.log.map((d) => d.k === 'seen' && d.screen === screen).lastIndexOf(true)
         return i < 0 ? s : { log: s.log.filter((_, j) => j !== i) }
       }),
-      restart: () => set({ code: newCode(), log: [] }),
+      restart: () => set({ code: newCode(), log: [], reported: false }),
     }),
     {
       name: 'showdown-v1',
       storage: createJSONStorage(() => safeStorage),
-      partialize: (s) => ({ code: s.code, log: s.log }),
+      partialize: (s) => ({ code: s.code, log: s.log, reported: s.reported }),
     },
   ),
 )

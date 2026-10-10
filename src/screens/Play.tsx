@@ -18,7 +18,14 @@ function PlanGame() {
   if (params.has('showdown')) {
     return (
       <Suspense fallback={<div className="absolute inset-0 grid place-items-center bg-jasmine font-sign text-[20px]">…</div>}>
-        <ShowdownGame onExit={() => nav('/')} />
+        <ShowdownGame
+          cohortCode={params.get('cohort') ?? 'local'}
+          onComplete={(r) => {
+            saveResult(r)
+            if (r.minaretLit) complete('plan')
+          }}
+          onExit={() => nav('/')}
+        />
       </Suspense>
     )
   }

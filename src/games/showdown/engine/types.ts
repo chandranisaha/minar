@@ -59,6 +59,8 @@ export interface RunResult {
   lightsOk: boolean
   /** the first date that was short, how much, and the biggest bill due that day */
   firstBreak: { point: Point; gap: number; bill: string } | null
+  /** what was due and what was in hand on each short date (lesson L1 quotes it) */
+  shortfallDetail: { point: Point; due: number; cash: number }[]
   survived: boolean
   pending?: Pending
 }

@@ -1,5 +1,5 @@
 import { runPlan } from './run'
-import type { Choices, Plan } from './types'
+import type { Choices, Plan, RunResult } from './types'
 
 export type PredictionId = 'P1' | 'P2' | 'P3' | 'P4'
 export const PREDICTIONS: Record<PredictionId, { options: string[]; truth?: string }> = {
@@ -20,3 +20,6 @@ export function judge(id: PredictionId, answer: string, plan: Plan, choices: Cho
   const truth = truthOf(id, plan, choices)
   return { correct: answer === truth, unsure: answer === 'unsure', truth }
 }
+
+/** P3's answer from the festival that was actually played (with the player's own shortfall choices). */
+export const p3Truth = (played: Pick<RunResult, 'shortfalls'>): 'yes' | 'no' => (played.shortfalls.some(([p]) => p === 'W3') ? 'no' : 'yes')

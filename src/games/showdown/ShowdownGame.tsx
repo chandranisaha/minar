@@ -1,6 +1,9 @@
 import './i18n'
 import { LangSwitch } from '../../components/Hud'
 import { Bunting, Rooftops } from '../../components/Scenery'
+import type { GameResult } from '../../lib/gameResult'
+import { useEffect } from 'react'
+import { presetLog, STAGES, type Stage } from './state/presets'
 import { useShowdown, useView } from './state/store'
 import { DateScreen } from './ui/Dates'
 import { Festival, Futures } from './ui/Festival'
@@ -8,18 +11,29 @@ import { Brief, Goals, PredictP1, Start } from './ui/Intro'
 import { GuardrailFooter } from './ui/kit'
 import { Market } from './ui/Market'
 import { PlanCheck } from './ui/PlanCheck'
+import { Report, Transfer } from './ui/Report'
 import { useSd } from './ui/useSd'
 
 export interface ShowdownProps {
   cohortCode?: string
+  /** called once with the result when the report is first shown (the hub saves it and lights the minaret) */
+  onComplete?: (r: GameResult) => void
   onExit: () => void
 }
 
 /** Festival Showdown (Pillar 1: Plan & Budget). Screens only append decisions; the engine decides what happens. */
-export default function ShowdownGame({ onExit }: ShowdownProps) {
+export default function ShowdownGame({ cohortCode = 'local', onComplete, onExit }: ShowdownProps) {
   const { t } = useSd()
   const { step } = useView()
-  const restart = useShowdown((s) => s.restart)
+  const load = useShowdown((s) => s.load)
+
+  // /play/plan?showdown&preset=A|B&at=market|locked|festival|futures|transfer jumps to a reference game (for checking and demos)
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    const plan = q.get('preset')
+    const at = (q.get('at') ?? 'market') as Stage
+    if ((plan === 'A' || plan === 'B') && STAGES.includes(at)) load(presetLog(plan, at))
+  }, [load])
 
   let body
   switch (step.screen) {
@@ -32,14 +46,8 @@ export default function ShowdownGame({ onExit }: ShowdownProps) {
     case 'date': body = <DateScreen key={step.point} point={step.point!} />; break
     case 'festival': body = <Festival />; break
     case 'futures': body = <Futures />; break
-    default:
-      // transfer and the report are built in the next steps
-      body = (
-        <div className="paper p-4 text-center">
-          <p className="m-0 text-[16px] font-extrabold">🔒 Plan locked. Next screen: {step.screen}{step.point ? ` (${step.point})` : ''}</p>
-          <button type="button" className="ink-btn cream mt-3" onClick={restart}>↺ {t('start.again')}</button>
-        </div>
-      )
+    case 'transfer': body = <Transfer />; break
+    case 'report': body = <Report cohortCode={cohortCode} onComplete={onComplete} onExit={onExit} />; break
   }
 
   return (

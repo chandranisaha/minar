@@ -5,6 +5,7 @@ import { futuresRun, firstBreak } from '../engine/survival'
 import { POINTS, type GoalId } from '../engine/types'
 import { useShowdown, usePlayed, useView } from '../state/store'
 import { Say } from './kit'
+import { MomentLesson } from './Moment'
 import { useLabel } from './labels'
 import { FestivalScene, type Layers } from './Scene'
 import { useSd } from './useSd'
@@ -160,6 +161,7 @@ export function Futures() {
         <p className="m-0 mt-1 text-[14px] font-extrabold">{fb ? t('futures.first', { when: when(fb.point), bill: label(fb.bill) }) : t('futures.none')}</p>
         <p className="m-0 mt-2 text-[12px] font-bold opacity-80">{t('futures.autopilot')}</p>
       </section>
+      <MomentLesson futures />
       <button type="button" className="ink-btn pink self-center" onClick={() => decide({ k: 'seen', screen: 'futures' })}>{t('futures.go')} ▶</button>
     </div>
   )

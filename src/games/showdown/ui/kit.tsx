@@ -1,8 +1,11 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Toon, type Mood } from '../../shared/Toon'
 import type { CashLines } from '../engine/lines'
 import { POINTS } from '../engine/types'
+import { MONEY_VARS, type LessonLine } from '../engine/lessons'
+import type { Point } from '../engine/types'
 import { CAST, type CastId } from './cast'
+import { useLabel } from './labels'
 import { useSd } from './useSd'
 
 export function GuardrailFooter() {
@@ -105,6 +108,34 @@ export function CashLinesTable({ lines }: { lines: CashLines }) {
         <div className="text-[14px] font-extrabold">{lines.cushion < 0 ? '▼ ' : ''}{t('lines.cushion', { money: money(lines.cushion) })}</div>
         <div className="text-[12px] font-bold opacity-80">{t('lines.cushionNote')}</div>
       </div>
+    </div>
+  )
+}
+
+/** A lesson card: what happened, the idea, the rule, and a Learn more with five short parts. The real-life idea is named only after it was felt. */
+export function LessonCard({ line, tilt = 0 }: { line: LessonLine; tilt?: number }) {
+  const { t, money, when } = useSd()
+  const label = useLabel()
+  const [more, setMore] = useState(false)
+  const vars: Record<string, string | number> = {}
+  for (const [k, v] of Object.entries(line.vars)) {
+    vars[k] = MONEY_VARS.includes(k) ? money(Number(v)) : k === 'item' || k === 'bill' ? label(String(v)) : k === 'goal' ? t(`goals.${v}.name`) : k === 'when' ? when(v as Point) : v
+  }
+  const id = line.id
+  return (
+    <div className="paper p-3 text-left" style={{ transform: `rotate(${tilt}deg)` }}>
+      <div className="font-sign lang-fit text-[12px] tracking-[.15em] text-pink">{t('lesson.rule')} · {t(`concepts.${id === 'L1' ? 'C1' : id === 'L2' ? 'C2' : id === 'L3' ? 'C3' : id === 'L4' ? 'C4' : id === 'L5' ? 'C5' : 'C7'}`)}</div>
+      <p className="m-0 mt-1 text-[15px] font-extrabold leading-snug">{t(`lesson.${line.key}`, vars)}</p>
+      <p className="m-0 mt-1 text-[14px] leading-snug">{t(`lesson.${id}.idea`)}</p>
+      <p className="font-sign lang-fit m-0 mt-2 text-[17px]">“{t(`lesson.${id}.rule`)}”</p>
+      <button type="button" className="mt-1 min-h-12 text-[13px] font-extrabold underline" aria-expanded={more} onClick={() => setMore(!more)}>{more ? t('lesson.less') : t('lesson.learnMore')}</button>
+      {more && (
+        <dl className="m-0 flex flex-col gap-1.5 text-[13px] leading-snug">
+          {(['what', 'idea', 'example', 'real', 'ask'] as const).map((part) => (
+            <div key={part}><dt className="font-extrabold">{t(`lesson.parts.${part}`)}</dt><dd className="m-0">{t(`lesson.${id}.more.${part}`)}</dd></div>
+          ))}
+        </dl>
+      )}
     </div>
   )
 }

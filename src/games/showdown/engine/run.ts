@@ -83,6 +83,7 @@ export function runPlan(plan: Plan, futureId: string, choices: Choices = {}, opt
   const crowdBase = promo ? (item(promo.id).crowd ?? RULES.noPromoCrowd) : RULES.noPromoCrowd
   let crowd: number | null = null
   let firstBreak: RunResult['firstBreak'] = null
+  const shortfallDetail: RunResult['shortfallDetail'] = []
   const ledger: RunResult['ledger'] = {}
   const arrivals: Record<Point, number> = { W1: 0, W2: 0, W3: 0, FD: 0 }
   arrivals.W2 += f.donation
@@ -103,7 +104,7 @@ export function runPlan(plan: Plan, futureId: string, choices: Choices = {}, opt
     const lostPaid = cs.reduce((a, c) => a + (items[c.id].cancelled ? items[c.id].paid : 0), 0)
     const unpaidTotal = unpaid.reduce((a, [, x]) => a + x, 0)
     return {
-      ledger, end: pyRound(cash), crowd, goals: goals.sort(), cap, lightsOk, firstBreak, shortfalls, cancelled, events, unpaid,
+      ledger, end: pyRound(cash), crowd, goals: goals.sort(), cap, lightsOk, firstBreak, shortfallDetail, shortfalls, cancelled, events, unpaid,
       extensionFees: pyRound(extensionFees),
       avoidable: { extensionFees, rushPlates: rushCost, lostPaid, unpaidFee: unpaidTotal * RULES.unpaidFee, unrecorded: sunnyLoss },
       survived: shortfalls.length === 0 && unpaid.length === 0,
@@ -142,6 +143,7 @@ export function runPlan(plan: Plan, futureId: string, choices: Choices = {}, opt
     let totalDue = due.reduce((a, [, x]) => a + x, 0)
     if (totalDue > cash + EPS) {
       shortfalls.push([p, pyRound(totalDue - cash)])
+      shortfallDetail.push({ point: p, due: pyRound(totalDue), cash: pyRound(cash) })
       firstBreak ??= { point: p, gap: pyRound(totalDue - cash), bill: [...due].sort((a, b) => b[1] - a[1])[0][0] }
       let need = totalDue - cash
       const actions = mode === 'auto' ? autopilot(due, need, p, ranks, isItem) : (opts.shortfall?.[p] ?? [])

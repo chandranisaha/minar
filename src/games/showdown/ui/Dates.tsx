@@ -5,6 +5,7 @@ import { choicesOf } from '../engine/log'
 import { POINTS, type Point } from '../engine/types'
 import { useShowdown, usePlayed, useView } from '../state/store'
 import { Say } from './kit'
+import { MomentLesson } from './Moment'
 import { useLabel } from './labels'
 import { useSd } from './useSd'
 
@@ -139,6 +140,8 @@ export function DateScreen({ point }: { point: Point }) {
           ], choices.e4, (id) => decide({ k: 'event', id: 'E4', choice: id }), undefined, choices.e4 === 'cash' ? t('date.e4.doneCash') : choices.e4 === 'bill' ? t('date.e4.doneBill') : t('date.e4.doneRefuse'))}
         </>
       )}
+
+      <MomentLesson point={point} />
 
       <div className="flex flex-col items-center gap-1">
         <button type="button" className="ink-btn pink" disabled={!decided} style={{ opacity: decided ? 1 : 0.5 }} onClick={next}>{point === 'FD' ? t('date.toFestival') : t('date.next')} ▶</button>
