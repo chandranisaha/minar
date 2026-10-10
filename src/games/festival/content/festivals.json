@@ -1,0 +1,7 @@
+[
+  { "id": "diwali", "mvp": true, "motif": "diya" },
+  { "id": "eid", "mvp": true, "motif": "lantern" },
+  { "id": "bonalu", "mvp": false, "motif": "lamp" },
+  { "id": "sankranti", "mvp": false, "motif": "kite" },
+  { "id": "christmas", "mvp": false, "motif": "star" }
+]

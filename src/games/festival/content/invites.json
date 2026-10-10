@@ -1,0 +1,11 @@
+[
+  { "id": "I1", "day": 1, "from": "arjun", "yes": 60, "swap": 0, "key": "wheel" },
+  { "id": "I2", "day": 1, "from": "ayesha", "yes": 40, "swap": 15, "key": "kulfi" },
+  { "id": "I3", "day": 1, "from": "arjun", "yes": 90, "swap": 30, "key": "panipuri" },
+  { "id": "I4", "day": 2, "from": "arjun", "yes": 160, "swap": 80, "key": "biryani" },
+  { "id": "I5", "day": 2, "from": "arjun", "yes": 150, "swap": 0, "key": "sunglasses" },
+  { "id": "I6", "day": 2, "from": "sunny", "yes": 100, "swap": 50, "key": "loan", "loan": true, "noFriendship": -3 },
+  { "id": "I7", "day": 3, "from": "arjun", "yes": 80, "swap": 40, "key": "ride" },
+  { "id": "I8", "day": 3, "from": "ayesha", "yes": 30, "swap": null, "key": "selfie" },
+  { "id": "I9", "day": 3, "from": "arjun", "yes": 120, "swap": 0, "key": "covers" }
+]

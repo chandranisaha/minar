@@ -1,0 +1,13 @@
+{
+  "startMoney": 2000,
+  "step": 10,
+  "dayMultiplier": { "1": 1.0, "2": 1.1, "3": 1.25 },
+  "busFare": 20,
+  "tiredVisits": 3,
+  "friendship": { "start": 60, "yes": 6, "swap": 3, "no": -6, "coverAyesha": 8, "refuseAyesha": -5 },
+  "ringToss": { "cost": 30, "playsPerEvening": 3, "winChance": 0.0833333333 },
+  "sunnyRepayChance": 0.4,
+  "ayeshaFare": 20,
+  "mamuCost": 150,
+  "sensiblePlan": { "ghar": 1100, "gift": 300, "masti": 400, "bus": 60, "loose": 140 }
+}
