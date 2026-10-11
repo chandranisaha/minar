@@ -469,5 +469,84 @@
     "shareDownload": "Save as file",
     "shareClose": "Close",
     "facilitator": "For teachers and NGOs"
+  },
+  "kit": {
+    "bar": {
+      "profile": "Your profile",
+      "money": "Your money",
+      "happy": "How happy you are"
+    },
+    "sheet": {
+      "close": "Close"
+    },
+    "money": {
+      "title": "Your money",
+      "saved": "Saved so far",
+      "reached": "You reached your goal!",
+      "toGo": "{{x}} still to go",
+      "from": "Where your money comes from",
+      "earned": "{{x}} added",
+      "notYet": "Not finished yet",
+      "upTo": "up to {{x}}",
+      "spent": "You spent {{x}} on looking after yourself.",
+      "spentHint": "Chai and treats cost a little and lift your Happy.",
+      "how": "How does my money grow?",
+      "h1": "Each of the four places is worth a quarter of the way to your goal.",
+      "h2": "Finish a place and its lamp lights. How bright it is depends on how happy you are at that moment.",
+      "h3": "Play a place again to brighten its lamp and add the rest.",
+      "start": "You started with {{x}} from your family.",
+      "lamp": {
+        "bright": "Bright lamp (Happy 60 or more): the full amount",
+        "dim": "Dim lamp (Happy 35 to 59): three quarters",
+        "flicker": "Flickering lamp (Happy below 35): half"
+      }
+    },
+    "happy": {
+      "title": "How happy you are",
+      "scale": "Lamps shine bright at 60 or more, dim from 35, and flicker below that.",
+      "tired": "You have played {{count}} games in a row. A short break will help.",
+      "moments": "Look after yourself",
+      "cost": "{{x}} from your savings",
+      "free": "Free",
+      "gain": "+{{n}} Happy",
+      "moves": "What moves your Happy",
+      "up": "Goes up",
+      "down": "Goes down",
+      "u1": "Chai with friends, a festival treat, rest at home.",
+      "u2": "Treats you chose in games, helping a friend, a balanced month.",
+      "d1": "Finishing a game. It tires you out a little.",
+      "d2": "Saying no to every treat for a long time, or falling for a scam.",
+      "w1": "A place finished while you are happy adds more money.",
+      "w2": "That is why looking after yourself is part of the plan."
+    },
+    "profile": {
+      "title": "Your profile",
+      "saveName": "Saved game",
+      "goalFor": "Saving for",
+      "lit": "{{n}} of 4 lamps lit",
+      "played": "{{n}} games played",
+      "places": "Your four places",
+      "skills": "What you are getting good at",
+      "skillNone": "Play to grow this",
+      "rewards": "Rewards",
+      "diamonds": "{{n}} diamonds",
+      "shield": "Shield pieces: {{n}} of 3",
+      "share": "Share my progress with my teacher"
+    },
+    "settings": {
+      "title": "Settings",
+      "light": "Light mode",
+      "lightHint": "Less animation. Good for older phones.",
+      "classHint": "Ask your teacher. Leave it empty if you do not have one.",
+      "story": "Watch Ammamma's story again",
+      "menu": "Main menu",
+      "menuHint": "Your game is saved first.",
+      "reset": "Start this game over",
+      "resetHint": "Erases this game's progress on this device.",
+      "resetAsk": "Erase this game's progress?",
+      "resetYes": "Yes, erase it",
+      "resetNo": "Keep it",
+      "about": "Minar. All amounts are made up, for practice."
+    }
   }
 }
