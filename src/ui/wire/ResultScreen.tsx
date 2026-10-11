@@ -41,7 +41,7 @@ export function ResultScreen({ view, lang, nextPillar, onContinue, onReplay, onB
         </div>
         <div className="rs-head">
           <h2 data-testid="result-title" className="font-display lang-fit m-0 text-[28px] leading-tight">{view.cleared ? t('result.cleared') : t('result.notCleared')}</h2>
-          <div className="mt-1 text-[15px] font-bold opacity-80">{t(`pillars.${view.pillar}.name`)}</div>
+          <div className="mt-1 text-[15px] font-bold opacity-80">{t(`pillars.${view.pillar}.name`)} · {t(`pillars.${view.pillar}.topic`)} · {t(`pillars.${view.pillar}.game`)}</div>
           <div data-testid="result-state" className="mt-2 flex flex-wrap items-center gap-1.5">
             <Stars n={starsFor(view.qualityPercent / 100, view.cleared)} size={24} />
             <span className="mk-chip">{t(`state.${stateKey}`)}{view.state.status !== 'complete' && view.state.partialPercent > 0 ? ` · ${t('result.partial', { percent: view.state.partialPercent })}` : ''}</span>
