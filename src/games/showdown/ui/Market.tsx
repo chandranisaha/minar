@@ -206,8 +206,8 @@ export function Market() {
   const combo = isSigned(m, 'combo')
   const covered = NEEDS.filter((n) => n.id !== 'combo' && (n.items.some((i) => isSigned(m, i)) || (combo && ['sound', 'lights', 'safety'].includes(n.id)))).length
   return (
-    <div className="flex flex-col gap-3">
-      <div className="paper p-3">
+    <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:items-start">
+      <div className="paper p-3 md:col-span-2">
         <div className="flex items-center justify-between gap-2">
           <h1 className="font-display lang-fit m-0 text-[22px]">{t('market.title')}</h1>
           <span className="rounded-md border-2 border-ink bg-mustard px-2 py-0.5 text-[13px] font-extrabold" role="status">{t('market.actions', { n: m.actionsLeft, max: RULES.actions })}</span>
@@ -218,7 +218,7 @@ export function Market() {
         <p className="m-0 mt-1 text-[12px] font-bold opacity-80">{t('market.actionsNote')}</p>
       </div>
 
-      {toast && <p className="ink-chip anim-squash m-0 px-3 py-2 text-[14px] font-extrabold" style={{ background: '#FFE08A' }} role="status" onClick={() => setToast(null)}>{toast}</p>}
+      {toast && <p className="ink-chip anim-squash m-0 px-3 py-2 text-[14px] font-extrabold md:col-span-2" style={{ background: '#FFE08A' }} role="status" onClick={() => setToast(null)}>{toast}</p>}
 
       <section className="paper p-3">
         <h2 className="font-sign lang-fit m-0 text-[15px]">{t('market.list')}</h2>
@@ -264,7 +264,7 @@ export function Market() {
         <CashLinesTable lines={lines} />
       </section>
 
-      <button type="button" className="ink-btn pink self-center" onClick={() => decide({ k: 'seen', screen: 'market' })}>{t('market.check')} ▶</button>
+      <button type="button" className="ink-btn pink self-center md:col-span-2 md:justify-self-center" onClick={() => decide({ k: 'seen', screen: 'market' })}>{t('market.check')} ▶</button>
 
       {need && !itemId && <NeedSheet need={need} onPick={setItemId} onClose={() => setNeedId(null)} />}
       {itemId && <ItemSheet id={itemId} onClose={() => setItemId(null)} onSigned={setToast} />}

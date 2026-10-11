@@ -14,11 +14,11 @@ export function Bunting() {
 }
 
 /** Old City rooftops (Charminar in the distance) behind every outdoor screen. */
-export function Rooftops({ night = false }: { night?: boolean }) {
+export function Rooftops({ night = false, className = 'pointer-events-none fixed inset-x-0 bottom-0 h-40 w-full', aspect = 'xMidYMax slice' }: { night?: boolean; className?: string; aspect?: string }) {
   const fill = night ? '#2A3658' : '#E7A86B'
   const back = night ? '#1E2A44' : '#F2C48D'
   return (
-    <svg className="pointer-events-none fixed inset-x-0 bottom-0 h-40 w-full" viewBox="0 0 360 160" preserveAspectRatio="xMidYMax slice" aria-hidden>
+    <svg className={className} viewBox="0 0 360 160" preserveAspectRatio={aspect} aria-hidden>
       <g fill={back} stroke="#2B1A17" strokeWidth="2" strokeLinejoin="round" opacity=".9">
         <path d="M150 160 V96 H210 V160Z" />
         <path d="M156 96 V58 Q158 50 160 58 V96 M200 96 V58 Q202 50 204 58 V96" />
