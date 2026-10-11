@@ -76,7 +76,7 @@ describe('lights on real company paths', () => {
     for (let i = 0; i < 200; i++) {
       const run = simulateMarket(`sound-${i}`)
       for (const id of ['dailyBasket', 'solarGrid'] as const)
-        for (let q = 0; q <= 12; q++) {
+        for (let q = 0; q <= 8; q++) {
           total++
           if (computeLights(run.history[id], COMPANY[id], q).customers === 'R') red++
         }

@@ -12,7 +12,7 @@ Read this, build to it, and your game appears in the app with **no change outsid
 
 | Pillar | Game | Folder name |
 | --- | --- | --- |
-| Plan & Budget | Festival Countdown | `src/games/festival/` |
+| Plan & Budget | Festival Showdown | `src/games/showdown/` |
 | Save & Manage | Pay Run | `src/games/payrun/` |
 | Understand Investing | Deal Board (lite mode) | `src/games/dealboard/` |
 | Stay Financially Safe | Case Files: Mohalla Detective | `src/games/casefiles/` |

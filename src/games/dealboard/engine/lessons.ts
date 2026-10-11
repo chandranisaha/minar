@@ -90,7 +90,7 @@ export function collectLessons(r: RunState, m: MarketRun, ev: QuarterEvents): Le
     else add({ id: 9, variant: 'b', params: { companyId: ev.emergency.companyId } })
   }
 
-  if ((r.trades >= 8 && t <= 8) || r.feesPaid > 0.03 * 100000) add({ id: 10, params: { n: r.trades, r_f: r.feesPaid, g: ((r.feesPaid / 100000) * 100).toFixed(1) } })
+  if ((r.trades >= 6 && t <= 6) || r.feesPaid > 0.03 * 100000) add({ id: 10, params: { n: r.trades, r_f: r.feesPaid, g: ((r.feesPaid / 100000) * 100).toFixed(1) } })
 
   return out
 }

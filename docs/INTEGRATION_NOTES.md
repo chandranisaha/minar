@@ -9,7 +9,7 @@ Neither game has an `index.tsx`, so the shell uses a thin wrapper per game (`src
 onto the game's own props. The registry picks the wrapper only when the game's entry file exists (`src/host/config.ts`, `GAME_ENTRIES`).
 A game that does add `src/games/<folder>/index.tsx` with a default export taking `GameProps` is used directly and the wrapper is skipped.
 
-## Festival Countdown (`src/games/festival`)
+## Festival Showdown (`src/games/showdown`, replaced the earlier Festival Countdown)
 
 | Spec / contract | What the real game does | What the shell did |
 | --- | --- | --- |

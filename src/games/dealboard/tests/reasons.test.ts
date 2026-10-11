@@ -51,7 +51,7 @@ describe('reasons are built from the company and what you looked at', () => {
     for (let i = 0; i < 100; i++) {
       const seed = `n-${i}`
       const m = marketFor(seed)
-      for (let turn = 1; turn <= 12; turn += 3) {
+      for (let turn = 1; turn <= 8; turn += 3) {
         const { run, id } = deskAt(seed, turn, ['cash', 'customers'])
         for (const ctx of ['invest', 'pass'] as const) {
           const opts = reasonOptions(ctx, run, m, id)
@@ -72,7 +72,7 @@ describe('reasons are built from the company and what you looked at', () => {
     for (let i = 0; i < 40; i++) {
       const seed = `var-${i}`
       const mm = marketFor(seed)
-      for (let turn = 1; turn <= 12; turn++) {
+      for (let turn = 1; turn <= 8; turn++) {
         const { run, id } = deskAt(seed, turn)
         for (const o of reasonOptions('invest', run, mm, id)) if (o.kind === 'feeling' || o.kind === 'headline') seen.add(o.id)
       }
@@ -122,7 +122,7 @@ describe('reasons are built from the company and what you looked at', () => {
   test('every company can produce options in every quarter', () => {
     const m = marketFor('all-1')
     for (const id of COMPANY_IDS) {
-      for (let turn = 1; turn <= 12; turn++) {
+      for (let turn = 1; turn <= 8; turn++) {
         const run = { ...act(newRun('all-1'), { type: 'brief' }), turn } as RunState
         expect(reasonOptions('invest', run, m, id).length).toBeGreaterThanOrEqual(3)
       }

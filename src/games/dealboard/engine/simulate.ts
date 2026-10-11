@@ -16,8 +16,8 @@ const round = Math.round
 
 /** Quarter in which a collapse company stops selling its story (99 = never). */
 export function collapseQuarter(co: Company, path: QuarterCtx['payEasyPath']): number {
-  if (co.params.collapse === 'downRoundOrFail') return path === 'downRound' ? 8 : 10
-  if (co.params.collapse === 'restate') return 7
+  if (co.params.collapse === 'downRoundOrFail') return path === 'downRound' ? 5 : 6
+  if (co.params.collapse === 'restate') return 5
   return 99
 }
 
@@ -205,7 +205,7 @@ function ctxFor(co: Company, banner: Banner, path: QuarterCtx['payEasyPath']): Q
   }
 }
 
-/** The whole seeded market: the market cycle and all six companies for 12 quarters. */
+/** The whole seeded market: the market cycle and all six companies for 8 quarters. */
 export function simulateMarket(seed: string): MarketRun {
   const picked = pickCompanies(seed)
   const { banners, fallQ } = buildBanners(seed, picked)

@@ -138,7 +138,8 @@
   "report2": {
     "decisions": "Your decisions",
     "decisionsBody": "What went well and what to improve.",
-    "analytics": "Your analytics"
+    "analytics": "Your analytics",
+    "overview": "Overview"
   },
   "pick": {
     "ev": {
@@ -193,12 +194,48 @@
     "wild": "Wildcard",
     "rival": "A new rival has started winning {{name}}’s customers. More are leaving than joining."
   },
-  "bonus": {
-    "title": "Bonus question",
-    "sub": "A quick check on what you just learned.",
-    "right": "Right!",
-    "wrong": "Not quite. Here is why:",
-    "skip": "Skip",
+  "wild": {
+    "tag": "Wildcard",
+    "bill0": "Your phone screen cracked. Repair bill: {{amount}}.",
+    "bill1": "A surprise family wedding gift. It costs you {{amount}}.",
+    "bill2": "Your laptop broke before exams. A new one: {{amount}}.",
+    "gift0": "Festival gift: answer right and relatives add {{amount}} to your account.",
+    "gift1": "School quiz round: answer right and win {{amount}}.",
+    "gift2": "Tutoring side job: explain this right and earn {{amount}}.",
+    "tip0": "A cousin swears {{name}} will double next quarter. “Put money in now!”",
+    "tip1": "A forwarded message says {{name}} is “guaranteed” to jump. No source given.",
+    "tip2": "A neighbour at the tea stall whispers: “{{name}} is the next big thing.”",
+    "follow": "Follow the tip · {{amount}}",
+    "ignore": "Ignore it",
+    "followed": "You put {{amount}} into {{name}}. You will see how it went next quarter.",
+    "ignored": "You ignored it. A tip is not evidence.",
+    "tooPoor": "Not enough cash to follow it."
+  },
+  "pitch3": {
+    "new": "New company",
+    "what": "What it does",
+    "pitch": "Their pitch",
+    "founder": "Founder",
+    "story": "Read their story",
+    "career": "Career",
+    "look": "Spot the clue",
+    "close": "Close",
+    "ask": "Research",
+    "tip": "Each check shows one real number about the company. Checking before you invest raises your Research score.",
+    "cash": "Will it run out of money?",
+    "customers": "Do customers stay and pay?",
+    "debt": "Does it owe a lot?",
+    "ceo": "Is the boss selling shares?",
+    "stars": "Research",
+    "ageL": "Age",
+    "yrsL": "Years working",
+    "startsL": "Startups",
+    "clue": "Clue",
+    "checksLeft": "checks left"
+  },
+  "task": {
+    "right": "Right! {{amount}} added to your cash.",
+    "wrong": "Not quite, no reward this time. Here is why:",
     "q": {
       "0": {
         "q": "₹10,000 grows 10% a year. After 10 years it is about…",

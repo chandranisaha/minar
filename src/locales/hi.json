@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "मनी मोहल्ला",
+    "title": "मीनार",
     "tagline": "एक द्वीप। चार सबक। एक लक्ष्य।"
   },
   "lang": {
@@ -325,7 +325,7 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Welcome to Money Mohalla",
+      "title": "मीनार में आपका स्वागत है",
       "body": "Select a language to continue."
     },
     "problem": {
@@ -365,7 +365,7 @@
     "back": "Back"
   },
   "hub": {
-    "title": "Money Mohalla Hub",
+    "title": "मीनार हब",
     "lookAfterYourself": "Look after yourself",
     "teaches": "Teaches:",
     "time": "Time:",
@@ -436,7 +436,7 @@
     "lessons": "देखे गए पाठ: {{n}}",
     "brighten": "दोबारा खेलने लायक: {{names}}",
     "share": "शेयर कार्ड डाउनलोड करें",
-    "shareTitle": "मेरा मनी मोहल्ला लक्ष्य"
+    "shareTitle": "मेरा मीनार लक्ष्य"
   },
   "home": {
     "tagline": "पैसों की समझ, एक गली एक बार में।",
@@ -458,7 +458,7 @@
     "places": "4 में से {{n}} जगहें",
     "deleteConfirm": "\"{{name}}\" हटाएँ? इसे वापस नहीं लाया जा सकता।",
     "deleteYes": "हाँ, हटाएँ",
-    "title": "मनी मोहल्ला",
+    "title": "मीनार",
     "share": "प्रगति साझा करें",
     "shareTitle": "मेरी प्रगति साझा करें",
     "shareBody": "यह कोड अपने शिक्षक या NGO सहायक को भेजें ताकि वे देख सकें कि कक्षा कैसा कर रही है।",

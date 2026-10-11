@@ -85,7 +85,7 @@
    82
   ]
  ],
- "spots": [{ "id": "chai", "x": 41, "y": 70 }, { "id": "restAtHome", "x": 59, "y": 70 }],
+ "spots": [{ "id": "chai", "x": 41, "y": 70 }, { "id": "restAtHome", "x": 57, "y": 74 }],
   "nodes": [
   {
    "id": "dock",

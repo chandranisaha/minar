@@ -22,7 +22,7 @@ export function Sheet({ eyebrow, title, icon, tone, children, actions }: { eyebr
         </div>
       </div>
       {children && <div className="mt-2 text-[15px] leading-snug">{children}</div>}
-      {actions && <div className="mt-3 flex flex-wrap items-center justify-end gap-2">{actions}</div>}
+      {actions && <div className="db-actions mt-3 flex items-stretch justify-center gap-2">{actions}</div>}
     </section>
   )
 }
@@ -51,11 +51,11 @@ export function Stat({ label, value, strong }: { label: string; value: string; s
 }
 
 /** A short flashing strip for a wildcard: a rival entering, or anything the player did not see coming. */
-export function AlertStrip({ children, tag }: { children: React.ReactNode; tag?: string }) {
+export function AlertStrip({ children, tag, tone = 'bad' }: { children: React.ReactNode; tag?: string; tone?: 'bad' | 'good' }) {
   const { t } = useTranslation('dealboard')
   return (
-    <div className="db-flash red flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2" style={{ background: '#F5D9CF' }} role="status">
-      <span className="font-sign mt-0.5 shrink-0 whitespace-nowrap rounded border-2 border-ink bg-[#C8442F] px-1.5 text-[10px] leading-5 text-jasmine">{tag ?? t('alert.tag')}</span>
+    <div className={`db-flash ${tone === 'good' ? 'green' : 'red'} flex items-start gap-2 rounded-lg border-2 border-ink px-3 py-2`} style={{ background: tone === 'good' ? '#E4EDCF' : '#F5D9CF' }} role="status">
+      <span className="font-sign mt-0.5 shrink-0 whitespace-nowrap rounded border-2 border-ink px-1.5 text-[10px] leading-5 text-jasmine" style={{ background: tone === 'good' ? '#3F7A3A' : '#C8442F' }}>{tag ?? t('alert.tag')}</span>
       <span className="text-[14px] font-semibold leading-snug">{children}</span>
     </div>
   )

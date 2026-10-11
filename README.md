@@ -1,7 +1,8 @@
-# Money Mohalla (working title)
+# Minar
 
-A financial-literacy game for Indian students (16-22). This repo holds the **island hub, the opening story and the shared game shell**;
-the four mini-games plug in later as `/play/:pillar`.
+A financial-literacy game for Indian students (16-22), built for the Vanguard India "Community Stewardship" brief: plan and budget, save and manage, understand investing, stay safe.
+This repo holds the **island hub, the opening story, the shared game shell** and the first full mini-game, **Deal Board** (pillar 3). The other mini-games plug in as `/play/:pillar`.
+It teaches how to think about money; it never recommends investments, and every number is a made-up simulation.
 
 The hub is a calm, hand-painted **isometric island** (Charminar plaza in the centre). Tap a place and a small character walks the path to it;
 a paper card offers "Enter". Four flags turn gold as pillars complete, and the college gate opens when all four are done.
@@ -16,6 +17,21 @@ a paper card offers "Enter". Four flags turn gold as pillars complete, and the c
 
 Art prompts for the island, landmarks and characters: `ART_PROMPTS.md`. Layout data: `src/content/island.json`.
 
+## Deal Board (pillar 3: Understand Investing)
+
+A Monopoly-style ring of 8 quarters. Each quarter you meet one fictional company, read its founder's story, run up to two checks (cash, customers, debt, the boss's shares), then invest or pass and say why. Between quarters you see how the last one went and move on.
+
+- **Judgement, not profit:** the score is five skills (research, skepticism, spread, calm, money habits), out of 100, pass mark 60. It never depends on how much money you made.
+- **Learning loop:** every decision is reviewed with what went well and what to improve; lessons fire from what you actually did; one rewind per year; a family emergency tests your cash cushion.
+- **Wildcards:** four per run (a surprise bill, a windfall, and two hot tips to follow or ignore), plus flashing alerts for a market fall, a sector rally, the family emergency, or a new rival entering a company's market. Market alerts come from the real simulated numbers.
+- **Final judgement:** a full-screen tabbed card (Overview, Good call, Mixed, Risky, Analytics).
+- **Languages:** English, Hindi and Telugu. The Hindi and Telugu finance terms still need a native-speaker review (see TRANSLATION_REVIEW.md).
+- **Under the hood:** a pure, seeded engine (`src/games/dealboard/engine`) precomputes the whole market from the seed, so a run is reproducible and testable. Deviations from the spec are listed in `DECISIONS.md`.
+
+```bash
+npm test           # engine, scoring, reasons, content parity (EN / HI / TE)
+```
+
 ## Run
 
 ```bash
@@ -25,8 +41,8 @@ npm run build      # type-check + production build into dist/
 npm run preview
 ```
 
-Routes: `/` hub, `/story` opening story (auto on first visit, replay from the HUD), `/play/plan` Festival Countdown (Pillar 1, see
-`src/games/festival/README.md`; `?demo` starts Demo mode), `/play/:pillar` placeholder shell for the other pillars
+Routes: `/` hub, `/story` opening story (auto on first visit, replay from the HUD), `/play/plan` Festival Showdown (Pillar 1, in
+`src/games/showdown/`; `src/games/showdown/CHECKING.md` shows how to check it), `/play/:pillar` placeholder shell for the other pillars
 (has a "Mark as complete" dev button), `/dashboard` stub, `/kit` art-kit review page.
 
 **Controls:** tap/click a place to walk there; drag to pan, pinch / wheel / +- to zoom. Keyboard: Tab to a place, Enter to walk.
@@ -74,6 +90,7 @@ EasyStar.js (A* on the walk grid). Fonts are self-hosted via Fontsource (Chango,
 src/art/         procedural SVG art, rubber-hose Toon rig, FilmOverlay, ArtSlot
 src/world/       overworld: layout + collision grid, scene, input/camera/hero loop
 src/screens/     Landing, Story (+ story/Beats), Play (game shell), Dashboard, Kit
+src/games/dealboard/  Deal Board: engine/ (pure, seeded), ui/, content/ (en, hi, te), tests/
 src/components/  HUD (goal bar, lamps, language, lite), TitleCard, Iris wipe, Celebration
 src/store/       Zustand game state (language, persona, goal, saved, completed pillars, lite mode)
 src/locales/     en.json hi.json te.json  (all copy; no text in images)
@@ -82,7 +99,7 @@ tools/           import_art.py, crop_sprites.py, shot.mjs (screenshots), e2e.mjs
 
 ## Test
 
-With the dev server running: `SHOT_DIR=./shots node tools/e2e.mjs` runs the core loop on phone and desktop sizes
+`npm test` runs the Deal Board unit tests (Vitest). With the dev server running: `SHOT_DIR=./shots node tools/e2e.mjs` runs the core loop on phone and desktop sizes
 (story skip, walk to a shop, iris, complete, lamp, keyboard, language, lite mode).
 
 ## Guardrails
