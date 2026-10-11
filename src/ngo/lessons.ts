@@ -3,7 +3,7 @@ import type { Concept, StudentSummary } from './summary'
 
 /** plain-English wording the facilitator sees (the facilitator desk is English only for now) */
 export const PLACE_NAME: Record<PillarId, string> = { plan: 'Bangle Bazaar', save: 'Café Meherban', invest: 'The Pearl Exchange', safe: 'Helpline Kiosk' }
-export const GAME_NAME: Record<PillarId, string> = { plan: 'Festival Countdown', save: 'Pocket Panic', invest: 'Deal Board', safe: 'Case Files' }
+export const GAME_NAME: Record<PillarId, string> = { plan: 'Festival Showdown', save: 'Pocket Panic', invest: 'Deal Board', safe: 'Case Files' }
 export const SKILL_NAME: Record<Skill, string> = {
   planning: 'Planning', prioritising: 'Needs before wants', saving: 'Saving', riskSense: 'Risk sense', patience: 'Patience', scamSense: 'Scam sense',
 }

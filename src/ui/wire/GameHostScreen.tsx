@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { isDevMode } from '../../lib/dev'
@@ -23,6 +23,7 @@ export function GameHostScreen() {
   const [confirming, setConfirming] = useState(false)
   const dev = isDevMode()
 
+  useEffect(() => { if (host.phase === 'entry' && host.pillarId) host.start() }, [host.phase, host.pillarId]) // eslint-disable-line react-hooks/exhaustive-deps
   if (!host.pillarId || !host.entry || !host.props) return <Navigate to="/" replace />
   const { pillarId, entry, phase, Game, props, resultView } = host
 
@@ -57,19 +58,7 @@ export function GameHostScreen() {
           </div>
         )}
 
-        {phase === 'entry' && (
-          <section data-testid={`game-entry-${pillarId}`} style={{ padding: 16, display: 'grid', gap: 12 }}>
-            <h1 style={{ margin: 0 }}>{t(entry.nameKey)}</h1>
-            <p style={{ margin: 0 }}>{t(`pillars.${pillarId}.hook`)}</p>
-            <p style={{ margin: 0, fontSize: 13 }}>{t('host.banner')}</p>
-            <div>
-              <button type="button" className="ink-btn pink" data-testid="game-play" onClick={host.start}>
-                {t('host.play')}
-              </button>
-            </div>
-          </section>
-        )}
-
+        {/* no intro page: the game opens straight away (each game has its own start screen) */}
         {phase === 'playing' && Game && (
           <GameErrorBoundary
             key={`${pillarId}:${host.salt}`}

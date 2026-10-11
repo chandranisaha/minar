@@ -48,7 +48,7 @@ for (const [w, h, tag] of [[390, 844, 'phone'], [1440, 900, 'desk']]) {
   await page.waitForTimeout(800)
   page.url().includes('/play/invest') ? ok(`${tag}: Enter -> pillar screen`) : fail(`${tag}: enter failed`)
   // the pillar screen is the game host: entry panel -> placeholder game -> result -> back to the island
-  await page.getByTestId('game-play').click()
+  // the intro page is gone: the game starts by itself
   await page.getByTestId('placeholder-great').click()
   ;(await page.getByTestId('result-title').textContent()) === 'Cleared' ? ok(`${tag}: placeholder game cleared`) : fail(`${tag}: result`)
   await page.getByTestId('result-back').click()
