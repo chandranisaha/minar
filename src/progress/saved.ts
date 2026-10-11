@@ -42,3 +42,6 @@ export function savedAmountFor(s: Pick<ProgressState, 'startAmount' | 'goalAmoun
   const ceiling = Math.max(s.goalAmount, PROGRESS.savedFloor)
   return Math.round(Math.min(ceiling, Math.max(PROGRESS.savedFloor, total)))
 }
+
+/** the most any one pillar can add: its share of the gap, at a bright lamp */
+export const pillarMax = (s: Pick<ProgressState, 'startAmount' | 'goalAmount'>): number => Math.max(0, s.goalAmount - s.startAmount) * PROGRESS.pillarShare

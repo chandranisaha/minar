@@ -58,6 +58,12 @@ export default function PocketPanic({ seed, cohortCode, onComplete, onExit }: Po
       seed: run.seed,
       score: { balance: starCount(balance(run)), saved: t.saved, behaviours: Object.values(t.evidence).filter(Boolean).length, total: Object.values(t.evidence).filter(Boolean).length },
       evidence: { ...t.evidence, little: t.little, cushionUsed: t.cushionUsed, borrowCost: t.borrowCost, lent: t.lentOut, billsFromSave: t.billsBySource.save },
+      joy: {
+        treatsBought: run.window.filter((w) => w.bought).length + run.trolley.filter((x) => x.action === 'ok' && run.worth[x.itemId] !== 'meh').length,
+        treatsSkipped: run.refused.length,
+        lent: run.lent > 0 || run.gift > 0 ? 1 : 0,
+        stars: starCount(balance(run)),
+      },
       lessonsSeen: t.cards.slice(0, 3).map((c) => c.id),
       minaretLit: t.ending === 'reached' || t.ending === 'reachedCost',
       meta: { ending: t.ending, reading: t.archetype, month: String(run.month), bigNight: run.bigNight?.choice ?? 'none' },

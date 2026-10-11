@@ -25,6 +25,16 @@ export const adaptCafe: GameAdapter = (payload): GameResult => {
   const cleared = finished && (typeof p.minaretLit === 'boolean' ? p.minaretLit : quality >= 0.5)
   const partial = cleared ? 1 : finished ? Math.min(PARTIAL_CAP, quality) : Math.min(PARTIAL_CAP, clamp01(num(p.progress, 0)))
 
+  // what the player did with joy: treats enjoyed, treats refused, kindness to a friend, and how balanced the month was (the stars)
+  const j = pickRecord(p, 'joy')
+  const stars = clamp(num(j.stars, 0), 0, 3)
+  const joy = {
+    treatsBought: Math.max(0, num(j.treatsBought, 0)),
+    treatsSkipped: Math.max(0, num(j.treatsSkipped, 0)),
+    lentToFriends: Math.max(0, num(j.lent, 0)),
+    restedOrBalanced: stars >= 3 ? 2 : stars === 2 ? 1 : 0,
+  }
+
   return {
     pillar: 'save',
     cleared,
@@ -38,7 +48,7 @@ export const adaptCafe: GameAdapter = (payload): GameResult => {
         })
       : {},
     lessonsSeen: strings(p.lessonsSeen),
-    joySignals: {},
+    joySignals: finished ? joy : {},
     raw: payload,
   }
 }

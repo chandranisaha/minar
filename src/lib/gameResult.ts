@@ -12,6 +12,8 @@ export interface GameResult {
   score: Record<string, number> & { total: number }
   /** per-concept evidence of learning, from play */
   evidence: Record<string, number | boolean>
+  /** what the player did with joy this play (Pocket Panic): treats enjoyed and refused, kindness, balance stars */
+  joy?: Record<string, number>
   lessonsSeen: string[]
   minaretLit: boolean
   /** extra context (e.g. which festival); never personal */

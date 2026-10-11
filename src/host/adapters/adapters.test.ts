@@ -281,6 +281,12 @@ describe('Pocket Panic (save)', () => {
     expect(r).toMatchObject({ pillar: 'save', cleared: true, quality: 1, partial: 1, lessonsSeen: ['a'] })
     expect(r.skills).toEqual({ saving: 1, planning: 1, patience: 1 })
   })
+  it('treats, kindness and a balanced month lift Happy; refusing everything does not', () => {
+    const warm = ADAPTERS.save(cafe({ joy: { treatsBought: 3, treatsSkipped: 1, lent: 1, stars: 3 } }))
+    expect(warm.joySignals).toEqual({ treatsBought: 3, treatsSkipped: 1, lentToFriends: 1, restedOrBalanced: 2 })
+    const grim = ADAPTERS.save(cafe({ joy: { treatsBought: 0, treatsSkipped: 5, lent: 0, stars: 0 } }))
+    expect(grim.joySignals).toMatchObject({ treatsBought: 0, treatsSkipped: 5, restedOrBalanced: 0 })
+  })
   it('a weak run is not cleared and is partial', () => {
     const r = ADAPTERS.save(cafe({ minaretLit: false, score: { balance: 0, saved: 0, behaviours: 3, total: 3 }, evidence: { payFirst: true } }))
     expect(r.cleared).toBe(false)
