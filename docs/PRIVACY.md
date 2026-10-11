@@ -72,11 +72,11 @@ This is a design summary, not legal advice; NGOs and schools should confirm thei
 ## Student to teacher, live
 
 - **Starting a game:** the student types their name (kept on the phone as the save's name, never sent), their roll number, and
-  optionally the class code. The code is checked with , which returns only the class name, so the student sees they
+  optionally the class code. The code is checked with `class_name()`, which returns only the class name, so the student sees they
   joined the right class.
 - **Sharing:** Profile → My teacher → *Share progress with my teacher*, or automatically after every finished game (a switch the
-  student can turn off). Each share is one call to  with the anonymous summary.
-- **Dashboard:** the  table is in the Supabase realtime publication, so a signed-in teacher's dashboard reloads the
+  student can turn off). Each share is one call to `submit_progress()` with the anonymous summary.
+- **Dashboard:** the `progress` table is in the Supabase realtime publication, so a signed-in teacher's dashboard reloads the
   moment a student shares and shows who it was (name from the on-device class list). Realtime applies the same row-level security:
   a teacher only hears about their own classes.
 
