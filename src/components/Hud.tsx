@@ -84,6 +84,8 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
   const [open, setOpen] = useState(false)
   const classCode = useGame((s) => s.classCode)
   const setClassCode = useGame((s) => s.setClassCode)
+  const rollNo = useGame((s) => s.rollNo)
+  const setRollNo = useGame((s) => s.setRollNo)
   const resetProgress = useGame((s) => s.resetProgress)
   const [confirm, setConfirm] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -114,6 +116,10 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
           <label className="mt-3 block text-[11px] font-bold uppercase tracking-[.18em] opacity-60">
             {t('hud.classCode')}
             <input type="text" value={classCode ?? ''} maxLength={12} onChange={(e) => setClassCode(e.target.value)} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[15px] normal-case tracking-normal" />
+          </label>
+          <label className="mt-2 block text-[12px] font-bold uppercase tracking-[.16em] opacity-70">
+            {t('hud.rollNo')}
+            <input type="text" inputMode="numeric" autoComplete="off" value={rollNo ?? ''} maxLength={4} placeholder="0000" onChange={(e) => setRollNo(e.target.value)} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[15px] normal-case tracking-normal" />
           </label>
           {confirm ? (
             <div className="mt-2" role="alertdialog" aria-label={t('hud.resetConfirm')}>

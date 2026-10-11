@@ -3,6 +3,10 @@ import { CONCEPTS, type Concept, type StudentSummary } from './summary'
 
 export const DEMO_CODE = 'DEMO-CLASS'
 
+/** made-up first names for the demo roster; like a real roster, kept only on the teacher's device. Two have not shared yet. */
+const DEMO_NAMES = ['Aarav', 'Ananya', 'Arjun', 'Bhavya', 'Charan', 'Deepika', 'Farhan', 'Gayatri', 'Harsha', 'Ishita', 'Imran', 'Jahnavi', 'Karthik', 'Lakshmi', 'Manoj', 'Meena', 'Nikhil', 'Nandini', 'Omkar', 'Pooja', 'Pranav', 'Rehana', 'Rohit', 'Sahithi', 'Sameer', 'Sanjana', 'Shreya', 'Siddharth', 'Sravani', 'Tanvi', 'Tarun', 'Uday', 'Vaishnavi', 'Varun', 'Yamini', 'Zoya', 'Abhinav', 'Bhargavi', 'Chaitanya', 'Divya', 'Ganesh', 'Haritha', 'Kavya', 'Mahesh', 'Navya', 'Pavan', 'Ritika', 'Sai', 'Teja', 'Vikram']
+export const demoRoster = (): Record<string, string> => Object.fromEntries(DEMO_NAMES.map((n, i) => [String(i + 1).padStart(4, '0'), `${n} (made-up)`]))
+
 /** small seeded random numbers so the demo class looks the same every time */
 function rng(seed: number) {
   let a = seed
@@ -40,6 +44,8 @@ export function demoStudents(now = Date.now()): StudentSummary[] {
       v: 1,
       id: `demo${i.toString(36).padStart(3, '0')}`,
       cohort: DEMO_CODE,
+      // most students give a roll number; a few forget (the desk shows them by student code)
+      roll: i % 11 === 10 ? null : String(i + 1).padStart(4, '0'),
       at: now - Math.floor(r() * 5 * 86400000),
       lang: r() < 0.45 ? 'te' : r() < 0.64 ? 'hi' : 'en',
       persona: r() < 0.4 ? 'school' : r() < 0.78 ? 'college' : 'earner',

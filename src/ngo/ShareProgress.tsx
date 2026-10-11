@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getActive, saveSlot, type SlotMeta } from '../home/slots'
 import type { SubmitResult } from './cloud'
+import { cleanRoll, rollInput } from '../lib/roll'
 import { buildSummary, cleanCode, encodeSummary } from './summary'
 
 // the database client is loaded only when a student actually sends, so the game itself stays small
@@ -26,7 +27,9 @@ export function ShareProgress({ slot, onClose }: { slot: SlotMeta; onClose: () =
     }
   }, [slot.id])
   const [code, setCode] = useState(base.cohort ?? '')
-  const text = encodeSummary({ ...base, cohort: cleanCode(code) })
+  const [roll, setRoll] = useState(base.roll ? String(Number(base.roll)) : '')
+  const shared = { ...base, cohort: cleanCode(code), roll: cleanRoll(roll) }
+  const text = encodeSummary(shared)
 
   const copy = async () => {
     try { await navigator.clipboard.writeText(text); setCopied(true) } catch { /* the box below can still be selected by hand */ }
@@ -44,7 +47,7 @@ export function ShareProgress({ slot, onClose }: { slot: SlotMeta; onClose: () =
     if (!cleanCode(code)) return setSending('need')
     setSending('busy')
     const { submitProgress } = await import('./cloud')
-    setSending(await submitProgress(code, { ...base, cohort: cleanCode(code) }))
+    setSending(await submitProgress(code, shared))
   }
   const send = () => { void navigator.share?.({ title: 'Minar', text }).catch(() => undefined) }
 
@@ -56,6 +59,11 @@ export function ShareProgress({ slot, onClose }: { slot: SlotMeta; onClose: () =
         {t('hud.classCode')}
         <input value={code} maxLength={14} onChange={(e) => setCode(e.target.value)} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[16px] normal-case tracking-normal" />
       </label>
+      <label className="mt-2 block text-[12px] font-bold uppercase tracking-[.16em] opacity-70">
+        {t('hud.rollNo')}
+        <input value={roll} inputMode="numeric" autoComplete="off" maxLength={4} placeholder="0000" onChange={(e) => setRoll(rollInput(e.target.value))} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[16px] normal-case tracking-normal" />
+      </label>
+      {!cleanRoll(roll) && <p className="m-0 mt-1 text-[12.5px] font-bold leading-snug" style={{ color: '#9A4A12' }}>{t('home.shareRollMissing')}</p>}
       <p className="m-0 mt-2 text-[13px] leading-snug">{t('home.shareYourCode', { id: base.id })}</p>
       {cloudEnabled && (
         <div className="mt-2 grid gap-1.5">

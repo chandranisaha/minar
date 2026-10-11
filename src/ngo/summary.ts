@@ -1,8 +1,9 @@
 import { PILLAR_IDS, SKILLS, type PillarId, type Skill } from '../content/data'
+import { cleanRoll } from '../lib/roll'
 
 /**
  * The anonymous progress summary a student can share with a facilitator. It is built from a save slot's snapshot (the game is only
- * read, never changed) and holds no name, no alias and nothing the student typed except the class code.
+ * read, never changed) and holds no name, no alias and nothing the student typed except the class code and their school roll number.
  */
 export const CONCEPTS = ['payFirst', 'track', 'small', 'emergency', 'plan', 'wait', 'goals', 'borrow', 'lend'] as const
 export type Concept = (typeof CONCEPTS)[number]
@@ -15,6 +16,8 @@ export interface StudentSummary {
   id: string
   /** the class code the student typed, or null */
   cohort: string | null
+  /** the student's school roll number as 4 digits, or null. Only the teacher's own device can turn it into a name. */
+  roll: string | null
   at: number
   lang: 'en' | 'hi' | 'te'
   persona: 'school' | 'college' | 'earner' | null
@@ -59,7 +62,7 @@ const parseJSON = (raw: string | undefined): Record<string, unknown> => {
 }
 
 /** reads a slot snapshot (what the game keeps in localStorage) into a summary; never throws */
-export function buildSummary(data: Record<string, string>, now = Date.now(), codeOverride?: string | null): StudentSummary {
+export function buildSummary(data: Record<string, string>, now = Date.now(), codeOverride?: string | null, rollOverride?: string | null): StudentSummary {
   const st = rec(parseJSON(data[GAME_KEY]).state)
   const pillars = rec(st.pillars)
   const places = {} as StudentSummary['places']
@@ -93,6 +96,7 @@ export function buildSummary(data: Record<string, string>, now = Date.now(), cod
     v: 1,
     id: hash(typeof st.installId === 'string' && st.installId ? st.installId : JSON.stringify(Object.keys(data))),
     cohort: cleanCode(codeOverride !== undefined ? codeOverride : st.classCode),
+    roll: cleanRoll(rollOverride !== undefined ? rollOverride : st.rollNo),
     at: now,
     lang: st.language === 'hi' || st.language === 'te' ? st.language : 'en',
     persona: st.persona === 'school' || st.persona === 'college' || st.persona === 'earner' ? st.persona : null,
@@ -123,6 +127,7 @@ export function parseSummary(v: unknown): StudentSummary | null {
     v: 1,
     id: o.id,
     cohort: cleanCode(o.cohort),
+    roll: cleanRoll(o.roll),
     at: typeof o.at === 'number' && Number.isFinite(o.at) ? o.at : 0,
     lang: o.lang === 'hi' || o.lang === 'te' ? o.lang : 'en',
     persona: o.persona === 'school' || o.persona === 'college' || o.persona === 'earner' ? o.persona : null,

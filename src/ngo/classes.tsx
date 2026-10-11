@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { cloudEnabled } from './cloud'
+import { parseRoster, rosterText } from './roster'
 import { useClasses, useNgo, type Cohort } from './store'
 import { C, Card, Chip, Icon, ICONS } from './ui'
 
@@ -94,6 +95,8 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
           </ul>
         </Card>
 
+        {current && <ClassList key={current.id} cls={current} />}
+
         <Card title="Add progress codes by hand" sub={cloudEnabled && mode === 'cloud' ? 'For students who were offline: they can send you their code (it starts with MM1.) over WhatsApp or as a file.' : 'Students send you a code (it starts with MM1.) or a file from Share progress. Paste many at once, even a whole chat.'}>
           <textarea className="mi-input font-mono text-[13px]" rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste progress codes here" aria-label="Progress codes" />
           <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -111,8 +114,8 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
       <div className="grid content-start gap-4">
         <Card title="How students join">
           <ol className="m-0 grid gap-2 pl-5 text-[14px] leading-snug">
-            <li>Students open Minar on any phone. <b>No sign-up, no email, no phone number.</b></li>
-            <li>They tap the gear and type your class code.</li>
+            <li>Students open Minar on any phone. <b>No sign-up, no email, no phone number, no name.</b></li>
+            <li>In Settings they type your class code and their <b>roll number</b> (up to 4 digits).</li>
             <li>After playing, they tap <b>Share progress</b>{cloudEnabled ? ' then Send to my teacher. It arrives here.' : ' and send you the code.'}</li>
           </ol>
         </Card>
@@ -125,5 +128,59 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
         </Card>
       </div>
     </div>
+  )
+}
+
+/** the class list: roll number -> name, kept on this device only, so the desk can show names without students ever sending one */
+function ClassList({ cls }: { cls: Cohort }) {
+  const { rosters, setRoster } = useNgo()
+  const roster = rosters[cls.id] ?? {}
+  const count = Object.keys(roster).length
+  const [editing, setEditing] = useState(count === 0)
+  const [text, setText] = useState(rosterText(roster))
+  const [msg, setMsg] = useState('')
+  const [ask, setAsk] = useState(false)
+  const shared = new Set(Object.values(cls.students).map((s) => s.roll).filter(Boolean))
+  const matched = Object.keys(roster).filter((r) => shared.has(r)).length
+
+  const save = () => {
+    const r = parseRoster(text)
+    setRoster(cls.id, r.roster)
+    const n = Object.keys(r.roster).length
+    setMsg(`${n} student${n === 1 ? '' : 's'} saved on this device.${r.skipped.length ? ` ${r.skipped.length} line${r.skipped.length === 1 ? '' : 's'} skipped (need a roll number and a name): ${r.skipped.slice(0, 3).join(' | ')}${r.skipped.length > 3 ? ' …' : ''}` : ''}${r.repeated.length ? ` Roll ${r.repeated.join(', ')} appeared twice; the last name was kept.` : ''}`)
+    if (n) setEditing(false)
+  }
+
+  return (
+    <Card title={`Class list: ${cls.name}`} sub="Roll numbers and names, so you know whose progress is whose. Students only ever send their roll number.">
+      <div className="mb-3 flex items-start gap-2 rounded-xl p-3 text-[13px] leading-snug" style={{ background: 'var(--t-strong)', color: 'var(--t-strong-ink)' }}>
+        <Icon d={ICONS.lock} size={16} />
+        <span><b>Stays on this device.</b> The class list is never uploaded to the Minar database, never included in CSV exports, and is deleted with the class. It only appears on screen and on report cards you print. On another device, paste it again.</span>
+      </div>
+      {editing ? (
+        <>
+          <textarea className="mi-input text-[14px]" rows={6} value={text} onChange={(e) => { setText(e.target.value); setMsg('') }} aria-label="Class list" placeholder={'One student per line, roll number and name, for example:\n0001, Ananya Reddy\n2, Mohammed Imran\n0003 Sravani K\n(copy two columns from a spreadsheet works too)'} />
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button type="button" className="mi-btn" disabled={!text.trim()} onClick={save}>Save class list</button>
+            {count > 0 && <button type="button" className="mi-btn ghost" onClick={() => { setText(rosterText(roster)); setEditing(false); setMsg('') }}>Cancel</button>}
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          <Chip>{count} on the list</Chip>
+          <Chip tone="strong">{matched} sharing progress</Chip>
+          {count - matched > 0 && <Chip tone="getting">{count - matched} not shared yet</Chip>}
+          <span className="flex-1" />
+          <button type="button" className="mi-btn ghost sm" onClick={() => { setText(rosterText(roster)); setEditing(true) }}><Icon d={ICONS.edit} size={14} />Edit</button>
+          {ask ? (
+            <>
+              <button type="button" className="mi-btn danger sm" onClick={() => { setRoster(cls.id, {}); setText(''); setAsk(false); setEditing(true); setMsg('Class list removed from this device.') }}>Remove list</button>
+              <button type="button" className="mi-btn ghost sm" autoFocus onClick={() => setAsk(false)}>Keep</button>
+            </>
+          ) : <button type="button" className="mi-btn quiet sm" style={{ color: 'var(--danger)' }} onClick={() => setAsk(true)}>Remove</button>}
+        </div>
+      )}
+      {msg && <p className="m-0 mt-2 text-[13px] font-semibold leading-snug" role="status">{msg}</p>}
+    </Card>
   )
 }

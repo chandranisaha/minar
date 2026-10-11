@@ -15,8 +15,16 @@ export interface DeskView {
   trend: TrendPoint[]
   focus: Focus[]
   insights: StudentInsight[]
+  /** the name to show: from the class list (by roll number), else a name given on this device, else "Roll 0023" or the student code */
   nameOf: (id: string) => string
-  hasLabel: (id: string) => boolean
+  /** the line under the name: roll number and / or student code */
+  subOf: (id: string) => string
+  /** where the shown name came from */
+  nameSource: (id: string) => 'roster' | 'label' | 'none'
+  /** roll numbers used by more than one student code (two phones, or a typo) */
+  dupRolls: Set<string>
+  /** students on the class list who have not shared any progress yet */
+  notShared: { roll: string; name: string }[]
 }
 
 const LANG: Record<string, string> = { en: 'English', hi: 'Hindi', te: 'Telugu' }
@@ -38,7 +46,7 @@ export function ReportCard({ d, ins }: { d: DeskView; ins: StudentInsight }) {
         <div>
           <div className="mi-eyebrow">Minar · Student progress card</div>
           <h1 className="mt-1 text-[22px] font-bold" style={{ color: C.navy }}>{d.nameOf(s.id)}</h1>
-          <div className="mi-muted mt-0.5 text-[12.5px]">{d.cohort.name} · student code {s.id} · last update {new Date(s.at).toLocaleDateString()}</div>
+          <div className="mi-muted mt-0.5 text-[12.5px]">{d.cohort.name} · {d.subOf(s.id)} · last update {new Date(s.at).toLocaleDateString()}</div>
         </div>
         <div className="text-right">
           <div className="mi-eyebrow">Understanding</div>

@@ -65,7 +65,8 @@
     "resetProgress": "Reset progress",
     "resetConfirm": "Erase all progress on this device?",
     "resetYes": "Yes, reset",
-    "resetNo": "Keep it"
+    "resetNo": "Keep it",
+    "rollNo": "Roll number"
   },
   "personas": {
     "school": {
@@ -473,7 +474,7 @@
     "share": "Share progress",
     "shareTitle": "Share my progress",
     "shareBody": "Send this code to your teacher or NGO facilitator so they can see how the class is doing.",
-    "shareWhat": "It shares your progress, skills, Happy score, language and class code, under a random student code. It never shares your name or alias.",
+    "shareWhat": "It shares your progress, skills, Happy score, language, class code and roll number. It never shares your name or alias.",
     "shareCopy": "Copy code",
     "shareCopied": "Copied",
     "shareSend": "Send",
@@ -489,7 +490,8 @@
     "shareErrSoon": "Already sent a moment ago. Try again in a few minutes.",
     "shareErrOffline": "No internet right now. Copy the code or save it as a file instead.",
     "shareErrOther": "Could not send. Copy the code instead.",
-    "shareNeedCode": "Type your class code first."
+    "shareNeedCode": "Type your class code first.",
+    "shareRollMissing": "Add your roll number so your teacher knows this is you."
   },
   "kit": {
     "bar": {
@@ -567,7 +569,8 @@
       "resetAsk": "Erase this game's progress?",
       "resetYes": "Yes, erase it",
       "resetNo": "Keep it",
-      "about": "Minar. All amounts are made up, for practice."
+      "about": "Minar. All amounts are made up, for practice.",
+      "rollHint": "Your school roll number (up to 4 digits). It lets your teacher see your progress. Your name is never sent."
     }
   },
   "welcome": {

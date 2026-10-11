@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { PILLAR_IDS } from '../content/data'
 import { K_MIN, aggregate, bandOf, toCsv } from './analytics'
-import { demoHistory, demoStudents } from './demo'
+import { DEMO_CODE, demoHistory, demoStudents } from './demo'
+import { cleanRoll, rollInput } from '../lib/roll'
+import { parseRoster } from './roster'
 import { toCsvText } from './export'
 import { focusAreas, studentInsight, understanding, weeklyTrend } from './insights'
 import { labelKey, latestOf, useNgo } from './store'
@@ -214,5 +216,66 @@ describe('reading rows back from the database', () => {
   })
   it('drops a row whose summary does not belong to its student', () => {
     expect(rowToSummary({ ...row(1, '2026-10-11T10:00:00Z'), student_id: 'other99' })).toBeNull()
+  })
+})
+
+describe('roll numbers', () => {
+  it('are always 4 digits, however the student types them', () => {
+    expect(cleanRoll('23')).toBe('0023')
+    expect(cleanRoll('0023')).toBe('0023')
+    expect(cleanRoll(' 1234 ')).toBe('1234')
+    expect(cleanRoll(7)).toBe('0007')
+    expect(cleanRoll('12345')).toBeNull()
+    expect(cleanRoll('0')).toBeNull()
+    expect(cleanRoll('Ravi')).toBeNull()
+    expect(cleanRoll('')).toBeNull()
+    expect(rollInput('2a3b45')).toBe('2345')
+  })
+  it('travel in the progress code with the class code, and never a name', () => {
+    const s = buildSummary(game({ ...played, rollNo: '23', nickname: 'Ravi Kumar' }), 5)
+    expect(s.roll).toBe('0023')
+    const back = decodeSummary(encodeSummary(s))!
+    expect(back).toMatchObject({ roll: '0023', cohort: 'HYD-4K7Q' })
+    expect(JSON.stringify(back)).not.toContain('Ravi')
+  })
+  it('a code from before roll numbers still reads, with no roll', () => {
+    const { roll: _roll, ...old } = buildSummary(game(played), 5)
+    expect(parseSummary(old)?.roll).toBeNull()
+  })
+  it('free text in the roll field is dropped', () => {
+    expect(parseSummary({ ...buildSummary(game(played), 5), roll: 'Ravi Kumar' })?.roll).toBeNull()
+  })
+})
+
+describe('class list (on the teacher device)', () => {
+  it('reads the shapes registers and spreadsheets give', () => {
+    const r = parseRoster('Roll, Name\n0001, Ananya Reddy\n2\tMohammed Imran\n3. Sravani K\nPavan Kalyan - 4\n\n5) Teja\n12345, Too long\nno number here')
+    expect(r.roster).toEqual({ '0001': 'Ananya Reddy', '0002': 'Mohammed Imran', '0003': 'Sravani K', '0004': 'Pavan Kalyan', '0005': 'Teja' })
+    expect(r.skipped).toEqual(['Roll, Name', '12345, Too long', 'no number here'])
+  })
+  it('keeps the last name when a roll number repeats, and says so', () => {
+    const r = parseRoster('7, A\n0007, B')
+    expect(r.roster).toEqual({ '0007': 'B' })
+    expect(r.repeated).toEqual(['0007'])
+  })
+  it('is never part of what is stored as progress or exported', async () => {
+    const id = await useNgo.getState().createCohort('Roster class')
+    useNgo.getState().setRoster(id, { '0023': 'Ravi Kumar' })
+    await useNgo.getState().importText(encodeSummary(buildSummary(game({ ...played, installId: 'r1', rollNo: '23' }), 9)), id)
+    const cls = useNgo.getState().local.find((c) => c.id === id)!
+    expect(JSON.stringify(cls)).not.toContain('Ravi')
+    expect(toCsv(Object.values(cls.students))).not.toContain('Ravi')
+    expect(Object.values(cls.students)[0].roll).toBe('0023')
+    // the class list goes when the class goes
+    await useNgo.getState().deleteCohort(id)
+    expect(useNgo.getState().rosters[id]).toBeUndefined()
+  })
+  it('the demo class comes with a made-up class list that matches most students', () => {
+    useNgo.getState().loadDemo()
+    const roster = useNgo.getState().rosters[DEMO_CODE]
+    const students = Object.values(useNgo.getState().local.find((c) => c.id === DEMO_CODE)!.students)
+    const named = students.filter((s) => s.roll && roster[s.roll])
+    expect(named.length).toBeGreaterThan(40)
+    expect(Object.values(roster).every((n) => n.endsWith('(made-up)'))).toBe(true)
   })
 })

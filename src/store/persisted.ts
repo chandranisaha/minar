@@ -45,6 +45,8 @@ export interface Identity {
   installId: string
   /** optional NGO class code */
   classCode: string | null
+  /** optional school roll number (digits only, up to 4), so a teacher can match progress to a student without a name */
+  rollNo: string | null
 }
 
 /** everything that is saved to the device. Derived values (savedAmount, completedPillars) are NOT saved. */
@@ -76,6 +78,7 @@ export function normalizePersisted(raw: unknown, makeId: () => string = newInsta
     festival: FESTIVALS.includes(p.festival as Festival) ? (p.festival as Festival) : DEFAULT_FESTIVAL,
     installId: typeof p.installId === 'string' && p.installId ? p.installId : makeId(),
     classCode: typeof p.classCode === 'string' && p.classCode ? p.classCode : null,
+    rollNo: typeof p.rollNo === 'string' && /^\d{1,4}$/.test(p.rollNo) && Number(p.rollNo) > 0 ? p.rollNo : null,
     ...progress,
   }
 }

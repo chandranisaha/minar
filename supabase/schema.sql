@@ -3,7 +3,8 @@
 --
 -- Privacy design (see docs/PRIVACY.md):
 --   * Facilitators sign in (Supabase Auth, email + password). Students never sign in and are never stored as people.
---   * A progress row holds only the anonymous game summary: random student code, class code, game results. No names.
+--   * A progress row holds only the game summary: random student code, class code, 4-digit roll number, game results.
+--     No names: the roll number -> name list (the roster) lives only on the teacher's own device.
 --   * Row-level security: a facilitator can only read or delete progress in classes they own.
 --   * Students cannot read anything. They can only call submit_progress(), which validates and rate-limits.
 --   * Old progress is purged after 400 days (purge_old_progress, scheduled below if pg_cron is enabled).
@@ -58,9 +59,48 @@ begin
   if not exists (select 1 from classes where code = v_code) then return 'unknown_class'; end if;
   if v_id is null or v_id !~ '^[a-z0-9]{3,12}$' or coalesce(p_summary->>'v', '') <> '1' then return 'invalid'; end if;
   if pg_column_size(p_summary) >= 4096 then return 'invalid'; end if;
+  -- the roll number is 4 digits or absent; never free text, so a name cannot be smuggled in through it
+  if p_summary ? 'roll' and jsonb_typeof(p_summary->'roll') <> 'null'
+     and coalesce(p_summary->>'roll', '') !~ '^[0-9]{4}  -- only the known anonymous fields; anything else (a name, free text) is refused
+  if exists (select 1 from jsonb_object_keys(p_summary) k
+             where k not in ('v','id','cohort','roll','at','lang','persona','lite','places','skills','happy','breaks','habits','p4')) then
+    return 'invalid';
+  end if;
+  if exists (select 1 from progress where class_code = v_code and student_id = v_id and received_at > now() - interval '2 minutes') then
+    return 'too_soon';
+  end if;
+  if (select count(*) from progress where class_code = v_code and received_at > now() - interval '1 day') >= 3000 then
+    return 'class_full';
+  end if;
+  insert into progress (class_code, student_id, summary)
+  values (v_code, v_id, jsonb_set(p_summary, '{cohort}', to_jsonb(v_code)));
+  return 'ok';
+end;
+$$;
+
+revoke all on function public.submit_progress(text, jsonb) from public;
+grant execute on function public.submit_progress(text, jsonb) to anon, authenticated;
+
+-- retention: progress older than 400 days is deleted
+create or replace function public.purge_old_progress()
+returns void language sql security definer set search_path = public as $$
+  delete from progress where received_at < now() - interval '400 days';
+$$;
+revoke all on function public.purge_old_progress() from public, anon, authenticated;
+
+-- schedule the purge nightly if pg_cron is available (Database > Extensions > pg_cron). Skipped quietly otherwise.
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.schedule('minar-purge-old-progress', '30 2 * * *', 'select public.purge_old_progress()');
+  end if;
+end $$;
+ then
+    return 'invalid';
+  end if;
   -- only the known anonymous fields; anything else (a name, free text) is refused
   if exists (select 1 from jsonb_object_keys(p_summary) k
-             where k not in ('v','id','cohort','at','lang','persona','lite','places','skills','happy','breaks','habits','p4')) then
+             where k not in ('v','id','cohort','roll','at','lang','persona','lite','places','skills','happy','breaks','habits','p4')) then
     return 'invalid';
   end if;
   if exists (select 1 from progress where class_code = v_code and student_id = v_id and received_at > now() - interval '2 minutes') then

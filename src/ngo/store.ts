@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { cloud, cloudEnabled, rowToSummary, submitProgress } from './cloud'
-import { DEMO_CODE, demoHistory } from './demo'
+import { DEMO_CODE, demoHistory, demoRoster } from './demo'
 import { cleanCode, decodeSummary, findCodes, parseSummary, type StudentSummary } from './summary'
 
 export interface Cohort {
@@ -35,6 +35,9 @@ interface DeskState {
   error: string
   /** names a facilitator gives anonymous ids ("classId:studentId" -> name). Kept on this device only, never uploaded. */
   labels: Record<string, string>
+  /** each class's list of roll number -> student name. Kept on this device only, never uploaded or exported. */
+  rosters: Record<string, Record<string, string>>
+  setRoster: (classId: string, roster: Record<string, string>) => void
   checklist: Record<string, boolean>
   /** dashboard appearance, remembered on this device */
   theme: 'system' | 'light' | 'dark'
@@ -102,6 +105,13 @@ export const useNgo = create<DeskState>()(
       lastSync: null,
       error: '',
       labels: {},
+      rosters: {},
+      setRoster: (classId, roster) => set((s) => {
+        const rosters = { ...s.rosters }
+        if (Object.keys(roster).length) rosters[classId] = roster
+        else delete rosters[classId]
+        return { rosters }
+      }),
       checklist: {},
       theme: 'system',
       setTheme: (theme) => set({ theme }),
@@ -166,8 +176,12 @@ export const useNgo = create<DeskState>()(
           await cloud.deleteClass(id)
           await get().refresh()
         } else set((s) => ({ local: s.local.filter((c) => c.id !== id) }))
-        // names given on this device go with the class
-        set((s) => ({ labels: Object.fromEntries(Object.entries(s.labels).filter(([k]) => !k.startsWith(`${id}:`))) }))
+        // names given on this device, and the class list, go with the class
+        set((s) => {
+          const rosters = { ...s.rosters }
+          delete rosters[id]
+          return { rosters, labels: Object.fromEntries(Object.entries(s.labels).filter(([k]) => !k.startsWith(`${id}:`))) }
+        })
       },
 
       deleteStudent: async (classId, studentId) => {
@@ -236,6 +250,7 @@ export const useNgo = create<DeskState>()(
             ...st.local.filter((c) => c.id !== DEMO_CODE),
             { id: DEMO_CODE, name: 'Demo class (made-up students)', createdAt: Date.now(), demo: true, history, students: latestOf(history) },
           ],
+          rosters: { ...st.rosters, [DEMO_CODE]: demoRoster() },
         }))
       },
 
@@ -254,7 +269,7 @@ export const useNgo = create<DeskState>()(
       name: 'mm-slots-ngo-v1',
       storage: createJSONStorage(() => localStorage),
       version: 2,
-      partialize: (s) => ({ local: s.local, labels: s.labels, checklist: s.checklist, theme: s.theme }),
+      partialize: (s) => ({ local: s.local, labels: s.labels, rosters: s.rosters, checklist: s.checklist, theme: s.theme }),
       // v1 kept classes under "cohorts" with no history
       migrate: (old, version) => {
         const o = (old ?? {}) as { cohorts?: Omit<Cohort, 'history'>[]; local?: Cohort[]; checklist?: Record<string, boolean> }
