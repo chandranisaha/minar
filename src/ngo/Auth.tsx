@@ -60,7 +60,7 @@ export function Auth({ onDemo, onBack }: { onDemo: () => void; onBack: () => voi
             {view === 'up' && (
               <label className="flex items-start gap-2 text-[12.5px] leading-snug">
                 <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#7A1F2B]" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-                <span>I will use Minar Insights for teaching only, will not record students' full names, phone numbers or other personal details here, and will delete a class's data when the programme ends.</span>
+                <span>I will use Minar Insights for teaching only. I understand student names stay on my device (the class list) and are never uploaded; I will not put students' phone numbers or other personal details anywhere in Minar; and I will delete a class's data when the programme ends.</span>
               </label>
             )}
             {err && <p className="m-0 text-[13px] font-semibold" role="alert" style={{ color: C.building }}>{err}</p>}

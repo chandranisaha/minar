@@ -15,6 +15,8 @@ export function SettingsSheet({ open, onClose, replay = true }: { open: boolean;
   const setLite = useGame((s) => s.setLite)
   const classCode = useGame((s) => s.classCode)
   const setClassCode = useGame((s) => s.setClassCode)
+  const rollNo = useGame((s) => s.rollNo)
+  const setRollNo = useGame((s) => s.setRollNo)
   const resetProgress = useGame((s) => s.resetProgress)
   const [ask, setAsk] = useState(false)
   const done = () => { setAsk(false); onClose() }
@@ -41,6 +43,12 @@ export function SettingsSheet({ open, onClose, replay = true }: { open: boolean;
         <Eyebrow>{t('hud.classCode')}</Eyebrow>
         <input type="text" className="mk-field" value={classCode ?? ''} maxLength={12} onChange={(e) => setClassCode(e.target.value)} />
         <span className="mk-sub mt-1 block">{t('kit.settings.classHint')}</span>
+      </label>
+
+      <label className="block">
+        <Eyebrow>{t('hud.rollNo')}</Eyebrow>
+        <input type="text" inputMode="numeric" autoComplete="off" className="mk-field" value={rollNo ?? ''} maxLength={4} placeholder="0000" onChange={(e) => setRollNo(e.target.value)} />
+        <span className="mk-sub mt-1 block">{t('kit.settings.rollHint')}</span>
       </label>
 
       <ul className="mk-list">

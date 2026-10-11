@@ -13,6 +13,7 @@ import { focusAreas, studentInsight, weeklyTrend } from './insights'
 import { SKILL_NAME, SKILL_PLACE } from './lessons'
 import { Overview, StudentDrawer, Students, Teach, firstSkill, type Page } from './pages'
 import { ClassReport, ReportCard, type DeskView } from './reports'
+import type { Roster } from './roster'
 import { labelKey, useClasses, useNgo, type Cohort } from './store'
 import { Avatar, Profile } from './profile'
 import { Brand, C, Card, Icon, ICONS, Menu, PrintProvider, usePrint } from './ui'
@@ -24,11 +25,29 @@ const PAGES: { id: Page; label: string; icon: keyof typeof ICONS }[] = [
   { id: 'classes', label: 'Classes', icon: 'classes' },
 ]
 
-function buildView(cohort: Cohort, labels: Record<string, string>): DeskView {
+function buildView(cohort: Cohort, labels: Record<string, string>, roster: Roster): DeskView {
   const list = Object.values(cohort.students)
   const v = aggregate(list)
   const last = v.lastSeen ?? Date.now()
-  const nameOf = (id: string) => labels[labelKey(cohort.id, id)] ?? `Student ${id}`
+  const byId = new Map(list.map((s) => [s.id, s]))
+  const rollOf = (id: string) => byId.get(id)?.roll ?? null
+  const nameSource = (id: string): 'roster' | 'label' | 'none' => {
+    const r = rollOf(id)
+    return r && roster[r] ? 'roster' : labels[labelKey(cohort.id, id)] ? 'label' : 'none'
+  }
+  const nameOf = (id: string) => {
+    const r = rollOf(id)
+    return (r && roster[r]) || labels[labelKey(cohort.id, id)] || (r ? `Roll ${r}` : `Student ${id}`)
+  }
+  const subOf = (id: string) => {
+    const r = rollOf(id)
+    if (!r) return `no roll number · student code ${id}`
+    return nameSource(id) === 'none' ? `student code ${id}` : `Roll ${r}`
+  }
+  const count = new Map<string, number>()
+  for (const s of list) if (s.roll) count.set(s.roll, (count.get(s.roll) ?? 0) + 1)
+  const dupRolls = new Set([...count].filter(([, n]) => n > 1).map(([r]) => r))
+  const notShared = Object.entries(roster).filter(([r]) => !count.has(r)).map(([roll, name]) => ({ roll, name })).sort((a, b) => a.roll.localeCompare(b.roll))
   return {
     cohort,
     list,
@@ -37,7 +56,10 @@ function buildView(cohort: Cohort, labels: Record<string, string>): DeskView {
     focus: focusAreas(v),
     insights: list.map((s) => studentInsight(s, last)),
     nameOf,
-    hasLabel: (id) => !!labels[labelKey(cohort.id, id)],
+    subOf,
+    nameSource,
+    dupRolls,
+    notShared,
   }
 }
 
@@ -89,7 +111,7 @@ type View = Page | 'profile'
 function Desk({ onSignedOut }: { onSignedOut: () => void }) {
   const nav = useNavigate()
   const classes = useClasses()
-  const { mode, labels, refresh, loadDemo, setUser } = useNgo()
+  const { mode, labels, rosters, refresh, loadDemo, setUser } = useNgo()
   const [page, setPage] = useState<View>('overview')
   const [pick, setPick] = useState<string | null>(null)
   const [student, setStudent] = useState<string | null>(null)
@@ -97,7 +119,7 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
   const print = usePrint()
 
   const cohort = classes.find((c) => c.id === pick) ?? classes[0] ?? null
-  const d = useMemo(() => (cohort ? buildView(cohort, labels) : null), [cohort, labels])
+  const d = useMemo(() => (cohort ? buildView(cohort, labels, rosters[cohort.id] ?? {}) : null), [cohort, labels, rosters])
   const ins = d && student ? d.insights.find((i) => i.s.id === student) ?? null : null
   const teach = useCallback((s: Skill) => { setSkill(s); setPage('teach') }, [])
 
@@ -123,7 +145,7 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
         <>
           <button type="button" role="menuitem" onClick={() => { close(); print(<ClassReport d={d} />, `${d.cohort.id}-class-report`) }}>Class report<small>Charts, focus areas and success measures. Print or save as PDF.</small></button>
           <button type="button" role="menuitem" disabled={!d.insights.length} onClick={() => { close(); print(<>{d.insights.map((i) => <ReportCard key={i.s.id} d={d} ins={i} />)}</>, `${d.cohort.id}-report-cards`) }}>All student report cards<small>One page per student. Print or save as PDF.</small></button>
-          <button type="button" role="menuitem" onClick={() => { close(); downloadText(`${d.cohort.id}-students.csv`, studentsCsv(d), 'text/csv') }}>Student data (CSV)<small>One row per student code. No names.</small></button>
+          <button type="button" role="menuitem" onClick={() => { close(); downloadText(`${d.cohort.id}-students.csv`, studentsCsv(d), 'text/csv') }}>Student data (CSV)<small>One row per student, with roll numbers. Names are never exported.</small></button>
           <button type="button" role="menuitem" onClick={() => { close(); downloadText(`${d.cohort.id}-trend.csv`, trendCsv(d), 'text/csv') }}>Weekly trend (CSV)<small>Understanding and places cleared per week.</small></button>
         </>
       )}
@@ -201,9 +223,9 @@ function DemoBanner({ onSignIn }: { onSignIn: () => void }) {
 }
 
 function studentsCsv(d: DeskView): string {
-  const head = ['student_code', 'class_code', 'understanding', 'places_cleared', ...PILLAR_IDS.map((p) => `${p}_status`), ...SKILLS.map((k) => SKILL_NAME[k]), 'needs_attention', 'language', 'last_update']
+  const head = ['student_code', 'roll_no', 'class_code', 'understanding', 'places_cleared', ...PILLAR_IDS.map((p) => `${p}_status`), ...SKILLS.map((k) => SKILL_NAME[k]), 'needs_attention', 'language', 'last_update']
   const rows = d.insights.map((i) => [
-    i.s.id, d.cohort.id, i.understanding === null ? '' : Math.round(i.understanding * 100), i.cleared,
+    i.s.id, i.s.roll ?? '', d.cohort.id, i.understanding === null ? '' : Math.round(i.understanding * 100), i.cleared,
     ...PILLAR_IDS.map((p) => ({ n: 'not started', p: 'in progress', c: 'cleared' })[i.s.places[p].s]),
     ...SKILLS.map((k) => (i.s.places[SKILL_PLACE[k]].a > 0 ? Math.round(i.s.skills[k] * 100) : '')),
     i.flags.join('; '), i.s.lang, new Date(i.s.at).toISOString().slice(0, 10),

@@ -1,3 +1,4 @@
+import { rollInput } from '../lib/roll'
 import { create } from 'zustand'
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 import { PERSONAS, type Avatar, type Festival, type Lang, type PersonaId, type PillarId } from '../content/data'
@@ -34,6 +35,7 @@ interface Actions {
   setGender: (g: Gender) => void
   setFestival: (f: Festival) => void
   setClassCode: (code: string | null) => void
+  setRollNo: (roll: string | null) => void
   /** fold a finished game into progress (see src/progress/applyGameResult.ts) */
   applyGameResult: (r: GameResult) => void
   applyLifeMoment: (id: string) => void
@@ -58,7 +60,7 @@ const withDerived = <T extends PersistedData>(s: T): T & Derived => ({ ...s, sav
 /** the keys of PersistedData: exactly what is saved to the device */
 const PERSISTED_KEYS = [
   'language', 'persona', 'storySeen', 'celebrated', 'liteMode', 'happyToastSeen', 'coachTipsSeen',
-  'avatar', 'gender', 'festival', 'installId', 'classCode',
+  'avatar', 'gender', 'festival', 'installId', 'classCode', 'rollNo',
   'startAmount', 'goalAmount', 'happy', 'pillars', 'skills', 'diamonds', 'shieldPieces', 'title', 'lifeMomentsUsed', 'lifeMomentSpend', 'sessionsSinceBreak',
 ] as const satisfies readonly (keyof PersistedData)[]
 
@@ -119,6 +121,7 @@ export const useGame = create<GameState>()(
         setGender: (gender) => patch({ gender, avatar: toAvatar(gender) }),
         setFestival: (festival) => patch({ festival }),
         setClassCode: (code) => patch({ classCode: code && code.trim() ? code.trim() : null }),
+        setRollNo: (roll) => patch({ rollNo: rollInput(roll ?? '') || null }),
         applyGameResult: (result) => commit(applyGameResultPure(progressNow(), result)),
         applyLifeMoment: (id) => commit(applyLifeMomentPure(progressNow(), id)),
         applyBurnout: () => commit(applyBurnoutPure(progressNow())),

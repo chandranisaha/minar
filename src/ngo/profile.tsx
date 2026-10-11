@@ -82,8 +82,9 @@ export function Profile({ onSignOut, onSignIn, onExit, onDemo }: { onSignOut: ()
 
       <Card title="Privacy" sub="Built for students under 18: no personal data about them is collected.">
         <ul className="m-0 grid gap-1.5 pl-5 text-[13.5px] leading-snug">
-          <li>Students never sign in. Each has a random student code; no name, phone, email, photo or location.</li>
-          <li>Names you give student codes stay in this browser and are never uploaded.</li>
+          <li>Students never sign in. They send a random student code, your class code, their 4-digit roll number and game results; never a name, phone, email, photo or location.</li>
+          <li>Your class list (roll number to name) and any names you add stay in this browser. They are never uploaded to the database and never exported.</li>
+          <li>The database only accepts the known game fields; a roll number must be exactly 4 digits, so free text cannot get in.</li>
           <li>Groups under 5 students are never broken down in charts or reports.</li>
           <li>Deleting a student or class removes their progress straight away; old progress is deleted after 400 days.</li>
         </ul>

@@ -67,6 +67,7 @@ export function Overview({ d, go, openStudent, teach }: { d: DeskView; go: (p: P
                 </li>
               ))}
               {attention.length > 6 && <li className="mi-muted px-2 pt-1 text-[12.5px]">and {attention.length - 6} more</li>}
+              {d.notShared.length > 0 && <li className="mi-muted px-2 pt-1 text-[12.5px]">{d.notShared.length} on your class list have not shared progress yet.</li>}
             </ul>
           )}
         </Card>
@@ -109,7 +110,7 @@ export function Students({ d, openStudent }: { d: DeskView; openStudent: (id: st
     const t = q.trim().toLowerCase()
     return d.insights
       .filter((i) => (filter === 'attention' ? i.flags.length > 0 : filter === 'strong' ? (i.understanding ?? 0) >= 0.7 : true))
-      .filter((i) => !t || d.nameOf(i.s.id).toLowerCase().includes(t) || i.s.id.includes(t))
+      .filter((i) => !t || d.nameOf(i.s.id).toLowerCase().includes(t) || i.s.id.includes(t) || (!!i.s.roll && (i.s.roll.includes(t) || String(Number(i.s.roll)) === t)))
       .sort((a, b) => (sort === 'name' ? d.nameOf(a.s.id).localeCompare(d.nameOf(b.s.id)) : sort === 'recent' ? b.s.at - a.s.at : (a.understanding ?? -1) - (b.understanding ?? -1)))
   }, [d, q, filter, sort])
   const counts = { all: d.insights.length, attention: d.insights.filter((i) => i.flags.length).length, strong: d.insights.filter((i) => (i.understanding ?? 0) >= 0.7).length }
@@ -119,7 +120,7 @@ export function Students({ d, openStudent }: { d: DeskView; openStudent: (id: st
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-[200px] flex-1">
           <span className="mi-muted absolute left-3 top-1/2 -translate-y-1/2"><Icon d={ICONS.search} size={16} /></span>
-          <input className="mi-input" style={{ paddingLeft: 34 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or student code" aria-label="Search students" />
+          <input className="mi-input" style={{ paddingLeft: 34 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, roll number or student code" aria-label="Search students" />
         </div>
         <div className="flex gap-1 rounded-xl border p-1" style={{ borderColor: C.line, background: C.card }} role="tablist">
           {(['all', 'attention', 'strong'] as const).map((f) => (
@@ -148,7 +149,7 @@ export function Students({ d, openStudent }: { d: DeskView; openStudent: (id: st
             <tbody>
               {rows.map((i) => (
                 <tr key={i.s.id} onClick={() => openStudent(i.s.id)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') openStudent(i.s.id) }}>
-                  <td><div className="font-semibold">{d.nameOf(i.s.id)}</div>{d.hasLabel(i.s.id) && <div className="mi-muted text-[12px]">{i.s.id}</div>}</td>
+                  <td><div className="font-semibold">{d.nameOf(i.s.id)}</div><div className="mi-muted text-[12px]">{d.subOf(i.s.id)}{i.s.roll && d.dupRolls.has(i.s.roll) && <Chip tone="getting" style={{ marginLeft: 6 }}>roll used twice</Chip>}</div></td>
                   <td><div className="flex gap-1">{PILLAR_IDS.map((p) => <Flag key={p} state={i.s.places[p].s} glow={i.s.places[p].b} />)}</div></td>
                   <td><Understanding u={i.understanding} /></td>
                   <td><StatusChips ins={i} /></td>
@@ -160,7 +161,12 @@ export function Students({ d, openStudent }: { d: DeskView; openStudent: (id: st
           </table>
         </div>
       </Card>
-      <p className="mi-muted m-0 text-[12.5px]">Students are anonymous: each has a random student code. You can add a name in a student's card. Names stay on this device and are never uploaded.</p>
+      {d.notShared.length > 0 && (
+        <Card title={`On your class list, not shared yet (${d.notShared.length})`} sub="These students have not sent any progress with their roll number. Remind them to type it in Settings or Share progress.">
+          <div className="flex flex-wrap gap-1.5">{d.notShared.map((n) => <Chip key={n.roll}>{n.name} · {n.roll}</Chip>)}</div>
+        </Card>
+      )}
+      <p className="mi-muted m-0 text-[12.5px]">Names come from your class list (Classes → Class list), matched by roll number. The list stays on this device: it is never uploaded or exported. Students only ever send their roll number.</p>
     </div>
   )
 }
@@ -180,16 +186,25 @@ export function StudentDrawer({ d, ins, onClose }: { d: DeskView; ins: StudentIn
       <div className="flex flex-wrap gap-2">
         <button type="button" className="mi-btn" onClick={() => print(<ReportCard d={d} ins={ins} />, `report-card-${ins.s.id}`)}><Icon d={ICONS.print} size={16} />Print or save as PDF</button>
       </div>
-      <Card>
-        <form className="grid gap-2" onSubmit={(e) => { e.preventDefault(); setLabel(d.cohort.id, ins.s.id, name) }}>
-          <label className="text-[13px] font-semibold" htmlFor="mi-label">Name on this device (optional)</label>
-          <div className="flex gap-2">
-            <input id="mi-label" className="mi-input" value={name} maxLength={30} onChange={(e) => setName(e.target.value)} placeholder="e.g. first name or roll number" autoComplete="off" />
-            <button type="submit" className="mi-btn ghost">Save</button>
+      {d.nameSource(ins.s.id) === 'roster' ? (
+        <Card>
+          <div className="flex items-center gap-2 text-[13.5px]">
+            <Icon d={ICONS.lock} size={15} />
+            <span><b>{d.nameOf(ins.s.id)}</b>, roll {ins.s.roll}, from your class list. The name is only on this device.</span>
           </div>
-          <p className="mi-muted m-0 text-[12px] leading-snug">Only you see this, on this device. It is never uploaded or shared, and is not printed unless you print this card.</p>
-        </form>
-      </Card>
+        </Card>
+      ) : (
+        <Card>
+          <form className="grid gap-2" onSubmit={(e) => { e.preventDefault(); setLabel(d.cohort.id, ins.s.id, name) }}>
+            <label className="text-[13px] font-semibold" htmlFor="mi-label">{ins.s.roll ? `Roll ${ins.s.roll} is not on your class list` : 'No roll number shared'}: name on this device (optional)</label>
+            <div className="flex gap-2">
+              <input id="mi-label" className="mi-input" value={name} maxLength={30} onChange={(e) => setName(e.target.value)} placeholder="e.g. first name" autoComplete="off" />
+              <button type="submit" className="mi-btn ghost">Save</button>
+            </div>
+            <p className="mi-muted m-0 text-[12px] leading-snug">{ins.s.roll ? 'Tip: add this roll number to the class list in Classes. ' : 'Ask the student to add their roll number in Settings, then share again. '}Names stay on this device only: never uploaded, never exported.</p>
+          </form>
+        </Card>
+      )}
       <Card><ReportCard d={d} ins={ins} /></Card>
       <Card title="Remove this student's data" sub={d.cohort.demo ? 'Made-up student.' : 'Deletes every progress update from this student in this class. They keep their own game and can share again.'}>
         {confirm ? (
