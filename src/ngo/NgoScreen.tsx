@@ -14,6 +14,7 @@ import { SKILL_NAME, SKILL_PLACE } from './lessons'
 import { Overview, StudentDrawer, Students, Teach, firstSkill, type Page } from './pages'
 import { ClassReport, ReportCard, type DeskView } from './reports'
 import { labelKey, useClasses, useNgo, type Cohort } from './store'
+import { Avatar, Profile } from './profile'
 import { Brand, C, Card, Icon, ICONS, Menu, PrintProvider, usePrint } from './ui'
 
 const PAGES: { id: Page; label: string; icon: keyof typeof ICONS }[] = [
@@ -73,11 +74,13 @@ export default function NgoScreen() {
   return <PrintProvider><Desk onSignedOut={() => setGate('signed-out')} /></PrintProvider>
 }
 
+type View = Page | 'profile'
+
 function Desk({ onSignedOut }: { onSignedOut: () => void }) {
   const nav = useNavigate()
   const classes = useClasses()
-  const { mode, user, labels, loading, refresh, loadDemo } = useNgo()
-  const [page, setPage] = useState<Page>('overview')
+  const { mode, labels, refresh, loadDemo, setUser } = useNgo()
+  const [page, setPage] = useState<View>('overview')
   const [pick, setPick] = useState<string | null>(null)
   const [student, setStudent] = useState<string | null>(null)
   const [skill, setSkill] = useState<Skill | null>(null)
@@ -88,19 +91,24 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
   const ins = d && student ? d.insights.find((i) => i.s.id === student) ?? null : null
   const teach = useCallback((s: Skill) => { setSkill(s); setPage('teach') }, [])
 
-  // pick up new student updates when the facilitator comes back to the tab
+  // new student updates arrive on their own: on return to the tab, and every minute while it is open
   useEffect(() => {
     if (mode !== 'cloud') return
-    const onFocus = () => { if (document.visibilityState === 'visible') void refresh() }
-    document.addEventListener('visibilitychange', onFocus)
-    return () => document.removeEventListener('visibilitychange', onFocus)
+    const tick = () => { if (document.visibilityState === 'visible') void refresh() }
+    document.addEventListener('visibilitychange', tick)
+    const t = window.setInterval(tick, 60_000)
+    return () => { document.removeEventListener('visibilitychange', tick); window.clearInterval(t) }
   }, [mode, refresh])
 
-  const signOut = async () => { await cloud.signOut(); onSignedOut() }
-  const title = PAGES.find((p) => p.id === page)?.label
+  const signOut = async () => {
+    try { await cloud.signOut() } finally { setUser(null); onSignedOut() }
+  }
+  const showDemo = () => { loadDemo(); setPick(DEMO_CODE); setPage('overview') }
+  const title = page === 'profile' ? 'Profile' : PAGES.find((p) => p.id === page)?.label
+  const dataPage = page === 'overview' || page === 'students' || page === 'teach'
 
   const exportMenu = d && (
-    <Menu label={<><Icon d={ICONS.download} size={16} />Export</>}>
+    <Menu label={<><Icon d={ICONS.download} size={16} /><span className="hidden sm:inline">Export</span></>}>
       {(close) => (
         <>
           <button type="button" role="menuitem" onClick={() => { close(); print(<ClassReport d={d} />, `${d.cohort.id}-class-report`) }}>Class report<small>Charts, focus areas and success measures. Print or save as PDF.</small></button>
@@ -112,58 +120,55 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
     </Menu>
   )
 
-  const classPicker = classes.length > 0 && (
-    <select className="mi-input" style={{ width: 'auto', maxWidth: 260, height: 40 }} value={cohort?.id ?? ''} onChange={(e) => setPick(e.target.value)} aria-label="Class">
+  const picker = (cls: string, style?: React.CSSProperties) => (
+    <select className={`mi-input ${cls}`} style={{ height: 38, ...style }} value={cohort?.id ?? ''} onChange={(e) => setPick(e.target.value)} aria-label="Class">
       {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
     </select>
   )
 
   return (
     <div className="mi absolute inset-0 flex overflow-hidden">
-      <aside className="hidden w-[232px] shrink-0 flex-col justify-between border-r p-4 lg:flex" style={{ borderColor: C.line, background: '#EFECE6' }}>
-        <div className="grid gap-6">
-          <Brand />
-          <nav className="grid gap-1" aria-label="Sections">
-            {PAGES.map((p) => <button key={p.id} type="button" className="mi-nav" aria-current={page === p.id ? 'page' : undefined} onClick={() => setPage(p.id)}><Icon d={ICONS[p.icon]} />{p.label}</button>)}
-          </nav>
-        </div>
-        <div className="grid gap-2">
-          <Account mode={mode} user={user} onSignOut={() => void signOut()} />
-          <button type="button" className="mi-nav" onClick={() => nav('/')}><Icon d={ICONS.back} />Back to the game</button>
-        </div>
+      <aside className="hidden w-[236px] shrink-0 flex-col border-r px-3 py-5 lg:flex" style={{ borderColor: C.line, background: '#EFECE6' }}>
+        <div className="px-2"><Brand /></div>
+        <nav className="mt-8 grid gap-1" aria-label="Sections">
+          {PAGES.map((p) => <button key={p.id} type="button" className="mi-nav" aria-current={page === p.id ? 'page' : undefined} onClick={() => setPage(p.id)}><Icon d={ICONS[p.icon]} />{p.label}</button>)}
+        </nav>
       </aside>
 
       <div className="min-w-0 flex-1 overflow-y-auto pb-24 lg:pb-10">
-        <header className="sticky top-0 z-20 border-b backdrop-blur" style={{ borderColor: C.line, background: 'rgba(245,243,239,.9)' }}>
-          <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
+        <header className="sticky top-0 z-20 border-b" style={{ borderColor: C.line, background: 'rgba(245,243,239,.92)', backdropFilter: 'blur(8px)' }}>
+          <div className="mx-auto flex h-16 max-w-[1180px] items-center gap-3 px-4 sm:px-6">
             <div className="lg:hidden"><Brand compact /></div>
-            <h1 className="mr-auto text-[20px] font-bold sm:text-[22px]">{title}</h1>
-            {mode === 'cloud' && <button type="button" className="mi-btn quiet sm" onClick={() => void refresh()} disabled={loading} title="Check for new student updates">{loading ? 'Updating…' : 'Refresh'}</button>}
-            {page !== 'classes' && classPicker}
-            {page !== 'classes' && exportMenu}
-            <div className="lg:hidden"><button type="button" className="mi-btn quiet sm" onClick={() => nav('/')}>Exit</button></div>
+            <h1 className="mr-auto truncate text-[19px] font-bold sm:text-[21px]">{title}</h1>
+            {dataPage && classes.length > 0 && <div className="hidden sm:block">{picker('', { width: 'auto', maxWidth: 240 })}</div>}
+            {dataPage && exportMenu}
+            <span className="mx-1 hidden h-6 w-px sm:block" style={{ background: C.line }} aria-hidden />
+            <Avatar onClick={() => setPage('profile')} active={page === 'profile'} />
           </div>
+          {dataPage && classes.length > 1 && <div className="px-4 pb-3 sm:hidden">{picker('')}</div>}
         </header>
 
         <main className="mx-auto grid max-w-[1180px] gap-4 px-4 py-5 sm:px-6">
-          {mode === 'device' && cloudEnabled && <DemoBanner onSignIn={onSignedOut} />}
-          {!cohort && page !== 'classes' ? (
+          {mode === 'device' && cloudEnabled && page !== 'profile' && <DemoBanner onSignIn={onSignedOut} />}
+          {page === 'profile' ? (
+            <Profile onSignOut={signOut} onSignIn={onSignedOut} onExit={() => nav('/')} onDemo={showDemo} />
+          ) : page === 'classes' ? (
+            <Classes current={cohort} pick={(id) => { setPick(id); setPage('overview') }} />
+          ) : !d ? (
             <Card title="Welcome to Minar Insights" sub="See how each class is learning, who needs help, and what to teach next.">
               <div className="flex flex-wrap gap-2">
                 <button type="button" className="mi-btn" onClick={() => setPage('classes')}>Create your first class</button>
-                <button type="button" className="mi-btn ghost" onClick={() => { loadDemo(); setPick(DEMO_CODE) }}>Show a demo class</button>
+                <button type="button" className="mi-btn ghost" onClick={showDemo}>Show a demo class</button>
               </div>
             </Card>
           ) : (
             <>
-              {page === 'overview' && d && <Overview d={d} go={setPage} openStudent={setStudent} teach={teach} />}
-              {page === 'students' && d && <Students d={d} openStudent={setStudent} />}
-              {page === 'teach' && d && <Teach d={d} skill={skill ?? firstSkill(d)} setSkill={setSkill} openStudent={setStudent} />}
-              {page === 'classes' && <Classes current={cohort} pick={(id) => { setPick(id); setPage('overview') }} />}
+              {page === 'overview' && <Overview d={d} go={setPage} openStudent={setStudent} teach={teach} />}
+              {page === 'students' && <Students d={d} openStudent={setStudent} />}
+              {page === 'teach' && <Teach d={d} skill={skill ?? firstSkill(d)} setSkill={setSkill} openStudent={setStudent} />}
             </>
           )}
-          {page === 'classes' && !classes.some((c) => c.demo) && <button type="button" className="mi-btn quiet sm justify-self-start" onClick={() => { loadDemo(); setPick(DEMO_CODE); setPage('overview') }}>Add a made-up demo class to explore</button>}
-          <p className="mi-muted m-0 text-center text-[12px] leading-snug">Educational only: every amount in Minar is made up, and nothing here recommends an investment. Student data is anonymous.</p>
+          <p className="mi-muted m-0 mt-2 text-center text-[12px] leading-snug">Educational only: every amount in Minar is made up, and nothing here recommends an investment. Student data is anonymous.</p>
         </main>
       </div>
 
@@ -172,23 +177,6 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
       </nav>
 
       {d && ins && <StudentDrawer key={ins.s.id} d={d} ins={ins} onClose={() => setStudent(null)} />}
-    </div>
-  )
-}
-
-function Account({ mode, user, onSignOut }: { mode: string; user: { email: string; org: string } | null; onSignOut: () => void }) {
-  if (mode === 'cloud' && user) {
-    return (
-      <div className="grid gap-2 rounded-xl bg-white p-3" style={{ border: `1px solid ${C.line}` }}>
-        <div className="min-w-0 text-[12.5px] leading-tight"><div className="truncate font-semibold">{user.org || 'Facilitator'}</div><div className="mi-muted truncate">{user.email}</div></div>
-        <button type="button" className="mi-btn ghost sm" onClick={onSignOut}><Icon d={ICONS.logout} size={14} />Sign out</button>
-      </div>
-    )
-  }
-  return (
-    <div className="rounded-xl bg-white p-3 text-[12.5px] leading-snug" style={{ border: `1px solid ${C.line}` }}>
-      <div className="flex items-center gap-1.5 font-semibold"><Icon d={ICONS.lock} size={14} />On this device only</div>
-      <div className="mi-muted mt-0.5">Nothing is sent online.</div>
     </div>
   )
 }

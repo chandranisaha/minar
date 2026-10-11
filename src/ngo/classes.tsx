@@ -116,7 +116,6 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
             <li>After playing, they tap <b>Share progress</b>{cloudEnabled ? ' then Send to my teacher. It arrives here.' : ' and send you the code.'}</li>
           </ol>
         </Card>
-        <Privacy />
         <Card title="Session checklist" sub="Ticks stay on this device.">
           <ul className="m-0 grid list-none gap-1 p-0">
             {CHECKLIST.map((c) => (
@@ -126,21 +125,5 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
         </Card>
       </div>
     </div>
-  )
-}
-
-function Privacy() {
-  const { mode } = useNgo()
-  return (
-    <Card title="What is stored, and where" sub="Built for students under 18: no personal data about them is collected.">
-      <ul className="m-0 grid gap-2 pl-5 text-[13.5px] leading-snug">
-        <li><b>Students:</b> a random student code, their class code, and game results (places, skills, language, avatar type). No name, alias, photo, phone, email, school or location.</li>
-        <li><b>Names you add</b> to student codes stay in this browser only. They are never uploaded.</li>
-        <li><b>You:</b> {mode === 'cloud' ? 'your email and organisation name, for signing in. Only you can see your classes.' : 'nothing. In device-only mode everything stays in this browser.'}</li>
-        <li><b>Small groups</b> (under 5 students) are never broken down in charts or reports.</li>
-        <li><b>Deleting</b> a student or class removes their progress {mode === 'cloud' ? 'from the database' : 'from this device'} straight away.</li>
-      </ul>
-      {!cloudEnabled && <p className="mi-muted m-0 mt-3 text-[12.5px] leading-snug">Device-only mode: this desk is not connected to a database, so there is no sign-in and progress arrives by pasted codes. See docs/PRIVACY.md to connect one.</p>}
-    </Card>
   )
 }

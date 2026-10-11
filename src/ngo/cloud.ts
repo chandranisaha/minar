@@ -43,7 +43,8 @@ export const cloud = {
     return data.session
   },
   onAuth(cb: (s: Session | null) => void) {
-    const { data } = sb().auth.onAuthStateChange((_e, s) => cb(s))
+    // deferred: calling Supabase again inside this callback can deadlock the auth client
+    const { data } = sb().auth.onAuthStateChange((_e, s) => { setTimeout(() => cb(s), 0) })
     return () => data.subscription.unsubscribe()
   },
   async signIn(email: string, password: string) {
@@ -61,7 +62,8 @@ export const cloud = {
     fail(error)
   },
   async signOut() {
-    await sb().auth.signOut()
+    // local scope: always clears this browser's session, even offline
+    await sb().auth.signOut({ scope: 'local' })
   },
   async listClasses(): Promise<CloudClass[]> {
     const { data, error } = await sb().from('classes').select('code,name,created_at').order('created_at')

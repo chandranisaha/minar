@@ -30,6 +30,8 @@ interface DeskState {
   remote: Cohort[]
   user: { email: string; org: string } | null
   loading: boolean
+  /** when the database was last read (cloud mode) */
+  lastSync: number | null
   error: string
   /** names a facilitator gives anonymous ids ("classId:studentId" -> name). Kept on this device only, never uploaded. */
   labels: Record<string, string>
@@ -94,12 +96,13 @@ export const useNgo = create<DeskState>()(
       remote: [],
       user: null,
       loading: false,
+      lastSync: null,
       error: '',
       labels: {},
       checklist: {},
 
       setMode: (mode) => set({ mode }),
-      setUser: (user) => set({ user, ...(user ? {} : { remote: [] }) }),
+      setUser: (user) => set({ user, ...(user ? {} : { remote: [], lastSync: null }) }),
 
       refresh: async () => {
         if (get().mode !== 'cloud' || !cloudEnabled) return
@@ -115,7 +118,7 @@ export const useNgo = create<DeskState>()(
             const history = byClass.get(c.code) ?? []
             return { id: c.code, name: c.name, createdAt: Date.parse(c.created_at), history, students: latestOf(history) }
           })
-          set({ remote, loading: false })
+          set({ remote, loading: false, lastSync: Date.now() })
         } catch (e) {
           set({ loading: false, error: e instanceof Error ? e.message : 'Could not reach the database' })
         }
