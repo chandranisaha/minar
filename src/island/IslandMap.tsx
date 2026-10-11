@@ -1,3 +1,4 @@
+import { irisClose } from '../ui/iris'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -435,6 +436,7 @@ export function IslandMap() {
               <button
                 type="button"
                 aria-label={isPillar ? `${labelFor(n)}. ${t(n.hookKey!)}` : labelFor(n)}
+                data-place={n.id}
                 onClick={() => goToPlace(n)}
                 onPointerEnter={() => setHover(n.id)}
                 onPointerLeave={() => setHover((h) => (h === n.id ? null : h))}
@@ -510,7 +512,7 @@ export function IslandMap() {
               </>
             )}
             <div className="mt-3 flex gap-2">
-              {card !== 'gate' && <button type="button" className="ink-btn" autoFocus onClick={() => nav(`/play/${card}`)}>{t(hub.pillars.find((p) => p.id === card)?.ctaKey ?? 'hud.enter')} ▸</button>}
+              {card !== 'gate' && <button type="button" className="ink-btn" autoFocus onClick={() => irisClose(document.querySelector(`[data-place="${card}"]`) ?? null, () => nav(`/play/${card}`))}>{t(hub.pillars.find((p) => p.id === card)?.ctaKey ?? 'hud.enter')} ▸</button>}
               {card === 'gate' && allDone && <button type="button" className="ink-btn" autoFocus onClick={() => { setCelebrated(true); nav('/dashboard') }}>{t('celebrate.enter')}</button>}
               <button type="button" className="ink-btn cream" onClick={() => { S.current.dismissed = S.current.near; setCard(null) }}>{t('buttons.back')}</button>
             </div>

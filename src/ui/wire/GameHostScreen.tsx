@@ -5,6 +5,7 @@ import { isDevMode } from '../../lib/dev'
 import { useGameHost } from '../../host/useGameHost'
 import { GameErrorBoundary } from './GameErrorBoundary'
 import { ResultScreen } from './ResultScreen'
+import { irisOpen } from '../iris'
 import { useGame } from '../../store/game'
 import { WIDE_GAMES } from '../../host/config'
 
@@ -20,6 +21,8 @@ export function GameHostScreen() {
   const nav = useNavigate()
   const lang = useGame((s) => s.language)
   const host = useGameHost(pillar)
+  // arriving through the iris (from the island card or the result screen): open it out of the spot it closed on
+  useEffect(() => { irisOpen() }, [pillar])
   const [confirming, setConfirming] = useState(false)
   const dev = isDevMode()
 
@@ -95,7 +98,7 @@ export function GameHostScreen() {
             lang={lang}
             nextPillar={host.nextPillar}
             onContinue={() => (host.nextPillar ? nav(`/play/${host.nextPillar}`) : leave())}
-            onReplay={host.replay}
+            onReplay={() => { host.replay(); requestAnimationFrame(irisOpen) }}
             onBack={leave}
           />
         )}

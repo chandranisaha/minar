@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { irisClose } from '../../ui/iris'
 import { useGame } from '../../store/game'
 import { buildHubView } from './view'
 import type { PillarId } from '../../content/data'
@@ -10,7 +11,7 @@ export function useHub() {
   const navigate = useNavigate()
 
   const enterPillar = (id: PillarId) => {
-    navigate(`/play/${id}`)
+    irisClose(document.querySelector(`[data-place="${id}"]`) ?? null, () => navigate(`/play/${id}`))
   }
 
   const openMoments = () => {
