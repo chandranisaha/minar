@@ -1,3 +1,4 @@
+import { TURNS } from './board'
 import type { CompanyId, MarketRun } from './types'
 import { COMPANY } from './companies'
 import { redFlags } from './lights'
@@ -27,9 +28,9 @@ export interface Score {
 export function tellQuarter(m: MarketRun, id: CompanyId): number {
   const h = m.history[id]
   const deflects = id === 'payEasy' || id === 'quickRide' ? 1 : 0
-  for (let q = 0; q <= 12; q++) if (redFlags(lightsAt(m, id, q)) + deflects >= 2) return q
-  for (let q = 0; q <= 12; q++) if (h[q].profit < 0) return q
-  return 12
+  for (let q = 0; q <= TURNS; q++) if (redFlags(lightsAt(m, id, q)) + deflects >= 2) return q
+  for (let q = 0; q <= TURNS; q++) if (h[q].profit < 0) return q
+  return TURNS
 }
 
 const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x))
@@ -76,7 +77,7 @@ export function computeScore(run: RunState, m: MarketRun): Score {
   const habits = clamp(20 - (feeHit ? 5 : 0) - (run.emergencyForcedSale ? 5 : 0) - (run.cashStreakMax >= 6 ? 5 : 0), 0, 20)
 
   const total = Math.round(research + skepticism + spread + calm + habits)
-  const netWorth = netWorthAt(run, m, Math.min(12, run.turn))
+  const netWorth = netWorthAt(run, m, Math.min(TURNS, run.turn))
   return {
     research: Math.round(research * 10) / 10,
     skepticism: Math.round(skepticism * 10) / 10,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TitleCard } from '../../../components/TitleCard'
+import { TitleCard } from './TitleCard'
 import { useGame, useLite } from '../../../store/game'
 import { RING_SIZE, TURNS, quarterTile } from '../engine/board'
 import { invested, marketFor, netWorth, pitchFor, type RunState } from '../engine/run'
@@ -33,6 +33,8 @@ export interface DealBoardProps {
 
 /** Deal Board: learn to invest by deciding, one company a quarter, with feedback on every decision. */
 export default function DealBoard({ seed, onExit, onComplete }: DealBoardProps) {
+  // the game always opens on the start screen: any earlier run is dropped before the first render
+  useState(() => useDealBoard.getState().quit())
   const run = useDealBoard((s) => s.run)
   const start = useDealBoard((s) => s.start)
   const { t } = useTranslation('dealboard')
@@ -83,7 +85,7 @@ function Intro({ onStart, onExit }: { onStart: () => void; onExit: () => void })
   const { t } = useTranslation('dealboard')
   const steps = t('intro', { returnObjects: true }) as string[]
   return (
-    <div className="mx-auto flex min-h-[calc(100%-40px)] max-w-[560px] flex-col gap-4 px-4 pb-6 pt-3">
+    <div className="db-roomy mx-auto my-auto flex w-full max-w-[560px] flex-col gap-4 px-4 pb-6 pt-3">
       <div className="flex items-start justify-between gap-2">
         <BackButton onExit={onExit} />
         <LangPick />
@@ -194,9 +196,9 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
 
   return (
     // phones: header, board, sheet stacked; wide screens: board beside the sheet
-    <div className="mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start lg:gap-5">
+    <div className="db-layout mx-auto flex max-w-[560px] flex-col gap-3 px-3 pb-6 pt-3 sm:px-4 lg:grid lg:max-w-[1060px] lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center lg:gap-5">
       <Header run={run} m={m} onExit={onExit} />
-      <div className="flex flex-col gap-2">
+      <div className="db-boardwrap flex flex-col gap-2">
         <Board run={run} m={m} tokenAt={shown} pitching={pitching} onOpen={setStudy}>
           <div className="db-eyebrow text-[#E8B04A]">{t('quarter', { n: Math.min(TURNS, run.turn) })}</div>
           <div className="db-wordmark">{t('title')}</div>
@@ -212,7 +214,7 @@ function Game({ run, onExit, onComplete }: { run: RunState; onExit: () => void; 
         </Board>
         <p className="m-0 text-center text-[12px] text-jasmine/80">{t('boardHint')}</p>
       </div>
-      <div className="lg:sticky lg:top-3 lg:max-h-[calc(100vh-110px)] lg:overflow-y-auto lg:pr-1">
+      <div className="db-panel lg:sticky lg:top-3 lg:max-h-[calc(100dvh-110px)] lg:overflow-y-auto lg:pr-1">
         {run.phase === 'yearEnd' ? (
           <YearEnd run={run} m={m} />
         ) : (

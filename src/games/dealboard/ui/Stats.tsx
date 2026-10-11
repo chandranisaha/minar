@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { interestCover } from '../engine/lights'
 import type { LightKey, QuarterStats } from '../engine/types'
 import { MiniChart } from './Lights'
+import { IconLock } from './icons'
 
 export type StatId = 'price' | 'valuation' | 'revenue' | 'profit' | 'runway' | 'debt' | 'customers' | 'retention' | 'net' | 'people' | 'ceo'
 type Tag = 'L' | 'G' | 'V'
@@ -93,5 +94,5 @@ export function StatRow({ id, hist, q, money }: { id: StatId; hist: QuarterStats
 
 export function StatLocked() {
   const { t } = useTranslation('dealboard')
-  return <div className="rounded-lg border-2 border-dashed border-ink/40 px-2.5 py-2 text-[13px] opacity-60">🔒 {t('stats.locked')}</div>
+  return <div className="flex items-center gap-1.5 rounded-lg border-2 border-dashed border-ink/40 px-2.5 py-2 text-[13px] opacity-60"><IconLock /> {t('stats.locked')}</div>
 }

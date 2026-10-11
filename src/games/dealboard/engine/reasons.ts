@@ -128,6 +128,9 @@ export function reasonOptions(ctx: ReasonCtx, run: RunState, m: MarketRun, id: C
 }
 
 /** How a kind counts in the analytics: evidence and caution are "reasoned". */
+/** The two ways to answer a hot tip: follow it on a feeling, or ignore it with a note of caution. */
+export const tipReasons = (): { follow: ReasonOption; ignore: ReasonOption } => ({ follow: opt('fe.hype2', 'feeling'), ignore: opt('ca.tooGood', 'caution') })
+
 export const kindBucket = (k: ReasonKind | undefined): 'reasoned' | 'headline' | 'feeling' | 'neutral' =>
   k === 'evidence' || k === 'caution' ? 'reasoned' : k === 'headline' ? 'headline' : k === 'feeling' ? 'feeling' : 'neutral'
 

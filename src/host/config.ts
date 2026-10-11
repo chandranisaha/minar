@@ -24,7 +24,7 @@ export const GAME_ENTRIES: Partial<Record<PillarId, { file: string }>> = {
 }
 
 /** games designed for a wide (landscape) screen: while playing they get the full width instead of the portrait column */
-export const WIDE_GAMES: PillarId[] = ['save']
+export const WIDE_GAMES: PillarId[] = ['save', 'invest']
 
 /** the order pillars are offered after a game ends ("Continue" goes to the next unfinished one) */
 export const PILLAR_ORDER: PillarId[] = ['plan', 'save', 'invest', 'safe']

@@ -415,7 +415,9 @@ export function IslandMap() {
 
         {/* places: marker flag + hit area. Positions come from island.json; swapping art never breaks them. */}
         {SPOTS.map((sp) => { const [x, y] = px([sp.x, sp.y]); return (
-          <button key={sp.id} type="button" aria-label={`${t('island.spot')}: ${t(`moments.${sp.id}.name`)}`} onClick={() => setSpot(sp.id)} className="ink-chip grid place-items-center" style={{ position: 'absolute', left: x, top: y, width: 64, height: 64, transform: `translate(-50%,-50%) scale(${inv})`, zIndex: 3600, cursor: 'pointer', fontSize: 28 }}>{sp.id === 'chai' ? '☕' : '🛏'}</button>
+          <button key={sp.id} type="button" aria-label={`${t('island.spot')}: ${t(`moments.${sp.id}.name`)}`} onClick={() => setSpot(sp.id)} className="ink-chip grid place-items-center" style={{ position: 'absolute', left: x, top: y, width: 64, height: 64, transform: `translate(-50%,-50%) scale(${inv})`, zIndex: 3600, cursor: 'pointer', padding: 4 }}>{sp.id === 'chai'
+            ? <img src="/art/cafe/icon-chai.webp" alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            : <img src={`/art/cafe/seat/${who}-${gender === 'girl' ? 5 : 8}.webp`} alt="" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />}</button>
         ) })}
         {NODES.map((n) => {
           const [x, y] = px([n.x, n.y])

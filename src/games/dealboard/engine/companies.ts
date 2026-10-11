@@ -19,9 +19,9 @@ export const TUNING = {
   sigmaCust: 0.015,
   sigmaUsers: 0.02,
   /** hype companies keep raising money; their runway glides down this path (months, index = quarter) */
-  hypeRunway: [10.3, 8.8, 7.3, 5.9, 4.5, 3.3, 2.2, 1.8, 1.5, 1.3, 1.0, 0.8, 0.6],
+  hypeRunway: [10.3, 8.0, 5.9, 4.0, 2.2, 1.6, 1.3, 1.0, 0.8],
   /** while the story sells, loss-making hype prices ignore profit surprises */
-  smokeSpike: { quarters: [4, 5] as number[], bump: 0.08 },
+  smokeSpike: { quarters: [3, 4] as number[], bump: 0.08 },
   postCollapseSentiment: -0.12,
   downRound: { priceMult: 0.55, newShares: 0.3, runwayMonths: 9 },
   restate: { priceMult: 0.5, usersMult: 0.4 },
@@ -44,7 +44,7 @@ type Raw = Omit<Company, 'start'> & { start: Omit<CompanyStart, 'shares'> }
 const RAW: Raw[] = [
   {
     id: 'dailyBasket', sector: 'food', archetype: 'steady', sound: true,
-    params: { g: 0.04, dm: 0.003, gd: -0.03, churn: 0.12, newBase: 2200, newGrowth: 0.01, userGrowth: 0.03,
+    params: { g: 0.04, dm: 0.0045, gd: -0.03, churn: 0.12, newBase: 2200, newGrowth: 0.01, userGrowth: 0.03,
       layoff: { from: 99, base: 0, step: 0, cap: 0 }, ceoSellProb: 0.05, ceoBuyProb: 0.12, sentiment: 0, sentimentUntil: 0,
       sigmaRev: 0.01, sigmaPrice: 0.04 },
     start: { revenue: 40, margin: 0.08, debt: 10, cash: 60, employees: 220, customers: 18000, users: 20000, retention: 0.88, price: 100 },
@@ -52,7 +52,7 @@ const RAW: Raw[] = [
   {
     id: 'payEasy', sector: 'fintech', archetype: 'hype', sound: false,
     params: { g: 0.25, dm: -0.02, gd: 0.05, churn: 0.45, newBase: 6000, newGrowth: 0.06, userGrowth: 0.4,
-      layoff: { from: 7, base: 0.15, step: 0, cap: 0.15 }, ceoSellProb: 0.2, ceoBuyProb: 0.02, sentiment: 0.1, sentimentUntil: 99,
+      layoff: { from: 5, base: 0.15, step: 0, cap: 0.15 }, ceoSellProb: 0.2, ceoBuyProb: 0.02, sentiment: 0.1, sentimentUntil: 99,
       sigmaRev: 0.04, sigmaPrice: 0.12, collapse: 'downRoundOrFail' },
     start: { revenue: 25, margin: -0.35, debt: 5, cash: 30, employees: 150, customers: 12000, users: 400000, retention: 0.55, price: 100 },
   },
@@ -66,7 +66,7 @@ const RAW: Raw[] = [
   {
     id: 'medLink', sector: 'health', archetype: 'leveraged', sound: false,
     params: { g: 0.12, dm: -0.01, gd: 0.2, churn: 0.16, newBase: 2800, newGrowth: 0.04, userGrowth: 0.04,
-      layoff: { from: 8, base: 0.08, step: 0, cap: 0.08 }, ceoSellProb: 0.15, ceoBuyProb: 0.03, sentiment: 0.04, sentimentUntil: 7,
+      layoff: { from: 6, base: 0.08, step: 0, cap: 0.08 }, ceoSellProb: 0.15, ceoBuyProb: 0.03, sentiment: 0.04, sentimentUntil: 5,
       sigmaRev: 0.02, sigmaPrice: 0.07 },
     start: { revenue: 30, margin: 0.06, debt: 90, cash: 25, employees: 300, customers: 15000, users: 17000, retention: 0.84, price: 100 },
   },
@@ -79,8 +79,8 @@ const RAW: Raw[] = [
   },
   {
     id: 'quickRide', sector: 'mobility', archetype: 'smoke', sound: false,
-    params: { g: 0, dm: 0, gd: 0.02, churn: 0.5, newBase: 3000, newGrowth: 0, userGrowth: 0.3,
-      layoff: { from: 99, base: 0, step: 0, cap: 0 }, ceoSellProb: 0.7, ceoForcedSell: [3, 4, 5], ceoBuyProb: 0, sentiment: 0.12, sentimentUntil: 7,
+    params: { g: 0, dm: 0, gd: 0.02, churn: 0.5, newBase: 3000, newGrowth: 0, userGrowth: 0.35,
+      layoff: { from: 99, base: 0, step: 0, cap: 0 }, ceoSellProb: 0.7, ceoForcedSell: [2, 3, 4], ceoBuyProb: 0, sentiment: 0.12, sentimentUntil: 5,
       sigmaRev: 0.03, sigmaPrice: 0.15, collapse: 'restate' },
     start: { revenue: 20, margin: -0.05, debt: 15, cash: 35, employees: 90, customers: 6000, users: 250000, retention: 0.5, price: 100 },
   },
