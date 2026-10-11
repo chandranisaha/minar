@@ -1,3 +1,4 @@
+import { autoShareAfterGame } from '../ngo/studentShare'
 import { restartGame } from './restart'
 import { lazy, useCallback, useEffect, useMemo, useReducer, useRef, type ComponentType } from 'react'
 import { HOST_DEFAULTS } from './config'
@@ -63,6 +64,7 @@ export function useGameHost(rawPillar: string | undefined) {
           const result = entry.adapter(payload)
           const outcome = useGame.getState().finishSession(result)
           dispatch({ type: 'complete', sessionId, outcome })
+          autoShareAfterGame() // keeps the teacher's dashboard up to date, if the student is in a class
         } catch (e) {
           dispatch({ type: 'fail', sessionId, message: e instanceof Error ? e.message : String(e) })
         }

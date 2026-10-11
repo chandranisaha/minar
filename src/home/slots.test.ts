@@ -35,6 +35,14 @@ describe('save slots', () => {
     expect(JSON.parse(s.getItem('money-mohalla-v2')!).state).toEqual({ language: 'te' })
     expect(getActive(s)).toBe(m.id)
   })
+  it('a new game can start already in a class, with the roll number; the name stays the slot name only', () => {
+    const s = fake({ 'money-mohalla-v2': game({ language: 'hi' }) })
+    const m = startNewGame(s, 'Ravi Kumar', 5, { classCode: 'HYD-K7Q2M', rollNo: '23' })
+    const state = JSON.parse(s.getItem('money-mohalla-v2')!).state
+    expect(state).toEqual({ language: 'hi', classCode: 'HYD-K7Q2M', rollNo: '23' })
+    expect(JSON.stringify(state)).not.toContain('Ravi')
+    expect(m.name).toBe('Ravi Kumar')
+  })
   it('saving updates the slot and its card summary', () => {
     const s = fake({ 'money-mohalla-v2': game({ persona: 'college', gender: 'girl', pillars: { plan: { status: 'complete' }, save: { status: 'in_progress' } } }) })
     const a = createSlot(s, 'A', {}, 1)

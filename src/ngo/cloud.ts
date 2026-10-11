@@ -102,6 +102,26 @@ export const cloud = {
     }
     return out
   },
+  /**
+   * live updates for the dashboard: called with each new progress row as a student shares. Realtime applies the same row-level
+   * security, so a facilitator only ever hears about their own classes.
+   */
+  onProgress(cb: (row: CloudRow) => void): () => void {
+    const ch = sb()
+      .channel('minar-progress')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'progress' }, (p) => cb(p.new as CloudRow))
+      .subscribe()
+    return () => { void sb().removeChannel(ch) }
+  },
+}
+
+/** the name of the class a code belongs to, or null; so a student can check they typed their teacher's code. No login needed. */
+export async function classInfo(code: string): Promise<string | null> {
+  const c = cleanCode(code)
+  if (!cloudEnabled || !c) return null
+  const { data, error } = await sb().rpc('class_name', { p_code: c })
+  if (error) throw new Error(error.message)
+  return typeof data === 'string' && data ? data : null
 }
 
 export type SubmitResult = 'ok' | 'unknown_class' | 'invalid' | 'too_soon' | 'class_full' | 'offline' | 'off'
