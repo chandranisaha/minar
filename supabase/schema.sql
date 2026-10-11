@@ -52,6 +52,8 @@ declare
   v_code text := upper(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9-]', '', 'g'));
   v_id   text := p_summary->>'id';
 begin
+  -- 'hydk7q2m' and 'HYD K7Q2M' both mean HYD-K7Q2M
+  if v_code ~ '^HYD[A-Z0-9]{4,5}$' then v_code := 'HYD-' || substr(v_code, 4); end if;
   if jsonb_typeof(p_summary) <> 'object' then return 'invalid'; end if;
   if not exists (select 1 from classes where code = v_code) then return 'unknown_class'; end if;
   if v_id is null or v_id !~ '^[a-z0-9]{3,12}$' or coalesce(p_summary->>'v', '') <> '1' then return 'invalid'; end if;

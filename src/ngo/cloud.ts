@@ -32,7 +32,11 @@ export interface CloudRow { class_code: string; student_id: string; summary: unk
 export const rowToSummary = (r: CloudRow): StudentSummary | null => {
   const s = parseSummary(r.summary)
   if (!s || s.id !== r.student_id) return null
-  return { ...s, cohort: r.class_code, at: Date.parse(r.received_at) || s.at }
+  // when the student played, not when it reached the database (a teacher may paste an older code); a phone clock that is
+  // ahead, or more than 60 days behind, is not trusted
+  const got = Date.parse(r.received_at) || Date.now()
+  const at = s.at > 0 && s.at <= got && got - s.at < 60 * 86400000 ? s.at : got
+  return { ...s, cohort: r.class_code, at }
 }
 
 const fail = (e: { message: string } | null) => { if (e) throw new Error(e.message) }

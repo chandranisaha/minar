@@ -121,7 +121,7 @@ export function Students({ d, openStudent }: { d: DeskView; openStudent: (id: st
           <span className="mi-muted absolute left-3 top-1/2 -translate-y-1/2"><Icon d={ICONS.search} size={16} /></span>
           <input className="mi-input" style={{ paddingLeft: 34 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or student code" aria-label="Search students" />
         </div>
-        <div className="flex gap-1 rounded-xl border bg-white p-1" style={{ borderColor: C.line }} role="tablist">
+        <div className="flex gap-1 rounded-xl border p-1" style={{ borderColor: C.line, background: C.card }} role="tablist">
           {(['all', 'attention', 'strong'] as const).map((f) => (
             <button key={f} type="button" role="tab" aria-selected={filter === f} onClick={() => setFilter(f)} className="mi-btn sm" style={filter === f ? undefined : { background: 'transparent', color: C.ink, borderColor: 'transparent' }}>
               {f === 'all' ? 'All' : f === 'attention' ? 'Need attention' : 'Strong'} <span className="opacity-70">{counts[f]}</span>

@@ -15,7 +15,7 @@ export function Avatar({ size = 36, onClick, active }: { size?: number; onClick?
   const { user, mode } = useNgo()
   const signedIn = mode === 'cloud' && !!user
   const face = (
-    <span className="grid shrink-0 place-items-center rounded-full font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.38, background: signedIn ? 'var(--avatar)' : 'var(--avatar-off)', boxShadow: active ? `0 0 0 3px #fff, 0 0 0 5px ${C.brand}` : undefined }}>
+    <span className="grid shrink-0 place-items-center rounded-full font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.38, background: signedIn ? 'var(--avatar)' : 'var(--avatar-off)', boxShadow: active ? `0 0 0 3px ${C.bg}, 0 0 0 5px ${C.brand}` : undefined }}>
       {signedIn ? initials(user) : <Icon d={ICONS.lock} size={size * 0.45} />}
     </span>
   )

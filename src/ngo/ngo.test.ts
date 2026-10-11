@@ -5,6 +5,7 @@ import { demoHistory, demoStudents } from './demo'
 import { toCsvText } from './export'
 import { focusAreas, studentInsight, understanding, weeklyTrend } from './insights'
 import { labelKey, latestOf, useNgo } from './store'
+import { rowToSummary } from './cloud'
 import { buildSummary, cleanCode, decodeSummary, encodeSummary, findCodes, parseSummary } from './summary'
 
 const game = (state: object) => ({ 'money-mohalla-v2': JSON.stringify({ state, version: 2 }) })
@@ -40,7 +41,14 @@ describe('student summary', () => {
     expect(parseSummary({ v: 1, id: 'abcdef', happy: 9999, skills: { saving: 7 } })?.happy).toBe(100)
     expect(parseSummary({ v: 1, id: 'abcdef', skills: { saving: 7 } })?.skills.saving).toBe(1)
   })
-  it('cleans class codes', () => expect(cleanCode(' hyd 4k7q!! ')).toBe('HYD4K7Q'))
+  it('cleans class codes so a student typing them loosely still matches the teacher', () => {
+    expect(cleanCode(' hyd 4k7q!! ')).toBe('HYD-4K7Q')
+    expect(cleanCode('hydk7q2m')).toBe('HYD-K7Q2M')
+    expect(cleanCode('HYD-K7Q2M')).toBe('HYD-K7Q2M')
+    expect(cleanCode('Hyd - k7q2m')).toBe('HYD-K7Q2M')
+    expect(cleanCode('DEMO-CLASS')).toBe('DEMO-CLASS')
+    expect(cleanCode('   ')).toBeNull()
+  })
 })
 
 describe('cohort analytics', () => {
@@ -166,5 +174,45 @@ describe('insights for teaching', () => {
   })
   it('CSV cells cannot start a spreadsheet formula', () => {
     expect(toCsvText([['=HYPERLINK("x")', 'a,b']])).toBe(`"'=HYPERLINK(""x"")","a,b"`)
+  })
+})
+
+describe('student to teacher, end to end (device mode)', () => {
+  it('a student who types the class code loosely lands in the teacher class, and an update replaces the old one', async () => {
+    const code = await useNgo.getState().createCohort('Class 11 C, Amberpet')
+    const loose = code.toLowerCase().replace('-', ' ')
+    // the student's saved game, as the phone keeps it
+    const save = (happy: number) => game({ ...played, installId: 'phone-of-student-a', classCode: loose, happy })
+    const first = encodeSummary(buildSummary(save(40), 1_000))
+    const report = await useNgo.getState().importText(`Sir my code: ${first}`, null) // teacher lets codes sort themselves
+    expect(report).toMatchObject({ added: 1 })
+    const cls = useNgo.getState().local.find((c) => c.id === code)!
+    const [only] = Object.values(cls.students)
+    expect(only.cohort).toBe(code)
+    // a week later the same student shares again: same student code, newer progress
+    const again = encodeSummary(buildSummary(save(80), 2_000))
+    expect(await useNgo.getState().importText(again, null)).toMatchObject({ updated: 1 })
+    const after = useNgo.getState().local.find((c) => c.id === code)!
+    expect(Object.keys(after.students)).toEqual([only.id])
+    expect(after.students[only.id].happy).toBe(80)
+    expect(after.history.map((h) => h.happy)).toEqual([40, 80])
+  })
+  it('two students on one shared phone get different student codes', () => {
+    const a = buildSummary(game({ ...played, installId: 'slot-1' }))
+    const b = buildSummary(game({ ...played, installId: 'slot-2' }))
+    expect(a.id).not.toBe(b.id)
+  })
+})
+
+describe('reading rows back from the database', () => {
+  const row = (at: number, received: string) => ({ class_code: 'HYD-K7Q2M', student_id: 'abc1234', received_at: received, summary: { ...buildSummary(game(played), at), id: 'abc1234' } })
+  it('keeps when the student played for a code pasted later, but not a phone clock that is off', () => {
+    const got = Date.parse('2026-10-11T10:00:00Z')
+    expect(rowToSummary(row(got - 3 * 86400000, '2026-10-11T10:00:00Z'))!.at).toBe(got - 3 * 86400000)
+    expect(rowToSummary(row(got + 86400000, '2026-10-11T10:00:00Z'))!.at).toBe(got)
+    expect(rowToSummary(row(got - 90 * 86400000, '2026-10-11T10:00:00Z'))!.at).toBe(got)
+  })
+  it('drops a row whose summary does not belong to its student', () => {
+    expect(rowToSummary({ ...row(1, '2026-10-11T10:00:00Z'), student_id: 'other99' })).toBeNull()
   })
 })
