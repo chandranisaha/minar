@@ -41,7 +41,10 @@ for (const [tag, w, h] of [['phone', 390, 844], ['desk', 1280, 800]]) {
   await page.getByRole('button', { name: 'Create class' }).click()
   await page.getByLabel('Progress codes').fill(`from Priya: ${code}`)
   await page.getByRole('button', { name: 'Add', exact: true }).click(); await page.waitForTimeout(300)
-  ;(await page.getByText('1 added').count()) ? ok(`${tag}: import added the student`) : fail(`${tag}: import`)
+  ;(await page.getByText('1 added in Class 11 B').count()) && !(await page.getByText('UNASSIGNED').count()) ? ok(`${tag}: import put the student in the chosen class`) : fail(`${tag}: import went to the wrong class`)
+  ;(await page.locator('li', { hasText: 'Class 11 B' }).getByText('1 students').count()) ? ok(`${tag}: the class shows 1 student`) : fail(`${tag}: class count`)
+  await page.getByLabel('Progress codes').fill('hello there'); await page.getByRole('button', { name: 'Add', exact: true }).click()
+  ;(await page.getByText('No progress codes found').count()) ? ok(`${tag}: text without a code explains itself`) : fail(`${tag}: no-code message`)
   await page.getByLabel('Progress codes').fill(code); await page.getByRole('button', { name: 'Add', exact: true }).click(); await page.waitForTimeout(300)
   ;(await page.getByText(/1 skipped/).count()) ? ok(`${tag}: same code twice is not double counted`) : fail(`${tag}: duplicate`)
   if (SHOT) { await tabBtn('Overview').click(); await page.screenshot({ path: `${SHOT}/ngo-${tag}.png` }) }

@@ -12,7 +12,7 @@ export interface Cohort {
   demo?: boolean
 }
 
-export interface ImportReport { added: number; updated: number; skipped: number }
+export interface ImportReport { added: number; updated: number; skipped: number; found: number; into: string | null }
 
 interface NgoState {
   cohorts: Cohort[]
@@ -45,9 +45,11 @@ export const useNgo = create<NgoState>()(
       renameCohort: (id, name) => set((s) => ({ cohorts: s.cohorts.map((c) => (c.id === id ? { ...c, name: name.trim().slice(0, 40) || c.name } : c)) })),
       deleteCohort: (id) => set((s) => ({ cohorts: s.cohorts.filter((c) => c.id !== id) })),
       importText: (text, into) => {
-        const report: ImportReport = { added: 0, updated: 0, skipped: 0 }
+        const report: ImportReport = { added: 0, updated: 0, skipped: 0, found: 0, into: cleanCode(into) }
         const incoming: StudentSummary[] = []
-        for (const code of findCodes(text)) {
+        const codes = findCodes(text)
+        report.found = codes.length
+        for (const code of codes) {
           const s = decodeSummary(code)
           if (s) incoming.push(s)
           else report.skipped++
@@ -57,7 +59,7 @@ export const useNgo = create<NgoState>()(
           const j = JSON.parse(text)
           for (const item of Array.isArray(j) ? j : []) {
             const s = parseSummary(item)
-            if (s) incoming.push(s)
+            if (s) { incoming.push(s); report.found++ }
           }
         } catch { /* plain text */ }
         set((st) => {

@@ -26,15 +26,22 @@ export function Rollout({ cohort, onPickCohort }: { cohort: Cohort | null; onPic
   const { cohorts, checklist, tick, createCohort, renameCohort, deleteCohort, importText } = useNgo()
   const [name, setName] = useState('')
   const [text, setText] = useState('')
-  const [into, setInto] = useState('')
+  // where new students go: the class being viewed by default, or 'auto' to sort by each student's own class code
+  const [into, setInto] = useState<string | null>(null)
+  const dest = into ?? cohort?.id ?? 'auto'
   const [msg, setMsg] = useState('')
   const [confirm, setConfirm] = useState<string | null>(null)
   const files = useRef<HTMLInputElement>(null)
 
   const run = (t: string) => {
-    const r = importText(t, into || null)
-    setMsg(`${r.added} added, ${r.updated} updated, ${r.skipped} skipped`)
-    if (r.added + r.updated > 0) setText('')
+    const r = importText(t, dest === 'auto' ? null : dest)
+    const where = dest === 'auto' ? 'sorted by class code' : `in ${cohorts.find((c) => c.id === dest)?.name ?? dest}`
+    if (r.found === 0) setMsg('No progress codes found in that text. A code starts with MM1. and is sent from a saved game with the Share progress button.')
+    else setMsg(`${r.added} added ${where}, ${r.updated} updated, ${r.skipped} skipped${r.skipped && !r.added && !r.updated ? ' (already added, or not a valid code)' : ''}`)
+    if (r.added + r.updated > 0) {
+      setText('')
+      if (dest !== 'auto') onPickCohort(dest)
+    }
   }
   const onFiles = async (fl: FileList | null) => {
     if (!fl) return
@@ -80,11 +87,11 @@ export function Rollout({ cohort, onPickCohort }: { cohort: Cohort | null; onPic
       <Card className="ngo-noprint" title="Add student progress" hint="Students send you a code or file from their saved game (Share progress). Paste many at once, even a whole chat.">
         <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Paste progress codes here (they start with MM1.)" aria-label="Progress codes" className="w-full rounded-md border-[1.5px] bg-transparent p-2 text-[14px]" style={{ borderColor: LINE, fontFamily: 'monospace' }} />
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <select value={into} onChange={(e) => setInto(e.target.value)} aria-label="Put them in" className="h-11 rounded-md border-[1.5px] bg-transparent px-2 text-[14px]" style={{ borderColor: LINE }}>
-            <option value="">Sort by each student's class code</option>
-            {cohorts.map((c) => <option key={c.id} value={c.id}>Put all in: {c.name}</option>)}
+          <select value={dest} onChange={(e) => setInto(e.target.value)} aria-label="Put them in" className="h-11 rounded-md border-[1.5px] bg-transparent px-2 text-[14px]" style={{ borderColor: LINE }}>
+            {cohorts.map((c) => <option key={c.id} value={c.id}>Add to: {c.name}</option>)}
+            <option value="auto">Sort by each student's own class code</option>
           </select>
-          <button type="button" className="ink-btn" disabled={!text.trim()} onClick={() => run(text)}>Add</button>
+          <button type="button" className="ink-btn" disabled={!text.trim() || cohorts.length === 0} onClick={() => run(text)}>Add</button>
           <button type="button" className="ink-btn cream" onClick={() => files.current?.click()}>Choose files</button>
           <input ref={files} type="file" multiple accept=".txt,.json,.mmprogress,text/plain,application/json" hidden onChange={(e) => void onFiles(e.target.files)} />
         </div>

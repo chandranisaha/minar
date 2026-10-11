@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PILLAR_IDS } from '../content/data'
 import { K_MIN, aggregate, bandOf, toCsv } from './analytics'
 import { demoStudents } from './demo'
+import { useNgo } from './store'
 import { buildSummary, cleanCode, decodeSummary, encodeSummary, findCodes, parseSummary } from './summary'
 
 const game = (state: object) => ({ 'money-mohalla-v2': JSON.stringify({ state, version: 2 }) })
@@ -87,5 +88,30 @@ describe('cohort analytics', () => {
     const csv = toCsv(demo).split('\n')
     expect(csv).toHaveLength(49)
     expect(csv[0].startsWith('id,class_code')).toBe(true)
+  })
+})
+
+describe('adding students to a class', () => {
+  const code = encodeSummary(buildSummary(game(played), 9))
+  it('puts students in the chosen class, even when their own code is different or missing', () => {
+    const st = useNgo.getState()
+    const a = st.createCohort('Class 11 B')
+    const noCode = encodeSummary({ ...buildSummary(game(played), 10), cohort: null, id: 'zzzzzz' })
+    const r = useNgo.getState().importText(`from Priya: ${code}
+${noCode}`, a)
+    expect(r).toMatchObject({ added: 2, found: 2, skipped: 0 })
+    const cohort = useNgo.getState().cohorts.find((c) => c.id === a)
+    expect(Object.keys(cohort!.students)).toHaveLength(2)
+    expect(useNgo.getState().cohorts.some((c) => c.id === 'UNASSIGNED')).toBe(false)
+  })
+  it('does not double count, and reports text with no codes', () => {
+    const a = useNgo.getState().createCohort('Class 12')
+    useNgo.getState().importText(code, a)
+    expect(useNgo.getState().importText(code, a)).toMatchObject({ added: 0, skipped: 1 })
+    expect(useNgo.getState().importText('hello', a)).toMatchObject({ found: 0, added: 0 })
+  })
+  it('sorts by each student own class code when no class is chosen', () => {
+    useNgo.getState().importText(code, null)
+    expect(useNgo.getState().cohorts.some((c) => c.id === 'HYD-4K7Q')).toBe(true)
   })
 })
