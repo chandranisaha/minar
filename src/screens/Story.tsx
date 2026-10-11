@@ -66,6 +66,7 @@ function S3Minars() {
                 <img className="flag" src="/art/flag-done.webp" alt="" draggable={false} />
               </div>
               <b>{t(`pillars.${p.id}.name`)}</b>
+              <em className="topic">{t(`pillars.${p.id}.topic`)}</em>
               <small>{t(`pillars.${p.id}.hook`)}</small>
             </div>
           ))}

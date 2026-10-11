@@ -113,3 +113,4 @@ html[data-lite='true'] .st-minar .pic .flag { opacity: 1; }
 .st-gate-tag { padding: 4px 18px; border: 2px solid #3A2A24; border-radius: 999px; background: #FFF8E2; font-family: var(--font-display); font-size: 20px; box-shadow: 0 3px 0 rgba(58, 42, 36, .3); }
 html[data-lite='true'] .st-gate-box .open, html[data-lite='true'] .st-gate-lamps img { opacity: 1; filter: none; }
 html[data-lite='true'] .st-gate-box .closed { display: none; }
+.st-minar .topic { display: block; margin-top: 3px; padding: 1px 8px; border-radius: 999px; background: #D9573F; color: #FFF7E6; font-style: normal; font-weight: 800; font-size: 11px; letter-spacing: .03em; }
