@@ -7,6 +7,7 @@ import { goHome } from '../home/Home'
 import { useHappyView } from '../features/happy/hooks'
 import { FaceGlyph } from '../ui/wire/icons'
 import { MomentsSheet } from '../ui/wire/MomentsSheet'
+import { MinarBar } from '../ui/kit/MinarBar'
 
 export function Coin({ size = 24 }: { size?: number }) {
   return (
@@ -157,17 +158,7 @@ export function HappyChip() {
   )
 }
 
+/** the top bar on every shell screen: see src/ui/kit/MinarBar.tsx */
 export function TopHud({ replay = true }: { replay?: boolean }) {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-2 p-2.5" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
-      <div className="pointer-events-auto flex items-center gap-1.5">
-        <GoalBar />
-        <HappyChip />
-      </div>
-      <div className="pointer-events-auto flex items-center gap-2">
-        <PersonaChip />
-        <GearMenu replay={replay} />
-      </div>
-    </div>
-  )
+  return <MinarBar replay={replay} />
 }

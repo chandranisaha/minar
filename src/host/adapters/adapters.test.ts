@@ -219,7 +219,8 @@ describe('Deal Board (lite)', () => {
     const { raw: _raw, ...rest } = r
     const text = JSON.stringify(rest)
     for (const amount of ['9999999', '8888888', '7777777', '123456', '23456']) expect(text).not.toContain(amount)
-    expect(r.joySignals).toEqual({})
+    expect(Object.keys(r.joySignals)).toEqual(['restedOrBalanced'])
+    expect(r.joySignals.restedOrBalanced).toBeLessThanOrEqual(2)
   })
   it('clamps skills above their maximum and ignores unknown keys', () => {
     const r = adaptDealBoard({ judgement: 80, skills: { research: 99, extra: 5 } })
@@ -298,5 +299,27 @@ describe('Pocket Panic (save)', () => {
   })
   it('an old Pay Run payload still goes to the Pay Run adapter', () => {
     expect(ADAPTERS.save({ game: 'payrun', goalReached: true, jar: 1800, goal: 1800, shifts: 8 }).cleared).toBe(true)
+  })
+})
+
+describe('one point system across all four games', () => {
+  it('a perfect clear is worth the same share of the goal in every pillar', () => {
+    const results = [
+      ADAPTERS.plan({ game: 'festival', stars: { goals: true, onTime: true, resilient: true, cleanBooks: true }, score: { goals: 40, onTime: 20, resilience: 20, smart: 20, total: 100 }, minaretLit: true }),
+      ADAPTERS.save({ game: 'cafe', score: { total: 9 }, evidence: { payFirst: true, track: true, small: true, emergency: true, plan: true, wait: true, goals: true, borrow: true, lend: true }, minaretLit: true }),
+      ADAPTERS.invest({ game: 'dealboard', judgement: 100, skills: { research: 20, skepticism: 20, spread: 20, calm: 20, habits: 20 } }),
+      ADAPTERS.safe({ status: 'complete', shieldPieces: ['protect', 'verify', 'pause'], firstTryAccuracy: 1 }),
+    ]
+    for (const r of results) expect(r).toMatchObject({ cleared: true, quality: 1, partial: 1 })
+  })
+  it('happiness signals only ever use the shared set, and a game that reports none leaves Happy alone', () => {
+    const allowed = ['friendship', 'treatsBought', 'treatsSkipped', 'lentToFriends', 'scammed', 'restedOrBalanced']
+    const plan = ADAPTERS.plan({ game: 'festival', stars: { goals: true, resilient: true }, score: { goals: 40, resilience: 20, total: 80 }, minaretLit: true })
+    expect(plan.joySignals.restedOrBalanced).toBe(1)
+    for (const r of [plan, ADAPTERS.safe({ status: 'complete', shieldPieces: [] }), ADAPTERS.invest({ judgement: 90 })]) {
+      for (const k of Object.keys(r.joySignals)) expect(allowed).toContain(k)
+    }
+    expect(ADAPTERS.safe({ status: 'complete', shieldPieces: [] }).joySignals).toEqual({})
+    expect(ADAPTERS.invest({ judgement: 90, skills: { calm: 20, spread: 5 } }).joySignals).toEqual({ restedOrBalanced: 1 })
   })
 })

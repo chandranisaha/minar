@@ -25,15 +25,15 @@ export default function Landing() {
       <IslandMap />
       <TopHud />
       {tip && (
-        <div className="absolute inset-x-0 z-30 flex justify-center px-3" style={{ top: 68 }}>
+        <div className="absolute inset-x-0 z-30 flex justify-center px-3" style={{ top: 84 }}>
           <div className="paper rise flex max-w-[420px] items-center gap-3 p-3" role="status">
             <div className="min-w-0"><div className="font-display text-[16px]">{t(tip.titleKey)}</div><div className="text-[13px] leading-snug">{t(tip.bodyKey)}</div></div>
             <button type="button" className="ink-btn cream shrink-0" onClick={dismissAll}>{t('buttons.ok', { defaultValue: 'OK' })}</button>
           </div>
         </div>
       )}
-      {hint && (
-        <div className="pointer-events-none absolute inset-x-0 z-30 flex justify-center px-3" style={{ top: 68 }}>
+      {hint && !tip && (
+        <div className="pointer-events-none absolute inset-x-0 z-30 flex justify-center px-3" style={{ top: 84 }}>
           <div className="ink-chip rise px-3 py-1.5 text-center text-[13px] font-bold">{t('hud.walkHint')}</div>
         </div>
       )}
