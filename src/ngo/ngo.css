@@ -1,11 +1,39 @@
-/* Facilitator desk: printing gives a clean one-page report or code cards instead of the on-screen layout. */
+/*
+  Facilitator desk theme. Everything is scoped under .ngo-root so the game's own look is untouched.
+  Palette: burgundy (primary), navy (secondary), warm neutrals. Printing gives a clean page instead of the screen layout.
+*/
+.ngo-root {
+  --n-bg: #F3F1EC; --n-card: #FFFFFF; --n-line: #E4DED2; --n-burg: #7A1F2B; --n-burg-dark: #651823; --n-navy: #14213D; --n-tan: #C9A66B; --n-text: #2B2B2B;
+  background: var(--n-bg); color: var(--n-text); font-family: var(--font-body);
+}
+.ngo-root .font-display { font-family: var(--font-body); font-weight: 700; letter-spacing: -0.01em; }
+.ngo-root .paper {
+  background: var(--n-card); border: 1px solid var(--n-line); border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(20, 33, 61, .05), 0 8px 20px rgba(20, 33, 61, .05);
+}
+.ngo-root .ink-btn {
+  min-height: 40px; padding: 0 16px; font-size: 14px; font-weight: 600; color: #fff;
+  background: var(--n-burg); border: 1px solid var(--n-burg); border-radius: 999px; box-shadow: 0 1px 2px rgba(20, 33, 61, .18);
+}
+.ngo-root .ink-btn:hover { background: var(--n-burg-dark); transform: none; }
+.ngo-root .ink-btn:active { transform: none; }
+.ngo-root .ink-btn.cream { background: #fff; color: var(--n-navy); border: 1px solid #D4CCBB; }
+.ngo-root .ink-btn.cream:hover { background: #F6F1E7; }
+.ngo-root button:focus-visible, .ngo-root input:focus-visible, .ngo-root select:focus-visible, .ngo-root textarea:focus-visible { outline: 3px solid rgba(20, 33, 61, .35); outline-offset: 2px; }
+.ngo-root input, .ngo-root select, .ngo-root textarea { background: #fff !important; border: 1px solid #D4CCBB !important; border-radius: 10px !important; color: var(--n-text); }
+.ngo-root code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.ngo-side { background: #ECE8DF; border-right: 1px solid var(--n-line); }
+.ngo-nav { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: #3B3A36; font-size: 14.5px; font-weight: 500; cursor: pointer; text-align: left; }
+.ngo-nav:hover { background: rgba(122, 31, 43, .08); }
+.ngo-nav[aria-current="page"] { background: var(--n-burg); color: #fff; font-weight: 600; }
+
 @media print {
   html, body, #root { height: auto !important; overflow: visible !important; background: #fff !important; }
   .fixed, .absolute.ngo-root { position: static !important; }
   .ngo-root { overflow: visible !important; background: #fff !important; }
   .ngo-noprint { display: none !important; }
   .ngo-print-only { display: block !important; }
-  .paper { box-shadow: none !important; break-inside: avoid; }
+  .ngo-root .paper { box-shadow: none !important; break-inside: avoid; }
   .ngo-cards { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
 }
 .ngo-print-only { display: none; }

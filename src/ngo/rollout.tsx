@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { aggregate, toCsv, K_MIN, type CohortView } from './analytics'
 import { GAME_NAME, PLACE_NAME, SKILL_NAME } from './lessons'
 import { useNgo, type Cohort } from './store'
-import { Bar, Card, Chip, INK, SAGE, pct } from './ui'
+import { Bar, Card, Chip, LINE, NAVY, pct } from './ui'
 
 const CHECKLIST = [
   'Devices or phones are charged and have a browser',
@@ -47,15 +47,15 @@ export function Rollout({ cohort, onPickCohort }: { cohort: Cohort | null; onPic
     <div className="grid gap-3">
       <Card className="ngo-noprint" title="Classes and codes" hint="Make a class, give its code to students. Students type it in the gear menu inside the game.">
         <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); const id = createCohort(name); onPickCohort(id); setName('') }}>
-          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="Class name, e.g. Class 11 B, Amberpet" aria-label="Class name" className="h-12 min-w-0 flex-1 rounded-md border-[1.5px] bg-transparent px-3 text-[16px]" style={{ borderColor: INK }} />
+          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder="Class name, e.g. Class 11 B, Amberpet" aria-label="Class name" className="h-12 min-w-0 flex-1 rounded-md border-[1.5px] bg-transparent px-3 text-[16px]" style={{ borderColor: LINE }} />
           <button type="submit" className="ink-btn">Create class</button>
         </form>
         <ul className="m-0 mt-3 grid list-none gap-2 p-0">
           {cohorts.map((c) => (
-            <li key={c.id} className="rounded-xl border-[1.5px] p-2.5" style={{ borderColor: INK, background: c.id === cohort?.id ? '#FBE3A6' : '#FFF7E3' }}>
+            <li key={c.id} className="rounded-xl border p-3" style={{ borderColor: LINE, background: c.id === cohort?.id ? '#F3EBDD' : '#FBF9F5' }}>
               <div className="flex flex-wrap items-center gap-2">
-                <button type="button" className="min-w-0 flex-1 truncate text-left text-[16px] font-bold" style={{ background: 'none', border: 0, cursor: 'pointer', color: INK }} onClick={() => onPickCohort(c.id)}>{c.name}</button>
-                <code className="rounded-md border-[1.5px] px-2 py-1 text-[16px] font-bold tracking-wider" style={{ borderColor: INK, background: '#FBF0D2' }}>{c.id}</code>
+                <button type="button" className="min-w-0 flex-1 truncate text-left text-[16px] font-bold" style={{ background: 'none', border: 0, cursor: 'pointer', color: NAVY }} onClick={() => onPickCohort(c.id)}>{c.name}</button>
+                <code className="rounded-md border-[1.5px] px-2 py-1 text-[16px] font-bold tracking-wider" style={{ borderColor: LINE, background: '#F6F1E7', color: NAVY }}>{c.id}</code>
                 <Chip>{Object.keys(c.students).length} students</Chip>
               </div>
               {confirm === c.id ? (
@@ -78,9 +78,9 @@ export function Rollout({ cohort, onPickCohort }: { cohort: Cohort | null; onPic
       </Card>
 
       <Card className="ngo-noprint" title="Add student progress" hint="Students send you a code or file from their saved game (Share progress). Paste many at once, even a whole chat.">
-        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Paste progress codes here (they start with MM1.)" aria-label="Progress codes" className="w-full rounded-md border-[1.5px] bg-transparent p-2 text-[14px]" style={{ borderColor: INK, fontFamily: 'monospace' }} />
+        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} placeholder="Paste progress codes here (they start with MM1.)" aria-label="Progress codes" className="w-full rounded-md border-[1.5px] bg-transparent p-2 text-[14px]" style={{ borderColor: LINE, fontFamily: 'monospace' }} />
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <select value={into} onChange={(e) => setInto(e.target.value)} aria-label="Put them in" className="h-11 rounded-md border-[1.5px] bg-transparent px-2 text-[14px]" style={{ borderColor: INK }}>
+          <select value={into} onChange={(e) => setInto(e.target.value)} aria-label="Put them in" className="h-11 rounded-md border-[1.5px] bg-transparent px-2 text-[14px]" style={{ borderColor: LINE }}>
             <option value="">Sort by each student's class code</option>
             {cohorts.map((c) => <option key={c.id} value={c.id}>Put all in: {c.name}</option>)}
           </select>
@@ -102,7 +102,7 @@ export function Rollout({ cohort, onPickCohort }: { cohort: Cohort | null; onPic
       {/* printed instead of the screen when you press Print code cards */}
       <div className="ngo-print-only ngo-cards">
         {cohorts.map((c) => (
-          <div key={c.id} className="paper p-4" style={{ border: `2px solid ${INK}` }}>
+          <div key={c.id} className="paper p-4" style={{ border: `2px solid ${NAVY}` }}>
             <div className="font-display text-[22px]">Money Mohalla</div>
             <div className="text-[13px]">{c.name}</div>
             <div className="my-2 text-[34px] font-bold tracking-widest">{c.id}</div>
@@ -123,7 +123,7 @@ export function Compare({ cohorts }: { cohorts: Cohort[] }) {
         {rows.map(({ c, v }) => (
           <div key={c.id} className="grid gap-1">
             <div className="font-semibold">{c.name}</div>
-            <Bar label="Finished all four" value={v.finishedAll} of={v.n} color={SAGE} />
+            <Bar label="Finished all four" value={v.finishedAll} of={v.n} color={NAVY} />
             <div className="text-[13px] opacity-75">Average Happy {v.happy.avg === null ? '–' : Math.round(v.happy.avg)} · weakest skill {v.weakestSkill ? SKILL_NAME[v.weakestSkill] : '–'}</div>
           </div>
         ))}
@@ -152,7 +152,7 @@ export function Report({ cohort, v, list }: { cohort: Cohort; v: CohortView; lis
         <dl className="m-0 mt-3 grid gap-2.5">
           <div className="grid grid-cols-3 gap-2 text-[15px]"><div><b>{v.n}</b><br /><span className="opacity-70">students</span></div><div><b>{v.finishedAll}</b><br /><span className="opacity-70">finished all four</span></div><div><b>{v.happy.avg === null ? '–' : Math.round(v.happy.avg)}</b><br /><span className="opacity-70">average Happy</span></div></div>
           {rows.map(([k, what, how]) => (
-            <div key={k} className="rounded-xl border-[1.5px] p-2.5" style={{ borderColor: INK, background: '#FFF7E3' }}>
+            <div key={k} className="rounded-xl border p-3" style={{ borderColor: LINE, background: '#FBF9F5' }}>
               <dt className="font-display text-[17px]">✓ {k}</dt>
               <dd className="m-0 text-[14px] leading-snug">{what}<br /><b>{how}</b></dd>
             </div>
