@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom'
 import type { Level } from './insights'
 import type { Glow } from './summary'
 
-/** colours used inside SVG charts (attributes, not CSS variables, so a downloaded PNG keeps them) */
+/** theme colours as CSS variables (light and dark are defined in ngo.css); PNG export resolves them to real colours */
 export const C = {
-  ink: '#1F2430', muted: '#6B6F7A', line: '#E7E2D8', track: '#EEEAE2', brand: '#7A1F2B', navy: '#14213D', tan: '#C9A66B',
-  building: '#C2555A', getting: '#D6A23E', strong: '#2F6F5E',
+  ink: 'var(--ink)', muted: 'var(--muted)', line: 'var(--line)', track: 'var(--track)', brand: 'var(--brand)', navy: 'var(--navy)', tan: 'var(--tan)',
+  building: 'var(--building)', getting: 'var(--getting)', strong: 'var(--strong)', card: 'var(--card)', bg: 'var(--bg)', soft: 'var(--soft)',
 }
 export const LEVEL_COLOR: Record<Level, string> = { building: C.building, getting: C.getting, strong: C.strong }
 
@@ -31,7 +31,7 @@ export function Card({ title, sub, action, children, className = '', pad = true 
 }
 
 export function Stat({ label, value, note, tone }: { label: string; value: ReactNode; note?: ReactNode; tone?: 'up' | 'down' | 'warn' }) {
-  const color = tone === 'up' ? C.strong : tone === 'down' ? C.building : tone === 'warn' ? '#9A6A12' : C.muted
+  const color = tone === 'up' ? C.strong : tone === 'down' ? C.building : tone === 'warn' ? 'var(--warn)' : C.muted
   return (
     <div className="mi-card flex min-w-0 flex-col gap-1.5 p-4">
       <div className="mi-eyebrow">{label}</div>
@@ -42,7 +42,8 @@ export function Stat({ label, value, note, tone }: { label: string; value: React
 }
 
 export function Chip({ children, tone = 'plain', style }: { children: ReactNode; tone?: 'plain' | Level | 'brand'; style?: CSSProperties }) {
-  const t = tone === 'building' ? ['#F8E4E5', '#8E2F34'] : tone === 'getting' ? ['#F7EDD6', '#7A5712'] : tone === 'strong' ? ['#DFEDE8', '#1F5446'] : tone === 'brand' ? ['#F3E1E3', C.brand] : ['#EFECE6', '#4A4E58']
+  const k = tone === 'plain' ? 'plain' : tone
+  const t = [`var(--t-${k})`, `var(--t-${k}-ink)`]
   return <span className="mi-chip" style={{ background: t[0], color: t[1], ...style }}>{children}</span>
 }
 
@@ -85,7 +86,7 @@ export function Flag({ state, glow, size = 20 }: { state: 'n' | 'p' | 'c'; glow:
   return (
     <svg width={size} height={size} viewBox="0 0 26 26" role="img" aria-label={word}>
       <title>{word}</title>
-      <circle cx="13" cy="13" r="10.5" fill={state === 'c' ? fill : '#fff'} stroke={state === 'n' ? '#C9C3B6' : state === 'p' ? C.tan : fill} strokeWidth="2" />
+      <circle cx="13" cy="13" r="10.5" fill={state === 'c' ? fill : C.card} stroke={state === 'n' ? 'var(--flag-empty)' : state === 'p' ? C.tan : fill} strokeWidth="2" />
       {state === 'p' && <path d="M13 2.5a10.5 10.5 0 0 1 0 21z" fill={C.tan} />}
       {state === 'c' && <path d="M8 13.4l3.4 3.3L18.2 9.8" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />}
     </svg>
@@ -110,6 +111,10 @@ export const ICONS = {
   logout: <path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" />,
   lock: <path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3" />,
   chevron: <path d="M6 9l6 6 6-6" />,
+  play: <path d="M7 4.5v15l12-7.5z" />,
+  sun: <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />,
+  moon: <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" />,
+  system: <path d="M3 5h18v11H3zM8 20h8M12 16v4" />,
 }
 
 /** the Minar mark: the painted monument from the game */
@@ -156,7 +161,7 @@ export function Drawer({ title, onClose, children }: { title: ReactNode; onClose
   return (
     <div className="mi-scrim" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <aside className="mi-drawer" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : 'Details'}>
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b px-5 py-3" style={{ background: '#F5F3EF', borderColor: C.line }}>
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b px-5 py-3" style={{ background: C.bg, borderColor: C.line }}>
           <div className="min-w-0 truncate text-[16px] font-semibold">{title}</div>
           <button type="button" className="mi-btn quiet" onClick={onClose} aria-label="Close"><Icon d={ICONS.close} /></button>
         </div>

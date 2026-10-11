@@ -15,7 +15,7 @@ export function Avatar({ size = 36, onClick, active }: { size?: number; onClick?
   const { user, mode } = useNgo()
   const signedIn = mode === 'cloud' && !!user
   const face = (
-    <span className="grid shrink-0 place-items-center rounded-full font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.38, background: signedIn ? C.navy : '#8A8F99', boxShadow: active ? `0 0 0 3px #fff, 0 0 0 5px ${C.brand}` : undefined }}>
+    <span className="grid shrink-0 place-items-center rounded-full font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.38, background: signedIn ? 'var(--avatar)' : 'var(--avatar-off)', boxShadow: active ? `0 0 0 3px #fff, 0 0 0 5px ${C.brand}` : undefined }}>
       {signedIn ? initials(user) : <Icon d={ICONS.lock} size={size * 0.45} />}
     </span>
   )
@@ -32,7 +32,7 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
 
 /** Profile: who is signed in, sync status, demo data, privacy, and the two ways out (sign out, exit to the game) */
 export function Profile({ onSignOut, onSignIn, onExit, onDemo }: { onSignOut: () => Promise<void>; onSignIn: () => void; onExit: () => void; onDemo: () => void }) {
-  const { user, mode, lastSync, loading, refresh, deleteCohort } = useNgo()
+  const { user, mode, lastSync, loading, refresh, deleteCohort, theme, setTheme } = useNgo()
   const classes = useClasses()
   const [busy, setBusy] = useState(false)
   const signedIn = mode === 'cloud' && !!user
@@ -49,7 +49,7 @@ export function Profile({ onSignOut, onSignIn, onExit, onDemo }: { onSignOut: ()
             <div className="truncate text-[20px] font-bold">{signedIn ? user!.org || 'Facilitator' : 'Not signed in'}</div>
             <div className="mi-muted truncate text-[14px]">{signedIn ? user!.email : cloudEnabled ? 'Exploring with demo data on this device' : 'Device-only mode: data stays in this browser'}</div>
           </div>
-          <span className="mi-chip" style={{ background: signedIn ? '#DFEDE8' : '#EFECE6', color: signedIn ? '#1F5446' : '#4A4E58' }}>{signedIn ? 'Signed in' : 'Offline desk'}</span>
+          <span className="mi-chip" style={{ background: signedIn ? 'var(--t-strong)' : 'var(--t-plain)', color: signedIn ? 'var(--t-strong-ink)' : 'var(--t-plain-ink)' }}>{signedIn ? 'Signed in' : 'Offline desk'}</span>
         </div>
       </Card>
 
@@ -70,6 +70,14 @@ export function Profile({ onSignOut, onSignIn, onExit, onDemo }: { onSignOut: ()
             ? <button type="button" className="mi-btn ghost sm" onClick={() => void deleteCohort(DEMO_CODE)}>Remove demo class</button>
             : <button type="button" className="mi-btn ghost sm" onClick={onDemo}>Add demo class</button>}
         </Row>
+      </Card>
+
+      <Card title="Appearance" sub="Printouts and slides always use the light look.">
+        <div className="mi-seg" role="group" aria-label="Theme">
+          {([['system', 'System', ICONS.system], ['light', 'Light', ICONS.sun], ['dark', 'Dark', ICONS.moon]] as const).map(([k, label, icon]) => (
+            <button key={k} type="button" aria-pressed={theme === k} onClick={() => setTheme(k)}><Icon d={icon} size={15} />{label}</button>
+          ))}
+        </div>
       </Card>
 
       <Card title="Privacy" sub="Built for students under 18: no personal data about them is collected.">

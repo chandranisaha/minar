@@ -3,7 +3,9 @@ import { SKILLS, type Skill } from '../content/data'
 import { PlacesChart, SkillsChart, TrendChart, ChartCard } from './charts'
 import { cloudEnabled } from './cloud'
 import { levelOf, trendDelta, type StudentInsight } from './insights'
+import { DECKS, deckFor } from './decks'
 import { LESSONS, PLACE_NAME, GAME_NAME, SKILL_NAME, SKILL_PLACE } from './lessons'
+import { downloadPptx, Presenter, PrintDeck, SlideView } from './Slides'
 import { ReportCard, StatusChips, Understanding, type DeskView } from './reports'
 import { labelKey, useNgo, type Cohort } from './store'
 import { C, Card, Chip, Drawer, Flag, Icon, ICONS, LevelBar, Legend, Stat, day, pct, usePrint } from './ui'
@@ -35,7 +37,7 @@ export function Overview({ d, go, openStudent, teach }: { d: DeskView; go: (p: P
         {focus.length === 0 ? <p className="mi-muted m-0 text-[14px]">Not enough play yet. Focus areas appear once a few students have played.</p> : (
           <div className="grid gap-3 md:grid-cols-3">
             {focus.map((f, i) => (
-              <div key={f.skill} className="flex flex-col gap-2 rounded-xl border p-4" style={{ borderColor: C.line, background: i === 0 ? '#FBF6F4' : '#fff' }}>
+              <div key={f.skill} className="flex flex-col gap-2 rounded-xl border p-4" style={{ borderColor: C.line, background: i === 0 ? 'var(--soft-brand)' : C.card }}>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[15px] font-semibold">{SKILL_NAME[f.skill]}</span>
                   <Chip tone={levelOf(f.avg)}>{pct(f.avg)}</Chip>
@@ -58,7 +60,7 @@ export function Overview({ d, go, openStudent, teach }: { d: DeskView; go: (p: P
             <ul className="m-0 grid list-none gap-1 p-0">
               {attention.slice(0, 6).map((i) => (
                 <li key={i.s.id}>
-                  <button type="button" className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-2 text-left hover:bg-[#F8F6F2]" style={{ border: 0, background: 'none', cursor: 'pointer' }} onClick={() => openStudent(i.s.id)}>
+                  <button type="button" className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-2 text-left hover:bg-[var(--soft)]" style={{ border: 0, background: 'none', cursor: 'pointer' }} onClick={() => openStudent(i.s.id)}>
                     <span className="min-w-0"><span className="block truncate text-[14px] font-semibold">{d.nameOf(i.s.id)}</span><span className="mi-muted block truncate text-[12.5px]">{i.flags.join(' · ')}</span></span>
                     <Understanding u={i.understanding} />
                   </button>
@@ -207,6 +209,9 @@ export function Teach({ d, skill, setSkill, openStudent }: { d: DeskView; skill:
   const place = SKILL_PLACE[skill]
   const slips = d.v.mistakes.filter((m) => m.pillar === place).slice(0, 4)
   const building = d.insights.filter((i) => i.s.places[place].a > 0 && i.s.skills[skill] < 0.4)
+  const [presenting, setPresenting] = useState<number | null>(null)
+  const [saving, setSaving] = useState(false)
+  const deck = useMemo(() => deckFor(skill, slips.filter((m) => m.reliable).map((m) => m.text)), [skill, slips])
   const ordered = [...d.v.skills].sort((a, b) => (a.avg ?? 2) - (b.avg ?? 2))
 
   const plan = (
@@ -229,8 +234,8 @@ export function Teach({ d, skill, setSkill, openStudent }: { d: DeskView; skill:
         <ul className="m-0 grid list-none gap-1 p-0">
           {ordered.map((s) => (
             <li key={s.id}>
-              <button type="button" onClick={() => setSkill(s.id)} aria-pressed={skill === s.id} className="grid w-full gap-1.5 rounded-lg px-3 py-2.5 text-left" style={{ border: 0, cursor: 'pointer', background: skill === s.id ? '#F3E1E3' : 'transparent' }}>
-                <span className="flex items-center justify-between"><span className="text-[14px] font-semibold" style={{ color: skill === s.id ? C.brand : C.ink }}>{SKILL_NAME[s.id]}</span><span className="text-[13px] font-semibold tabular-nums">{s.avg === null ? '–' : pct(s.avg)}</span></span>
+              <button type="button" onClick={() => setSkill(s.id)} aria-pressed={skill === s.id} className="grid w-full gap-1.5 rounded-lg px-3 py-2.5 text-left" style={{ border: 0, cursor: 'pointer', background: skill === s.id ? 'var(--t-brand)' : 'transparent' }}>
+                <span className="flex items-center justify-between"><span className="text-[14px] font-semibold" style={{ color: skill === s.id ? 'var(--t-brand-ink)' : C.ink }}>{SKILL_NAME[s.id]}</span><span className="text-[13px] font-semibold tabular-nums">{s.avg === null ? '–' : pct(s.avg)}</span></span>
                 <LevelBar low={s.low} mid={s.mid} high={s.high} height={6} />
               </button>
             </li>
@@ -243,7 +248,7 @@ export function Teach({ d, skill, setSkill, openStudent }: { d: DeskView; skill:
         <Card title={SKILL_NAME[skill]} sub={`Shown in ${PLACE_NAME[place]} (${GAME_NAME[place]}). ${row.of ? `${row.of} students have played it.` : 'Nobody has played it yet.'}`}>
           <div className="grid grid-cols-3 gap-3 text-center">
             {([['building', row.low], ['getting', row.mid], ['strong', row.high]] as const).map(([lv, n]) => (
-              <div key={lv} className="rounded-xl p-3" style={{ background: lv === 'building' ? '#FBF0EF' : lv === 'getting' ? '#FBF5E8' : '#EEF5F2' }}>
+              <div key={lv} className="rounded-xl p-3" style={{ background: `var(--soft-${lv})` }}>
                 <div className="text-[22px] font-bold" style={{ color: C[lv] }}>{n}</div>
                 <div className="mi-muted text-[12px]">{lv === 'building' ? 'still building' : lv === 'getting' ? 'getting there' : 'strong'}</div>
               </div>
@@ -256,9 +261,22 @@ export function Teach({ d, skill, setSkill, openStudent }: { d: DeskView; skill:
           )}
           {building.length > 0 && (
             <div className="mt-4"><div className="mb-1.5 text-[13px] font-semibold">Pair these students up, or check in with them</div>
-              <div className="flex flex-wrap gap-1.5">{building.slice(0, 24).map((i) => <button key={i.s.id} type="button" onClick={() => openStudent(i.s.id)} className="mi-chip" style={{ background: '#F8E4E5', color: '#8E2F34', border: 0, cursor: 'pointer' }}>{d.nameOf(i.s.id)}</button>)}</div>
+              <div className="flex flex-wrap gap-1.5">{building.slice(0, 24).map((i) => <button key={i.s.id} type="button" onClick={() => openStudent(i.s.id)} className="mi-chip" style={{ background: 'var(--t-building)', color: 'var(--t-building-ink)', border: 0, cursor: 'pointer' }}>{d.nameOf(i.s.id)}</button>)}</div>
             </div>
           )}
+        </Card>
+        <Card title="Flashcard deck" sub={`${deck.length} slides: the big idea, ${DECKS[skill].cards.length} flashcards, the activity and a takeaway. Present in class or download.`} action={<span className="mi-chip" style={{ background: 'var(--t-brand)', color: 'var(--t-brand-ink)' }}>{SKILL_NAME[skill]}</span>}>
+          <div className="mi-deckstrip">
+            {deck.map((s, k) => (
+              <button key={k} type="button" className="mi-thumb" onClick={() => setPresenting(k)} aria-label={`Present from slide ${k + 1}`}><SlideView slide={s} revealed={false} /></button>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button type="button" className="mi-btn" onClick={() => setPresenting(0)}><Icon d={ICONS.play} size={16} />Present</button>
+            <button type="button" className="mi-btn ghost" disabled={saving} onClick={async () => { setSaving(true); try { await downloadPptx(deck, `minar-${skill}-flashcards`, l.title) } finally { setSaving(false) } }}><Icon d={ICONS.download} size={16} />{saving ? 'Preparing…' : 'PowerPoint (.pptx)'}</button>
+            <button type="button" className="mi-btn ghost" onClick={() => print(<PrintDeck slides={deck} />, `minar-${skill}-flashcards`)}><Icon d={ICONS.print} size={16} />PDF handout</button>
+          </div>
+          <p className="mi-muted m-0 mt-3 text-[12px]">The PowerPoint opens in PowerPoint, Google Slides or Keynote; answers are also in the speaker notes. Made-up amounts only.</p>
         </Card>
         <Card title={`Activity: ${l.title}`} sub={`${l.minutes} minutes, no devices. Then replay ${GAME_NAME[l.replay]}.`} action={<button type="button" className="mi-btn ghost sm" onClick={() => print(plan, `lesson-${skill}`)}><Icon d={ICONS.print} size={15} />Print</button>}>
           <div className="grid gap-3 text-[14.5px] leading-snug md:grid-cols-2">
@@ -268,6 +286,7 @@ export function Teach({ d, skill, setSkill, openStudent }: { d: DeskView; skill:
           <p className="mi-muted m-0 mt-3 text-[12px]">Made-up examples only. It teaches how to think about money and never recommends a product or investment.</p>
         </Card>
       </div>
+      {presenting !== null && <Presenter slides={deck} start={presenting} title={l.title} onClose={() => setPresenting(null)} />}
     </div>
   )
 }

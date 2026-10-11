@@ -26,6 +26,7 @@
     "easystarjs": "^0.4.4",
     "framer-motion": "^14.1.0",
     "i18next": "^26.4.3",
+    "pptxgenjs": "^3.12.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-i18next": "^17.0.16",

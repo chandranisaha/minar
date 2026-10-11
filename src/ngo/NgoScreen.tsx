@@ -48,6 +48,16 @@ export default function NgoScreen() {
   const nav = useNavigate()
   const { setMode, setUser, refresh, loadDemo } = useNgo()
   const [gate, setGate] = useState<Gate>(cloudEnabled ? 'checking' : 'ready')
+  const theme = useNgo((s) => s.theme)
+
+  // light / dark: follows the device unless the facilitator picks one in Profile; removed again when leaving the desk
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const apply = () => { document.documentElement.dataset.miTheme = theme === 'system' ? (mq.matches ? 'dark' : 'light') : theme }
+    apply()
+    mq.addEventListener('change', apply)
+    return () => { mq.removeEventListener('change', apply); delete document.documentElement.dataset.miTheme }
+  }, [theme])
 
   useEffect(() => {
     if (!cloudEnabled) { setMode('device'); return }
@@ -128,7 +138,7 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
 
   return (
     <div className="mi absolute inset-0 flex overflow-hidden">
-      <aside className="hidden w-[236px] shrink-0 flex-col border-r px-3 py-5 lg:flex" style={{ borderColor: C.line, background: '#EFECE6' }}>
+      <aside className="hidden w-[236px] shrink-0 flex-col border-r px-3 py-5 lg:flex" style={{ borderColor: C.line, background: 'var(--side)' }}>
         <div className="px-2"><Brand /></div>
         <nav className="mt-8 grid gap-1" aria-label="Sections">
           {PAGES.map((p) => <button key={p.id} type="button" className="mi-nav" aria-current={page === p.id ? 'page' : undefined} onClick={() => setPage(p.id)}><Icon d={ICONS[p.icon]} />{p.label}</button>)}
@@ -136,7 +146,7 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
       </aside>
 
       <div className="min-w-0 flex-1 overflow-y-auto pb-24 lg:pb-10">
-        <header className="sticky top-0 z-20 border-b" style={{ borderColor: C.line, background: 'rgba(245,243,239,.92)', backdropFilter: 'blur(8px)' }}>
+        <header className="sticky top-0 z-20 border-b" style={{ borderColor: C.line, background: 'var(--header)', backdropFilter: 'blur(8px)' }}>
           <div className="mx-auto flex h-16 max-w-[1180px] items-center gap-3 px-4 sm:px-6">
             <div className="lg:hidden"><Brand compact /></div>
             <h1 className="mr-auto truncate text-[19px] font-bold sm:text-[21px]">{title}</h1>
@@ -183,7 +193,7 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
 
 function DemoBanner({ onSignIn }: { onSignIn: () => void }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-2.5 text-[13.5px]" style={{ background: '#F3E1E3', color: C.brand }}>
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-2.5 text-[13.5px]" style={{ background: 'var(--t-brand)', color: 'var(--t-brand-ink)' }}>
       <span><b>Demo mode.</b> You are exploring made-up students; nothing is saved online.</span>
       <button type="button" className="mi-btn sm" onClick={onSignIn}>Sign in for real classes</button>
     </div>

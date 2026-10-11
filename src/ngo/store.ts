@@ -36,6 +36,9 @@ interface DeskState {
   /** names a facilitator gives anonymous ids ("classId:studentId" -> name). Kept on this device only, never uploaded. */
   labels: Record<string, string>
   checklist: Record<string, boolean>
+  /** dashboard appearance, remembered on this device */
+  theme: 'system' | 'light' | 'dark'
+  setTheme: (t: 'system' | 'light' | 'dark') => void
 
   setMode: (m: Mode) => void
   setUser: (u: DeskState['user']) => void
@@ -100,6 +103,8 @@ export const useNgo = create<DeskState>()(
       error: '',
       labels: {},
       checklist: {},
+      theme: 'system',
+      setTheme: (theme) => set({ theme }),
 
       setMode: (mode) => set({ mode }),
       setUser: (user) => set({ user, ...(user ? {} : { remote: [], lastSync: null }) }),
@@ -249,7 +254,7 @@ export const useNgo = create<DeskState>()(
       name: 'mm-slots-ngo-v1',
       storage: createJSONStorage(() => localStorage),
       version: 2,
-      partialize: (s) => ({ local: s.local, labels: s.labels, checklist: s.checklist }),
+      partialize: (s) => ({ local: s.local, labels: s.labels, checklist: s.checklist, theme: s.theme }),
       // v1 kept classes under "cohorts" with no history
       migrate: (old, version) => {
         const o = (old ?? {}) as { cohorts?: Omit<Cohort, 'history'>[]; local?: Cohort[]; checklist?: Record<string, boolean> }

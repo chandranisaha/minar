@@ -52,7 +52,7 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
         <g key={p.at}>
           {p.understanding !== null && (
             <>
-              <circle cx={x(i)} cy={y(p.understanding)} r="4" fill="#fff" stroke={C.navy} strokeWidth="2" />
+              <circle cx={x(i)} cy={y(p.understanding)} r="4" fill={C.card} stroke={C.navy} strokeWidth="2" />
               {i === points.length - 1 && <text x={x(i)} y={y(p.understanding) - 10} fontSize="12" fontWeight="700" fill={C.navy} textAnchor="end">{Math.round(p.understanding * 100)}%</text>}
             </>
           )}
@@ -91,7 +91,7 @@ export function PlacesChart({ list }: { list: StudentSummary[] }) {
             <text x={0} y={top + 29} fontSize="11" fill={C.muted}>{GAME_NAME[p]}</text>
             {cols.map(([k, col]) => {
               const w = (c[k] / n) * (W - L - R)
-              const el = w > 0 ? <g key={k}><rect x={acc} y={top + 4} width={w} height={24} fill={col} />{w > 26 && <text x={acc + w / 2} y={top + 20} fontSize="11" fontWeight="700" fill={k === 'n' || k === 'p' ? C.ink : '#fff'} textAnchor="middle">{c[k]}</text>}</g> : null
+              const el = w > 0 ? <g key={k}><rect x={acc} y={top + 4} width={w} height={24} fill={col} />{w > 26 && <text x={acc + w / 2} y={top + 20} fontSize="11" fontWeight="700" fill={k === 'p' ? '#1F2430' : k === 'n' ? C.ink : '#fff'} textAnchor="middle">{c[k]}</text>}</g> : null
               acc += w
               return el
             })}
@@ -100,7 +100,7 @@ export function PlacesChart({ list }: { list: StudentSummary[] }) {
       })}
       <g transform={`translate(${L} ${H - 14})`}>
         {cols.map(([k, col, label], i) => (
-          <g key={k} transform={`translate(${i * 118} 0)`}><rect width="10" height="10" y="-9" rx="2" fill={col} stroke={k === 'n' ? '#C9C3B6' : 'none'} /><text x="15" fontSize="11" fill={C.muted}>{label}</text></g>
+          <g key={k} transform={`translate(${i * 118} 0)`}><rect width="10" height="10" y="-9" rx="2" fill={col} stroke={k === 'n' ? 'var(--flag-empty)' : 'none'} /><text x="15" fontSize="11" fill={C.muted}>{label}</text></g>
         ))}
       </g>
     </svg>

@@ -81,11 +81,11 @@ export function ReportCard({ d, ins }: { d: DeskView; ins: StudentInsight }) {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl p-3" style={{ background: '#EEF5F2' }}>
+        <div className="rounded-xl p-3" style={{ background: 'var(--soft-strong)' }}>
           <h3 className="text-[13px] font-semibold" style={{ color: C.strong }}>Doing well</h3>
           <p className="m-0 mt-1 text-[13.5px] leading-snug">{ins.strengths.length ? ins.strengths.map((k) => SKILL_NAME[k]).join(', ') : ins.started ? 'Keep playing: strengths show after a few more choices.' : 'Not started yet.'}</p>
         </div>
-        <div className="rounded-xl p-3" style={{ background: '#FBF0EF' }}>
+        <div className="rounded-xl p-3" style={{ background: 'var(--soft-building)' }}>
           <h3 className="text-[13px] font-semibold" style={{ color: C.building }}>To work on</h3>
           <p className="m-0 mt-1 text-[13.5px] leading-snug">{ins.toWork.length ? ins.toWork.map((k) => SKILL_NAME[k]).join(', ') : 'Nothing stands out.'}</p>
           {ins.slips.length > 0 && <ul className="m-0 mt-1.5 grid gap-0.5 pl-4 text-[12.5px] leading-snug">{ins.slips.slice(0, 3).map((x) => <li key={x}>{x}</li>)}</ul>}

@@ -60,7 +60,7 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
             {classes.map((c) => {
               const n = Object.keys(c.students).length
               return (
-                <li key={c.id} className="rounded-xl border p-3" style={{ borderColor: c.id === current?.id ? C.brand : C.line, background: c.id === current?.id ? '#FDF8F7' : '#fff' }}>
+                <li key={c.id} className="rounded-xl border p-3" style={{ borderColor: c.id === current?.id ? C.brand : C.line, background: c.id === current?.id ? 'var(--soft-brand)' : C.card }}>
                   {renaming?.id === c.id ? (
                     <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); void renameCohort(c.id, renaming.name); setRenaming(null) }}>
                       <input className="mi-input min-w-0 flex-1" autoFocus value={renaming.name} maxLength={40} onChange={(e) => setRenaming({ id: c.id, name: e.target.value })} aria-label="New class name" />
@@ -84,7 +84,7 @@ export function Classes({ current, pick }: { current: Cohort | null; pick: (id: 
                   ) : renaming?.id !== c.id && (
                     <div className="mt-1 flex gap-1">
                       <button type="button" className="mi-btn quiet sm" onClick={() => setRenaming({ id: c.id, name: c.name })}><Icon d={ICONS.edit} size={14} />Rename</button>
-                      <button type="button" className="mi-btn quiet sm" style={{ color: '#9B2C2C' }} onClick={() => setConfirm(c.id)}>Delete</button>
+                      <button type="button" className="mi-btn quiet sm" style={{ color: 'var(--danger)' }} onClick={() => setConfirm(c.id)}>Delete</button>
                     </div>
                   )}
                 </li>
