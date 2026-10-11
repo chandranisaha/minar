@@ -51,7 +51,6 @@ All libraries are used under their own open-source licenses.
 - Zustand (state), i18next and react-i18next (English, Hindi, Telugu), Framer Motion, EasyStar.js (path finding)
 - Fonts via Fontsource: Chango, Bowlby One, Rozha One, DM Serif Display, Noto Sans (with Devanagari and Telugu)
 - Painted sprites and backgrounds are in `public/art/`; the prompts used to produce them are in `ART_PROMPTS.md`
-- AI coding assistants were used while building this project, as permitted by the event rules
 
 ## License
 
