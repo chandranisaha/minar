@@ -132,6 +132,23 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
     return () => { document.removeEventListener('visibilitychange', tick); window.clearInterval(t) }
   }, [mode, refresh])
 
+  // live: the moment a student shares, the database pushes the row here; reload the class and say who it was
+  const [news, setNews] = useState<{ id: number; text: string }[]>([])
+  useEffect(() => {
+    if (mode !== 'cloud') return
+    return cloud.onProgress((row) => {
+      void refresh()
+      const st = useNgo.getState()
+      const roll = (row.summary as { roll?: unknown } | null)?.roll
+      const r = typeof roll === 'string' ? roll : null
+      const who = (r && st.rosters[row.class_code]?.[r]) || (r ? `Roll ${r}` : 'A student')
+      const cls = st.remote.find((c) => c.id === row.class_code)?.name ?? row.class_code
+      const id = Date.now() + Math.random()
+      setNews((n) => [...n.slice(-2), { id, text: `${who} just shared progress · ${cls}` }])
+      window.setTimeout(() => setNews((n) => n.filter((x) => x.id !== id)), 6000)
+    })
+  }, [mode, refresh])
+
   const signOut = async () => {
     try { await cloud.signOut() } finally { setUser(null); onSignedOut() }
   }
@@ -209,6 +226,14 @@ function Desk({ onSignedOut }: { onSignedOut: () => void }) {
       </nav>
 
       {d && ins && <StudentDrawer key={ins.s.id} d={d} ins={ins} onClose={() => setStudent(null)} />}
+
+      <div className="pointer-events-none fixed bottom-20 right-4 z-40 grid gap-2 lg:bottom-6" aria-live="polite">
+        {news.map((n) => (
+          <div key={n.id} className="mi-card pointer-events-auto flex items-center gap-2.5 px-4 py-3 text-[14px] font-semibold" style={{ boxShadow: 'var(--pop)', animation: 'mi-in .2s ease-out' }}>
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: 'var(--strong)' }} aria-hidden />{n.text}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

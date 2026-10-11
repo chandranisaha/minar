@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LangSwitch } from '../components/Hud'
 import { ShareProgress } from '../ngo/ShareProgress'
+import { NewGameForm } from './NewGameForm'
 import { WelcomeScene } from './WelcomeScene'
 import { NAME_MAX, adoptLiveIfNeeded, deleteSlot, getActive, listSlots, loadSlot, renameSlot, saveSlot, startNewGame, type SlotMeta } from './slots'
 
@@ -107,12 +108,11 @@ export default function Home() {
   const [view, setView] = useState<'menu' | 'load' | 'new'>('menu')
   useMemo(() => { const s = store(); if (s) adoptLiveIfNeeded(s, t('home.firstName')) }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const slots = useMemo(() => { const s = store(); return s ? listSlots(s) : [] }, [tick])
-  const [name, setName] = useState('')
   const defaultName = t('home.defaultName', { n: slots.length + 1 })
   useEffect(() => { if (slots.length === 0 && view === 'load') setView('menu') }, [slots.length, view])
 
   const play = (id: string) => { const s = store(); if (s && loadSlot(s, id)) { enter(); reloadAtStart() } }
-  const begin = () => { const s = store(); if (!s) { enter(); reloadAtStart(); return } startNewGame(s, name || defaultName); enter(); reloadAtStart() }
+  const begin = (name: string, classCode: string | null, rollNo: string) => { const s = store(); if (!s) { enter(); reloadAtStart(); return } startNewGame(s, name || defaultName, Date.now(), { classCode, rollNo }); enter(); reloadAtStart() }
 
   const letters = useMemo(() => Array.from(new Intl.Segmenter(i18n.language, { granularity: 'grapheme' }).segment(t('home.title')), (x) => x.segment), [i18n.language, t])
 
@@ -134,7 +134,7 @@ export default function Home() {
         <div className="wl-card">
         {view === 'menu' && (
           <div className="rise flex w-full flex-col gap-3">
-            <button type="button" className="wl-btn" autoFocus onClick={() => { setName(''); setView('new') }}>{t('welcome.begin')} <span aria-hidden>▸</span></button>
+            <button type="button" className="wl-btn" autoFocus onClick={() => setView('new')}>{t('welcome.begin')} <span aria-hidden>▸</span></button>
             <button type="button" className="wl-btn cream" disabled={slots.length === 0} onClick={() => setView('load')}>
               {t('home.load')}{slots.length > 0 ? ` (${slots.length})` : ''}
             </button>
@@ -142,16 +142,7 @@ export default function Home() {
           </div>
         )}
 
-        {view === 'new' && (
-          <form className="paper rise flex w-full flex-col gap-3 p-4 text-left" onSubmit={(e) => { e.preventDefault(); begin() }}>
-            <label className="text-[13px] font-bold uppercase tracking-[.16em] opacity-70" htmlFor="home-name">{t('home.nameLabel')}</label>
-            <input id="home-name" autoFocus value={name} maxLength={NAME_MAX} placeholder={defaultName} onChange={(e) => setName(e.target.value)} className="h-12 w-full rounded-md border-[1.5px] border-ink bg-transparent px-3 text-[17px]" />
-            <div className="flex gap-2">
-              <button type="button" className="ink-btn cream" onClick={() => setView('menu')}>{t('home.back')}</button>
-              <button type="submit" className="ink-btn flex-1">{t('home.start')} ▸</button>
-            </div>
-          </form>
-        )}
+        {view === 'new' && <NewGameForm onBack={() => setView('menu')} onStart={begin} />}
 
         {view === 'load' && (
           <div className="rise flex w-full flex-col gap-3">

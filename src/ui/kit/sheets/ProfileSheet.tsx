@@ -5,6 +5,7 @@ import { getActive, listSlots, type SlotMeta } from '../../../home/slots'
 import { ShareProgress } from '../../../ngo/ShareProgress'
 import { useGame } from '../../../store/game'
 import { Eyebrow, Sheet } from '../Sheet'
+import { TeacherCard } from './TeacherCard'
 
 function activeSlot(): SlotMeta | null {
   try {
@@ -43,6 +44,8 @@ export function ProfileSheet({ open, onClose }: { open: boolean; onClose: () => 
           </div>
         </div>
       </div>
+
+      <TeacherCard />
 
       <div>
         <Eyebrow>{t('kit.profile.places')}</Eyebrow>
@@ -87,7 +90,7 @@ export function ProfileSheet({ open, onClose }: { open: boolean; onClose: () => 
       {slot && (
         <div>
           <button type="button" className="mk-act" onClick={() => setSharing((v) => !v)}>
-            <span className="flex-1">{t('kit.profile.share')}</span><span aria-hidden>{sharing ? '−' : '+'}</span>
+            <span className="flex-1">{t('kit.profile.otherWays')}</span><span aria-hidden>{sharing ? '−' : '+'}</span>
           </button>
           {sharing && <div className="mt-2"><ShareProgress slot={slot} onClose={() => setSharing(false)} /></div>}
         </div>

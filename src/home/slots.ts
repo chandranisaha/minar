@@ -126,8 +126,11 @@ export function deleteSlot(s: KV, id: string): void {
   if (getActive(s) === id) setActive(s, null)
 }
 
-/** a brand-new slot with an empty game (only the chosen language carries over), made active; the caller reloads the page */
-export function startNewGame(s: KV, name: string, now = Date.now()): SlotMeta {
+/**
+ * a brand-new slot with an empty game, made active; the caller reloads the page. Only the chosen language carries over, plus the
+ * class code and roll number the student typed on the new-game form (their name is the slot's name and never leaves the phone).
+ */
+export function startNewGame(s: KV, name: string, now = Date.now(), join: { classCode?: string | null; rollNo?: string | null } = {}): SlotMeta {
   let language: unknown
   try {
     language = JSON.parse(s.getItem(GAME_KEY) ?? '{}').state?.language
@@ -135,7 +138,8 @@ export function startNewGame(s: KV, name: string, now = Date.now()): SlotMeta {
     language = undefined
   }
   clearLive(s)
-  const data: Record<string, string> = language ? { [GAME_KEY]: JSON.stringify({ state: { language }, version: 2 }) } : {}
+  const state = { ...(language ? { language } : {}), ...(join.classCode ? { classCode: join.classCode } : {}), ...(join.rollNo ? { rollNo: join.rollNo } : {}) }
+  const data: Record<string, string> = Object.keys(state).length ? { [GAME_KEY]: JSON.stringify({ state, version: 2 }) } : {}
   const meta = createSlot(s, name, data, now)
   for (const [k, v] of Object.entries(data)) s.setItem(k, v)
   setActive(s, meta.id)

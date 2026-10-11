@@ -464,7 +464,7 @@
     "start": "Start",
     "saved": "Saved games",
     "menu": "Home",
-    "nameLabel": "Name this game",
+    "nameLabel": "Your name",
     "defaultName": "Game {{n}}",
     "firstName": "My game",
     "places": "{{n}} of 4 places",
@@ -491,7 +491,16 @@
     "shareErrOffline": "No internet right now. Copy the code or save it as a file instead.",
     "shareErrOther": "Could not send. Copy the code instead.",
     "shareNeedCode": "Type your class code first.",
-    "shareRollMissing": "Add your roll number so your teacher knows this is you."
+    "shareRollMissing": "Add your roll number so your teacher knows this is you.",
+    "nameHint": "Stays on this phone. It is never sent to anyone.",
+    "nameRequired": "Type your name.",
+    "rollRequired": "Type your school roll number (up to 4 digits).",
+    "classOptional": "Class code (optional)",
+    "classHint": "From your teacher. You can add it later in your profile.",
+    "classChecking": "Checking the class code…",
+    "classFound": "Class: {{name}}",
+    "classNotFound": "No class has this code. Check it with your teacher, or leave it empty for now.",
+    "classOffline": "Could not check the code right now. You can still start."
   },
   "kit": {
     "bar": {
@@ -554,7 +563,20 @@
       "rewards": "Rewards",
       "diamonds": "{{n}} diamonds",
       "shield": "Shield pieces: {{n}} of 3",
-      "share": "Share my progress with my teacher"
+      "share": "Share my progress with my teacher",
+      "teacher": "My teacher",
+      "teacherNone": "You are not in a class yet. Type the class code your teacher gave you.",
+      "join": "Join class",
+      "classLine": "Class {{code}}",
+      "rollLine": "Roll {{roll}}",
+      "shareNow": "Share progress with my teacher",
+      "sending": "Sending…",
+      "sent": "Sent to your teacher {{when}}.",
+      "notSent": "Not sent yet.",
+      "autoShare": "Send my progress after every game",
+      "autoHint": "Your teacher sees it straight away. Only your roll number and game results are sent, never your name.",
+      "otherWays": "Other ways to share (code or file)",
+      "needRoll": "Add your roll number in Settings first."
     },
     "settings": {
       "title": "Settings",

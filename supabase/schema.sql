@@ -84,6 +84,33 @@ $$;
 revoke all on function public.submit_progress(text, jsonb) from public;
 grant execute on function public.submit_progress(text, jsonb) to anon, authenticated;
 
+-- lets a student check the class code they typed: returns the class name (what the teacher called it) or null. Nothing else.
+create or replace function public.class_name(p_code text)
+returns text
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_code text := upper(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9-]', '', 'g'));
+begin
+  if v_code ~ '^HYD[A-Z0-9]{4,5}$' then v_code := 'HYD-' || substr(v_code, 4); end if;
+  return (select name from classes where code = v_code);
+end;
+$$;
+revoke all on function public.class_name(text) from public;
+grant execute on function public.class_name(text) to anon, authenticated;
+
+-- live dashboard: new progress rows are pushed to signed-in facilitators (row-level security still decides who sees which row)
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'progress') then
+    alter publication supabase_realtime add table public.progress;
+  end if;
+end $$;
+
 -- retention: progress older than 400 days is deleted
 create or replace function public.purge_old_progress()
 returns void language sql security definer set search_path = public as $$
