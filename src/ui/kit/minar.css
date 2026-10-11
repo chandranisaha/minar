@@ -97,3 +97,11 @@
 
 @media (prefers-reduced-motion: reduce) { .mk-backdrop, .mk-sheet, .mk-ring, .mk-pill, .mk-delta, .mk-lamp { animation: none !important; } }
 html[data-lite='true'] .mk-ring, html[data-lite='true'] .mk-lamp, html[data-lite='true'] .mk-pill { animation: none !important; }
+
+.mk-emoji { display: inline-block; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; filter: drop-shadow(0 1px 0 rgba(58, 42, 36, .35)); }
+.mk-stars { display: inline-flex; gap: 3px; }
+.mk-stars span { color: rgba(58, 42, 36, .22); text-shadow: 0 1px 0 rgba(255, 255, 255, .5); }
+.mk-stars span.on { color: #E8A21F; text-shadow: 0 0 8px rgba(232, 162, 31, .7); animation: mk-starpop .6s cubic-bezier(.3, 1.8, .5, 1) both; }
+@keyframes mk-starpop { from { transform: scale(0) rotate(-90deg); opacity: 0 } to { transform: none; opacity: 1 } }
+@media (prefers-reduced-motion: reduce) { .mk-stars span.on { animation: none; } }
+@media (max-width: 420px) { .mk-happy { padding-left: 8px; gap: 5px; } .mk-happy .mk-pill-num { font-size: 13px; } .mk-happy .mk-pill-num small { display: none; } .mk-happy .mk-emoji { font-size: 24px !important; } }

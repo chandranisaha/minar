@@ -88,7 +88,8 @@ export const adaptFestival: GameAdapter = (payload): GameResult => {
       ...(friendship !== undefined ? { friendship } : {}),
       treatsBought: Math.max(0, num(evidence.ringTossPlays, evidence.ringToss === true ? 1 : 0)),
       ...(evidence.lentToSunny === true ? { lentToFriends: 1 } : {}),
-      restedOrBalanced: Math.max(0, num(evidence.swaps, 0)),
+      // Festival Showdown has no swaps; surviving the surprises with a buffer is its way of looking after your future self
+      restedOrBalanced: showdown ? (stars.resilient === true ? 1 : 0) : Math.max(0, num(evidence.swaps, 0)),
     },
     raw: payload,
   }

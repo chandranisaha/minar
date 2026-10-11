@@ -6,6 +6,7 @@ import { HAPPY } from '../../../happy/config'
 import { useGame } from '../../../store/game'
 import { AvatarFace } from '../MinarBar'
 import { useCountTo } from '../hooks'
+import { HappyIcon } from '../Icons'
 import { Eyebrow, Sheet } from '../Sheet'
 
 const MOMENT_ART: Record<string, string> = { chai: '/art/cafe/icon-chai.webp', festivalTreat: '/art/cafe/icon-gift.webp' }
@@ -26,11 +27,11 @@ export function HappySheet({ open, onClose }: { open: boolean; onClose: () => vo
   const fill = v.band === 'glowing' ? 'linear-gradient(90deg, #F5B93A, #FFD25A)' : v.band === 'ok' ? 'linear-gradient(90deg, #C79A42, #D8B05A)' : 'linear-gradient(90deg, #8C7B6E, #A39284)'
   const { bright, dim } = HAPPY.thresholds
   return (
-    <Sheet open={open} onClose={onClose} title={t('kit.happy.title')} tone="rose" art={<AvatarFace size={40} band={v.band} />}>
+    <Sheet open={open} onClose={onClose} title={t('kit.happy.title')} tone="rose" art={<HappyIcon band={v.band} size={38} />}>
       <div className="mk-card" style={{ background: 'linear-gradient(#FFF3DA, #FFF8E2)' }}>
         <div className="mk-row" style={{ justifyContent: 'space-between' }}>
           <div>
-            <div className="mk-big">{shown}<span className="text-[18px] opacity-50"> / 100</span></div>
+            <div className="mk-big"><HappyIcon band={v.band} size={34} className="mr-2 align-middle" />{shown}<span className="text-[18px] opacity-50"> / 100</span></div>
             <div className="mt-1 text-[15px] font-extrabold">{t(v.labelKey)}</div>
           </div>
           <div style={{ transform: 'scale(1.5)', transformOrigin: 'right center', margin: '8px 18px 8px 0' }}><AvatarFace size={44} band={v.band} /></div>

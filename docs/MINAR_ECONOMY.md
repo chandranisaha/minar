@@ -57,10 +57,10 @@ Games send a few small signals. The shell turns them into Happy using the number
 
 | Game | Money | Happy signals |
 | --- | --- | --- |
-| Plan & Budget (Festival) | Clears the place when the plan holds | Friendship, treats, lending, swaps (balance) |
+| Plan & Budget (Festival Showdown) | Clears the place when the plan holds | Surviving the surprises with a buffer (the resilient star) counts as a balanced choice (+4). The older Festival Countdown also sent friendship, treats, lending and swaps |
 | Save & Manage (Pocket Panic) | Clears when the goal is reached or the nine habits show up | Treats enjoyed and refused, helping Teja, **balance stars**: 2 stars is +4, 3 stars is +8 |
-| Understand Investing (Deal Board) | Clears at judgement 60 or more | **None, on purpose.** Play money never touches Happy |
-| Stay Safe (Case Files) | Clears when the master board is done | None. Diamonds and shield pieces are kept as rewards |
+| Understand Investing (Deal Board) | Clears at judgement 60 or more | Balanced habits only: a calm hand (calm skill 12/20+) and a spread-out portfolio (spread 12/20+) are +1 each. **Play money, profit and net worth never reach Happy** |
+| Stay Safe (Case Files) | Clears when the master board is done | None. It has no treats or friends to choose. Diamonds and shield pieces are kept as rewards |
 
 ### The three Pocket Panic stars
 
@@ -72,6 +72,17 @@ Pocket Panic is where the link between money and happiness is most visible, so i
 
 Three stars and the goal make a **Perfect Month**. Stars never change money inside the game; they change how happy you leave the table, which
 changes how bright your lamp is, which changes how much money the place adds.
+
+## One language for points
+
+| Thing | How it looks everywhere (bar, panels, result screen, games) |
+| --- | --- |
+| Money | The painted coin and the rupee amount, with a `+₹` or `−₹` tag when it changes |
+| Happy | An emoji face that follows the band: 😄 glowing (60+), 🙂 ok (35 to 59), 😴 tired (below 35), with the number |
+| Stars | 1 to 3 gold stars for how well you played, the same for every game: 3 stars at 85% or more, 2 at 60%, 1 for a clear, none if not cleared |
+| Lamps | Bright, dim, faint, drawn with the same flag and glow on the island, in the money panel, in the profile and on the result screen |
+
+Code: `src/progress/points.ts` (icons and star rule), `src/ui/kit/Icons.tsx` (`HappyIcon`, `MoneyIcon`, `Stars`). The money share per place is the same for all four games, and `host.test.ts` checks that four bright clears reach the goal exactly.
 
 ## Why this loop teaches the lesson
 
