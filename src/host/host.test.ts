@@ -256,3 +256,15 @@ describe('placeholder payloads through the full session path', () => {
     expect(savedAmountFor(s)).toBe(GOAL)
   })
 })
+
+describe('restartGame: Play again really starts over', () => {
+  it('wipes Pocket Panic back to its first screen and empty jars', async () => {
+    const { useCafe } = await import('../games/cafe/state/store')
+    const { restartGame } = await import('./restart')
+    useCafe.getState().goTo('tally')
+    useCafe.getState().apply((r) => ({ ...r, jars: { spend: 10, save: 20, emergency: 30 } }))
+    await restartGame('save')
+    expect(useCafe.getState().step).toBe('entry')
+    expect(useCafe.getState().run.jars).toEqual({ spend: 0, save: 0, emergency: 0 })
+  })
+})

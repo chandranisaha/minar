@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LANGS, type Lang } from '../../../content/data'
 import { goHome } from '../../../home/Home'
+import { restartAllGames } from '../../../host/restart'
 import { useGame, useLite } from '../../../store/game'
 import { Eyebrow, Sheet } from '../Sheet'
 
@@ -61,7 +62,7 @@ export function SettingsSheet({ open, onClose, replay = true }: { open: boolean;
             <div className="mk-card" role="alertdialog" aria-label={t('kit.settings.resetAsk')}>
               <p className="m-0 mb-2 text-[14.5px] font-bold">{t('kit.settings.resetAsk')}</p>
               <div className="flex gap-2">
-                <button type="button" className="ink-btn" onClick={() => { resetProgress(); done() }}>{t('kit.settings.resetYes')}</button>
+                <button type="button" className="ink-btn" onClick={() => { resetProgress(); void restartAllGames(); done() }}>{t('kit.settings.resetYes')}</button>
                 <button type="button" className="ink-btn cream" autoFocus onClick={() => setAsk(false)}>{t('kit.settings.resetNo')}</button>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import { restartGame } from './restart'
 import { lazy, useCallback, useEffect, useMemo, useReducer, useRef, type ComponentType } from 'react'
 import { HOST_DEFAULTS } from './config'
 import { initialFlow, flowReducer } from './flow'
@@ -41,8 +42,15 @@ export function useGameHost(rawPillar: string | undefined) {
   // lazy component for this pillar; recreated only when the pillar changes (entry.load decides placeholder vs real game)
   const Game: ComponentType<GameProps> | null = useMemo(() => (entry ? lazy(entry.load) : null), [entry])
 
-  const start = useCallback(() => dispatch({ type: 'start', sessionId: newInstallId() }), [])
-  const replay = useCallback(() => dispatch({ type: 'replay', sessionId: newInstallId() }), [])
+  // a pillar already cleared always opens as a fresh run (not frozen on last time's report); an unfinished one resumes where it was left
+  const start = useCallback(() => {
+    const fresh = pillarId && useGame.getState().pillars[pillarId]?.status === 'complete' ? restartGame(pillarId) : Promise.resolve()
+    void fresh.then(() => dispatch({ type: 'start', sessionId: newInstallId() }))
+  }, [pillarId])
+  // "play again" wipes the game's saved run first, so it really starts over instead of resuming at the end
+  const replay = useCallback(() => {
+    void (pillarId ? restartGame(pillarId) : Promise.resolve()).then(() => dispatch({ type: 'replay', sessionId: newInstallId() }))
+  }, [pillarId])
   const newSeed = useCallback(() => dispatch({ type: 'newSeed' }), [])
 
   const onComplete = useCallback(
