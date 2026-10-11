@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { PILLAR_IDS } from '../content/data'
 import { K_MIN, aggregate, bandOf, toCsv } from './analytics'
-import { demoStudents } from './demo'
+import { demoHistory, demoStudents } from './demo'
+import { toCsvText } from './export'
+import { focusAreas, studentInsight, understanding, weeklyTrend } from './insights'
+import { labelKey, latestOf, useNgo } from './store'
+import { rowToSummary } from './cloud'
 import { buildSummary, cleanCode, decodeSummary, encodeSummary, findCodes, parseSummary } from './summary'
 
 const game = (state: object) => ({ 'money-mohalla-v2': JSON.stringify({ state, version: 2 }) })
@@ -37,7 +41,14 @@ describe('student summary', () => {
     expect(parseSummary({ v: 1, id: 'abcdef', happy: 9999, skills: { saving: 7 } })?.happy).toBe(100)
     expect(parseSummary({ v: 1, id: 'abcdef', skills: { saving: 7 } })?.skills.saving).toBe(1)
   })
-  it('cleans class codes', () => expect(cleanCode(' hyd 4k7q!! ')).toBe('HYD4K7Q'))
+  it('cleans class codes so a student typing them loosely still matches the teacher', () => {
+    expect(cleanCode(' hyd 4k7q!! ')).toBe('HYD-4K7Q')
+    expect(cleanCode('hydk7q2m')).toBe('HYD-K7Q2M')
+    expect(cleanCode('HYD-K7Q2M')).toBe('HYD-K7Q2M')
+    expect(cleanCode('Hyd - k7q2m')).toBe('HYD-K7Q2M')
+    expect(cleanCode('DEMO-CLASS')).toBe('DEMO-CLASS')
+    expect(cleanCode('   ')).toBeNull()
+  })
 })
 
 describe('cohort analytics', () => {
@@ -87,5 +98,121 @@ describe('cohort analytics', () => {
     const csv = toCsv(demo).split('\n')
     expect(csv).toHaveLength(49)
     expect(csv[0].startsWith('id,class_code')).toBe(true)
+  })
+})
+
+describe('adding students to a class (device mode)', () => {
+  const code = encodeSummary(buildSummary(game(played), 9))
+  const cls = (id: string) => useNgo.getState().local.find((c) => c.id === id)
+  it('puts students in the chosen class, even when their own code is different or missing', async () => {
+    const a = await useNgo.getState().createCohort('Class 11 B')
+    expect(a).toMatch(/^HYD-[A-Z0-9]{5}$/)
+    const noCode = encodeSummary({ ...buildSummary(game(played), 10), cohort: null, id: 'zzzzzz' })
+    const r = await useNgo.getState().importText(`from Priya: ${code}\n${noCode}`, a)
+    expect(r).toMatchObject({ added: 2, found: 2, skipped: 0 })
+    expect(Object.keys(cls(a)!.students)).toHaveLength(2)
+    expect(cls(a)!.history).toHaveLength(2)
+    expect(cls('UNASSIGNED')).toBeUndefined()
+  })
+  it('does not double count, keeps newer updates as history, and reports text with no codes', async () => {
+    const a = await useNgo.getState().createCohort('Class 12')
+    await useNgo.getState().importText(code, a)
+    expect(await useNgo.getState().importText(code, a)).toMatchObject({ added: 0, skipped: 1 })
+    const later = encodeSummary({ ...buildSummary(game(played), 99) })
+    expect(await useNgo.getState().importText(later, a)).toMatchObject({ updated: 1 })
+    expect(cls(a)!.history).toHaveLength(2)
+    expect(await useNgo.getState().importText('hello', a)).toMatchObject({ found: 0, added: 0 })
+  })
+  it('sorts by each student own class code when no class is chosen', async () => {
+    await useNgo.getState().importText(code, null)
+    expect(cls('HYD-4K7Q')).toBeDefined()
+  })
+  it('keeps names on this device only and drops them with the student', async () => {
+    const a = await useNgo.getState().createCohort('Names')
+    await useNgo.getState().importText(code, a)
+    const id = Object.keys(cls(a)!.students)[0]
+    useNgo.getState().setLabel(a, id, '  Ravi   K ')
+    expect(useNgo.getState().labels[labelKey(a, id)]).toBe('Ravi K')
+    await useNgo.getState().deleteStudent(a, id)
+    expect(useNgo.getState().labels[labelKey(a, id)]).toBeUndefined()
+    expect(cls(a)!.history).toHaveLength(0)
+  })
+})
+
+describe('insights for teaching', () => {
+  const now = Date.UTC(2026, 9, 11)
+  const hist = demoHistory(now)
+  it('the demo history ends at the demo class and grows week by week', () => {
+    const latest = latestOf(hist)
+    expect(Object.keys(latest)).toHaveLength(48)
+    const t = weeklyTrend(hist, 8, now)
+    expect(t.length).toBeGreaterThanOrEqual(5)
+    const u = t.map((p) => p.understanding as number)
+    expect(u.at(-1)!).toBeGreaterThan(u[0])
+    expect(t.at(-1)!.students).toBe(48)
+  })
+  it('understanding counts only skills a student has had the chance to show', () => {
+    const s = buildSummary(game(played), 9)
+    // plan and save were played: planning 0, prioritising 0, saving 0.8; invest and safe skills do not count yet
+    expect(understanding(s)).toBeCloseTo(0.8 / 3)
+    expect(understanding(buildSummary({}))).toBeNull()
+  })
+  it('flags students who need help, with a reason and a next step', () => {
+    const fresh = buildSummary({})
+    const i = studentInsight(fresh, Date.now())
+    expect(i.flags[0]).toMatch(/not started/i)
+    expect(i.next).toMatch(/Festival/)
+    const quiet = studentInsight({ ...buildSummary(game(played), 0), at: 0 }, 20 * 86400000)
+    expect(quiet.flags.some((f) => /Quiet for 20 days/.test(f))).toBe(true)
+  })
+  it('ranks focus areas, weakest first, and never more than three', () => {
+    const v = aggregate(Object.values(latestOf(hist)))
+    const f = focusAreas(v)
+    expect(f.length).toBeLessThanOrEqual(3)
+    expect(f.length).toBeGreaterThan(0)
+    expect(f[0].why).toMatch(/students are still building/)
+  })
+  it('CSV cells cannot start a spreadsheet formula', () => {
+    expect(toCsvText([['=HYPERLINK("x")', 'a,b']])).toBe(`"'=HYPERLINK(""x"")","a,b"`)
+  })
+})
+
+describe('student to teacher, end to end (device mode)', () => {
+  it('a student who types the class code loosely lands in the teacher class, and an update replaces the old one', async () => {
+    const code = await useNgo.getState().createCohort('Class 11 C, Amberpet')
+    const loose = code.toLowerCase().replace('-', ' ')
+    // the student's saved game, as the phone keeps it
+    const save = (happy: number) => game({ ...played, installId: 'phone-of-student-a', classCode: loose, happy })
+    const first = encodeSummary(buildSummary(save(40), 1_000))
+    const report = await useNgo.getState().importText(`Sir my code: ${first}`, null) // teacher lets codes sort themselves
+    expect(report).toMatchObject({ added: 1 })
+    const cls = useNgo.getState().local.find((c) => c.id === code)!
+    const [only] = Object.values(cls.students)
+    expect(only.cohort).toBe(code)
+    // a week later the same student shares again: same student code, newer progress
+    const again = encodeSummary(buildSummary(save(80), 2_000))
+    expect(await useNgo.getState().importText(again, null)).toMatchObject({ updated: 1 })
+    const after = useNgo.getState().local.find((c) => c.id === code)!
+    expect(Object.keys(after.students)).toEqual([only.id])
+    expect(after.students[only.id].happy).toBe(80)
+    expect(after.history.map((h) => h.happy)).toEqual([40, 80])
+  })
+  it('two students on one shared phone get different student codes', () => {
+    const a = buildSummary(game({ ...played, installId: 'slot-1' }))
+    const b = buildSummary(game({ ...played, installId: 'slot-2' }))
+    expect(a.id).not.toBe(b.id)
+  })
+})
+
+describe('reading rows back from the database', () => {
+  const row = (at: number, received: string) => ({ class_code: 'HYD-K7Q2M', student_id: 'abc1234', received_at: received, summary: { ...buildSummary(game(played), at), id: 'abc1234' } })
+  it('keeps when the student played for a code pasted later, but not a phone clock that is off', () => {
+    const got = Date.parse('2026-10-11T10:00:00Z')
+    expect(rowToSummary(row(got - 3 * 86400000, '2026-10-11T10:00:00Z'))!.at).toBe(got - 3 * 86400000)
+    expect(rowToSummary(row(got + 86400000, '2026-10-11T10:00:00Z'))!.at).toBe(got)
+    expect(rowToSummary(row(got - 90 * 86400000, '2026-10-11T10:00:00Z'))!.at).toBe(got)
+  })
+  it('drops a row whose summary does not belong to its student', () => {
+    expect(rowToSummary({ ...row(1, '2026-10-11T10:00:00Z'), student_id: 'other99' })).toBeNull()
   })
 })

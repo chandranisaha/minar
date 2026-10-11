@@ -1,7 +1,16 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getActive, saveSlot, type SlotMeta } from '../home/slots'
+import type { SubmitResult } from './cloud'
 import { buildSummary, cleanCode, encodeSummary } from './summary'
+
+// the database client is loaded only when a student actually sends, so the game itself stays small
+const cloudEnabled = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY)
+
+const SEND_MSG: Record<SubmitResult | 'need', string> = {
+  ok: 'home.shareSent', unknown_class: 'home.shareErrClass', too_soon: 'home.shareErrSoon', offline: 'home.shareErrOffline',
+  invalid: 'home.shareErrOther', class_full: 'home.shareErrOther', off: 'home.shareErrOther', need: 'home.shareNeedCode',
+}
 
 /** What a student can send to a facilitator from a saved game: an anonymous progress code, as text, a file, or the phone's share sheet. */
 export function ShareProgress({ slot, onClose }: { slot: SlotMeta; onClose: () => void }) {
@@ -29,6 +38,14 @@ export function ShareProgress({ slot, onClose }: { slot: SlotMeta; onClose: () =
     a.click()
     setTimeout(() => URL.revokeObjectURL(a.href), 2000)
   }
+  // straight to the class's database when one is connected: no sign-in, only the anonymous summary is sent
+  const [sending, setSending] = useState<SubmitResult | 'busy' | 'need' | null>(null)
+  const toTeacher = async () => {
+    if (!cleanCode(code)) return setSending('need')
+    setSending('busy')
+    const { submitProgress } = await import('./cloud')
+    setSending(await submitProgress(code, { ...base, cohort: cleanCode(code) }))
+  }
   const send = () => { void navigator.share?.({ title: 'Minar', text }).catch(() => undefined) }
 
   return (
@@ -39,6 +56,13 @@ export function ShareProgress({ slot, onClose }: { slot: SlotMeta; onClose: () =
         {t('hud.classCode')}
         <input value={code} maxLength={14} onChange={(e) => setCode(e.target.value)} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[16px] normal-case tracking-normal" />
       </label>
+      <p className="m-0 mt-2 text-[13px] leading-snug">{t('home.shareYourCode', { id: base.id })}</p>
+      {cloudEnabled && (
+        <div className="mt-2 grid gap-1.5">
+          <button type="button" className="ink-btn" disabled={sending === 'busy'} onClick={() => void toTeacher()}>{sending === 'busy' ? t('home.shareSending') : t('home.shareToTeacher')}</button>
+          {sending && sending !== 'busy' && <p className="m-0 text-[13px] font-bold leading-snug" role="status">{t(SEND_MSG[sending])}</p>}
+        </div>
+      )}
       <textarea readOnly value={text} rows={3} aria-label={t('home.shareTitle')} onFocus={(e) => e.currentTarget.select()} className="mt-2 w-full rounded-md border-[1.5px] border-ink bg-transparent p-2 text-[12px]" style={{ fontFamily: 'monospace' }} />
       <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" className="ink-btn" onClick={() => void copy()}>{copied ? t('home.shareCopied') : t('home.shareCopy')}</button>

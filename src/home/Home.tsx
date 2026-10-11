@@ -121,6 +121,11 @@ export default function Home() {
       <WelcomeScene />
       <div className="wl-fore" style={{ paddingTop: 'max(14px, env(safe-area-inset-top))' }}>
         <div className="absolute right-3 top-3 z-10" style={{ top: 'max(12px, env(safe-area-inset-top))' }}><LangSwitch /></div>
+        {/* the door to Minar Insights, the dashboard for teachers and NGOs */}
+        <button type="button" className="wl-ngo absolute left-3 z-10" style={{ top: 'max(12px, env(safe-area-inset-top))' }} onClick={() => nav('/ngo')} title={t('home.facilitatorSub')}>
+          <img src="/art/monument.webp" alt="" aria-hidden />
+          <span>{t('home.facilitator')}</span>
+        </button>
         <div className="wl-head">
           <h1 className="wl-title" aria-label={t('home.title')}>{letters.map((ch, n) => <span key={n} aria-hidden style={{ ['--i' as string]: n }}>{ch}</span>)}</h1>
           <p className="wl-tag">{t('home.tagline')}</p>
@@ -134,7 +139,6 @@ export default function Home() {
               {t('home.load')}{slots.length > 0 ? ` (${slots.length})` : ''}
             </button>
             {slots.length === 0 && <p className="m-0 text-center text-[13px] font-semibold opacity-80">{t('home.noSaves')}</p>}
-            <button type="button" className="mt-1 self-center text-[14px] font-bold underline" style={{ background: 'none', border: 0, cursor: 'pointer', minHeight: 44, color: 'inherit' }} onClick={() => nav('/ngo')}>{t('home.facilitator')}</button>
           </div>
         )}
 
