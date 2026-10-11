@@ -61,3 +61,7 @@ The games position themselves with `absolute inset-0`. The host now gives the pl
 ## Pocket Panic replaced Pay Run (Save & Manage)
 
 `src/games/cafe` (from origin/pocketpanic) is now the Save game: wrapper `src/host/wrappers/PocketPanicGame.tsx`, adapter `adapters/cafe.ts` (behaviours 0-9 give quality; no play money is read). It resumes its own saved month, so no seed is passed. Pay Run's files, wrapper and adapter are kept but unused; to bring it back, set `save` back to `payrun` / `PayRun` in `src/host/config.ts` and the registry wrapper. Merge choices: kept the shell's `package*.json` and `src/art/palette.ts` and the existing festival files; took Pocket Panic's `lib/gameResult.ts` (adds the 'cafe' id).
+
+## Facilitator desk (/ngo)
+
+Built over the game: it only reads a save slot's snapshot (`src/ngo/summary.ts`) and never changes the game. Students share an anonymous code from the home screen (Share progress); facilitators paste codes into /ngo. Files: `src/ngo/` (summary, analytics, lessons, demo, store, panels, rollout, NgoScreen, ShareProgress). Misconceptions are specific for Pocket Panic (9 habits) and Case Files (tries, hints); for Festival Countdown and Deal Board they come from the skill scores. Facilitator data is stored under `mm-slots-ngo-v1` so save slots never capture it. The desk is English only.

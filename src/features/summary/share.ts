@@ -1,3 +1,4 @@
+import { C } from '../../art/palette'
 import type { SummaryView } from './view'
 
 export const SHARE_W = 1080
@@ -8,15 +9,15 @@ export type DrawOp =
   | { op: 'rect'; x: number; y: number; w: number; h: number; fill: string }
   | { op: 'text'; x: number; y: number; text: string; size: number; weight: 400 | 700; fill: string; align: 'left' | 'center' }
 
-const INK = '#3A2A24'
-const CREAM = '#FBF0D2'
-const GOLD = '#F2B84B'
+const INK = C.ink
+const CREAM = C.jasmine
+const GOLD = C.mustard
 
 /** `labels` carries the already-translated strings so this stays free of i18n */
 export function shareCardLayout(view: SummaryView, labels: { title: string; goal: string; pillars: Record<string, string>; skills: Record<string, string>; closing: string }): DrawOp[] {
   const ops: DrawOp[] = [{ op: 'rect', x: 0, y: 0, w: SHARE_W, h: SHARE_H, fill: CREAM }]
   ops.push({ op: 'text', x: SHARE_W / 2, y: 140, text: labels.title, size: 72, weight: 700, fill: INK, align: 'center' })
-  ops.push({ op: 'rect', x: 120, y: 220, w: 840, h: 48, fill: '#E5D5AE' })
+  ops.push({ op: 'rect', x: 120, y: 220, w: 840, h: 48, fill: C.track })
   ops.push({ op: 'rect', x: 120, y: 220, w: Math.round((840 * Math.max(0, Math.min(100, view.goal.percent))) / 100), h: 48, fill: GOLD })
   ops.push({ op: 'text', x: SHARE_W / 2, y: 330, text: labels.goal, size: 40, weight: 700, fill: INK, align: 'center' })
   view.pillars.forEach((p, i) => {

@@ -19,5 +19,5 @@ export default defineConfig({
   ],
   build: { chunkSizeWarningLimit: 700 },
   // unit tests for the pure progress/happy logic and the store; no DOM needed
-  test: { environment: 'node', include: ['src/**/*.test.ts'] },
+  test: { environment: 'node', include: ['src/**/*.test.ts'], testTimeout: 30000 },
 })

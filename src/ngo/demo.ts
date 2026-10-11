@@ -54,3 +54,40 @@ export function demoStudents(now = Date.now()): StudentSummary[] {
   }
   return out
 }
+
+const WEEK = 7 * 86400000
+
+/**
+ * Six weekly snapshots per demo student, ending at the student's latest summary, so trends have something to show: places open
+ * up week by week and skills grow as students replay. Some students join a week or two late. Made-up data, stable every time.
+ */
+export function demoHistory(now = Date.now()): StudentSummary[] {
+  const out: StudentSummary[] = []
+  demoStudents(now).forEach((fin, i) => {
+    const order = PILLAR_IDS.filter((p) => fin.places[p].s !== 'n')
+    const cleared = PILLAR_IDS.filter((p) => fin.places[p].s === 'c').length
+    const join = i % 5 === 0 ? 2 : i % 7 === 0 ? 1 : 0
+    for (let w = join; w < 6; w++) {
+      const f = (w + 1) / 6
+      const allowed = Math.round(cleared * f)
+      const places = {} as StudentSummary['places']
+      PILLAR_IDS.forEach((p) => {
+        const k = order.indexOf(p)
+        if (w === 5 || (k >= 0 && k < allowed)) places[p] = fin.places[p]
+        else if (k === allowed && k >= 0) places[p] = { s: 'p', q: 0, a: 1, b: null }
+        else places[p] = { s: 'n', q: 0, a: 0, b: null }
+      })
+      const skills = {} as StudentSummary['skills']
+      for (const s of SKILLS) skills[s] = w === 5 ? fin.skills[s] : Math.round(fin.skills[s] * (0.55 + 0.45 * f) * 100) / 100
+      out.push({
+        ...fin,
+        at: fin.at - (5 - w) * WEEK,
+        places,
+        skills,
+        habits: places.save.a > 0 ? fin.habits : null,
+        p4: places.safe.s === 'c' ? fin.p4 : null,
+      })
+    }
+  })
+  return out.sort((a, b) => a.at - b.at)
+}

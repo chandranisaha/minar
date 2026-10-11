@@ -37,9 +37,11 @@ const rec = (v: unknown): Record<string, unknown> => (typeof v === 'object' && v
 const n01 = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? Math.round(Math.min(1, Math.max(0, v)) * 100) / 100 : 0)
 const cnt = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.min(9999, Math.floor(v))) : 0)
 
+/** a class code as typed by a student, made to match the teacher's: case, spaces and a missing dash do not matter ('hyd k7q2m' is HYD-K7Q2M) */
 export const cleanCode = (v: unknown): string | null => {
   const s = typeof v === 'string' ? v.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 14) : ''
-  return s || null
+  const hyd = /^HYD-?([A-Z0-9]{4,5})$/.exec(s)
+  return hyd ? `HYD-${hyd[1]}` : s || null
 }
 
 const hash = (s: string): string => {
