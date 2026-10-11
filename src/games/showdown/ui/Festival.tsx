@@ -177,8 +177,8 @@ export function Futures() {
   const crowdWord = sf.crowd >= 1.1 ? 'big' : sf.crowd <= 0.9 ? 'small' : 'normal'
   const weak = runs.find((r) => !r.result.survived) ?? runs.find((r) => !metAll(r.result))
   return (
-    <div className="flex flex-col gap-3">
-      <div className="paper p-3">
+    <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:items-start">
+      <div className="paper p-3 md:col-span-2">
         <h1 className="font-display lang-fit m-0 text-[22px] leading-tight">{t('futures.title')}</h1>
         <p className="m-0 mt-1 text-[13px] font-bold leading-snug">{t('futures.sub')}</p>
       </div>
@@ -222,7 +222,7 @@ export function Futures() {
       </section>
 
       {done && (
-        <section className="paper anim-squash p-3 text-center" style={{ background: g >= 7 ? '#FFE08A' : undefined }}>
+        <section className="paper anim-squash p-3 text-center md:col-span-2" style={{ background: g >= 7 ? '#FFE08A' : undefined }}>
           <p className="font-display m-0 text-[20px] leading-tight">{t('futures.count', { k })}</p>
           <p className="font-display m-0 mt-1 text-[18px] leading-tight">{t('futures.goalsCount', { g })}</p>
           {g < k && <p className="m-0 mt-1 text-[13px] font-extrabold">{t('futures.goalsWarn')}</p>}
@@ -231,8 +231,8 @@ export function Futures() {
           <p className="m-0 mt-2 text-[12px] font-bold opacity-80">{t('futures.autopilot')}</p>
         </section>
       )}
-      {done && <MomentLesson futures />}
-      <button type="button" className="ink-btn pink self-center" disabled={!done} style={{ opacity: done ? 1 : 0.5 }} onClick={() => decide({ k: 'seen', screen: 'futures' })}>{t('futures.go')} ▶</button>
+      {done && <div className="md:col-span-2"><MomentLesson futures /></div>}
+      <button type="button" className="ink-btn pink self-center md:col-span-2 md:justify-self-center" disabled={!done} style={{ opacity: done ? 1 : 0.5 }} onClick={() => decide({ k: 'seen', screen: 'futures' })}>{t('futures.go')} ▶</button>
     </div>
   )
 }
