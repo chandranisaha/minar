@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LangSwitch } from '../components/Hud'
 import { ShareProgress } from '../ngo/ShareProgress'
+import { WelcomeScene } from './WelcomeScene'
 import { NAME_MAX, adoptLiveIfNeeded, deleteSlot, getActive, listSlots, loadSlot, renameSlot, saveSlot, startNewGame, type SlotMeta } from './slots'
 
 const ENTERED = 'mm-entered'
@@ -100,7 +101,7 @@ function SlotCard({ slot, onPlay, onChanged }: { slot: SlotMeta; onPlay: () => v
 
 /** The home screen: new game or load a saved one (any number, each with its own name). Built over the game, not into it. */
 export default function Home() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const nav = useNavigate()
   const [tick, setTick] = useState(0)
   const [view, setView] = useState<'menu' | 'load' | 'new'>('menu')
@@ -113,25 +114,27 @@ export default function Home() {
   const play = (id: string) => { const s = store(); if (s && loadSlot(s, id)) { enter(); reloadAtStart() } }
   const begin = () => { const s = store(); if (!s) { enter(); reloadAtStart(); return } startNewGame(s, name || defaultName); enter(); reloadAtStart() }
 
-  return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#92C9D3, #F8EBCB 62%, #F1D9A3)' }}>
-      <img src="/art/island-bg.webp" alt="" aria-hidden draggable={false} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25" />
-      <div className="relative mx-auto flex min-h-full w-full max-w-[460px] flex-col items-center gap-4 px-4 pb-10 pt-6" style={{ paddingTop: 'max(24px, env(safe-area-inset-top))' }}>
-        <div className="self-end"><LangSwitch /></div>
-        <img src="/art/monument.webp" alt="" aria-hidden draggable={false} className="rise h-[26vh] max-h-[230px] object-contain" style={{ filter: 'drop-shadow(0 10px 14px rgba(58,42,36,.3))' }} />
-        <div className="text-center">
-          <h1 className="font-display lang-fit m-0 text-[44px] leading-none" style={{ color: '#3A2A24', textShadow: '0 3px 0 #FBF0D2' }}>{t('home.title')}</h1>
-          <p className="m-0 mt-2 text-[16px] font-semibold opacity-85">{t('home.tagline')}</p>
-        </div>
+  const letters = useMemo(() => Array.from(new Intl.Segmenter(i18n.language, { granularity: 'grapheme' }).segment(t('home.title')), (x) => x.segment), [i18n.language, t])
 
+  return (
+    <div className="absolute inset-0 overflow-y-auto overflow-x-hidden">
+      <WelcomeScene />
+      <div className="wl-fore" style={{ paddingTop: 'max(14px, env(safe-area-inset-top))' }}>
+        <div className="absolute right-3 top-3 z-10" style={{ top: 'max(12px, env(safe-area-inset-top))' }}><LangSwitch /></div>
+        <div className="wl-head">
+          <h1 className="wl-title" aria-label={t('home.title')}>{letters.map((ch, n) => <span key={n} aria-hidden style={{ ['--i' as string]: n }}>{ch}</span>)}</h1>
+          <p className="wl-tag">{t('home.tagline')}</p>
+        </div>
+        <div className="wl-spacer" />
+        <div className="wl-card">
         {view === 'menu' && (
           <div className="rise flex w-full flex-col gap-3">
-            <button type="button" className="ink-btn w-full text-[18px]" style={{ minHeight: 60 }} autoFocus onClick={() => { setName(''); setView('new') }}>{t('home.new')}</button>
-            <button type="button" className="ink-btn cream w-full text-[18px]" style={{ minHeight: 60 }} disabled={slots.length === 0} onClick={() => setView('load')}>
+            <button type="button" className="wl-btn" autoFocus onClick={() => { setName(''); setView('new') }}>{t('welcome.begin')} <span aria-hidden>▸</span></button>
+            <button type="button" className="wl-btn cream" disabled={slots.length === 0} onClick={() => setView('load')}>
               {t('home.load')}{slots.length > 0 ? ` (${slots.length})` : ''}
             </button>
-            {slots.length === 0 && <p className="m-0 text-center text-[13px] opacity-70">{t('home.noSaves')}</p>}
-            <button type="button" className="mt-2 self-center text-[14px] font-bold underline" style={{ background: 'none', border: 0, cursor: 'pointer', minHeight: 44, color: 'inherit' }} onClick={() => nav('/ngo')}>{t('home.facilitator')}</button>
+            {slots.length === 0 && <p className="m-0 text-center text-[13px] font-semibold opacity-80">{t('home.noSaves')}</p>}
+            <button type="button" className="mt-1 self-center text-[14px] font-bold underline" style={{ background: 'none', border: 0, cursor: 'pointer', minHeight: 44, color: 'inherit' }} onClick={() => nav('/ngo')}>{t('home.facilitator')}</button>
           </div>
         )}
 
@@ -157,6 +160,7 @@ export default function Home() {
             </ul>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

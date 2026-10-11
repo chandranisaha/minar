@@ -1,85 +1,100 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { animate, motion, useMotionValue } from 'framer-motion'
+import { animate, useMotionValue } from 'framer-motion'
 import { FESTIVALS, PERSONAS, PILLARS, inr, type PersonaId } from '../content/data'
-import { HappyMeter } from '../ui/wire/HappyMeter'
 import { useGame } from '../store/game'
-import { GearMenu, GoalBar } from '../components/Hud'
-import { TitleCard } from '../components/TitleCard'
-import { ArtSlot, useManifest } from '../art/ArtSlot'
-import { IslandArt } from '../island/IslandArt'
-import { WORLD, nodeById, px } from '../island/data'
+import { LangSwitch } from '../components/Hud'
+import { MinarBar } from '../ui/kit/MinarBar'
+import { useManifest } from '../art/ArtSlot'
 import { stepped } from '../lib/stepped'
+import { Backdrop, Beat, Say } from './story/parts'
+import './story/story.css'
 
-const LAST = 6
-const bgSky = 'linear-gradient(#92C9D3, #F8EBCB 70%)'
+const LAST = 7
 
-function useSize(ref: React.RefObject<HTMLElement | null>) {
-  const [s, set] = useState({ w: 390, h: 844 })
-  useEffect(() => {
-    const el = ref.current!
-    const f = () => set({ w: el.clientWidth, h: el.clientHeight })
-    f()
-    const ro = new ResizeObserver(f)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [ref])
-  return s
-}
-
-/** Beat 1: a slow pull-in over the island at dawn, ending at the dock. */
-function B1Island({ w, h }: { w: number; h: number }) {
+/** 1. Before sunrise: Ammamma sweeps the steps of the Charminar */
+function S1Dawn() {
   const { t } = useTranslation()
-  const sc = useMotionValue(1)
-  const tx = useMotionValue(0)
-  const ty = useMotionValue(0)
-  useEffect(() => {
-    const fit = Math.min(w / WORLD.w, h / WORLD.h) * 1.12
-    const close = Math.max(fit * 2.4, h / WORLD.h * 1.5)
-    const c = px([nodeById('plaza').x, nodeById('plaza').y - 6])
-    const d = px([nodeById('dock').x + 8, nodeById('dock').y - 4])
-    sc.set(fit); tx.set(w / 2 - c[0] * fit); ty.set(h * 0.5 - c[1] * fit)
-    const o = { duration: 6, delay: 0.4, ease: stepped(30) }
-    const a = [animate(sc, close, o), animate(tx, w / 2 - d[0] * close, o), animate(ty, h * 0.6 - d[1] * close, o)]
-    return () => a.forEach((x) => x.stop())
-  }, [w, h, sc, tx, ty])
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
-      <motion.div style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', x: tx, y: ty, scale: sc, willChange: 'transform' }}>
-        <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={[]} allDone={false} />} />
-      </motion.div>
-      <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(232,150,120,.38), rgba(255,214,150,.12) 55%, rgba(255,214,150,0))', mixBlendMode: 'multiply' }} />
-      <div className="absolute inset-x-0 top-[12%] px-5">
-        <div className="rise mx-auto max-w-[420px]">
-          <TitleCard title={t('story.b1.title')}>{t('story.b1.caption')}</TitleCard>
+    <Beat
+      art={
+        <div className="st-dawn">
+          <img className="mon" src="/art/monument.webp" alt="" draggable={false} />
+          <div className="ground" />
+          <img className="amma" src="/art/npc-nani-stand.webp" alt="" draggable={false} />
+          {[0, 1, 2].map((n) => <span key={n} className="st-dust" style={{ animationDelay: `${n * 0.8}s`, left: `${16 + n * 7}%` }} />)}
         </div>
-      </div>
-    </div>
+      }
+      say={<Say line={t('tale.s1.line')} caption={t('tale.s1.cap')} />}
+    />
   )
 }
 
-/** Beat 2: three plain persona cards, a quiet selected state. */
-function B2Persona() {
+/** 2. The gullak: one coin every Friday */
+function S2Gullak() {
+  const { t } = useTranslation()
+  return (
+    <Beat
+      art={
+        <div className="st-gullak">
+          <img className="amma" src="/art/npc-nani-stand.webp" alt="" draggable={false} />
+          <span className="fri">{t('tale.s2.friday')}</span>
+          <img className="coin" src="/art/cafe/coin.webp" alt="" draggable={false} />
+          <span className="sparkle" />
+          <div className="shelf" />
+          <img className="pot" src="/art/cafe/gullak.webp" alt="" draggable={false} />
+        </div>
+      }
+      say={<Say line={t('tale.s2.line')} caption={t('tale.s2.cap')} />}
+    />
+  )
+}
+
+/** 3. Four minars: the four places light up one by one */
+function S3Minars() {
+  const { t } = useTranslation()
+  return (
+    <Beat
+      art={
+        <div className="st-minars">
+          {PILLARS.map((p, n) => (
+            <div key={p.id} className="st-minar" style={{ ['--n' as string]: n }}>
+              <div className="pic">
+                <span className="halo" />
+                <img className="shop" src={`/art/shop-${p.id}.webp`} alt="" draggable={false} />
+                <img className="flag" src="/art/flag-done.webp" alt="" draggable={false} />
+              </div>
+              <b>{t(`pillars.${p.id}.name`)}</b>
+              <small>{t(`pillars.${p.id}.hook`)}</small>
+            </div>
+          ))}
+        </div>
+      }
+      say={<Say line={t('tale.s3.line')} caption={t('tale.s3.cap')} />}
+    />
+  )
+}
+
+/** 4. Who is walking out today? The only choice in the story. */
+function S4Who() {
   const { t } = useTranslation()
   const lang = useGame((s) => s.language)
   const persona = useGame((s) => s.persona)
   const setPersona = useGame((s) => s.setPersona)
   const gender = useGame((s) => s.gender)
   const setGender = useGame((s) => s.setGender)
-  const ids = Object.keys(PERSONAS) as PersonaId[]
   const seen = useGame((s) => s.storySeen) // replaying must not reset progress: the person is fixed once chosen
   const festival = useGame((s) => s.festival)
   const setFestival = useGame((s) => s.setFestival)
+  const ids = Object.keys(PERSONAS) as PersonaId[]
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
-        <TitleCard title={t('story.b2.title')}>{t('story.b2.caption')}</TitleCard>
-        <div className="ink-chip mx-auto inline-flex p-0.5" role="radiogroup" aria-label={t('story.b2.look')}>
+    <div className="st-pick">
+      <div className="st-pick-in">
+        <Say line={t('tale.s4.line')} caption={t('tale.s4.cap')} />
+        <div className="mk-seg self-center" role="radiogroup" aria-label={t('story.b2.look')}>
           {(['girl', 'boy'] as const).map((g) => (
-            <button key={g} type="button" role="radio" aria-checked={gender === g} onClick={() => setGender(g)} className="h-10 min-w-24 rounded-full px-4 text-[14px] font-bold" style={{ background: gender === g ? '#3A2A24' : 'transparent', color: gender === g ? '#FBF0D2' : '#3A2A24', border: 0, cursor: 'pointer' }}>
-              {t(`story.b2.${g}`)}
-            </button>
+            <button key={g} type="button" role="radio" aria-checked={gender === g} onClick={() => setGender(g)}>{t(`story.b2.${g}`)}</button>
           ))}
         </div>
         <div className="flex flex-col gap-2.5" role="radiogroup" aria-label={t('story.b2.title')}>
@@ -94,7 +109,7 @@ function B2Persona() {
                 disabled={seen && !!persona}
                 onClick={() => { if (!seen) setPersona(id) }}
                 className="paper flex w-full items-center gap-3 p-2.5 text-left"
-                style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FBF3DF' : '#FBF0D2', borderColor: sel ? '#D9573F' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s' }}
+                style={{ cursor: 'pointer', minHeight: 88, background: sel ? '#FFF6DC' : '#FBF0D2', borderColor: sel ? '#D9573F' : '#3A2A24', borderWidth: sel ? 2.5 : 1.5, transition: 'border-color .2s, background .2s, transform .2s', transform: sel ? 'scale(1.02)' : undefined }}
               >
                 <img src={`/art/avatar/${gender}-${id}-face.webp`} alt="" draggable={false} className="h-[64px] w-[64px] shrink-0 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] object-cover object-top" />
                 <div className="min-w-0 flex-1">
@@ -121,42 +136,37 @@ function B2Persona() {
   )
 }
 
-/** Beat 3: the grandmother's flower stall (watercolour vignette), the bundle, the line. */
-function B3Flowers() {
+/** 5. Her cloth bundle: what the family could save */
+function S5Bundle() {
   const { t } = useTranslation()
   const lang = useGame((s) => s.language)
   const start = useGame((s) => s.startAmount)
   const man = useManifest()
-  const m = man['story-flowers']
-  const nani = !!man['npc-nani-wave']
+  const n = useMotionValue(0)
+  const [shown, setShown] = useState(0)
+  useEffect(() => {
+    const c = animate(n, start, { duration: 1.2, delay: 0.9, ease: stepped(12), onUpdate: (v) => setShown(Math.round(v)) })
+    return () => c.stop()
+  }, [start, n])
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: 'linear-gradient(#F8EBCB, #F2DFB0)' }}>
-      <div className="mx-auto flex min-h-full max-w-[520px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
-        {m && (
-          <div className="fade-in relative w-full">
-            <img src="/art/story-flowers.webp" alt="" draggable={false} className="block w-full" style={{ filter: 'drop-shadow(0 8px 14px rgba(58,42,36,.25))' }} />
-            {nani && (
-              <div className="anim-float absolute" style={{ left: '38%', bottom: '4%', width: '24%' }}>
-                <img src="/art/npc-nani-wave.webp" alt="" draggable={false} className="block w-full" />
-              </div>
-            )}
-          </div>
-        )}
-        <div className="paper rise relative mx-auto -mt-6 w-[92%] px-4 py-3 text-center" style={{ animationDelay: '.5s' }}>
-          <p className="m-0 text-[17px] font-bold leading-snug">“{t('story.b3.quote')}”</p>
-          <p className="m-0 mt-1 text-[13px] opacity-75">{t('story.b3.caption')}</p>
-          <div className="mx-auto mt-2 inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-[#F2DFB0] px-3 py-1 text-[14px] font-bold">
-            <svg width="22" height="22" viewBox="0 0 92 92" aria-hidden><path d="M8 60 Q4 26 36 18 Q60 10 82 34 Q92 60 70 82 Q40 94 8 60Z" fill="#F8EBCB" stroke="#3A2A24" strokeWidth="5" strokeLinejoin="round" /></svg>
-            +{inr(start, lang)}
-          </div>
+    <Beat
+      art={
+        <div className="st-bundle">
+          {man['story-flowers'] && <img className="vig" src="/art/story-flowers.webp" alt="" draggable={false} />}
+          {man['npc-nani-wave'] && <img className="amma" src="/art/npc-nani-wave.webp" alt="" draggable={false} />}
+          <span className="sum">
+            <img src="/art/cafe/coin.webp" alt="" width={26} height={26} draggable={false} />
+            +{inr(shown, lang)}
+          </span>
         </div>
-      </div>
-    </div>
+      }
+      say={<Say line={t('tale.s5.line')} caption={t('tale.s5.cap')} />}
+    />
   )
 }
 
-/** Beat 4: the fee letter. The goal pill slides in at the top. */
-function B4Letter() {
+/** 6. The goal: the fee letter */
+function S6Goal() {
   const { t } = useTranslation()
   const lang = useGame((s) => s.language)
   const persona = useGame((s) => s.persona) ?? 'college'
@@ -169,9 +179,9 @@ function B4Letter() {
     return () => c.stop()
   }, [goal, n])
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-4 px-4 pb-24 pt-24">
-        <div className="rise relative mx-auto w-full">
+    <Beat
+      art={
+        <div className="relative w-[min(100%,440px)]" style={{ animation: 'st-rise 1s ease both' }}>
           {m ? (
             <div className="relative">
               <img src="/art/receipt.webp" alt="" draggable={false} className="block w-full" style={{ filter: 'drop-shadow(0 8px 14px rgba(58,42,36,.25))' }} />
@@ -190,79 +200,30 @@ function B4Letter() {
             </div>
           )}
         </div>
-        <TitleCard title={t('story.b4.title')}>{t('story.b4.caption')}</TitleCard>
-      </div>
-    </div>
+      }
+      say={<Say line={t('tale.s6.line')} caption={t('tale.s6.cap')} />}
+    />
   )
 }
 
-/** Beat 5: the four places and the skill each teaches. */
-function B5Places() {
+/** 7. Look after yourself: happy lamps shine bright */
+function S7Happy() {
   const { t } = useTranslation()
   return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-20">
-        <TitleCard title={t('story.places.title')}>{t('story.places.caption')}</TitleCard>
-        <ul className="m-0 flex list-none flex-col gap-2 p-0">
-          {PILLARS.map((p) => (
-            <li key={p.id} className="paper flex items-center gap-3 p-2.5">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border-[1.5px] border-ink text-[14px] font-bold">{p.n}</span>
-              <div className="min-w-0"><div className="font-display text-[17px] leading-tight">{t(`pillars.${p.id}.name`)}</div><div className="text-[13px] leading-snug opacity-85">{t(`pillars.${p.id}.hook`)}</div></div>
-            </li>
+    <Beat
+      art={
+        <div className="st-lamps">
+          {(['bright', 'dim', 'flicker'] as const).map((b, n) => (
+            <div key={b} className={`st-lamp ${b}`} style={{ ['--n' as string]: n }}>
+              <div className="flagbox"><img src="/art/flag-done.webp" alt="" draggable={false} /></div>
+              <b>{t(`tale.s7.${b}`)}</b>
+              <small>{t(`tale.s7.${b}Hint`)}</small>
+            </div>
           ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-/** Beat 6: finish a place, its flag turns gold, the goal bar fills. */
-function B6Win() {
-  const { t } = useTranslation()
-  return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-24">
-        <div className="paper rise flex items-end justify-center gap-6 p-3" aria-hidden>
-          <img src="/art/flag-open.webp" alt="" draggable={false} className="h-24 object-contain" />
-          <span className="pb-8 text-[26px]">→</span>
-          <img src="/art/flag-done.webp" alt="" draggable={false} className="h-24 object-contain" />
         </div>
-        <TitleCard title={t('story.win.title')}>{t('story.win.caption')}</TitleCard>
-      </div>
-    </div>
-  )
-}
-
-/** Beat 7: stay happy, and how to move on the island. */
-function B7Happy() {
-  const { t } = useTranslation()
-  return (
-    <div className="absolute inset-0 overflow-y-auto" style={{ background: bgSky }}>
-      <div className="mx-auto flex min-h-full max-w-[460px] flex-col justify-center gap-3 px-4 pb-24 pt-24">
-        <div className="paper rise p-3"><HappyMeter /></div>
-        <TitleCard title={t('story.happy.title')}>{t('story.happy.caption')}</TitleCard>
-      </div>
-    </div>
-  )
-}
-
-function Cover({ onStart, w, h }: { onStart: () => void; w: number; h: number }) {
-  const { t } = useTranslation()
-  return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
-      <div style={{ position: 'absolute', left: 0, top: 0, width: WORLD.w, height: WORLD.h, transformOrigin: '0 0', transform: `translate(${(w - WORLD.w * Math.max(w / WORLD.w, h / WORLD.h) * 1.15) / 2}px, ${h * 0.12}px) scale(${Math.max(w / WORLD.w, h / WORLD.h) * 1.15})`, opacity: 0.95 }}>
-        <ArtSlot name="island-bg" className="absolute inset-0 h-full w-full" fallback={<IslandArt done={[]} allDone={false} />} />
-      </div>
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(rgba(243,233,210,.88), rgba(243,233,210,.35) 55%, rgba(243,233,210,0))' }} />
-      <div className="absolute inset-x-0 top-[9%] px-5">
-        <div className="rise mx-auto max-w-[420px]">
-          <TitleCard title={t('app.title')}>
-            <p className="m-0">{t('app.tagline')}</p>
-            <button type="button" className="ink-btn mt-4" style={{ minHeight: 50, paddingInline: 34 }} onClick={onStart} autoFocus>{t('buttons.start')} ▸</button>
-          </TitleCard>
-        </div>
-      </div>
-    </div>
+      }
+      say={<Say line={t('tale.s7.line')} caption={t('tale.s7.cap')} />}
+    />
   )
 }
 
@@ -272,9 +233,7 @@ export default function Story() {
   const persona = useGame((s) => s.persona)
   const setPersona = useGame((s) => s.setPersona)
   const setSeen = useGame((s) => s.setStorySeen)
-  const [step, setStep] = useState(1) // the story opens on choosing your avatar; the cover and the opening island beat are skipped
-  const frame = useRef<HTMLDivElement>(null)
-  const { w, h } = useSize(frame)
+  const [step, setStep] = useState(1)
 
   const finish = useCallback(() => {
     if (!useGame.getState().persona) setPersona('college')
@@ -282,7 +241,7 @@ export default function Story() {
     nav('/')
   }, [nav, setPersona, setSeen])
 
-  const canNext = step === 1 ? !!persona : true
+  const canNext = step === 4 ? !!persona : true
   const next = useCallback(() => { if (!canNext) return; if (step >= LAST) finish(); else setStep((s) => s + 1) }, [canNext, step, finish])
   const back = useCallback(() => setStep((s) => Math.max(1, s - 1)), [])
 
@@ -298,35 +257,32 @@ export default function Story() {
   }, [next, back, finish])
 
   return (
-    <div ref={frame} className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: '#92C9D3' }}>
+      <Backdrop tone={step >= 5 ? 'day' : 'dawn'} />
       <div key={step} className="fade-in absolute inset-0">
-        {step === -1 && <Cover onStart={next} w={w} h={h} />}
-        {step === 0 && <B1Island w={w} h={h} />}
-        {step === 1 && <B2Persona />}
-        {step === 2 && <B3Flowers />}
-        {step === 3 && <B4Letter />}
-        {step === 4 && <B5Places />}
-        {step === 5 && <B6Win />}
-        {step === 6 && <B7Happy />}
+        {step === 1 && <S1Dawn />}
+        {step === 2 && <S2Gullak />}
+        {step === 3 && <S3Minars />}
+        {step === 4 && <S4Who />}
+        {step === 5 && <S5Bundle />}
+        {step === 6 && <S6Goal />}
+        {step === 7 && <S7Happy />}
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-2 p-2.5" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
-        <div className="pointer-events-auto">{step >= 3 ? <GoalBar className="rise" /> : <GearMenu replay={false} />}</div>
-        <div className="pointer-events-auto flex items-center gap-2">
-          {step >= 3 && <GearMenu replay={false} />}
-          <button type="button" className="ink-btn cream" onClick={finish}>{t('buttons.skip')} »</button>
-        </div>
-      </div>
-
-      {step >= 0 && (
-        <div className="absolute inset-x-0 bottom-0 z-40 flex items-center justify-between gap-2 p-3" style={{ paddingBottom: 'max(14px, env(safe-area-inset-bottom))' }}>
-          <button type="button" className="ink-btn cream" onClick={back} disabled={step <= 1} aria-label={t('buttons.back')}>◂</button>
-          <div className="flex items-center gap-2" role="img" aria-label={t('story.step', { n: step })}>
-            {[1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ width: i === step ? 22 : 8, height: 8, borderRadius: 4, background: i <= step ? '#3A2A24' : 'rgba(58,42,36,.25)', transition: 'width .25s' }} />)}
-          </div>
-          <button type="button" className="ink-btn" onClick={next} disabled={!canNext}>{step === LAST ? t('buttons.go') : t('buttons.next')} ▸</button>
-        </div>
+      {step >= 5 ? (
+        <MinarBar replay={false} hideProfile />
+      ) : (
+        <div className="st-top"><LangSwitch /></div>
       )}
+
+      <div className="st-nav">
+        <button type="button" className="ink-btn cream" onClick={back} disabled={step <= 1} aria-label={t('buttons.back')}>◂</button>
+        <div className="st-dots" role="img" aria-label={t('story.stepOf', { n: step, total: LAST })}>
+          {Array.from({ length: LAST }, (_, i) => <i key={i} className={`${i + 1 <= step ? 'on' : ''} ${i + 1 === step ? 'cur' : ''}`} />)}
+        </div>
+        <button type="button" className="ink-btn" style={{ minWidth: 96 }} onClick={next} disabled={!canNext}>{step === LAST ? t('buttons.go') : t('buttons.next')} ▸</button>
+        <button type="button" className="st-skip" onClick={finish}>{t('tale.skip')}</button>
+      </div>
     </div>
   )
 }

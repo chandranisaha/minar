@@ -127,7 +127,8 @@
     "happy": {
       "title": "Stay happy",
       "caption": "A short break keeps your Happy Index up, so lessons count in full. Tap a place to walk there, drag to look around, pinch to zoom."
-    }
+    },
+    "stepOf": "Step {{n}} of {{total}}"
   },
   "buttons": {
     "start": "Start",
@@ -216,7 +217,13 @@
     "next": "Next: {{name}}",
     "replay": "Replay",
     "back": "Back",
-    "progressLink": "See your progress"
+    "progressLink": "See your progress",
+    "noChange": "No change",
+    "details": "What you practised and learned",
+    "whyBright": "You finished happy, so the lamp shines bright and this place added the full amount.",
+    "whyDim": "The lamp is a little dim because you were tired. Rest, then play again to brighten it and add more.",
+    "whyTired": "Playing wears you out a little. A chai or some rest in the Happy panel brings it back.",
+    "whyKeep": "Keep going. Each place adds to your money."
   },
   "state": {
     "notStarted": "Not started",
@@ -547,6 +554,51 @@
       "resetYes": "Yes, erase it",
       "resetNo": "Keep it",
       "about": "Minar. All amounts are made up, for practice."
+    }
+  },
+  "welcome": {
+    "begin": "Begin your story",
+    "hello1": "Come, beta. Let me tell you about four minars.",
+    "hello2": "A little, always. That is how it starts.",
+    "hello3": "Your goal is waiting for you."
+  },
+  "tale": {
+    "ammamma": "Ammamma",
+    "skip": "Skip story",
+    "s1": {
+      "line": "Good morning, beta. You are up early today.",
+      "cap": "Hyderabad, before sunrise. Ammamma sweeps the steps by the Charminar, the way she has for forty years."
+    },
+    "s2": {
+      "friday": "Every Friday",
+      "line": "I never earned much. But every Friday, one coin in the gullak. A little, always.",
+      "cap": "Her clay gullak was never empty. That is how it starts."
+    },
+    "s3": {
+      "line": "Four minars hold up this city. Four habits can hold up a life.",
+      "cap": "Plan. Save. Invest. Stay safe. Light all four lamps and your goal opens up."
+    },
+    "s4": {
+      "line": "Now tell me, beta. Who is heading out into the world this year?",
+      "cap": "Pick the person you will be this year."
+    },
+    "s5": {
+      "line": "This is what we could save. The rest is up to you.",
+      "cap": "She places a small cloth bundle in your hands."
+    },
+    "s6": {
+      "line": "Your fee is due in a year. I will be watching from the dock.",
+      "cap": "Let's earn the rest, one place at a time."
+    },
+    "s7": {
+      "line": "Look after yourself, beta. A tired minar leans. Take your chai, rest, laugh with friends.",
+      "cap": "When you are happy, your lamps shine bright and every place adds more.",
+      "bright": "Bright",
+      "brightHint": "Happy 60 or more: the full amount",
+      "dim": "Dim",
+      "dimHint": "Happy 35 to 59: three quarters",
+      "flicker": "Faint",
+      "flickerHint": "Happy below 35: half"
     }
   }
 }
