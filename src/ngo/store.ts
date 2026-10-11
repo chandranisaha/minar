@@ -287,3 +287,9 @@ export const useClasses = (): Cohort[] => {
   const remote = useNgo((s) => s.remote)
   return useMemo(() => (mode === 'cloud' ? [...remote, ...local.filter((c) => c.demo)] : local), [mode, local, remote])
 }
+
+// keep open tabs in step: when another tab saves the desk, reload it here, so a tab left open never writes its older copy over
+// newer data (a class list added in another tab, say)
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => { if (e.key === 'mm-slots-ngo-v1') void useNgo.persist.rehydrate() })
+}
