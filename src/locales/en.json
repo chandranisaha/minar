@@ -462,12 +462,21 @@
     "share": "Share progress",
     "shareTitle": "Share my progress",
     "shareBody": "Send this code to your teacher or NGO facilitator so they can see how the class is doing.",
-    "shareWhat": "It shares your progress, skills, Happy score and language. It never shares your name, your alias or anything you typed.",
+    "shareWhat": "It shares your progress, skills, Happy score, language and class code, under a random student code. It never shares your name or alias.",
     "shareCopy": "Copy code",
     "shareCopied": "Copied",
     "shareSend": "Send",
     "shareDownload": "Save as file",
     "shareClose": "Close",
-    "facilitator": "For teachers and NGOs"
+    "facilitator": "For teachers and NGOs",
+    "shareYourCode": "Your student code: {{id}}. Tell your teacher if they ask which one is you.",
+    "shareToTeacher": "Send to my teacher",
+    "shareSending": "Sending…",
+    "shareSent": "Sent. Your teacher can see it now.",
+    "shareErrClass": "That class code was not found. Check it with your teacher.",
+    "shareErrSoon": "Already sent a moment ago. Try again in a few minutes.",
+    "shareErrOffline": "No internet right now. Copy the code or save it as a file instead.",
+    "shareErrOther": "Could not send. Copy the code instead.",
+    "shareNeedCode": "Type your class code first."
   }
 }

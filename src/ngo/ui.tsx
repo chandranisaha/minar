@@ -1,146 +1,191 @@
-import type { ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import type { Level } from './insights'
 import type { Glow } from './summary'
 
-/**
- * The facilitator desk has its own calm, professional look (burgundy, navy and warm neutrals) so it reads as an analytics page
- * rather than part of the game. The colours below match the variables in ngo.css.
- */
-export const INK = '#2B2B2B'
-export const NAVY = '#14213D'
-export const BURG = '#7A1F2B'
-export const TAN = '#C9A66B'
-export const SAGE = '#6F8F72'
-export const LINE = '#DDD6C8'
-export const CREAM = '#F6F1E7'
-export const TRACK = '#EAE5DA'
-// legacy names kept so the panels read naturally
-export const GOLD = TAN
-export const CORAL = BURG
-export const TEAL = NAVY
+/** colours used inside SVG charts (attributes, not CSS variables, so a downloaded PNG keeps them) */
+export const C = {
+  ink: '#1F2430', muted: '#6B6F7A', line: '#E7E2D8', track: '#EEEAE2', brand: '#7A1F2B', navy: '#14213D', tan: '#C9A66B',
+  building: '#C2555A', getting: '#D6A23E', strong: '#2F6F5E',
+}
+export const LEVEL_COLOR: Record<Level, string> = { building: C.building, getting: C.getting, strong: C.strong }
 
-export function Card({ title, hint, children, className = '' }: { title?: string; hint?: string; children: ReactNode; className?: string }) {
+export const pct = (v: number | null | undefined) => (v === null || v === undefined ? '–' : `${Math.round(v * 100)}%`)
+export const day = (t: number | null) => (t ? new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '–')
+
+export function Card({ title, sub, action, children, className = '', pad = true }: { title?: ReactNode; sub?: ReactNode; action?: ReactNode; children: ReactNode; className?: string; pad?: boolean }) {
   return (
-    <section className={`paper p-4 text-left ${className}`}>
-      {title && <h2 className="font-display m-0 text-[17px] leading-tight">{title}</h2>}
-      {hint && <p className="m-0 mt-1 text-[13px] leading-snug" style={{ color: '#6B6558' }}>{hint}</p>}
-      <div className={title ? 'mt-3.5' : ''}>{children}</div>
+    <section className={`mi-card ${pad ? 'p-5' : ''} ${className}`}>
+      {(title || action) && (
+        <div className={`flex items-start justify-between gap-3 ${pad ? '' : 'px-5 pt-5'}`}>
+          <div className="min-w-0">
+            {title && <h2 className="text-[16px] font-semibold leading-tight">{title}</h2>}
+            {sub && <p className="mi-muted m-0 mt-1 text-[13px] leading-snug">{sub}</p>}
+          </div>
+          {action && <div className="flex shrink-0 items-center gap-1">{action}</div>}
+        </div>
+      )}
+      <div className={title || action ? 'mt-4' : ''}>{children}</div>
     </section>
   )
 }
 
-export function Kpi({ label, value, sub, badge }: { label: string; value: ReactNode; sub?: string; badge?: string }) {
+export function Stat({ label, value, note, tone }: { label: string; value: ReactNode; note?: ReactNode; tone?: 'up' | 'down' | 'warn' }) {
+  const color = tone === 'up' ? C.strong : tone === 'down' ? C.building : tone === 'warn' ? '#9A6A12' : C.muted
   return (
-    <div className="paper flex min-w-[140px] flex-1 flex-col gap-1 p-4 text-left">
-      <div className="text-[12px] font-semibold" style={{ color: '#6B6558' }}>{label}</div>
-      <div className="text-[30px] font-bold leading-none tracking-tight" style={{ color: NAVY }}>{value}</div>
-      {(badge || sub) && (
-        <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[12px] leading-snug" style={{ color: '#6B6558' }}>
-          {badge && <span className="rounded-full px-2 py-0.5 text-[11.5px] font-semibold" style={{ background: '#F3DEE0', color: BURG }}>{badge}</span>}
-          {sub && <span>{sub}</span>}
+    <div className="mi-card flex min-w-0 flex-col gap-1.5 p-4">
+      <div className="mi-eyebrow">{label}</div>
+      <div className="text-[28px] font-bold leading-none tracking-tight" style={{ color: C.navy }}>{value}</div>
+      {note && <div className="text-[12.5px] font-medium leading-snug" style={{ color }}>{note}</div>}
+    </div>
+  )
+}
+
+export function Chip({ children, tone = 'plain', style }: { children: ReactNode; tone?: 'plain' | Level | 'brand'; style?: CSSProperties }) {
+  const t = tone === 'building' ? ['#F8E4E5', '#8E2F34'] : tone === 'getting' ? ['#F7EDD6', '#7A5712'] : tone === 'strong' ? ['#DFEDE8', '#1F5446'] : tone === 'brand' ? ['#F3E1E3', C.brand] : ['#EFECE6', '#4A4E58']
+  return <span className="mi-chip" style={{ background: t[0], color: t[1], ...style }}>{children}</span>
+}
+
+/** a thin progress bar with the value written next to it (colour is never the only signal) */
+export function Meter({ value, color = C.navy, width = 120, label }: { value: number | null; color?: string; width?: number | string; label?: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="h-2 overflow-hidden rounded-full" style={{ width, background: C.track }} role="img" aria-label={pct(value)}>
+        {value !== null && <div className="h-full rounded-full" style={{ width: `${Math.round(value * 100)}%`, background: color }} />}
+      </div>
+      {label !== false && <span className="w-9 text-right text-[13px] font-semibold tabular-nums">{pct(value)}</span>}
+    </div>
+  )
+}
+
+/** one horizontal bar split into building / getting there / strong */
+export function LevelBar({ low, mid, high, height = 10 }: { low: number; mid: number; high: number; height?: number }) {
+  const of = low + mid + high
+  return (
+    <div className="flex overflow-hidden rounded-full" style={{ height, background: C.track }} role="img" aria-label={`${low} still building, ${mid} getting there, ${high} strong`}>
+      {of > 0 && <><div style={{ width: `${(low / of) * 100}%`, background: C.building }} /><div style={{ width: `${(mid / of) * 100}%`, background: C.getting }} /><div style={{ width: `${(high / of) * 100}%`, background: C.strong }} /></>}
+    </div>
+  )
+}
+
+export function Legend() {
+  return (
+    <div className="mi-muted flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
+      {(['building', 'getting', 'strong'] as const).map((l) => (
+        <span key={l} className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full" style={{ background: LEVEL_COLOR[l] }} />{l === 'building' ? 'Still building (under 40%)' : l === 'getting' ? 'Getting there (40 to 69%)' : 'Strong (70% and up)'}</span>
+      ))}
+    </div>
+  )
+}
+
+/** a place's status: filled when cleared (shade = how strong), half when in progress, empty when not started */
+export function Flag({ state, glow, size = 20 }: { state: 'n' | 'p' | 'c'; glow: Glow; size?: number }) {
+  const word = state === 'c' ? (glow === 'b' ? 'cleared strongly' : glow === 'd' ? 'cleared' : 'cleared, weakly') : state === 'p' ? 'in progress' : 'not started'
+  const fill = glow === 'b' ? C.strong : glow === 'd' ? C.getting : C.building
+  return (
+    <svg width={size} height={size} viewBox="0 0 26 26" role="img" aria-label={word}>
+      <title>{word}</title>
+      <circle cx="13" cy="13" r="10.5" fill={state === 'c' ? fill : '#fff'} stroke={state === 'n' ? '#C9C3B6' : state === 'p' ? C.tan : fill} strokeWidth="2" />
+      {state === 'p' && <path d="M13 2.5a10.5 10.5 0 0 1 0 21z" fill={C.tan} />}
+      {state === 'c' && <path d="M8 13.4l3.4 3.3L18.2 9.8" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />}
+    </svg>
+  )
+}
+
+export const Icon = ({ d, size = 18 }: { d: ReactNode; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+)
+export const ICONS = {
+  overview: <path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4v3h6V4zM4 20h6v-3H4z" />,
+  students: <path d="M16 20v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM20 20v-1a3 3 0 0 0-2-2.8M16 4.3a3.5 3.5 0 0 1 0 6.4" />,
+  teach: <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5M9 8h6M9 12h4" />,
+  classes: <path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6" />,
+  download: <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />,
+  print: <path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z" />,
+  back: <path d="M15 6l-6 6 6 6" />,
+  close: <path d="M6 6l12 12M18 6L6 18" />,
+  copy: <path d="M9 9h11v11H9zM5 15H4V4h11v1" />,
+  edit: <path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" />,
+  search: <path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4" />,
+  logout: <path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" />,
+  lock: <path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3" />,
+  chevron: <path d="M6 9l6 6 6-6" />,
+}
+
+/** the Minar mark: the painted monument from the game */
+export function Brand({ compact }: { compact?: boolean }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <img src="/art/monument.webp" alt="" aria-hidden className="h-9 w-9 shrink-0 object-contain" draggable={false} />
+      {!compact && (
+        <div className="leading-tight">
+          <div className="text-[16px] font-bold" style={{ color: C.navy }}>Minar Insights</div>
+          <div className="mi-muted text-[11.5px]">For teachers and NGOs</div>
         </div>
       )}
     </div>
   )
 }
 
-/** a labelled horizontal bar; the number is always written out so colour is never the only signal */
-export function Bar({ label, value, of, color = NAVY, note }: { label: ReactNode; value: number; of: number; color?: string; note?: string }) {
-  const pct = of > 0 ? Math.round((value / of) * 100) : 0
+/** a small popover menu that closes on outside click or Escape */
+export function Menu({ label, children }: { label: ReactNode; children: (close: () => void) => ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const off = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', off)
+    document.addEventListener('keydown', esc)
+    return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc) }
+  }, [open])
   return (
-    <div className="grid gap-1.5">
-      <div className="flex items-baseline justify-between gap-2 text-[14px]">
-        <span className="min-w-0 font-medium">{label}</span>
-        <span className="shrink-0 text-[13px] tabular-nums" style={{ color: '#6B6558' }}>{value}/{of} · {pct}%{note ? ` · ${note}` : ''}</span>
-      </div>
-      <div className="h-2.5 overflow-hidden rounded-full" style={{ background: TRACK }} role="img" aria-label={`${pct}%`}>
-        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 999, transition: 'width .5s ease' }} />
-      </div>
+    <div ref={ref} className="relative">
+      <button type="button" className="mi-btn" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen((o) => !o)}>{label}<Icon d={ICONS.chevron} size={16} /></button>
+      {open && <div className="mi-menu" role="menu">{children(() => setOpen(false))}</div>}
     </div>
   )
 }
 
-export function Chip({ children, tone = 'plain' }: { children: ReactNode; tone?: 'plain' | 'gold' | 'coral' | 'sage' }) {
-  const t = tone === 'gold' ? ['#F1E6CF', '#7A5C1E'] : tone === 'coral' ? ['#F3DEE0', BURG] : tone === 'sage' ? ['#E2EBE3', '#3F5E45'] : ['#EFEBE2', '#4A453B']
-  return <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-semibold" style={{ background: t[0], color: t[1] }}>{children}</span>
-}
-
-/** a small status mark for a place: filled when cleared (strength shown by shade), half when in progress, empty when not started */
-export function Flag({ state, glow, size = 26 }: { state: 'n' | 'p' | 'c'; glow: Glow; size?: number }) {
-  const word = state === 'c' ? (glow === 'b' ? 'cleared, bright' : glow === 'd' ? 'cleared, dim' : 'cleared, flickering') : state === 'p' ? 'in progress' : 'not started'
-  const fill = glow === 'b' ? NAVY : glow === 'd' ? TAN : BURG
+export function Drawer({ title, onClose, children }: { title: ReactNode; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', esc)
+    return () => document.removeEventListener('keydown', esc)
+  }, [onClose])
   return (
-    <svg width={size} height={size} viewBox="0 0 26 26" role="img" aria-label={word}>
-      <title>{word}</title>
-      <circle cx="13" cy="13" r="10.5" fill={state === 'c' ? fill : '#fff'} stroke={state === 'n' ? '#BDB5A3' : state === 'p' ? TAN : fill} strokeWidth="2" />
-      {state === 'p' && <path d="M13 2.5a10.5 10.5 0 0 1 0 21z" fill={TAN} />}
-      {state === 'c' && <path d="M8 13.4l3.4 3.3L18.2 9.8" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />}
-    </svg>
-  )
-}
-
-export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: { id: T; label: string }[]; value: T; onChange: (t: T) => void }) {
-  return (
-    <div className="ngo-noprint -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="tablist">
-      {tabs.map((t) => (
-        <button key={t.id} type="button" role="tab" aria-selected={value === t.id} onClick={() => onChange(t.id)} className="h-10 shrink-0 rounded-full px-4 text-[14px] font-semibold" style={pillStyle(value === t.id)}>
-          {t.label}
-        </button>
-      ))}
+    <div className="mi-scrim" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+      <aside className="mi-drawer" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : 'Details'}>
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b px-5 py-3" style={{ background: '#F5F3EF', borderColor: C.line }}>
+          <div className="min-w-0 truncate text-[16px] font-semibold">{title}</div>
+          <button type="button" className="mi-btn quiet" onClick={onClose} aria-label="Close"><Icon d={ICONS.close} /></button>
+        </div>
+        <div className="grid gap-4 p-5">{children}</div>
+      </aside>
     </div>
   )
 }
 
-export const pillStyle = (active: boolean): React.CSSProperties => ({ background: active ? BURG : '#fff', color: active ? '#fff' : NAVY, border: `1px solid ${active ? BURG : '#D4CCBB'}`, cursor: 'pointer' })
+/* ---------- printing: anything handed to print() is rendered into <body> and printed alone (Save as PDF works too) ---------- */
 
-export const pct = (v: number | null) => (v === null ? '–' : `${Math.round(v * 100)}%`)
+const PrintCtx = createContext<(node: ReactNode, title?: string) => void>(() => {})
+export const usePrint = () => useContext(PrintCtx)
 
-/** a ring split into shares, with the total in the middle and a written legend (never colour alone) */
-export function Donut({ rows, total, centre }: { rows: { label: string; n: number; hidden?: boolean }[]; total: number; centre: string }) {
-  const colors = [BURG, NAVY, TAN]
-  const R = 38
-  const C = 2 * Math.PI * R
-  let acc = 0
+export function PrintProvider({ children }: { children: ReactNode }) {
+  const [job, setJob] = useState<{ node: ReactNode; title?: string } | null>(null)
+  useEffect(() => {
+    if (!job) return
+    const prev = document.title
+    if (job.title) document.title = job.title // becomes the PDF file name
+    const done = () => { setJob(null); document.title = prev }
+    window.addEventListener('afterprint', done, { once: true })
+    const t = window.setTimeout(() => window.print(), 60)
+    return () => { window.clearTimeout(t); window.removeEventListener('afterprint', done) }
+  }, [job])
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <svg width="116" height="116" viewBox="0 0 100 100" role="img" aria-label={rows.map((r) => `${r.label} ${r.n}`).join(', ')}>
-        <circle cx="50" cy="50" r={R} fill="none" stroke={TRACK} strokeWidth="13" />
-        {total > 0 && rows.map((r, i) => {
-          const len = (r.n / total) * C
-          const el = r.n > 0 ? <circle key={r.label} cx="50" cy="50" r={R} fill="none" stroke={colors[i % 3]} strokeWidth="13" strokeDasharray={`${len} ${C - len}`} strokeDashoffset={-acc} transform="rotate(-90 50 50)" /> : null
-          acc += len
-          return el
-        })}
-        <text x="50" y="49" textAnchor="middle" fontSize="17" fontWeight="700" fill={NAVY}>{total}</text>
-        <text x="50" y="62" textAnchor="middle" fontSize="8" fill="#6B6558">{centre}</text>
-      </svg>
-      <ul className="m-0 grid min-w-[150px] flex-1 list-none gap-1.5 p-0 text-[14px]">
-        {rows.map((r, i) => (
-          <li key={r.label} className="flex items-center gap-2">
-            <span aria-hidden className="h-3 w-3 shrink-0 rounded-full" style={{ background: colors[i % 3] }} />
-            <span className="flex-1 font-medium">{r.label}</span>
-            <span className="tabular-nums" style={{ color: '#6B6558' }}>{r.hidden ? `under 5` : `${r.n} · ${total ? Math.round((r.n / total) * 100) : 0}%`}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-/** a half-circle dial with a needle, for a 0 to 100 value */
-export function Gauge({ value, label }: { value: number | null; label: string }) {
-  const v = value === null ? 0 : Math.max(0, Math.min(100, value))
-  const ang = Math.PI * (1 - v / 100)
-  const x = 60 + 38 * Math.cos(ang)
-  const y = 62 - 38 * Math.sin(ang)
-  const arc = (a: number, b: number, c: string) => {
-    const p = (t: number) => `${60 + 46 * Math.cos(Math.PI * (1 - t))} ${62 - 46 * Math.sin(Math.PI * (1 - t))}`
-    return <path d={`M ${p(a)} A 46 46 0 0 1 ${p(b)}`} fill="none" stroke={c} strokeWidth="9" />
-  }
-  return (
-    <svg width="160" height="108" viewBox="0 0 120 81" role="img" aria-label={`${label}: ${value === null ? 'no data' : Math.round(v)} out of 100`}>
-      {arc(0, 0.35, BURG)}{arc(0.35, 0.6, TAN)}{arc(0.6, 1, NAVY)}
-      {value !== null && <><line x1="60" y1="62" x2={x} y2={y} stroke={NAVY} strokeWidth="2.6" strokeLinecap="round" /><circle cx="60" cy="62" r="4.5" fill={NAVY} /></>}
-      <text x="60" y="79" textAnchor="middle" fontSize="13" fontWeight="700" fill={NAVY}>{value === null ? '–' : Math.round(v)}</text>
-    </svg>
+    <PrintCtx.Provider value={(node, title) => setJob({ node, title })}>
+      {children}
+      {job && createPortal(<div className="mi mi-print">{job.node}</div>, document.body)}
+    </PrintCtx.Provider>
   )
 }

@@ -1,39 +1,79 @@
 /*
-  Facilitator desk theme. Everything is scoped under .ngo-root so the game's own look is untouched.
-  Palette: burgundy (primary), navy (secondary), warm neutrals. Printing gives a clean page instead of the screen layout.
+  Minar Insights: the facilitator dashboard. Everything is scoped under .mi so the game's own look is untouched.
+  A calm analytics look: warm neutral page, white cards, burgundy for actions, navy for data. Light only, on purpose: it is printed
+  and projected in classrooms.
 */
-.ngo-root {
-  --n-bg: #F3F1EC; --n-card: #FFFFFF; --n-line: #E4DED2; --n-burg: #7A1F2B; --n-burg-dark: #651823; --n-navy: #14213D; --n-tan: #C9A66B; --n-text: #2B2B2B;
-  background: var(--n-bg); color: var(--n-text); font-family: var(--font-body);
+.mi {
+  --bg: #F5F3EF; --card: #FFFFFF; --line: #E7E2D8; --ink: #1F2430; --muted: #6B6F7A; --soft: #F8F6F2;
+  --brand: #7A1F2B; --brand-dark: #62171F; --navy: #14213D; --tan: #C9A66B;
+  --lv-building: #C2555A; --lv-getting: #D6A23E; --lv-strong: #2F6F5E;
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-weight: 400; color-scheme: light;
+  -webkit-font-smoothing: antialiased;
 }
-.ngo-root .font-display { font-family: var(--font-body); font-weight: 700; letter-spacing: -0.01em; }
-.ngo-root .paper {
-  background: var(--n-card); border: 1px solid var(--n-line); border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(20, 33, 61, .05), 0 8px 20px rgba(20, 33, 61, .05);
-}
-.ngo-root .ink-btn {
-  min-height: 40px; padding: 0 16px; font-size: 14px; font-weight: 600; color: #fff;
-  background: var(--n-burg); border: 1px solid var(--n-burg); border-radius: 999px; box-shadow: 0 1px 2px rgba(20, 33, 61, .18);
-}
-.ngo-root .ink-btn:hover { background: var(--n-burg-dark); transform: none; }
-.ngo-root .ink-btn:active { transform: none; }
-.ngo-root .ink-btn.cream { background: #fff; color: var(--n-navy); border: 1px solid #D4CCBB; }
-.ngo-root .ink-btn.cream:hover { background: #F6F1E7; }
-.ngo-root button:focus-visible, .ngo-root input:focus-visible, .ngo-root select:focus-visible, .ngo-root textarea:focus-visible { outline: 3px solid rgba(20, 33, 61, .35); outline-offset: 2px; }
-.ngo-root input, .ngo-root select, .ngo-root textarea { background: #fff !important; border: 1px solid #D4CCBB !important; border-radius: 10px !important; color: var(--n-text); }
-.ngo-root code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.ngo-side { background: #ECE8DF; border-right: 1px solid var(--n-line); }
-.ngo-nav { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: #3B3A36; font-size: 14.5px; font-weight: 500; cursor: pointer; text-align: left; }
-.ngo-nav:hover { background: rgba(122, 31, 43, .08); }
-.ngo-nav[aria-current="page"] { background: var(--n-burg); color: #fff; font-weight: 600; }
+.mi * { box-sizing: border-box; }
+:where(.mi) :where(h1, h2, h3) { font-family: var(--font-body); color: var(--ink); margin: 0; letter-spacing: -0.01em; }
+.mi button { font-family: inherit; }
 
-@media print {
-  html, body, #root { height: auto !important; overflow: visible !important; background: #fff !important; }
-  .fixed, .absolute.ngo-root { position: static !important; }
-  .ngo-root { overflow: visible !important; background: #fff !important; }
-  .ngo-noprint { display: none !important; }
-  .ngo-print-only { display: block !important; }
-  .ngo-root .paper { box-shadow: none !important; break-inside: avoid; }
-  .ngo-cards { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mi-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 1px 2px rgba(20,33,61,.04); }
+.mi-muted { color: var(--muted); }
+.mi-eyebrow { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+.mi-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px;
+  font-size: 14px; font-weight: 600; border-radius: 10px; cursor: pointer; white-space: nowrap;
+  background: var(--brand); color: #fff; border: 1px solid var(--brand); transition: background .15s;
 }
-.ngo-print-only { display: none; }
+.mi-btn:hover { background: var(--brand-dark); }
+.mi-btn.ghost { background: #fff; color: var(--ink); border-color: var(--line); }
+.mi-btn.ghost:hover { background: var(--soft); }
+.mi-btn.quiet { background: transparent; color: var(--ink); border-color: transparent; padding: 0 10px; }
+.mi-btn.quiet:hover { background: rgba(20,33,61,.06); }
+.mi-btn.danger { background: #fff; color: #9B2C2C; border-color: #E9C7C7; }
+.mi-btn.danger:hover { background: #FBF1F1; }
+.mi-btn:disabled { opacity: .45; cursor: not-allowed; }
+.mi-btn.sm { min-height: 32px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+
+.mi-input { font-weight: 400; height: 42px; width: 100%; border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 0 12px; font-size: 15px; color: var(--ink); }
+.mi textarea.mi-input { height: auto; padding: 10px 12px; }
+.mi-input:focus, .mi select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(20,33,61,.12); }
+.mi button:focus-visible, .mi a:focus-visible, .mi [tabindex]:focus-visible { outline: 3px solid rgba(20,33,61,.3); outline-offset: 2px; }
+.mi select.mi-input { padding-right: 32px; }
+
+.mi-nav { display: flex; align-items: center; gap: 12px; width: 100%; height: 42px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: #3B3F4A; font-size: 14.5px; font-weight: 500; cursor: pointer; text-align: left; }
+.mi-nav:hover { background: rgba(20,33,61,.05); }
+.mi-nav[aria-current="page"] { background: #fff; color: var(--brand); font-weight: 650; box-shadow: 0 1px 2px rgba(20,33,61,.08); }
+
+/* phone: bottom tab bar */
+.mi-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+.mi-tabbar button { display: grid; justify-items: center; gap: 2px; padding: 8px 0 7px; border: 0; background: none; font-size: 11.5px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.mi-tabbar button[aria-current="page"] { color: var(--brand); }
+@media (min-width: 1024px) { .mi-tabbar { display: none; } }
+
+.mi-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+.mi-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mi-table th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.mi-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.mi-table tbody tr { cursor: pointer; }
+.mi-table tbody tr:hover { background: var(--soft); }
+
+.mi-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 40; min-width: 260px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 32px rgba(20,33,61,.14); padding: 6px; }
+.mi-menu button { display: grid; width: 100%; text-align: left; gap: 1px; border: 0; background: none; border-radius: 8px; padding: 9px 10px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink); }
+.mi-menu button:hover { background: var(--soft); }
+.mi-menu small { font-size: 12px; font-weight: 400; color: var(--muted); }
+
+.mi-scrim { position: fixed; inset: 0; z-index: 50; background: rgba(20,24,33,.38); display: flex; justify-content: flex-end; }
+.mi-drawer { width: min(560px, 100%); height: 100%; overflow-y: auto; background: var(--bg); box-shadow: -12px 0 32px rgba(20,33,61,.18); animation: mi-in .2s ease-out; }
+@keyframes mi-in { from { transform: translateX(24px); opacity: 0 } to { transform: none; opacity: 1 } }
+
+.mi-print { display: none; }
+@media print {
+  @page { margin: 14mm; }
+  /* the print area is portalled straight into <body>; everything else is left out of the printout */
+  html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
+  body > *:not(.mi-print) { display: none !important; }
+  .mi-print { display: block !important; width: 100%; background: #fff; color: #1F2430; font-family: var(--font-body); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .mi-page { break-after: page; }
+  .mi-page:last-child { break-after: auto; }
+  .mi-card { box-shadow: none !important; break-inside: avoid; }
+}
