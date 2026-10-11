@@ -51,7 +51,7 @@ Text rendered inside the scene art (shop signs, OFFER! board) comes from `world.
 
 ## Festival Countdown (Pillar 1)
 
-Strings live in `src/games/festival/content/{en,hi,te}.json` (namespace `festival`). A test checks every key and `{{placeholder}}`
+Strings live in `src/games/showdown/content/{en,hi,te}.json` (namespace `showdown`). A test checks every key and `{{placeholder}}`
 exists in all three files, but not the wording. Please review especially:
 
 | Key | English | Concern |

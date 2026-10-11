@@ -125,6 +125,12 @@ html[data-lite="true"] .gate-glow { animation: none; }
 html[data-lite="true"] .anim-float, html[data-lite="true"] .anim-float-fast { animation: none; }
 @media (prefers-reduced-motion: reduce) { .anim-float, .anim-float-fast, .anim-squash { animation: none; } }
 
+/* diya flames (Festival Showdown): a small stepped flicker */
+@keyframes flame-flicker { 0%,100% { transform: scale(1,1) } 33% { transform: scale(.92,1.08) } 66% { transform: scale(1.06,.94) } }
+.flame { animation: flame-flicker .9s steps(6) infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@media (prefers-reduced-motion: reduce) { .flame { animation: none; } }
+html[data-lite="true"] .flame { animation: none; }
+
 /* shell wireframe tokens (see src/art/palette.ts); main's island palette above wins on shared names */
 @theme {
   --color-marigold: #f28c28;

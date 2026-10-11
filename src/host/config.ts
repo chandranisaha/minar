@@ -6,18 +6,18 @@ import type { GameLevel } from './types'
  * src/games/<folder>/index.tsx (default export) replaces that pillar's placeholder with no other change.
  */
 export const GAME_FOLDERS: Record<PillarId, string> = {
-  plan: 'festival',
+  plan: 'showdown',
   save: 'cafe',
   invest: 'dealboard',
   safe: 'casefiles',
 }
 
 /**
- * Games that do not have an index.tsx but export their own component (Festival Countdown, Pay Run). The shell loads them through a
+ * Games that do not have an index.tsx but export their own component (Festival Showdown, Pocket Panic). The shell loads them through a
  * wrapper that maps GameProps onto the game's real props. `file` is the game's entry file; the wrapper is used only if it exists.
  */
 export const GAME_ENTRIES: Partial<Record<PillarId, { file: string }>> = {
-  plan: { file: 'FestivalCountdown' },
+  plan: { file: 'ShowdownGame' },
   save: { file: 'PocketPanic' },
   invest: { file: 'ui/DealBoard' },
   safe: { file: 'Pillar4' },

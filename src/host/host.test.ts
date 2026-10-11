@@ -231,7 +231,7 @@ describe('registry', () => {
   })
   it('each pillar maps to its own folder name', () => {
     expect(new Set(Object.values(GAME_FOLDERS)).size).toBe(4)
-    expect(GAME_FOLDERS).toEqual({ plan: 'festival', save: 'cafe', invest: 'dealboard', safe: 'casefiles' })
+    expect(GAME_FOLDERS).toEqual({ plan: 'showdown', save: 'cafe', invest: 'dealboard', safe: 'casefiles' })
   })
   it('PILLAR_ORDER lists every pillar once', () => {
     expect([...PILLAR_ORDER].sort()).toEqual([...PILLAR_IDS].sort())

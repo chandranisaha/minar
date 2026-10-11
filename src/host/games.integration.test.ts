@@ -1,53 +1,41 @@
 import { describe, expect, it } from 'vitest'
-import { BARGAIN_HUNTER, HOARDER, IMPULSIVE, PLANNER, runBot } from '../games/festival/engine/bots'
-import { ideasFelt } from '../games/festival/engine/explain'
-import { evidence, minaretLit, score, stars } from '../games/festival/engine/score'
-import { replay } from '../games/festival/engine/state'
+import { reportOf, toGameResult } from '../games/showdown/engine/report'
+import { presetLog } from '../games/showdown/state/presets'
 import { ECON } from '../games/payrun/engine/content'
 import { replaySeason } from '../games/payrun/engine/replay'
 import { makeScript } from '../games/payrun/engine/script'
 import { adaptFestival, adaptPayRun } from './adapters'
 
-/** exactly what FestivalCountdown.finish() hands to onComplete, built from the game's own engine and bots */
-function festivalPayload(seed: string, policy: Parameters<typeof runBot>[1]) {
-  const log = runBot(seed, policy)
-  const s = replay(log)
-  const sr = stars(s)
-  const sc = score(s)
-  return { game: 'festival', cohortCode: '', seed, stars: { ...sr }, score: { ...sc }, evidence: { ...evidence(log, s) }, lessonsSeen: ideasFelt(log), minaretLit: minaretLit(sr, sc), meta: { festival: 'diwali' } }
+/** exactly what Festival Showdown hands to onComplete: the reference plans played to the report, through the game's own engine */
+function festivalPayload(plan: 'A' | 'B') {
+  const log = presetLog(plan, 'report')
+  const r = reportOf(log)
+  return { payload: toGameResult(r, 'K7M2', '', r.lessons.map((l) => l.id)), report: r }
 }
 
-describe('the real Festival Countdown, through its adapter', () => {
-  const seeds = ['DEMO', ...Array.from({ length: 25 }, (_, i) => `seed-${i}`)]
-  const rate = (policy: Parameters<typeof runBot>[1]) => seeds.filter((s) => adaptFestival(festivalPayload(s, policy)).cleared).length / seeds.length
-
-  it('every bot run gives a well-formed result, and the shell clears exactly when the game lights its own minaret', () => {
-    for (const policy of [PLANNER, HOARDER, IMPULSIVE, BARGAIN_HUNTER]) {
-      for (const seed of seeds) {
-        const payload = festivalPayload(seed, policy)
-        const r = adaptFestival(payload)
-        expect(r.pillar).toBe('plan')
-        expect(r.cleared).toBe(payload.minaretLit)
-        for (const n of [r.quality, r.partial]) expect(n >= 0 && n <= 1).toBe(true)
-        if (!r.cleared) expect(r.partial).toBeLessThan(1)
-        expect(r.joySignals.friendship).toBeDefined()
-      }
+describe('the real Festival Showdown, through its adapter', () => {
+  it('Plan B clears the pillar and Plan A does not, exactly when the game lights its own minaret', () => {
+    for (const plan of ['A', 'B'] as const) {
+      const { payload } = festivalPayload(plan)
+      const r = adaptFestival(payload)
+      expect(r.pillar).toBe('plan')
+      expect(r.cleared).toBe(payload.minaretLit)
+      for (const n of [r.quality, r.partial]) expect(n >= 0 && n <= 1).toBe(true)
+      if (!r.cleared) expect(r.partial).toBeLessThan(1)
     }
+    expect(adaptFestival(festivalPayload('B').payload).cleared).toBe(true)
+    expect(adaptFestival(festivalPayload('A').payload).cleared).toBe(false)
   })
-  it('reads the real score parts as skills', () => {
-    const r = adaptFestival(festivalPayload('DEMO', PLANNER))
-    expect(Object.keys(r.skills).sort()).toEqual(['planning', 'prioritising', 'saving'])
+  it('reads the score parts as skills, and quality is the 100-point total', () => {
+    const r = adaptFestival(festivalPayload('B').payload)
+    expect(Object.keys(r.skills).sort()).toEqual(['planning', 'prioritising', 'riskSense', 'scamSense'])
+    expect(r.quality).toBeCloseTo(0.98, 2)
   })
-  it('a careful planner clears far more often than an impulsive player', () => {
-    expect(rate(PLANNER)).toBeGreaterThan(rate(IMPULSIVE))
-    expect(rate(PLANNER)).toBeGreaterThan(0.8)
-  })
-  it('a hoarder who refuses every friend gets a weaker friendship signal than the planner', () => {
-    const friendship = (p: Parameters<typeof runBot>[1]) => adaptFestival(festivalPayload('DEMO', p)).joySignals.friendship ?? 0
-    expect(friendship(HOARDER)).toBeLessThan(friendship(PLANNER))
-  })
-  it('carries the game\'s own lessons through', () => {
-    expect(adaptFestival(festivalPayload('DEMO', PLANNER)).lessonsSeen.length).toBeGreaterThan(0)
+  it('carries the game\'s own lessons through, and a quit before the report is a quit', () => {
+    expect(adaptFestival(festivalPayload('A').payload).lessonsSeen.length).toBeGreaterThan(0)
+    const quit = adaptFestival({ game: 'festival', progress: 0 })
+    expect(quit.cleared).toBe(false)
+    expect(quit.partial).toBe(0)
   })
 })
 
