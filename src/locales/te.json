@@ -325,7 +325,7 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Welcome to Money Mohalla",
+      "title": "మినార్‌కు స్వాగతం",
       "body": "Select a language to continue."
     },
     "problem": {
@@ -365,7 +365,7 @@
     "back": "Back"
   },
   "hub": {
-    "title": "Money Mohalla Hub",
+    "title": "మినార్ హబ్",
     "lookAfterYourself": "Look after yourself",
     "teaches": "Teaches:",
     "time": "Time:",
@@ -436,7 +436,7 @@
     "lessons": "చూసిన పాఠాలు: {{n}}",
     "brighten": "మళ్ళీ ఆడదగినవి: {{names}}",
     "share": "షేర్ కార్డ్ డౌన్‌లోడ్ చేయండి",
-    "shareTitle": "నా మనీ మొహల్లా లక్ష్యం"
+    "shareTitle": "నా మినార్ లక్ష్యం"
   },
   "home": {
     "tagline": "డబ్బు పాఠాలు, ఒక్కో వీధిలో.",
@@ -458,7 +458,7 @@
     "places": "4లో {{n}} చోట్లు",
     "deleteConfirm": "\"{{name}}\" తొలగించాలా? దీన్ని తిరిగి తేలేరు.",
     "deleteYes": "అవును, తొలగించు",
-    "title": "మనీ మొహల్లా",
+    "title": "మినార్",
     "share": "ప్రగతిని పంచుకోండి",
     "shareTitle": "నా ప్రగతిని పంచుకోండి",
     "shareBody": "తరగతి ఎలా ఉందో చూడడానికి ఈ కోడ్‌ను మీ ఉపాధ్యాయునికి లేదా NGO సహాయకునికి పంపండి.",

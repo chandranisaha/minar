@@ -20,7 +20,7 @@ export default function Dashboard() {
     const ops = shareCardLayout(sum, { title: t('summary.shareTitle'), goal: `${sum.goal.percent}%`, pillars, skills, closing: t(sum.closingKey) })
     const a = document.createElement('a')
     a.href = renderShareCard(ops)
-    a.download = 'money-mohalla.png'
+    a.download = 'minar.png'
     a.click()
   }
   return (

@@ -103,7 +103,7 @@ export function Rollout({ cohort, onPickCohort }: { cohort: Cohort | null; onPic
       <div className="ngo-print-only ngo-cards">
         {cohorts.map((c) => (
           <div key={c.id} className="paper p-4" style={{ border: `2px solid ${INK}` }}>
-            <div className="font-display text-[22px]">Money Mohalla</div>
+            <div className="font-display text-[22px]">Minar</div>
             <div className="text-[13px]">{c.name}</div>
             <div className="my-2 text-[34px] font-bold tracking-widest">{c.id}</div>
             <ol className="m-0 pl-4 text-[13px]"><li>Open the game, start or load your game.</li><li>Tap the gear, then Class code.</li><li>Type the code above.</li></ol>

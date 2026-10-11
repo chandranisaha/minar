@@ -325,7 +325,7 @@
   },
   "onboarding": {
     "welcome": {
-      "title": "Welcome to Money Mohalla",
+      "title": "Welcome to Minar",
       "body": "Select a language to continue."
     },
     "problem": {
@@ -365,7 +365,7 @@
     "back": "Back"
   },
   "hub": {
-    "title": "Money Mohalla Hub",
+    "title": "Minar Hub",
     "lookAfterYourself": "Look after yourself",
     "teaches": "Teaches:",
     "time": "Time:",
@@ -436,7 +436,7 @@
     "lessons": "Lessons seen: {{n}}",
     "brighten": "Worth replaying: {{names}}",
     "share": "Download share card",
-    "shareTitle": "My Money Mohalla goal"
+    "shareTitle": "My Minar goal"
   },
   "home": {
     "tagline": "Learn money, one lane at a time.",
@@ -458,7 +458,7 @@
     "places": "{{n}} of 4 places",
     "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
     "deleteYes": "Yes, delete",
-    "title": "Money Mohalla",
+    "title": "Minar",
     "share": "Share progress",
     "shareTitle": "Share my progress",
     "shareBody": "Send this code to your teacher or NGO facilitator so they can see how the class is doing.",

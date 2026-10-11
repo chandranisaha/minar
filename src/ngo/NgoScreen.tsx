@@ -38,7 +38,7 @@ export default function NgoScreen() {
         <header className="ngo-noprint flex items-center gap-3">
           <img src="/art/monument.webp" alt="" aria-hidden draggable={false} className="h-16 shrink-0 object-contain" style={{ filter: 'drop-shadow(0 4px 6px rgba(58,42,36,.3))' }} />
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-bold uppercase tracking-[.2em] opacity-70">Money Mohalla</div>
+            <div className="text-[11px] font-bold uppercase tracking-[.2em] opacity-70">Minar</div>
             <h1 className="font-display m-0 text-[28px] leading-none" style={{ color: INK, textShadow: '0 2px 0 #FBF0D2' }}>Facilitator desk</h1>
           </div>
           <button type="button" className="ink-btn cream" onClick={() => nav('/')}>← Game</button>
