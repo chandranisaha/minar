@@ -69,6 +69,17 @@ This is a design summary, not legal advice; NGOs and schools should confirm thei
   (`studentsCsv`) contain roll numbers, never names.
 - CSV exports neutralise cells starting with `=`, `+`, `-` or `@` (spreadsheet formula injection).
 
+## Student to teacher, live
+
+- **Starting a game:** the student types their name (kept on the phone as the save's name, never sent), their roll number, and
+  optionally the class code. The code is checked with , which returns only the class name, so the student sees they
+  joined the right class.
+- **Sharing:** Profile → My teacher → *Share progress with my teacher*, or automatically after every finished game (a switch the
+  student can turn off). Each share is one call to  with the anonymous summary.
+- **Dashboard:** the  table is in the Supabase realtime publication, so a signed-in teacher's dashboard reloads the
+  moment a student shares and shows who it was (name from the on-device class list). Realtime applies the same row-level security:
+  a teacher only hears about their own classes.
+
 ## Connecting the database (about 10 minutes)
 
 1. Create a free project at supabase.com in the **Mumbai (ap-south-1)** region.
