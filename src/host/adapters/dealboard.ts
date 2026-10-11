@@ -59,7 +59,8 @@ export const adaptDealBoard: GameAdapter = (payload): GameResult => {
       saving: skill(habits, SKILL_MAX),
     }),
     lessonsSeen: strings(p.lessonsSeen),
-    joySignals: {},
+    // how you invested, never how much you made: a calm hand and a spread-out portfolio are the balanced habits
+    joySignals: finished ? { restedOrBalanced: (calm !== undefined && calm >= SKILL_MAX * 0.6 ? 1 : 0) + (spread !== undefined && spread >= SKILL_MAX * 0.6 ? 1 : 0) } : {},
     raw: payload,
   }
 }

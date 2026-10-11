@@ -11,24 +11,28 @@
   },
   "pillars": {
     "plan": {
-      "name": "Plan & Budget",
+      "name": "Bangle Bazaar",
       "hook": "Needs, wants, and a plan for every ₹.",
-      "game": "Festival Showdown"
+      "game": "Festival Showdown",
+      "topic": "Plan & Budget"
     },
     "save": {
-      "name": "Save & Manage",
+      "name": "Café Meherban",
       "hook": "Two bad weeks are coming. Ready?",
-      "game": "Two Bad Weeks"
+      "game": "Pocket Panic",
+      "topic": "Save & Manage"
     },
     "invest": {
-      "name": "Understand Investing",
+      "name": "The Pearl Exchange",
       "hook": "Risk, time, and a little magic called compounding.",
-      "game": "Risk & Time Lab"
+      "game": "Deal Board",
+      "topic": "Understand Investing"
     },
     "safe": {
-      "name": "Stay Financially Safe",
+      "name": "Helpline Kiosk",
       "hook": "Spot the scam before it spots you.",
-      "game": "Spot the Scam"
+      "game": "Case Files",
+      "topic": "Stay Financially Safe"
     }
   },
   "world": {
@@ -122,7 +126,7 @@
     },
     "win": {
       "title": "Light the flags",
-      "caption": "Finish a place and its flag turns gold, and the goal bar fills. Finish all four and the college gate opens."
+      "caption": "Finish a place and its flag turns gold, and the goal bar fills. Finish all four and the gate to Chapter 2 opens."
     },
     "happy": {
       "title": "Stay happy",
@@ -158,20 +162,20 @@
   },
   "celebrate": {
     "title": "Goal reached",
-    "body": "The college gate is open. Well done.",
+    "body": "The gate to Chapter 2 is open. Well done.",
     "again": "Continue",
     "enter": "Step through the gate",
     "nani": "Shabash!"
   },
   "dashboard": {
     "title": "Goal reached",
-    "body": "You made it. The college gate is open."
+    "body": "You made it. The gate to Chapter 2 is open."
   },
   "lang_notice": "Language",
   "island": {
     "dock": "Arrival dock",
     "plaza": "Charminar plaza",
-    "gate": "College gate",
+    "gate": "Chapter 2 gate",
     "gateLocked": "The gate opens when all four lessons are done.",
     "cardMeta": "About {{minutes}} min · {{state}}",
     "cardBest": "Best result: {{percent}}%",
@@ -407,7 +411,7 @@
     "dismissAll": "Dismiss All",
     "goal": {
       "title": "Your Goal",
-      "body": "Each finished place fills the goal bar. All four open the college gate."
+      "body": "Each finished place fills the goal bar. All four open the gate to Chapter 2."
     },
     "happy": {
       "title": "Stay Happy",
@@ -575,8 +579,8 @@
       "cap": "Her clay gullak was never empty. That is how it starts."
     },
     "s3": {
-      "line": "Four minars hold up this city. Four habits can hold up a life.",
-      "cap": "Plan. Save. Invest. Stay safe. Light all four lamps and your goal opens up."
+      "line": "Four minars hold up this city. Four places hold up your year.",
+      "cap": "Plan & Budget at Bangle Bazaar. Save & Manage at Café Meherban. Understand Investing at The Pearl Exchange. Stay Financially Safe at the Helpline Kiosk."
     },
     "s4": {
       "line": "Now tell me, beta. Who is heading out into the world this year?",
@@ -599,6 +603,11 @@
       "dimHint": "Happy 35 to 59: three quarters",
       "flicker": "Faint",
       "flickerHint": "Happy below 35: half"
+    },
+    "s8": {
+      "line": "Light all four lamps, beta, and the gate to Chapter 2 opens. I will be waiting on the other side.",
+      "cap": "Finish all four places and a golden gate opens on the island. That is only the end of Chapter 1.",
+      "gate": "Chapter 2"
     }
   }
 }

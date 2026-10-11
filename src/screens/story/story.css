@@ -97,3 +97,20 @@ html[data-lite='true'] .st-say-cap { opacity: .78; }
 html[data-lite='true'] .st-minar .pic img.shop { filter: none; }
 html[data-lite='true'] .st-minar .pic .flag { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .st-beat *, .st-say, .st-backdrop * { animation: none !important; } .st-word { opacity: 1; } .st-minar .pic img.shop { filter: none; } .st-minar .pic .flag { opacity: 1; } }
+
+/* beat 8: the gate to Chapter 2 */
+.st-gate { position: relative; width: min(100%, 420px); height: 100%; max-height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; }
+.st-gate-lamps { display: flex; gap: 10px; height: 18%; }
+.st-gate-lamps img { height: 100%; width: auto; opacity: .3; filter: grayscale(1); animation: st-lamp-on 8s ease-in-out infinite; animation-delay: calc(var(--n) * 1s); }
+@keyframes st-lamp-on { 0%, 8% { opacity: .3; filter: grayscale(1) } 14%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 210, 90, .95)) } }
+.st-gate-box { position: relative; flex: 1; width: 100%; min-height: 0; display: grid; place-items: center; }
+.st-gate-box img { position: absolute; max-height: 100%; max-width: 86%; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(58, 42, 36, .3)); }
+.st-gate-box .closed { animation: st-gate-closed 8s ease-in-out infinite; }
+.st-gate-box .open { opacity: 0; animation: st-gate-open 8s ease-in-out infinite; }
+.st-gate-box .glow { position: absolute; width: 70%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255, 226, 130, .85), transparent 65%); opacity: 0; animation: st-gate-open 8s ease-in-out infinite; }
+@keyframes st-gate-closed { 0%, 52% { opacity: 1 } 60%, 100% { opacity: 0 } }
+@keyframes st-gate-open { 0%, 52% { opacity: 0 } 60%, 100% { opacity: 1 } }
+.st-gate-tag { padding: 4px 18px; border: 2px solid #3A2A24; border-radius: 999px; background: #FFF8E2; font-family: var(--font-display); font-size: 20px; box-shadow: 0 3px 0 rgba(58, 42, 36, .3); }
+html[data-lite='true'] .st-gate-box .open, html[data-lite='true'] .st-gate-lamps img { opacity: 1; filter: none; }
+html[data-lite='true'] .st-gate-box .closed { display: none; }
+.st-minar .topic { display: block; margin-top: 3px; padding: 1px 8px; border-radius: 999px; background: #D9573F; color: #FFF7E6; font-style: normal; font-weight: 800; font-size: 11px; letter-spacing: .03em; }

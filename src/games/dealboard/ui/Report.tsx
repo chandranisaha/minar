@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PASS_MARK, type Score } from '../engine/scoring'
+import { Stars } from '../../../ui/kit/Icons'
+import '../../../ui/kit/minar.css'
+import { starsFor } from '../../../progress/points'
 import type { RunState } from '../engine/state'
 import { marketFor } from '../engine/state'
 import { reviewDecisions, type Verdict } from '../engine/review'
@@ -70,7 +73,7 @@ export function Report({ run, score, onComplete, onAgain, onExit }: { run: RunSt
         <div className="h-2 shrink-0 border-b-2 border-ink" style={{ background: score.cleared ? '#3F7A3A' : '#E8B04A' }} />
         <header className="flex shrink-0 items-center gap-3 px-4 pt-2.5">
           <div className="min-w-0 flex-1">
-            <div className="db-eyebrow text-[#8a5a2b]">★ ★ ★ {t('report.eyebrow')}</div>
+            <div className="db-eyebrow flex items-center gap-2 text-[#8a5a2b]"><Stars n={starsFor(score.total / 100, score.cleared)} size={16} /> {t('report.eyebrow')}</div>
             <h2 className="font-sign lang-fit m-0 text-[20px] leading-tight sm:text-[24px]">{t('report.title')}</h2>
           </div>
           <div className="shrink-0 text-right">

@@ -48,6 +48,7 @@ export function MoneySheet({ open, onClose }: { open: boolean; onClose: () => vo
                 <span className={`mk-lamp ${lit ? st.brightness : 'off'}`}><img src={`/art/shop-${p.id}.webp`} alt="" draggable={false} /></span>
                 <div className="min-w-0 flex-1">
                   <div className="font-display text-[18px] leading-tight">{t(`pillars.${p.id}.name`)}</div>
+                  <div className="mk-sub font-bold">{t(`pillars.${p.id}.topic`)}</div>
                   <div className="mk-sub">{lit ? t('kit.money.earned', { x: inr(gained, lang) }) : t('kit.money.notYet')}</div>
                 </div>
                 <div className="text-right">

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { inr, type Lang, type PillarId } from '../../content/data'
 import type { ResultView } from '../../host/resultView'
 import { useCountTo } from '../kit/hooks'
+import { HappyIcon, MoneyIcon, Stars } from '../kit/Icons'
+import { starsFor } from '../../progress/points'
 import '../kit/minar.css'
 import './result.css'
 import { BalanceCard } from './BalanceCard'
@@ -39,8 +41,9 @@ export function ResultScreen({ view, lang, nextPillar, onContinue, onReplay, onB
         </div>
         <div className="rs-head">
           <h2 data-testid="result-title" className="font-display lang-fit m-0 text-[28px] leading-tight">{view.cleared ? t('result.cleared') : t('result.notCleared')}</h2>
-          <div className="mt-1 text-[15px] font-bold opacity-80">{t(`pillars.${view.pillar}.name`)}</div>
+          <div className="mt-1 text-[15px] font-bold opacity-80">{t(`pillars.${view.pillar}.name`)} · {t(`pillars.${view.pillar}.topic`)} · {t(`pillars.${view.pillar}.game`)}</div>
           <div data-testid="result-state" className="mt-2 flex flex-wrap items-center gap-1.5">
+            <Stars n={starsFor(view.qualityPercent / 100, view.cleared)} size={24} />
             <span className="mk-chip">{t(`state.${stateKey}`)}{view.state.status !== 'complete' && view.state.partialPercent > 0 ? ` · ${t('result.partial', { percent: view.state.partialPercent })}` : ''}</span>
             {view.improved && <span className="mk-chip" style={{ background: '#CFE8B8' }}>▲ {t('result.improved')}</span>}
             <span className="mk-chip">{t('result.quality')}: <b data-testid="result-quality">{view.qualityPercent}%</b></span>
@@ -50,7 +53,7 @@ export function ResultScreen({ view, lang, nextPillar, onContinue, onReplay, onB
 
       <div className="rs-deltas">
         <div className="rs-delta gold" data-testid="result-goal">
-          <img src="/art/cafe/coin.webp" alt="" draggable={false} />
+          <MoneyIcon size={38} />
           <div className="min-w-0">
             <div className="rs-k">{t('kit.bar.money')}</div>
             <div className="rs-v"><span data-testid="result-saved-after"><Tween before={view.saved.before} after={view.saved.after} render={(n) => inr(n, lang)} /></span></div>
@@ -58,7 +61,7 @@ export function ResultScreen({ view, lang, nextPillar, onContinue, onReplay, onB
           </div>
         </div>
         <div className="rs-delta rose" data-testid="result-happy">
-          <span className="rs-face">{view.happy.delta < 0 ? '😮‍💨' : '😊'}</span>
+          <HappyIcon band={view.happy.after >= 60 ? 'glowing' : view.happy.after >= 35 ? 'ok' : 'tired'} size={36} />
           <div className="min-w-0">
             <div className="rs-k">{t('kit.bar.happy')}</div>
             <div className="rs-v"><span data-testid="result-happy-after"><Tween before={view.happy.before} after={view.happy.after} delay={1100} render={(n) => String(n)} /></span></div>

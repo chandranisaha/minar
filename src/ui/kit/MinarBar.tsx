@@ -4,6 +4,7 @@ import { inr } from '../../content/data'
 import { useHappyView } from '../../features/happy/hooks'
 import { useGame } from '../../store/game'
 import { useCountTo, useDelta } from './hooks'
+import { HappyIcon } from './Icons'
 import { HappySheet } from './sheets/HappySheet'
 import { MoneySheet } from './sheets/MoneySheet'
 import { ProfileSheet } from './sheets/ProfileSheet'
@@ -64,6 +65,7 @@ export function MinarBar({ replay = true, hideProfile = false }: { replay?: bool
             {dMoney !== 0 && <span className={`mk-delta ${dMoney < 0 ? 'neg' : ''}`} aria-live="polite">{dMoney > 0 ? '+' : '−'}{inr(Math.abs(dMoney), lang)}</span>}
           </button>
           <button type="button" className="mk-pill mk-happy" aria-label={`${t('kit.bar.happy')}: ${happy.valueRounded}`} onClick={() => setOpen('happy')}>
+            <HappyIcon band={happy.band} size={30} />
             <span className="mk-pill-text">
               <span className="mk-pill-num">{t(happy.labelKey)} <small>{shownHappy}</small></span>
               <span className="mk-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={happy.percent}>

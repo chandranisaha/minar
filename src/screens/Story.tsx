@@ -11,7 +11,7 @@ import { stepped } from '../lib/stepped'
 import { Backdrop, Beat, Say } from './story/parts'
 import './story/story.css'
 
-const LAST = 7
+const LAST = 8
 
 /** 1. Before sunrise: Ammamma sweeps the steps of the Charminar */
 function S1Dawn() {
@@ -66,6 +66,7 @@ function S3Minars() {
                 <img className="flag" src="/art/flag-done.webp" alt="" draggable={false} />
               </div>
               <b>{t(`pillars.${p.id}.name`)}</b>
+              <em className="topic">{t(`pillars.${p.id}.topic`)}</em>
               <small>{t(`pillars.${p.id}.hook`)}</small>
             </div>
           ))}
@@ -227,6 +228,29 @@ function S7Happy() {
   )
 }
 
+/** 8. The gate to Chapter 2: closed while you play, golden when all four lamps are lit */
+function S8Gate() {
+  const { t } = useTranslation()
+  return (
+    <Beat
+      art={
+        <div className="st-gate">
+          <div className="st-gate-lamps" aria-hidden>
+            {PILLARS.map((p, n) => <img key={p.id} src="/art/flag-done.webp" alt="" draggable={false} style={{ ['--n' as string]: n }} />)}
+          </div>
+          <div className="st-gate-box">
+            <img className="closed" src="/art/gate-closed.webp" alt="" draggable={false} />
+            <img className="open" src="/art/gate-open.webp" alt="" draggable={false} />
+            <span className="glow" />
+          </div>
+          <div className="st-gate-tag">{t('tale.s8.gate')}</div>
+        </div>
+      }
+      say={<Say line={t('tale.s8.line')} caption={t('tale.s8.cap')} />}
+    />
+  )
+}
+
 export default function Story() {
   const { t } = useTranslation()
   const nav = useNavigate()
@@ -267,6 +291,7 @@ export default function Story() {
         {step === 5 && <S5Bundle />}
         {step === 6 && <S6Goal />}
         {step === 7 && <S7Happy />}
+        {step === 8 && <S8Gate />}
       </div>
 
       {step >= 5 ? (
