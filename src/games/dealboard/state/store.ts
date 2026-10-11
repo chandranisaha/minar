@@ -37,7 +37,9 @@ export const useDealBoard = create<DealBoardStore>()(
       migrate: () => ({ run: null }),
       merge: (saved, current) => {
         const run = (saved as { run?: unknown } | undefined)?.run
-        return { ...current, run: usableRun(run) ? run : null }
+        // the game starts fresh every time the app loads; a saved run is only kept if a caller opts in later
+        void run
+        return { ...current, run: null }
       },
     },
   ),

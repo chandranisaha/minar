@@ -144,5 +144,81 @@
     "met": "pitched",
     "unmet": "not met yet",
     "pitching": "Pitching"
+  },
+  "what": {
+    "dailyBasket": "Delivers groceries to your door.",
+    "payEasy": "A phone app for sending money.",
+    "solarGrid": "Puts solar panels on rooftops.",
+    "medLink": "Runs neighbourhood health clinics.",
+    "steelWorks": "Makes steel for buildings and bridges.",
+    "quickRide": "A cab-booking app."
+  },
+  "founders": {
+    "dailyBasket": {
+      "name": "Mohan Rao",
+      "role": "Ex-supermarket manager",
+      "age": "52",
+      "j0": "1998–2012 · Managed three supermarkets",
+      "j1": "2012–2018 · Ran supplies for a grocery chain",
+      "j2": "2018–now · Started Daily Basket",
+      "notice": "Twenty years in groceries. He knows this business.",
+      "yrs": "26",
+      "starts": "1"
+    },
+    "payEasy": {
+      "name": "Kabir Sethi",
+      "role": "App founder",
+      "age": "29",
+      "j0": "2017 · Left college to build apps",
+      "j1": "2019 · First app shut down after a year",
+      "j2": "2021 · Launched PayEasy with big investor money",
+      "notice": "No profit history yet, only big promises.",
+      "yrs": "7",
+      "starts": "2"
+    },
+    "solarGrid": {
+      "name": "Anil Varma",
+      "role": "Engineer",
+      "age": "47",
+      "j0": "2003–2011 · Power plant engineer",
+      "j1": "2011–2018 · Built solar farms for a utility",
+      "j2": "2018–now · Started SolarGrid",
+      "notice": "Real solar experience, but sales swing with the seasons.",
+      "yrs": "21",
+      "starts": "1"
+    },
+    "medLink": {
+      "name": "Dr. Farah Siddiqui",
+      "role": "Clinic builder",
+      "age": "41",
+      "j0": "2008–2014 · Doctor at a city hospital",
+      "j1": "2014 · Opened her first clinic with a bank loan",
+      "j2": "2016–now · Keeps opening new clinics",
+      "notice": "Every new clinic is built on borrowed money.",
+      "yrs": "16",
+      "starts": "1"
+    },
+    "steelWorks": {
+      "name": "R. Krishnan",
+      "role": "Third-generation owner",
+      "age": "63",
+      "j0": "1985 · Joined his father’s steel mill",
+      "j1": "2000 · Took over as owner",
+      "j2": "2015–now · Customers keep leaving for newer mills",
+      "notice": "Proud of the past, but the world moved on.",
+      "yrs": "39",
+      "starts": "1"
+    },
+    "quickRide": {
+      "name": "Zoya Malik",
+      "role": "Showman",
+      "age": "34",
+      "j0": "2013 · Started a food delivery app",
+      "j1": "2016 · Sold her shares and left",
+      "j2": "2019 · Launched QuickRide and sold shares again",
+      "notice": "Has a habit of selling shares and moving on.",
+      "yrs": "11",
+      "starts": "3"
+    }
   }
 }

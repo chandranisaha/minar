@@ -5,7 +5,7 @@ import type { CompanyId, MarketRun } from '../engine/types'
 import { InfoHeader } from './InfoTip'
 import { LightChip } from './Lights'
 import { useInr } from './Panels'
-import { TitleCard } from '../../../components/TitleCard'
+import { TitleCard } from './TitleCard'
 
 /** Round sector-coloured mark with the company's initial: the company's token on the board and in lists. */
 export function Mark({ id, size = 26 }: { id: CompanyId; size?: number }) {
@@ -62,7 +62,7 @@ export function Meet({ m, onStart }: { m: MarketRun; onStart: () => void }) {
   const { t } = useTranslation('dealboard')
   const tips = t('meet.tips', { returnObjects: true }) as string[]
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-4 pb-6 pt-3">
+    <div className="db-roomy mx-auto my-auto flex w-full max-w-[640px] flex-col gap-4 px-4 pb-6 pt-3">
       <TitleCard eyebrow={t('meet.eyebrow')} title={t('meet.title')}><p className="m-0">{t('meet.intro')}</p></TitleCard>
       <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-2">
         {m.picked.map((id) => {

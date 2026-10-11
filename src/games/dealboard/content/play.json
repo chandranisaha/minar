@@ -10,8 +10,8 @@
       "X": "No answer"
     },
     "cash": {
-      "name": "Cash cushion",
-      "ask": "How long can you run on cash?",
+      "name": "Bank balance",
+      "ask": "Will the money run out soon?",
       "explain": "How many months the company can pay its bills before its cash runs out.",
       "G": "Profitable, or 12 months or more of cash.",
       "A": "Runway of 6 to 12 months.",
@@ -20,7 +20,7 @@
     },
     "customers": {
       "name": "Customers",
-      "ask": "How many pay, and how many stay?",
+      "ask": "Do customers keep coming back?",
       "explain": "Are more paying customers arriving than leaving, and do most of them stay?",
       "G": "More customers arriving than leaving, and 75% or more stay.",
       "A": "Customers about steady, 60 to 75% stay.",
@@ -28,8 +28,8 @@
       "deflect": "“People love us.”"
     },
     "debt": {
-      "name": "Debt",
-      "ask": "How much do you owe?",
+      "name": "Loans",
+      "ask": "Does it owe a lot of money?",
       "explain": "Can its profit comfortably pay the interest on what it owes?",
       "G": "No debt, or profit pays the interest 3 times or more.",
       "A": "Profit pays the interest 1.5 to 3 times.",
@@ -37,8 +37,8 @@
       "deflect": "“We are investing in growth.”"
     },
     "ceo": {
-      "name": "Insider trades",
-      "ask": "Are you selling shares?",
+      "name": "Boss’s shares",
+      "ask": "Is the boss selling their shares?",
       "explain": "Have the people running the company been selling their own shares lately?",
       "G": "No share sales in the last 3 quarters.",
       "A": "One sale in the last 3 quarters.",
@@ -181,7 +181,7 @@
     "toolkit": "Your toolkit",
     "toolkitNone": "Play a few quarters to earn terms for your toolkit.",
     "again": "Play again",
-    "back": "Back to the Charminar",
+    "back": "Back to Minar",
     "closing": "Real markets are harder than this game. This teaches how to ask good questions, not what to buy."
   }
 }
