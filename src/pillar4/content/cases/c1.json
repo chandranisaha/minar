@@ -1,0 +1,105 @@
+{
+  "id": "C1", "kind": "case", "support": "guided",
+  "victim": { "name": "Anjali", "age": 17 },
+  "apps": ["messages", "phone", "chatup", "instaglam", "paynow"],
+  "items": [
+    { "id": "C1-M01", "app": "messages", "kind": "sms", "thread": "Amma" },
+    { "id": "C1-M02", "app": "messages", "kind": "sms", "thread": "Appa" },
+    { "id": "C1-M03", "app": "messages", "kind": "sms", "thread": "Sunrise Junior College", "role": "herring" },
+    { "id": "C1-M04", "app": "messages", "kind": "sms", "thread": "Tulasi Aunty", "role": "herring" },
+    { "id": "C1-M05", "app": "messages", "kind": "sms", "thread": "VM-DRMSCH", "time": "Tue 5:15 PM", "zones": [
+      { "id": "C1-M05.a" }, { "id": "C1-M05.deadline" }, { "id": "C1-M05.b" }, { "id": "C1-M05.link" }
+    ] },
+    { "id": "C1-M06", "app": "messages", "kind": "sms", "thread": "PNOW-OTP", "time": "Tue 7:04 PM", "role": "context" },
+    { "id": "C1-M07", "app": "messages", "kind": "sms", "thread": "PNOW-ALERT", "time": "Tue 7:08 PM", "role": "context" },
+    { "id": "C1-M08", "app": "messages", "kind": "sms", "thread": "Library", "role": "herring" },
+
+    { "id": "C1-P01", "app": "phone", "kind": "call", "dir": "out" },
+    { "id": "C1-P02", "app": "phone", "kind": "call" },
+    { "id": "C1-P03", "app": "phone", "kind": "call", "linkKey": "num42" },
+    { "id": "C1-P04", "app": "phone", "kind": "call", "linkKey": "num42" },
+    { "id": "C1-P05", "app": "phone", "kind": "call" },
+    { "id": "C1-P06", "app": "phone", "kind": "call", "role": "herring" },
+    { "id": "C1-P04-R1", "app": "phone", "kind": "caption", "thread": "C1-P04" },
+    { "id": "C1-P04-R2", "app": "phone", "kind": "caption", "thread": "C1-P04" },
+    { "id": "C1-P04-R3", "app": "phone", "kind": "caption", "thread": "C1-P04" },
+    { "id": "C1-P04-R4", "app": "phone", "kind": "caption", "thread": "C1-P04", "dir": "out", "role": "context" },
+    { "id": "C1-P04-R5", "app": "phone", "kind": "caption", "thread": "C1-P04" },
+    { "id": "C1-P04-R6", "app": "phone", "kind": "caption", "thread": "C1-P04", "dir": "out", "role": "context" },
+    { "id": "C1-P04-R7", "app": "phone", "kind": "caption", "thread": "C1-P04" },
+
+    { "id": "C1-CH01", "app": "chatup", "kind": "chat", "thread": "Amma" },
+    { "id": "C1-CH02", "app": "chatup", "kind": "chat", "thread": "Class 12-B group" },
+    { "id": "C1-CH03", "app": "chatup", "kind": "chat", "thread": "Meera", "time": "Mon 6:10 PM", "role": "herring" },
+    { "id": "C1-CH04", "app": "chatup", "kind": "chat", "thread": "Kiran (cousin)" },
+    { "id": "C1-CH05a", "app": "chatup", "kind": "chat", "thread": "Officer Rajesh (Dream Scholars)", "time": "Mon 7:12 PM" },
+    { "id": "C1-CH05b", "app": "chatup", "kind": "chat", "thread": "Officer Rajesh (Dream Scholars)", "role": "context" },
+    { "id": "C1-CH05c", "app": "chatup", "kind": "chat", "thread": "Officer Rajesh (Dream Scholars)" },
+    { "id": "C1-CH05d", "app": "chatup", "kind": "chat", "thread": "Officer Rajesh (Dream Scholars)", "time": "Tue 5:25 PM", "role": "context" },
+    { "id": "C1-CH05e", "app": "chatup", "kind": "chat", "thread": "Officer Rajesh (Dream Scholars)", "time": "Tue 7:31 PM" },
+    { "id": "C1-CH05p", "app": "chatup", "kind": "profile", "thread": "Officer Rajesh (Dream Scholars)", "zones": [
+      { "id": "C1-CH05p.name" }, { "id": "C1-CH05p.photo", "zoomKey": "C1-CH05p.photo.zoom" }, { "id": "C1-CH05p.about" },
+      { "id": "C1-CH05p.phone", "linkKey": "num42" }, { "id": "C1-CH05p.org" }
+    ] },
+    { "id": "C1-CH06", "app": "chatup", "kind": "chat", "thread": "Family group" },
+
+    { "id": "C1-IG01", "app": "instaglam", "kind": "feed" },
+    { "id": "C1-IG02", "app": "instaglam", "kind": "feed" },
+    { "id": "C1-IG03", "app": "instaglam", "kind": "feed" },
+    { "id": "C1-IG04a", "app": "instaglam", "kind": "saved", "thread": "Dream Scholars Foundation", "zones": [
+      { "id": "C1-IG04a.a" }, { "id": "C1-IG04a.noexam" }, { "id": "C1-IG04a.b" }, { "id": "C1-IG04a.cap" }
+    ] },
+    { "id": "C1-IG04b", "app": "instaglam", "kind": "saved", "thread": "Dream Scholars Foundation" },
+    { "id": "C1-IG05", "app": "instaglam", "kind": "page", "thread": "Dream Scholars Foundation", "zones": [
+      { "id": "C1-IG05.handle" }, { "id": "C1-IG05.stats" }, { "id": "C1-IG05.age" }, { "id": "C1-IG05.comments" }
+    ] },
+    { "id": "C1-IG06", "app": "instaglam", "kind": "dm", "thread": "dream.scholars.0fficial", "time": "Mon 7:05 PM", "zones": [
+      { "id": "C1-IG06.handle", "part": "head" }, { "id": "C1-IG06.a" }, { "id": "C1-IG06.num", "linkKey": "num42" }, { "id": "C1-IG06.b" }
+    ] },
+    { "id": "C1-IG07", "app": "instaglam", "kind": "dm", "thread": "Meera", "role": "herring", "explainKey": "C1-CH03.explain" },
+
+    { "id": "C1-PN01", "app": "paynow", "kind": "summary" },
+    { "id": "C1-PN02", "app": "paynow", "kind": "history", "time": "Tue 7:08 PM" },
+    { "id": "C1-PN03", "app": "paynow", "kind": "history", "time": "Tue 2:20 PM" },
+    { "id": "C1-PN04", "app": "paynow", "kind": "history", "time": "Mon 9:00 AM", "role": "herring" },
+    { "id": "C1-PN05", "app": "paynow", "kind": "history", "time": "Sat" },
+    { "id": "C1-PN06", "app": "paynow", "kind": "history", "time": "Fri", "role": "herring" },
+    { "id": "C1-PN07", "app": "paynow", "kind": "payees" }
+  ],
+  "clues": [
+    { "id": "C1-01", "kind": "required", "reason": "too_good", "distractors": ["secret", "threat"], "step": 1, "targets": ["C1-IG04a.noexam", "C1-IG04a.a", "C1-IG06.a"] },
+    { "id": "C1-02", "kind": "required", "reason": "pretend", "distractors": ["secret", "threat"], "step": 2, "targets": ["C1-IG06.handle", "C1-CH05p.photo", "C1-CH05p.org", "C1-CH05p.name", "C1-CH05a", "C1-P04-R1", "C1-IG05.handle"] },
+    { "id": "C1-03", "kind": "required", "reason": "rushing", "distractors": ["pretend", "secret"], "step": 3, "targets": ["C1-M05.deadline", "C1-M05.a", "C1-M05.b", "C1-IG04a.b", "C1-IG04a.cap", "C1-P04-R2", "C1-P04-R5"] },
+    { "id": "C1-04", "kind": "required", "reason": "grab", "distractors": ["too_good", "rushing"], "step": 4, "targets": ["C1-P04-R3"] },
+    { "id": "C1-05", "kind": "required", "reason": "grab", "distractors": ["rushing", "threat"], "step": 4, "targets": ["C1-PN02"] },
+    { "id": "C1-06", "kind": "required", "reason": "secret", "distractors": ["pretend", "grab"], "step": 5, "targets": ["C1-IG04b", "C1-CH05e"] },
+    { "id": "C1-G1", "kind": "gold", "reason": "pretend", "distractors": ["too_good", "rushing"], "step": 1, "targets": ["C1-IG05.age", "C1-IG05.comments", "C1-IG05.stats"] },
+    { "id": "C1-G2", "kind": "gold", "reason": "secret", "alsoAccepted": ["rushing"], "distractors": ["grab", "threat"], "step": 3, "targets": ["C1-CH05c", "C1-P04-R7"] },
+    { "id": "C1-G3", "kind": "gold", "reason": "pretend", "distractors": ["too_good", "grab"], "step": 2, "targets": ["C1-M05.link"] },
+    { "id": "C1-X1", "kind": "connect", "step": 2, "linkKey": "num42", "targets": [] }
+  ],
+  "leads": [
+    { "id": "C1-L1", "clueId": "C1-01", "glowApp": "instaglam", "pulseTarget": "C1-IG04a.noexam" },
+    { "id": "C1-L2", "clueId": "C1-02", "glowApp": "instaglam", "pulseTarget": "C1-IG06.handle" },
+    { "id": "C1-L3", "clueId": "C1-03", "glowApp": "messages", "pulseTarget": "C1-M05.deadline" },
+    { "id": "C1-L4", "clueId": "C1-04", "glowApp": "phone", "pulseTarget": "C1-P04-R3" },
+    { "id": "C1-L5", "clueId": "C1-05", "glowApp": "paynow", "pulseTarget": "C1-PN02" },
+    { "id": "C1-L6", "clueId": "C1-06", "glowApp": "instaglam", "pulseTarget": "C1-IG04b" }
+  ],
+  "fix": {
+    "qKey": "C1.fix.q",
+    "shield": "protect",
+    "options": [
+      { "key": "C1.fix.a", "correct": false, "whyKey": "C1.fix.a.why" },
+      { "key": "C1.fix.b", "correct": true, "whyKey": "C1.fix.b.why" },
+      { "key": "C1.fix.c", "correct": false, "whyKey": "C1.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 1, "captionKey": "C1.replay.1" },
+    { "step": 2, "captionKey": "C1.replay.2" },
+    { "step": 3, "captionKey": "C1.replay.3" },
+    { "step": 4, "captionKey": "C1.replay.4" },
+    { "step": 5, "captionKey": "C1.replay.5" }
+  ]
+}

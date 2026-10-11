@@ -130,3 +130,66 @@ html[data-lite="true"] .anim-float, html[data-lite="true"] .anim-float-fast { an
 .flame { animation: flame-flicker .9s steps(6) infinite; transform-box: fill-box; transform-origin: 50% 100%; }
 @media (prefers-reduced-motion: reduce) { .flame { animation: none; } }
 html[data-lite="true"] .flame { animation: none; }
+
+/* shell wireframe tokens (see src/art/palette.ts); main's island palette above wins on shared names */
+@theme {
+  --color-marigold: #f28c28;
+  --color-mustard: #e8b04a;
+  --color-jasmine: #fff3d6;
+  --color-sky: #5bb5d6;
+  --color-teal: #2f6f73;
+  --color-pink: #e5457a;
+  --color-dusk: #1e2a44;
+  --color-maroon: #7a2a22;
+  --color-stone-shade: #d9a86a;
+  --color-peach: #f2a56b;
+  --color-cobble: #d49a62;
+  --color-cobble-dark: #b97a48;
+  --color-glove: #fff3d6;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-ink-soft: #3a231f;
+  --color-paper-tan: #f2d9a8;
+  --color-track: #e9d3a6;
+  --color-skin: #f9c97a;
+  --color-slate: #4b5a63;
+  --color-stone-grey: #d9d3c6;
+  --color-coin-light: #f0c24a;
+  --color-lamp-lit: #ffd25a;
+  --color-lamp-unlit: #8c7b6e;
+  --color-lamp-ray: #ffe9a0;
+  --color-lamp-stone-light: #a39284;
+  --color-lamp-stone-dark: #6e5e52;
+  --color-lamp-glow: #ffc94a;
+  --color-glow-pale: #ffe696;
+  --color-glow-yellow: #ffe178;
+  --color-glow-amber: #ffc85a;
+  --color-sky-cream: #ffe3a8;
+  --color-sky-orange: #f9a94c;
+  --color-sun-glow: #fff1b0;
+  --color-ground-tan: #c98b58;
+  --color-night-sky: #2a2a5e;
+  --color-dawn-purple: #7c4a8e;
+  --color-dawn-pink: #f28c9a;
+  --color-dawn-gold: #ffc36b;
+  --color-hill-purple: #6a4a7a;
+  --color-rose-light: #f26ba0;
+  --color-rose-bright: #ff8fb8;
+  --color-marigold-light: #f5a623;
+  --color-marigold-deep: #e8742a;
+  --color-cream-white: #fff8e1;
+  --color-cream-pale: #fff0c4;
+  --color-cream: #f7e6b8;
+  --color-rule-line: #f3e1b4;
+  --color-sand-line: #c9a867;
+  --color-yellow: #f4c430;
+  --color-gold-dark: #b98a14;
+  --color-wood: #8a4f2b;
+  --color-night-wall-end: #3b1f26;
+  --color-floor-dark: #3b2a26;
+}
+:root {
+  --surface: var(--color-paper); --surface-ink: var(--color-ink); --accent: var(--color-pink); --success: var(--color-sage); --warning: var(--color-marigold); --danger: var(--color-coral);
+  --joy-bright: var(--color-lamp-lit); --joy-dim: #b8923a; --joy-flicker: var(--color-lamp-unlit);
+  --z-scene: 30; --z-hud: 40; --z-overlay: 50; --z-modal: 60; --z-film: 90; --z-transition: 100;
+}

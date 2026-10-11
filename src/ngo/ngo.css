@@ -1,0 +1,11 @@
+/* Facilitator desk: printing gives a clean one-page report or code cards instead of the on-screen layout. */
+@media print {
+  html, body, #root { height: auto !important; overflow: visible !important; background: #fff !important; }
+  .fixed, .absolute.ngo-root { position: static !important; }
+  .ngo-root { overflow: visible !important; background: #fff !important; }
+  .ngo-noprint { display: none !important; }
+  .ngo-print-only { display: block !important; }
+  .paper { box-shadow: none !important; break-inside: avoid; }
+  .ngo-cards { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+.ngo-print-only { display: none; }

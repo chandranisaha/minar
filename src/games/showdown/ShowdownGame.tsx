@@ -19,10 +19,12 @@ export interface ShowdownProps {
   /** called once with the result when the report is first shown (the hub saves it and lights the minaret) */
   onComplete?: (r: GameResult) => void
   onExit: () => void
+  /** inside the shell, which already has an Exit bar: hide this game's own back button */
+  embedded?: boolean
 }
 
 /** Festival Showdown (Pillar 1: Plan & Budget). Screens only append decisions; the engine decides what happens. */
-export default function ShowdownGame({ cohortCode = 'local', onComplete, onExit }: ShowdownProps) {
+export default function ShowdownGame({ cohortCode = 'local', onComplete, onExit, embedded = false }: ShowdownProps) {
   const { t } = useSd()
   const { step } = useView()
   const load = useShowdown((s) => s.load)
@@ -55,7 +57,7 @@ export default function ShowdownGame({ cohortCode = 'local', onComplete, onExit 
       <div className="relative mx-auto flex min-h-full max-w-md flex-col">
         <header className="sticky top-0 z-40" style={{ background: '#FFF3D6', borderBottom: '3px solid #2B1A17' }}>
           <div className="flex items-center gap-1.5 px-2 pb-1" style={{ paddingTop: 'max(6px, env(safe-area-inset-top))' }}>
-            <button type="button" className="ink-chip grid h-12 w-12 shrink-0 place-items-center text-[18px]" aria-label={t('exit')} title={t('exit')} onClick={onExit}>◀</button>
+            {!embedded && <button type="button" className="ink-chip grid h-12 w-12 shrink-0 place-items-center text-[18px]" aria-label={t('exit')} title={t('exit')} onClick={onExit}>◀</button>}
             <span className="font-sign lang-fit min-w-0 flex-1 text-[15px]">{t('title')}</span>
             <LangSwitch />
           </div>

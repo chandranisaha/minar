@@ -56,7 +56,12 @@
     "keysHint": "Arrow keys / WASD to walk · Enter to go in",
     "completed": "Done",
     "illustrative": "Illustrative amounts. Not real offers or advice.",
-    "settings": "Settings"
+    "settings": "Settings",
+    "classCode": "Class code",
+    "resetProgress": "Reset progress",
+    "resetConfirm": "Erase all progress on this device?",
+    "resetYes": "Yes, reset",
+    "resetNo": "Keep it"
   },
   "personas": {
     "school": {
@@ -86,7 +91,8 @@
       "caption": "Pick the person you will be this year.",
       "look": "Look",
       "girl": "Girl",
-      "boy": "Boy"
+      "boy": "Boy",
+      "festival": "Your family's festival"
     },
     "b3": {
       "title": "Nani's flower stall",
@@ -96,15 +102,32 @@
     },
     "b4": {
       "title": "The goal",
-      "caption": "Fee due in 12 months. Each good choice fills the bar.",
+      "caption": "Your fee is due in 12 months. Let's earn the rest.",
       "receipt": "FEE RECEIPT",
       "amount": "Amount due",
       "deadline": "Due in 12 months",
       "paid": "Paid so far",
       "stamp": "DUE"
     },
-    "step": "Scene {{n}} of 4",
-    "rotate": "Turn your phone upright to play the story."
+    "step": "Scene {{n}} of 6",
+    "rotate": "Turn your phone upright to play the story.",
+    "b5": {
+      "title": "The bazaar opens",
+      "caption": "Four doors. Four lessons. All yours.",
+      "ask": "Where will you go first?"
+    },
+    "places": {
+      "title": "Four places, four skills",
+      "caption": "Each place on the island teaches one skill. Visit all four."
+    },
+    "win": {
+      "title": "Light the flags",
+      "caption": "Finish a place and its flag turns gold, and the goal bar fills. Finish all four and the college gate opens."
+    },
+    "happy": {
+      "title": "Stay happy",
+      "caption": "A short break keeps your Happy Index up, so lessons count in full. Tap a place to walk there, drag to look around, pinch to zoom."
+    }
   },
   "buttons": {
     "start": "Start",
@@ -136,7 +159,8 @@
     "title": "Goal reached",
     "body": "The college gate is open. Well done.",
     "again": "Continue",
-    "enter": "Step through the gate"
+    "enter": "Step through the gate",
+    "nani": "Shabash!"
   },
   "dashboard": {
     "title": "Goal reached",
@@ -147,6 +171,303 @@
     "dock": "Arrival dock",
     "plaza": "Charminar plaza",
     "gate": "College gate",
-    "gateLocked": "The gate opens when all four lessons are done."
+    "gateLocked": "The gate opens when all four lessons are done.",
+    "cardMeta": "About {{minutes}} min · {{state}}",
+    "cardBest": "Best result: {{percent}}%",
+    "spot": "Take a short break"
+  },
+  "host": {
+    "exit": "Exit",
+    "exitConfirm": "Leave this game? Progress inside the game may not be saved.",
+    "exitYes": "Leave",
+    "exitNo": "Keep playing",
+    "play": "Play",
+    "loading": "Loading the game…",
+    "errorTitle": "This game could not run",
+    "errorBody": "Something went wrong. Your progress so far is safe.",
+    "errorBack": "Back",
+    "banner": "Made-up numbers. Real life is different.",
+    "newSeed": "New seed (dev)",
+    "placeholder": {
+      "label": "Placeholder game",
+      "seed": "Seed",
+      "great": "Great run",
+      "ok": "OK run",
+      "poor": "Poor run",
+      "quit": "Quit"
+    }
+  },
+  "result": {
+    "cleared": "Cleared",
+    "notCleared": "Not cleared yet",
+    "state": "State",
+    "partial": "{{percent}}% of the way",
+    "improved": "Better than before",
+    "quality": "How well you did",
+    "goal": "Goal meter",
+    "happy": "Happy Index",
+    "before": "Before",
+    "after": "After",
+    "skills": "Skills you practised",
+    "noSkills": "No skills reported.",
+    "lessons": "What you learned",
+    "noLessons": "No lessons yet.",
+    "continue": "Continue",
+    "next": "Next: {{name}}",
+    "replay": "Replay",
+    "back": "Back",
+    "progressLink": "See your progress"
+  },
+  "state": {
+    "notStarted": "Not started",
+    "partial": "In progress",
+    "bright": "Full",
+    "dim": "Dim",
+    "flicker": "Faint"
+  },
+  "skills": {
+    "planning": "Planning",
+    "prioritising": "Needs before wants",
+    "saving": "Saving",
+    "riskSense": "Risk sense",
+    "patience": "Patience",
+    "scamSense": "Scam sense"
+  },
+  "progress": {
+    "title": "Your progress",
+    "back": "Back",
+    "goalLabel": "Goal meter",
+    "goalValue": "{{saved}} of {{target}}",
+    "summary": {
+      "none": "No pillars finished yet",
+      "allBright": "All {{total}} pillars complete and shining",
+      "lit": "{{lit}} of {{total}} pillars complete",
+      "litDim": "{{lit}} of {{total}} complete, {{dim}} dim",
+      "litFaint": "{{lit}} of {{total}} complete, {{flicker}} faint",
+      "litDimFaint": "{{lit}} of {{total}} complete, {{dim}} dim, {{flicker}} faint"
+    },
+    "partial": "{{percent}}% of the way",
+    "details": "Details",
+    "hideDetails": "Hide details",
+    "quality": "Best result",
+    "attempts": "Times played",
+    "lessons": "Lessons seen",
+    "skills": "Skills practised",
+    "none": "None yet",
+    "action": {
+      "start": "Play",
+      "continue": "Continue",
+      "replay": "Replay",
+      "brighten": "Replay to brighten"
+    },
+    "penalty": {
+      "title": "Some pillars count for less",
+      "body": "Your Happy Index was low when you finished {{count}} of your pillars, so {{amount}} is held back.",
+      "how": "To recover: take a short break with a life moment, then replay a pillar to brighten it. A replay can only make a pillar better."
+    }
+  },
+  "happy": {
+    "title": "Happy Index",
+    "band": {
+      "glowing": "Glowing",
+      "ok": "OK",
+      "tired": "Tired"
+    },
+    "tiredNote": "You have finished {{count}} games in a row without a break. A short break looks after you and lifts your Happy Index.",
+    "toast": {
+      "title": "Your Happy Index is getting low",
+      "body": "A pillar finished while Happy is low counts for less. Take a short break, then replay to brighten it.",
+      "dismiss": "Got it"
+    }
+  },
+  "moments": {
+    "title": "Look after yourself",
+    "open": "Look after yourself",
+    "close": "Close",
+    "cost": "Costs {{amount}}",
+    "free": "Free",
+    "gain": "+{{gain}} Happy right now",
+    "gainFaded": "Little effect now: it fades when repeated",
+    "used": "Used {{count}} time(s)",
+    "cannotAfford": "Not enough saved yet",
+    "choose": "Choose",
+    "chai": {
+      "name": "A chai with friends",
+      "description": "A quick catch-up over a hot drink."
+    },
+    "festivalTreat": {
+      "name": "A festival treat",
+      "description": "Something special to celebrate with."
+    },
+    "restAtHome": {
+      "name": "Rest at home",
+      "description": "An evening to rest and recharge."
+    }
+  },
+  "balance": {
+    "title": "You and your future",
+    "earned": "Earned toward your goal",
+    "spent": "Spent on yourself",
+    "why": "Finishing pillars fills your goal meter. Looking after yourself keeps your Happy Index up, so your pillars count fully. You need both.",
+    "next": {
+      "none": "Finish a pillar to start filling your goal meter.",
+      "allWork": "Try a short break: a life moment lifts your Happy Index.",
+      "balanced": "Keep this rhythm: finish a pillar, then take a short break.",
+      "selfHeavy": "Your goal meter is falling behind: finish a pillar to catch up."
+    }
+  },
+  "wire": {
+    "title": "Wireframe index (dev)",
+    "intro": "Every wireframe screen and component. Use the DEV panel to change Happy and clear pillars and watch them update.",
+    "screens": "Screens",
+    "legacy": "legacy overworld",
+    "live": "Live components"
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Money Mohalla",
+      "body": "Select a language to continue."
+    },
+    "problem": {
+      "title": "The Goal",
+      "body": "Your fee is due in 12 months. Let's earn the rest."
+    },
+    "persona": {
+      "title": "Who are you?",
+      "body": "Choose your player."
+    },
+    "festival": {
+      "title": "Your Festival",
+      "body": "Choose a festival to celebrate."
+    },
+    "avatar": {
+      "title": "Your Avatar",
+      "body": "Choose how you look."
+    },
+    "skills": {
+      "title": "Four Pillars",
+      "body": "Learn these four skills."
+    },
+    "win": {
+      "title": "How to win",
+      "body": "Finish a pillar, earn its badge, fill the goal meter. Finish all four and you've earned your fee."
+    },
+    "happy": {
+      "title": "Stay Happy",
+      "body": "Money isn't everything. Look after yourself, or your badges count for less."
+    },
+    "controls": {
+      "title": "How to move",
+      "text": "Drag to walk, tap to enter."
+    },
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back"
+  },
+  "hub": {
+    "title": "Money Mohalla Hub",
+    "lookAfterYourself": "Look after yourself",
+    "teaches": "Teaches:",
+    "time": "Time:",
+    "minutes": "mins",
+    "bestQuality": "Best Score:",
+    "cta": {
+      "start": "Play",
+      "continue": "Continue",
+      "replay": "Replay",
+      "brighten": "Replay to brighten",
+      "back": "Back"
+    },
+    "plan": {
+      "tagline": "Count down to your festival",
+      "teaches": "Planning and budgeting"
+    },
+    "save": {
+      "tagline": "Two bad weeks",
+      "teaches": "Saving and managing"
+    },
+    "invest": {
+      "tagline": "Deal Board",
+      "teaches": "Understanding investing"
+    },
+    "safe": {
+      "tagline": "Case Files",
+      "teaches": "Staying safe from scams"
+    }
+  },
+  "coach": {
+    "header": "Tips",
+    "dismissAll": "Dismiss All",
+    "goal": {
+      "title": "Your Goal",
+      "body": "Each finished place fills the goal bar. All four open the college gate."
+    },
+    "happy": {
+      "title": "Stay Happy",
+      "body": "Keep your index up."
+    },
+    "progress": {
+      "title": "Progress",
+      "body": "Check how you're doing."
+    },
+    "hub": {
+      "title": "The Hub",
+      "body": "Choose a pillar to play."
+    }
+  },
+  "avatars": {
+    "male": "Boy",
+    "female": "Girl"
+  },
+  "festivals": {
+    "diwali": "Diwali",
+    "eid": "Eid",
+    "bonalu": "Bonalu",
+    "sankranti": "Sankranti",
+    "christmas": "Christmas"
+  },
+  "summary": {
+    "title": "Your summary",
+    "closing": {
+      "allBright": "All four places are bright. Keep taking breaks.",
+      "someDim": "Some places are dim. Replay them to brighten them.",
+      "keepGoing": "Finish all four places to open the gate."
+    },
+    "lessons": "Lessons seen: {{n}}",
+    "brighten": "Worth replaying: {{names}}",
+    "share": "Download share card",
+    "shareTitle": "My Money Mohalla goal"
+  },
+  "home": {
+    "tagline": "Learn money, one lane at a time.",
+    "new": "New game",
+    "load": "Load game",
+    "noSaves": "No saved games yet.",
+    "play": "Play",
+    "rename": "Rename",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "start": "Start",
+    "saved": "Saved games",
+    "menu": "Home",
+    "nameLabel": "Name this game",
+    "defaultName": "Game {{n}}",
+    "firstName": "My game",
+    "places": "{{n}} of 4 places",
+    "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+    "deleteYes": "Yes, delete",
+    "title": "Money Mohalla",
+    "share": "Share progress",
+    "shareTitle": "Share my progress",
+    "shareBody": "Send this code to your teacher or NGO facilitator so they can see how the class is doing.",
+    "shareWhat": "It shares your progress, skills, Happy score and language. It never shares your name, your alias or anything you typed.",
+    "shareCopy": "Copy code",
+    "shareCopied": "Copied",
+    "shareSend": "Send",
+    "shareDownload": "Save as file",
+    "shareClose": "Close",
+    "facilitator": "For teachers and NGOs"
   }
 }

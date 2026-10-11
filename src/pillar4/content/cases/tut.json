@@ -1,0 +1,48 @@
+{
+  "id": "TUT", "kind": "tutorial", "support": "full",
+  "victim": { "name": "Rohit", "age": 16 },
+  "apps": ["messages", "paynow"],
+  "items": [
+    { "id": "TUT-M01", "app": "messages", "kind": "sms", "thread": "Appa" },
+    { "id": "TUT-M02", "app": "messages", "kind": "sms", "thread": "Sana" },
+    { "id": "TUT-M03", "app": "messages", "kind": "sms", "thread": "PNOW-REWARD", "time": "5:02 PM", "zones": [
+      { "id": "TUT-M03.head", "part": "head" },
+      { "id": "TUT-M03.name" },
+      { "id": "TUT-M03.body" },
+      { "id": "TUT-M03.timer" }
+    ] },
+    { "id": "TUT-M04", "app": "messages", "kind": "sms", "thread": "Tulasi Aunty", "role": "herring" },
+    { "id": "TUT-M05", "app": "messages", "kind": "sms", "thread": "Library", "role": "herring" },
+    { "id": "TUT-P01", "app": "paynow", "kind": "request", "zones": [
+      { "id": "TUT-P01.card" },
+      { "id": "TUT-P01.btn" }
+    ] },
+    { "id": "TUT-P02", "app": "paynow", "kind": "history", "time": "Monday", "role": "herring" },
+    { "id": "TUT-P03", "app": "paynow", "kind": "history" },
+    { "id": "TUT-P04", "app": "paynow", "kind": "payees" },
+    { "id": "TUT-P05", "app": "paynow", "kind": "summary" }
+  ],
+  "clues": [
+    { "id": "TUT-01", "kind": "required", "reason": "grab", "distractors": ["rushing", "threat"], "step": 4, "targets": ["TUT-P01.btn", "TUT-P01.card", "TUT-M03.body"] },
+    { "id": "TUT-02", "kind": "required", "reason": "pretend", "distractors": ["too_good", "threat"], "step": 2, "targets": ["TUT-M03.head", "TUT-M03.name"] },
+    { "id": "TUT-03", "kind": "required", "reason": "rushing", "distractors": ["secret", "grab"], "step": 3, "targets": ["TUT-M03.timer"] }
+  ],
+  "leads": [
+    { "id": "TUT-L1", "clueId": "TUT-01", "glowApp": "paynow", "pulseTarget": "TUT-P01.btn" },
+    { "id": "TUT-L2", "clueId": "TUT-02", "glowApp": "messages", "pulseTarget": "TUT-M03.head" },
+    { "id": "TUT-L3", "clueId": "TUT-03", "glowApp": "messages", "pulseTarget": "TUT-M03.timer" }
+  ],
+  "fix": {
+    "qKey": "TUT.fix.q",
+    "options": [
+      { "key": "TUT.fix.a", "correct": false, "whyKey": "TUT.fix.a.why" },
+      { "key": "TUT.fix.b", "correct": true, "whyKey": "TUT.fix.b.why" },
+      { "key": "TUT.fix.c", "correct": false, "whyKey": "TUT.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 3, "captionKey": "TUT.replay.1" },
+    { "step": 4, "captionKey": "TUT.replay.2" },
+    { "step": 5, "captionKey": "TUT.replay.3" }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "MC", "kind": "mystery", "variant": "C", "support": "none",
+  "victim": { "name": "Vikram", "age": 16 },
+  "apps": ["messages", "chatup", "instaglam"],
+  "items": [
+    { "id": "MC-I01", "app": "instaglam", "kind": "saved", "thread": "starclash.free.gems" },
+    { "id": "MC-I02", "app": "instaglam", "kind": "dm", "thread": "starc1ash.official.support", "time": "Sat 8:10 PM", "zones": [
+      { "id": "MC-I02.handle", "part": "head" }, { "id": "MC-I02.body" }
+    ] },
+    { "id": "MC-I03", "app": "instaglam", "kind": "dm", "thread": "starc1ash.official.support", "time": "Sat 8:12 PM" },
+    { "id": "MC-I04", "app": "instaglam", "kind": "dm", "thread": "starc1ash.official.support", "time": "Sat 8:14 PM" },
+    { "id": "MC-I05", "app": "instaglam", "kind": "dm", "thread": "starc1ash.official.support", "time": "Sat 9:00 PM" },
+    { "id": "MC-I06", "app": "instaglam", "kind": "page", "thread": "starclash.free.gems", "zones": [
+      { "id": "MC-I06.stats" }, { "id": "MC-I06.link" }
+    ] },
+    { "id": "MC-I07", "app": "instaglam", "kind": "feed" },
+    { "id": "MC-I08", "app": "instaglam", "kind": "feed" },
+    { "id": "MC-M01", "app": "messages", "kind": "sms", "thread": "STARCLASH", "role": "herring" },
+    { "id": "MC-M02", "app": "messages", "kind": "sms", "thread": "STARCLASH", "time": "Sat 8:30 PM", "role": "context" },
+    { "id": "MC-M03", "app": "messages", "kind": "sms", "thread": "Amma" },
+    { "id": "MC-C01", "app": "chatup", "kind": "chat", "thread": "Dev", "role": "context" },
+    { "id": "MC-C02", "app": "chatup", "kind": "chat", "thread": "Gaming group" },
+    { "id": "MC-C03", "app": "chatup", "kind": "chat", "thread": "Amma" },
+    { "id": "MC-C04", "app": "chatup", "kind": "chat", "thread": "Cousin Ravi", "role": "herring" }
+  ],
+  "clues": [
+    { "id": "MC-01", "kind": "required", "reason": "too_good", "distractors": ["secret", "threat"], "step": 1, "targets": ["MC-I01"] },
+    { "id": "MC-02", "kind": "required", "reason": "pretend", "distractors": ["secret", "threat"], "step": 2, "targets": ["MC-I02.handle", "MC-I02.body"] },
+    { "id": "MC-03", "kind": "required", "reason": "rushing", "distractors": ["pretend", "secret"], "step": 3, "targets": ["MC-I03"] },
+    { "id": "MC-04", "kind": "required", "reason": "grab", "distractors": ["too_good", "threat"], "step": 4, "targets": ["MC-I04"] },
+    { "id": "MC-05", "kind": "required", "reason": "secret", "distractors": ["too_good", "grab"], "step": 5, "targets": ["MC-I05"] },
+    { "id": "MC-G1", "kind": "gold", "reason": "pretend", "alsoAccepted": ["too_good"], "distractors": ["grab", "threat"], "step": 2, "targets": ["MC-I06.link", "MC-I06.stats"] }
+  ],
+  "leads": [],
+  "fix": {
+    "qKey": "MC.fix.q",
+    "options": [
+      { "key": "MC.fix.a", "correct": false, "whyKey": "MC.fix.a.why" },
+      { "key": "MC.fix.b", "correct": true, "whyKey": "MC.fix.b.why" },
+      { "key": "MC.fix.c", "correct": false, "whyKey": "MC.fix.c.why" }
+    ]
+  },
+  "replay": [
+    { "step": 1, "captionKey": "MC-01.explain" },
+    { "step": 2, "captionKey": "MC-02.explain" },
+    { "step": 3, "captionKey": "MC-03.explain" },
+    { "step": 4, "captionKey": "MC-04.explain" },
+    { "step": 5, "captionKey": "MC-05.explain" }
+  ]
+}

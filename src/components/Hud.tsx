@@ -3,6 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { LANGS, inr, type Lang } from '../content/data'
 import { useGame, useLite } from '../store/game'
+import { goHome } from '../home/Home'
+import { useHappyView } from '../features/happy/hooks'
+import { FaceGlyph } from '../ui/wire/icons'
+import { MomentsSheet } from '../ui/wire/MomentsSheet'
 
 export function Coin({ size = 24 }: { size?: number }) {
   return (
@@ -77,6 +81,10 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
   const lite = useLite()
   const setLite = useGame((s) => s.setLite)
   const [open, setOpen] = useState(false)
+  const classCode = useGame((s) => s.classCode)
+  const setClassCode = useGame((s) => s.setClassCode)
+  const resetProgress = useGame((s) => s.resetProgress)
+  const [confirm, setConfirm] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!open) return
@@ -102,6 +110,22 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
             <span>{t('hud.lite')}</span>
             <span>{lite ? '●' : '○'}</span>
           </button>
+          <label className="mt-3 block text-[11px] font-bold uppercase tracking-[.18em] opacity-60">
+            {t('hud.classCode')}
+            <input type="text" value={classCode ?? ''} maxLength={12} onChange={(e) => setClassCode(e.target.value)} className="mt-1 h-11 w-full rounded-md border-[1.5px] border-ink bg-transparent px-2 text-[15px] normal-case tracking-normal" />
+          </label>
+          {confirm ? (
+            <div className="mt-2" role="alertdialog" aria-label={t('hud.resetConfirm')}>
+              <p className="m-0 mb-1.5 text-[13px] font-bold">{t('hud.resetConfirm')}</p>
+              <div className="flex gap-2">
+                <button type="button" className="ink-btn" onClick={() => { resetProgress(); setConfirm(false); setOpen(false) }}>{t('hud.resetYes')}</button>
+                <button type="button" className="ink-btn cream" autoFocus onClick={() => setConfirm(false)}>{t('hud.resetNo')}</button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={() => setConfirm(true)}>{t('hud.resetProgress')}</button>
+          )}
+          <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={goHome}>⌂ {t('home.menu')}</button>
           {replay && (
             <button type="button" role="menuitem" className="ink-btn cream mt-2 w-full" onClick={() => nav('/story?replay=1')}>
               ↺ {t('hud.replay')}
@@ -113,10 +137,33 @@ export function GearMenu({ replay = true }: { replay?: boolean }) {
   )
 }
 
+/** Happy Index chip (face + number, never colour alone); opens the life-moments sheet. */
+export function HappyChip() {
+  const { t } = useTranslation()
+  const view = useHappyView()
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" className="ink-btn cream flex h-11 items-center gap-1 px-2" aria-label={`${t('happy.title')}: ${view.valueRounded}`} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <FaceGlyph band={view.band} size={24} />
+        <span className="text-[13px] font-bold tabular-nums">{view.valueRounded}</span>
+      </button>
+      {open && (
+        <div className="fixed inset-x-0 z-50 flex justify-center px-3" style={{ top: 64 }}>
+          <div className="w-full max-w-[420px]"><MomentsSheet onClose={() => setOpen(false)} /></div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function TopHud({ replay = true }: { replay?: boolean }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-2 p-2.5" style={{ paddingTop: 'max(10px, env(safe-area-inset-top))' }}>
-      <GoalBar className="pointer-events-auto" />
+      <div className="pointer-events-auto flex items-center gap-1.5">
+        <GoalBar />
+        <HappyChip />
+      </div>
       <div className="pointer-events-auto flex items-center gap-2">
         <PersonaChip />
         <GearMenu replay={replay} />
