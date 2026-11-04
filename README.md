@@ -1,6 +1,10 @@
 # Minar
 
-**Play it now: https://minar-tau.vercel.app/**
+Our submission for Vanguard's problem statement at Megathon 2026, where we were the runners-up.
+
+**[Play it now](https://minar-tau.vercel.app/)** · [Demo video](#demo) · [Final report](deliverables/final_report.pdf)
+
+![Minar: the island hub with the Charminar at its centre](docs/screenshots/home.jpg)
 
 Minar is a financial-literacy game for Indian students (Grades 11 and 12, ages 16 to 22), built for the Vanguard India "Community Stewardship" brief.
 Ammamma sends you out from the Charminar with a small cloth bundle and a goal. You walk a floating island, play four short games, and learn to
@@ -8,6 +12,30 @@ plan, save, invest and stay safe, while looking after your own happiness. It wor
 amount in it is made up, for practice.
 
 The full write-up is in [`deliverables/final_report.pdf`](deliverables/final_report.pdf).
+
+## Demo
+
+<!-- Replace with the demo video: drag the .mp4 into this README in GitHub's web editor, or link a YouTube thumbnail. -->
+*Demo video coming soon. Meanwhile, [play it in your browser](https://minar-tau.vercel.app/).*
+
+| Ammamma's story | Café Meherban (Save & Manage) |
+| --- | --- |
+| ![Opening story with Ammamma at the Charminar](docs/screenshots/story.jpg) | ![Café Meherban, the Pocket Panic game](docs/screenshots/play-save.jpg) |
+| **The Pearl Exchange (Understand Investing)** | **Helpline Kiosk (Stay Financially Safe)** |
+| ![Deal Board start screen](docs/screenshots/play-invest.jpg) | ![Case Files scam game](docs/screenshots/play-safe.jpg) |
+
+| Minar Insights for teachers | On a phone |
+| --- | --- |
+| ![Teacher dashboard with a made-up demo class](docs/screenshots/ngo-demo.jpg) | <img src="docs/screenshots/phone-home.jpg" alt="Minar home screen on a phone" width="240"> |
+
+## Team
+
+Built by **Sushi Aur Ek** at Megathon 2026:
+[Chandrani Saha](https://github.com/chandranisaha),
+[Shriya Kansal](https://github.com/Shr1yaK),
+[Maithily Bhala](https://github.com/maithily180),
+[Inesh Roy](https://github.com/iRoy456) and
+[Tanishi Tyagi](https://github.com/Tanishi26).
 
 ## The four places
 
